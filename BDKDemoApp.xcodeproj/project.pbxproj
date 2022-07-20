@@ -14,6 +14,7 @@
 		756A311F288821F4004978E2 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A311E288821F4004978E2 /* Persistence.swift */; };
 		756A3122288821F4004978E2 /* BDKDemoApp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 756A3120288821F4004978E2 /* BDKDemoApp.xcdatamodeld */; };
 		756A312A2888252D004978E2 /* BitcoinDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 756A31292888252D004978E2 /* BitcoinDevKit */; };
+		756A312D28884452004978E2 /* WalletItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A312C28884452004978E2 /* WalletItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		756A311C288821F4004978E2 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		756A311E288821F4004978E2 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		756A3121288821F4004978E2 /* BDKDemoApp.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = BDKDemoApp.xcdatamodel; sourceTree = "<group>"; };
+		756A312C28884452004978E2 /* WalletItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +59,7 @@
 		756A3114288821F3004978E2 /* BDKDemoApp */ = {
 			isa = PBXGroup;
 			children = (
+				756A312B2888443A004978E2 /* Models */,
 				756A3115288821F3004978E2 /* BDKDemoAppApp.swift */,
 				756A3117288821F3004978E2 /* WalletView.swift */,
 				756A3119288821F4004978E2 /* Assets.xcassets */,
@@ -73,6 +76,14 @@
 				756A311C288821F4004978E2 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		756A312B2888443A004978E2 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				756A312C28884452004978E2 /* WalletItem.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -151,6 +162,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				756A312D28884452004978E2 /* WalletItem.swift in Sources */,
 				756A311F288821F4004978E2 /* Persistence.swift in Sources */,
 				756A3118288821F3004978E2 /* WalletView.swift in Sources */,
 				756A3122288821F4004978E2 /* BDKDemoApp.xcdatamodeld in Sources */,
