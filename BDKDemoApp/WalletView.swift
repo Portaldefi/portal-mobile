@@ -7,6 +7,16 @@
 
 import SwiftUI
 
+struct WalletItem: Identifiable {
+    let id: UUID = UUID()
+    let description: String
+    let balance: Int64
+    
+    var fiatValue: Int64 {
+        balance/1000
+    }
+}
+
 struct WalletView: View {
     private let items: [WalletItem] = [
         WalletItem(description: "Lightning", balance: 26225000),
