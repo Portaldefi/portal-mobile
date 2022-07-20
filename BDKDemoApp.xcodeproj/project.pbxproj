@@ -13,6 +13,7 @@
 		756A311D288821F4004978E2 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 756A311C288821F4004978E2 /* Preview Assets.xcassets */; };
 		756A311F288821F4004978E2 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A311E288821F4004978E2 /* Persistence.swift */; };
 		756A3122288821F4004978E2 /* BDKDemoApp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 756A3120288821F4004978E2 /* BDKDemoApp.xcdatamodeld */; };
+		756A312A2888252D004978E2 /* BitcoinDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 756A31292888252D004978E2 /* BitcoinDevKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				756A312A2888252D004978E2 /* BitcoinDevKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,6 +91,9 @@
 			dependencies = (
 			);
 			name = BDKDemoApp;
+			packageProductDependencies = (
+				756A31292888252D004978E2 /* BitcoinDevKit */,
+			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* BDKDemoApp.app */;
 			productType = "com.apple.product-type.application";
@@ -117,6 +122,9 @@
 				Base,
 			);
 			mainGroup = 756A3109288821F3004978E2;
+			packageReferences = (
+				756A31282888252D004978E2 /* XCRemoteSwiftPackageReference "bdk-swift" */,
+			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -345,6 +353,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		756A31282888252D004978E2 /* XCRemoteSwiftPackageReference "bdk-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/bitcoindevkit/bdk-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		756A31292888252D004978E2 /* BitcoinDevKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 756A31282888252D004978E2 /* XCRemoteSwiftPackageReference "bdk-swift" */;
+			productName = BitcoinDevKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		756A3120288821F4004978E2 /* BDKDemoApp.xcdatamodeld */ = {
