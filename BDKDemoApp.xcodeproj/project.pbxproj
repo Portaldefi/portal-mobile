@@ -59,10 +59,10 @@
 		756A3114288821F3004978E2 /* BDKDemoApp */ = {
 			isa = PBXGroup;
 			children = (
+				756A3115288821F3004978E2 /* BDKDemoAppApp.swift */,
 				756A312B2888443A004978E2 /* Models */,
 				756A312E2888448F004978E2 /* ViewModels */,
-				756A3115288821F3004978E2 /* BDKDemoAppApp.swift */,
-				756A3117288821F3004978E2 /* WalletView.swift */,
+				756A312F288844AD004978E2 /* Views */,
 				756A3119288821F4004978E2 /* Assets.xcassets */,
 				756A311E288821F4004978E2 /* Persistence.swift */,
 				756A3120288821F4004978E2 /* BDKDemoApp.xcdatamodeld */,
@@ -92,6 +92,14 @@
 			children = (
 			);
 			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		756A312F288844AD004978E2 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				756A3117288821F3004978E2 /* WalletView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
