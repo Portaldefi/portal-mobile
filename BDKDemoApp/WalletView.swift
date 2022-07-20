@@ -19,21 +19,23 @@ struct WalletItem: Identifiable {
 
 struct WalletView: View {
     private let items: [WalletItem] = [
-        WalletItem(description: "Lightning", balance: 26225000),
+        WalletItem(description: "Lightning", balance: 2622500),
         WalletItem(description: "On-chain", balance: 26225000 * 3)
     ]
     
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             BalanceView(balance: 420000)
                 .padding(.horizontal, 16)
             ActionButtonsView
+                .padding(.top, 28)
                 .padding(.horizontal, 16)
             Divider()
                 .padding(.top, 16)
                 .padding(.bottom, 20)
             ForEach(items) { item in
                 WalletItemView(item: item)
+                    .padding(.vertical, 10)
             }
             .padding(.horizontal, 16)
             Spacer()
@@ -43,11 +45,16 @@ struct WalletView: View {
     
     func BalanceView(balance: Int64) -> some View {
         HStack {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 12) {
                 Text("total balance")
-                HStack(spacing: 1) {
+                    .font(.system(size: 16))
+                HStack(alignment: .bottom, spacing: 1) {
                     Text("\(balance)")
+                        .fontWeight(.bold)
+                        .font(.system(size: 48))
                     Text("sat")
+                        .font(.system(size: 16))
+                        .padding(.bottom, 10)
                 }
             }
             Spacer()
@@ -60,29 +67,36 @@ struct WalletView: View {
                 
             } label: {
                 Text("Send")
+                    .font(.system(size: 18))
+                    .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
                     .padding(8)
-                    .background(Color.yellow)
+                    .background(Color.blue)
             }
+            .buttonStyle(.plain)
 
             Button {
                 
             } label: {
                 Text("Receive")
+                    .font(.system(size: 18))
+                    .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
                     .padding(8)
-                    .background(Color.yellow)
+                    .background(Color.blue)
             }
             .frame(maxWidth: .infinity)
+            .buttonStyle(.plain)
 
             Button {
                 
             } label: {
                 Text("[ ]")
                     .padding(8)
-                    .background(Color.yellow)
+                    .background(Color.blue)
                     .background(in: RoundedRectangle(cornerRadius: 8))
             }
+            .buttonStyle(.plain)
         }
     }
     
@@ -93,18 +107,23 @@ struct WalletView: View {
                     .frame(width: 16, height: 16)
                     .foregroundColor(Color.blue)
                 Text(item.description)
+                    .font(.system(size: 16))
                 Spacer()
             }
-            HStack {
-                HStack(spacing: 1) {
+            HStack(alignment: .bottom) {
+                HStack(alignment: .bottom, spacing: 1) {
                     Text("\(item.balance)")
+                        .font(.system(size: 32))
+                        .fontWeight(.semibold)
                     Text("sats")
+                        .padding(.bottom, 6)
                 }
                 Spacer()
                 HStack(spacing: 1) {
-                    Text("\(item.fiatValue)")
+                    Text("$\(item.fiatValue)")
                     Text("USD")
                 }
+                .padding(.bottom, 6)
             }
         }
     }
