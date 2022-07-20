@@ -13,7 +13,7 @@ struct BDKDemoAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            WalletView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
