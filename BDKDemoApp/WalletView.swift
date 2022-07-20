@@ -72,6 +72,7 @@ struct WalletView: View {
                     .frame(maxWidth: .infinity)
                     .padding(8)
                     .background(Color.blue)
+                    .background(in: RoundedRectangle(cornerRadius: 8))
             }
             .buttonStyle(.plain)
 
@@ -84,6 +85,7 @@ struct WalletView: View {
                     .frame(maxWidth: .infinity)
                     .padding(8)
                     .background(Color.blue)
+                    .background(in: RoundedRectangle(cornerRadius: 8))
             }
             .frame(maxWidth: .infinity)
             .buttonStyle(.plain)
@@ -92,6 +94,7 @@ struct WalletView: View {
                 
             } label: {
                 Text("[ ]")
+                    .fontWeight(.semibold)
                     .padding(8)
                     .background(Color.blue)
                     .background(in: RoundedRectangle(cornerRadius: 8))
