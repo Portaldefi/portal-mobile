@@ -10,9 +10,13 @@ import Foundation
 struct WalletItem: Identifiable {
     let id: UUID = UUID()
     let description: String
-    let balance: Int64
+    let balance: UInt64
     
-    var fiatValue: Int64 {
+    var fiatValue: UInt64 {
         balance/1000
+    }
+    
+    var balanceString: String {
+        String(format: "%.8f", Double(balance) / Double(100000000))
     }
 }
