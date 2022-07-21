@@ -8,14 +8,12 @@
 import SwiftUI
 
 struct WalletView: View {
-    private let items: [WalletItem] = [
-        WalletItem(description: "Lightning", balance: 2622500),
-        WalletItem(description: "On-chain", balance: 26225000 * 3)
-    ]
+    @StateObject private var viewModel = WalletViewModel()
     
     var body: some View {
         VStack(spacing: 0) {
-            BalanceView(balance: 420000)
+            BalanceView(balance: viewModel.balance)
+                .padding(.top, 20)
                 .padding(.horizontal, 16)
             ActionButtonsView
                 .padding(.top, 28)
@@ -23,28 +21,49 @@ struct WalletView: View {
             Divider()
                 .padding(.top, 16)
                 .padding(.bottom, 20)
-            ForEach(items) { item in
-                WalletItemView(item: item)
-                    .padding(.vertical, 10)
+            
+            ScrollView {
+                ForEach(viewModel.items) { item in
+                    WalletItemView(item: item)
+                        .padding(.vertical, 10)
+                }
             }
             .padding(.horizontal, 16)
-            Spacer()
+            .frame(height: 100)
+            
+            ScrollView {
+                if viewModel.transactions.isEmpty {
+                    Text("No transactions yet.").padding()
+                } else {
+                    ForEach(viewModel.transactions, id: \.self) { transaction in
+                        SingleTxView(transaction: transaction)
+                    }
+                }
+            }
         }
-        .padding(.top, 48)
+        .onAppear {
+            viewModel.load()
+        }
     }
     
-    func BalanceView(balance: Int64) -> some View {
+    func BalanceView(balance: UInt64) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 12) {
                 Text("total balance")
-                    .font(.system(size: 16))
+                    .textStyle(BasicTextStyle(white: true))
                 HStack(alignment: .bottom, spacing: 1) {
-                    Text("\(balance)")
-                        .fontWeight(.bold)
-                        .font(.system(size: 48))
-                    Text("sat")
-                        .font(.system(size: 16))
-                        .padding(.bottom, 10)
+                    if viewModel.isSynced {
+                        Text("\(balance)")
+                            .fontWeight(.bold)
+                            .font(.system(size: 48))
+                        Text("sats")
+                            .font(.system(size: 16))
+                            .padding(.bottom, 10)
+                    } else {
+                        Text("Syncing...")
+                            .fontWeight(.bold)
+                            .font(.system(size: 48))
+                    }
                 }
             }
             Spacer()
