@@ -15,6 +15,9 @@
 		756A3122288821F4004978E2 /* BDKDemoApp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 756A3120288821F4004978E2 /* BDKDemoApp.xcdatamodeld */; };
 		756A312A2888252D004978E2 /* BitcoinDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 756A31292888252D004978E2 /* BitcoinDevKit */; };
 		756A312D28884452004978E2 /* WalletItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A312C28884452004978E2 /* WalletItem.swift */; };
+		756A3131288844FD004978E2 /* WalletViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3130288844FD004978E2 /* WalletViewModel.swift */; };
+		756A313328898C73004978E2 /* SingleTxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313228898C73004978E2 /* SingleTxView.swift */; };
+		756A313528898CA2004978E2 /* BasicTextStyleModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +29,9 @@
 		756A311E288821F4004978E2 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		756A3121288821F4004978E2 /* BDKDemoApp.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = BDKDemoApp.xcdatamodel; sourceTree = "<group>"; };
 		756A312C28884452004978E2 /* WalletItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItem.swift; sourceTree = "<group>"; };
+		756A3130288844FD004978E2 /* WalletViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewModel.swift; sourceTree = "<group>"; };
+		756A313228898C73004978E2 /* SingleTxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleTxView.swift; sourceTree = "<group>"; };
+		756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTextStyleModifier.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +66,7 @@
 			isa = PBXGroup;
 			children = (
 				756A3115288821F3004978E2 /* BDKDemoAppApp.swift */,
+				756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */,
 				756A312B2888443A004978E2 /* Models */,
 				756A312E2888448F004978E2 /* ViewModels */,
 				756A312F288844AD004978E2 /* Views */,
@@ -90,6 +97,7 @@
 		756A312E2888448F004978E2 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				756A3130288844FD004978E2 /* WalletViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -98,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				756A3117288821F3004978E2 /* WalletView.swift */,
+				756A313228898C73004978E2 /* SingleTxView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -180,8 +189,11 @@
 			files = (
 				756A312D28884452004978E2 /* WalletItem.swift in Sources */,
 				756A311F288821F4004978E2 /* Persistence.swift in Sources */,
+				756A313328898C73004978E2 /* SingleTxView.swift in Sources */,
 				756A3118288821F3004978E2 /* WalletView.swift in Sources */,
+				756A3131288844FD004978E2 /* WalletViewModel.swift in Sources */,
 				756A3122288821F4004978E2 /* BDKDemoApp.xcdatamodeld in Sources */,
+				756A313528898CA2004978E2 /* BasicTextStyleModifier.swift in Sources */,
 				756A3116288821F3004978E2 /* BDKDemoAppApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
