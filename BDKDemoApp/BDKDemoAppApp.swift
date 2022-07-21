@@ -15,6 +15,7 @@ struct BDKDemoAppApp: App {
         WindowGroup {
             WalletView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .preferredColorScheme(.dark)
         }
     }
 }
