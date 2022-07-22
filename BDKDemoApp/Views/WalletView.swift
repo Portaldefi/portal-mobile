@@ -52,7 +52,6 @@ struct WalletView: View {
                         NavigationLink(destination: TxsView(txs: viewModel.transactions), isActive: $goToTxs) { EmptyView() }
                     }
                     .padding(.horizontal, 16)
-                    .frame(height: 100)
                     
                     Spacer()
                 }
