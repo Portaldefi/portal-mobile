@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct WalletView: View {
-    @StateObject private var viewModel = WalletViewModel()
+    @StateObject private var viewModel: WalletViewModel
+    
+    init(viewModel: WalletViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -80,8 +84,8 @@ struct WalletView: View {
             } label: {
                 Text("Send")
                     .foregroundColor(.black)
-                    .font(.system(size: 16))
-                    .fontWeight(.semibold)
+                    .font(.system(size: 16, design: .monospaced))
+                    .fontWeight(.bold)
                     .frame(maxWidth: .infinity)
                     .padding(8)
                     .background(Color.blue)
@@ -97,8 +101,8 @@ struct WalletView: View {
             } label: {
                 Text("Receive")
                     .foregroundColor(.black)
-                    .font(.system(size: 16))
-                    .fontWeight(.semibold)
+                    .font(.system(size: 16, design: .monospaced))
+                    .fontWeight(.bold)
                     .frame(maxWidth: .infinity)
                     .padding(8)
                     .background(Color.blue)
@@ -114,8 +118,8 @@ struct WalletView: View {
             } label: {
                 Text("Scan")
                     .foregroundColor(.black)
-                    .font(.system(size: 16))
-                    .fontWeight(.semibold)
+                    .font(.system(size: 16, design: .monospaced))
+                    .fontWeight(.bold)
                     .frame(maxWidth: .infinity)
                     .padding(8)
                     .background(Color.blue)
@@ -168,7 +172,7 @@ struct WalletView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        WalletView()
+        WalletView(viewModel: WalletViewModel.mocked())
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
             .preferredColorScheme(.dark)
     }
