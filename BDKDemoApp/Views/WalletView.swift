@@ -9,7 +9,9 @@ import SwiftUI
 
 struct WalletView: View {
     @StateObject private var viewModel: WalletViewModel
+    
     @State private var goToTxs = false
+    @State private var goToReceive = false
     
     init(viewModel: WalletViewModel) {
         UINavigationBar.appearance().largeTitleTextAttributes = [.font : UIFont.monospacedSystemFont(ofSize: 28, weight: .bold), .foregroundColor: UIColor.white]
@@ -63,7 +65,7 @@ struct WalletView: View {
         HStack {
             VStack(alignment: .leading, spacing: 12) {
                 Text("total balance")
-                    .font(.system(size: 16, design: .monospaced))//.weight(bold ? .bold : .regular))
+                    .font(.system(size: 16, design: .monospaced))
                     .foregroundColor(Color(red: 138/255, green: 138/255, blue: 138/255, opacity: 1))
                 HStack(alignment: .bottom, spacing: 0) {
                     if viewModel.isSynced {
@@ -104,9 +106,9 @@ struct WalletView: View {
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity)
             .frame(height: 30)
-
+            
             Button {
-                
+                goToReceive.toggle()
             } label: {
                 Text("Receive")
                     .foregroundColor(.black)
@@ -121,7 +123,7 @@ struct WalletView: View {
             .frame(maxWidth: .infinity)
             .buttonStyle(.plain)
             .frame(height: 30)
-
+            
             Button {
                 
             } label: {
@@ -138,6 +140,8 @@ struct WalletView: View {
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity)
             .frame(height: 30)
+            
+            NavigationLink(destination: ReceiveView(viewModel: viewModel), isActive: $goToReceive) { EmptyView() }
         }
     }
     
