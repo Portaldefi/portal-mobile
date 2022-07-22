@@ -9,45 +9,54 @@ import SwiftUI
 
 struct WalletView: View {
     @StateObject private var viewModel: WalletViewModel
+    @State private var goToTxs = false
     
     init(viewModel: WalletViewModel) {
+        UINavigationBar.appearance().largeTitleTextAttributes = [.font : UIFont.monospacedSystemFont(ofSize: 28, weight: .bold), .foregroundColor: UIColor.white]
+        
         _viewModel = StateObject(wrappedValue: viewModel)
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            BalanceView(balance: viewModel.balance)
-                .padding(.top, 18)
-                .padding(.horizontal, 16)
-            ActionButtonsView
-                .padding(.top, 28)
-                .padding(.horizontal, 16)
-            Divider()
-                .padding(.top, 16)
-                .padding(.bottom, 20)
-            
-            ScrollView {
-                ForEach(viewModel.items) { item in
-                    WalletItemView(item: item)
-                        .padding(.vertical, 10)
-                }
-            }
-            .padding(.horizontal, 16)
-            .frame(height: 100)
-            
-            ScrollView {
-                if viewModel.transactions.isEmpty {
-                    Text("No transactions yet.").padding()
-                } else {
-                    ForEach(viewModel.transactions, id: \.self) { transaction in
-                        SingleTxView(transaction: transaction)
+        NavigationView {
+            switch viewModel.state {
+            case .empty:
+                VStack {Text("error")}
+            case .failed(_):
+                VStack {Text("error")}
+            case .loading:
+                VStack {Text("error")}
+            case .loaded(_, _):
+                VStack(spacing: 0) {
+                    BalanceView(balance: viewModel.balance)
+                        .padding(.top, 18)
+                        .padding(.horizontal, 16)
+                    ActionButtonsView
+                        .padding(.top, 28)
+                        .padding(.horizontal, 16)
+                    Divider()
+                        .padding(.top, 16)
+                        .padding(.bottom, 20)
+                    
+                    ScrollView {
+                        ForEach(viewModel.items) { item in
+                            WalletItemView(item: item)
+                                .padding(.vertical, 10)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    goToTxs.toggle()
+                                }
+                        }
+                        NavigationLink(destination: TxsView(txs: viewModel.transactions), isActive: $goToTxs) { EmptyView() }
                     }
+                    .padding(.horizontal, 16)
+                    .frame(height: 100)
+                    
+                    Spacer()
                 }
+                .navigationBarHidden(true)
             }
-        }
-        .onAppear {
-            viewModel.load()
-        }
+        }.onAppear(perform: viewModel.load)
     }
     
     func BalanceView(balance: UInt64) -> some View {
