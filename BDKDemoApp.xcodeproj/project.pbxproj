@@ -18,6 +18,8 @@
 		756A3131288844FD004978E2 /* WalletViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3130288844FD004978E2 /* WalletViewModel.swift */; };
 		756A313328898C73004978E2 /* SingleTxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313228898C73004978E2 /* SingleTxView.swift */; };
 		756A313528898CA2004978E2 /* BasicTextStyleModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */; };
+		756A3137288AEAAD004978E2 /* TxsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3136288AEAAD004978E2 /* TxsView.swift */; };
+		756A3139288AEAD2004978E2 /* BackButtonModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3138288AEAD2004978E2 /* BackButtonModifier.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,8 @@
 		756A3130288844FD004978E2 /* WalletViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewModel.swift; sourceTree = "<group>"; };
 		756A313228898C73004978E2 /* SingleTxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleTxView.swift; sourceTree = "<group>"; };
 		756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTextStyleModifier.swift; sourceTree = "<group>"; };
+		756A3136288AEAAD004978E2 /* TxsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxsView.swift; sourceTree = "<group>"; };
+		756A3138288AEAD2004978E2 /* BackButtonModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackButtonModifier.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +71,7 @@
 			children = (
 				756A3115288821F3004978E2 /* BDKDemoAppApp.swift */,
 				756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */,
+				756A3138288AEAD2004978E2 /* BackButtonModifier.swift */,
 				756A312B2888443A004978E2 /* Models */,
 				756A312E2888448F004978E2 /* ViewModels */,
 				756A312F288844AD004978E2 /* Views */,
@@ -107,6 +112,7 @@
 			children = (
 				756A3117288821F3004978E2 /* WalletView.swift */,
 				756A313228898C73004978E2 /* SingleTxView.swift */,
+				756A3136288AEAAD004978E2 /* TxsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -190,9 +196,11 @@
 				756A312D28884452004978E2 /* WalletItem.swift in Sources */,
 				756A311F288821F4004978E2 /* Persistence.swift in Sources */,
 				756A313328898C73004978E2 /* SingleTxView.swift in Sources */,
+				756A3137288AEAAD004978E2 /* TxsView.swift in Sources */,
 				756A3118288821F3004978E2 /* WalletView.swift in Sources */,
 				756A3131288844FD004978E2 /* WalletViewModel.swift in Sources */,
 				756A3122288821F4004978E2 /* BDKDemoApp.xcdatamodeld in Sources */,
+				756A3139288AEAD2004978E2 /* BackButtonModifier.swift in Sources */,
 				756A313528898CA2004978E2 /* BasicTextStyleModifier.swift in Sources */,
 				756A3116288821F3004978E2 /* BDKDemoAppApp.swift in Sources */,
 			);
