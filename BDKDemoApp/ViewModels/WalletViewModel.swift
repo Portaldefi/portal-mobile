@@ -36,7 +36,6 @@ class WalletViewModel: ObservableObject {
     @Published private(set) var balance: UInt64 = 0
     @Published private(set) var transactions: [BitcoinDevKit.Transaction] = []
     @Published private(set) var items: [WalletItem] = []
-    @Published private(set) var syncStatusString = "Not synced"
     @Published private(set) var isSynced: Bool = false
     
     private(set) var progressHandler = ProgressHandler()
@@ -70,7 +69,6 @@ class WalletViewModel: ObservableObject {
     func sync() {
         switch self.state {
         case .loaded(let wallet, let blockchain):
-            syncStatusString = "Syncing..."
             self.syncState = .syncing
             self.isSynced = false
 //            do {
@@ -79,7 +77,6 @@ class WalletViewModel: ObservableObject {
                 let wallet_transactions = try! wallet.getTransactions()
                 DispatchQueue.main.async {
                     self.syncState = .synced
-                    self.syncStatusString = "Synced!"
                     self.isSynced = true
                     self.balance = try! wallet.getBalance()
                     self.items = [WalletItem(description: "On-chain", balance: self.balance)]
@@ -105,6 +102,14 @@ class WalletViewModel: ObservableObject {
         default: do { }
             print("default")
         }
+    }
+    
+    static func mocked() -> WalletViewModel {
+        let viewModel = WalletViewModel()
+        viewModel.isSynced = true
+        viewModel.balance = 23587
+        viewModel.items = [WalletItem(description: "On-chain", balance: 23587)]
+        return viewModel
     }
 }
 
