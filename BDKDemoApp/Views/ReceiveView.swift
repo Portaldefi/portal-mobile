@@ -45,7 +45,7 @@ struct ReceiveView: View {
                         .padding(8)
                         .background(Color.blue)
                         .background(in: RoundedRectangle(cornerRadius: 10))
-                        .frame(height: 40)
+                        .frame(height: 50)
                 }
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
