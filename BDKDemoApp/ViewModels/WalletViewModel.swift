@@ -7,6 +7,7 @@
 
 import Foundation
 import BitcoinDevKit
+import SwiftUI
 
 class WalletViewModel: ObservableObject {
     class ProgressHandler: BitcoinDevKit.Progress {
@@ -93,6 +94,7 @@ class WalletViewModel: ObservableObject {
                         default: return false
                         }
                     } })
+                    print(self.transactions.first!)
                 }
             }
 //          } catch let error {
@@ -102,6 +104,34 @@ class WalletViewModel: ObservableObject {
         default: do { }
             print("default")
         }
+    }
+        
+    func getAddress(new: Bool = false) -> String {
+        switch state {
+        case .loaded(let wallet, _):
+            do {
+                let addressInfo = try wallet.getAddress(addressIndex: new ? AddressIndex.new : AddressIndex.lastUnused)
+                return addressInfo.address
+            } catch {
+                return "ERROR"
+            }
+        default: do {
+                return "ERROR"
+            }
+        }
+    }
+    
+    func generateQRCode(from string: String) -> UIImage {
+        let data = Data(string.utf8)
+        filter.setValue(data, forKey: "inputMessage")
+        
+        if let outputImage = filter.outputImage {
+            if let cgimg = context.createCGImage(outputImage, from: outputImage.extent) {
+                return UIImage(cgImage: cgimg)
+            }
+        }
+        
+        return UIImage(systemName: "xmark.circle") ?? UIImage()
     }
     
     static func mocked() -> WalletViewModel {
