@@ -105,6 +105,23 @@ class WalletViewModel: ObservableObject {
             print("default")
         }
     }
+    
+    func send(to: String, amount: String) {
+        switch self.state {
+        case .loaded(let wallet, _):
+            if let amountToSend = UInt64(amount) {
+                let txBuilder = TxBuilder().addRecipient(address: to, amount: amountToSend).enableRbf()
+                let psbt = try! txBuilder.finish(wallet: wallet)
+                let finalized = try! wallet.sign(psbt: psbt)
+                if finalized {
+                    let rawTransaction = psbt.serialize()
+                    print("Transaction: \(rawTransaction) with id: \(psbt.txid())")
+                }
+            }
+        default: do { }
+            print("default")
+        }
+    }
         
     func getAddress(new: Bool = false) -> String {
         switch state {
