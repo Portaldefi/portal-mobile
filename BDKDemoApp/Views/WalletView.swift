@@ -12,6 +12,7 @@ struct WalletView: View {
     
     @State private var goToTxs = false
     @State private var goToReceive = false
+    @State private var goToSend = false
     
     init(viewModel: WalletViewModel) {
         UINavigationBar.appearance().largeTitleTextAttributes = [.font : UIFont.monospacedSystemFont(ofSize: 28, weight: .bold), .foregroundColor: UIColor.white]
@@ -50,6 +51,7 @@ struct WalletView: View {
                                 }
                         }
                         NavigationLink(destination: TxsView(txs: viewModel.transactions), isActive: $goToTxs) { EmptyView() }
+                        NavigationLink(destination: SendView(viewModel: viewModel), isActive: $goToSend) { EmptyView() }
                     }
                     .padding(.horizontal, 16)
                     
@@ -90,7 +92,7 @@ struct WalletView: View {
     var ActionButtonsView: some View {
         HStack(spacing: 10) {
             Button {
-                
+                goToSend.toggle()
             } label: {
                 Text("Send")
                     .foregroundColor(.black)
