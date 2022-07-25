@@ -14,43 +14,18 @@ let filter = CIFilter.qrCodeGenerator()
 
 struct ReceiveView: View {
     @ObservedObject var viewModel: WalletViewModel
-    @State private var address: String = "tb1qfafsasdfasd"
+    @State private var address: String = String()
+    @State private var qrCode: UIImage = UIImage()
     
     init(viewModel: WalletViewModel) {
         _viewModel = ObservedObject(wrappedValue: viewModel)
-    }
-    
-    func getAddress() {
-        switch viewModel.state {
-        case .loaded(let wallet, _):
-            do {
-                let addressInfo = try wallet.getAddress(addressIndex: AddressIndex.lastUnused)
-                address = addressInfo.address
-            } catch {
-                address = "ERROR"
-            }
-        default: do { }
-        }
-    }
-    
-    func generateQRCode(from string: String) -> UIImage {
-        let data = Data(string.utf8)
-        filter.setValue(data, forKey: "inputMessage")
-        
-        if let outputImage = filter.outputImage {
-            if let cgimg = context.createCGImage(outputImage, from: outputImage.extent) {
-                return UIImage(cgImage: cgimg)
-            }
-        }
-        
-        return UIImage(systemName: "xmark.circle") ?? UIImage()
     }
     
     var body: some View {
         VStack {
             Spacer()
             VStack {
-                Image(uiImage: generateQRCode(from: "bitcoin:\(address)"))
+                Image(uiImage: qrCode)
                     .interpolation(.none)
                     .resizable()
                     .scaledToFit()
@@ -58,6 +33,24 @@ struct ReceiveView: View {
                 Spacer()
                 Text(address)
                 Spacer()
+                Button {
+                    address = viewModel.getAddress(new: true)
+                    qrCode = viewModel.generateQRCode(from: "bitcoin:\(address)")
+                } label: {
+                    Text("Generate new address")
+                        .foregroundColor(.black)
+                        .font(.system(size: 16, design: .monospaced))
+                        .fontWeight(.bold)
+                        .frame(maxWidth: .infinity)
+                        .padding(8)
+                        .background(Color.blue)
+                        .background(in: RoundedRectangle(cornerRadius: 10))
+                        .frame(height: 40)
+                }
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity)
+                .frame(height: 30)
+                .padding()
             }.contextMenu {
                 Button(action: {
                     UIPasteboard.general.string = address}) {
@@ -68,7 +61,10 @@ struct ReceiveView: View {
         }
         .navigationTitle("Receive Address")
         .modifier(BackButtonModifier())
-        .onAppear(perform: getAddress)
+        .onAppear(perform: {
+            address = viewModel.getAddress()
+            qrCode = viewModel.generateQRCode(from: "bitcoin:\(address)")
+        })
     }
 }
 
