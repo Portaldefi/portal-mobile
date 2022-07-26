@@ -13,7 +13,7 @@ struct BDKDemoAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            WalletView(viewModel: WalletViewModel())
+            HostingTabBarView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .preferredColorScheme(.dark)
         }
