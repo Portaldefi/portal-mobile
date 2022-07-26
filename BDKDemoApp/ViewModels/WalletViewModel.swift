@@ -80,7 +80,7 @@ class WalletViewModel: ObservableObject {
                     self.syncState = .synced
                     self.isSynced = true
                     self.balance = try! wallet.getBalance()
-                    self.items = [WalletItem(description: "On-chain", balance: self.balance)]
+                    self.items = [WalletItem(description: "on Chain", balance: self.balance)]
                     self.transactions = wallet_transactions.sorted(by: {
                     switch $0 {
                     case .confirmed(_, let confirmation_a):
@@ -155,7 +155,7 @@ class WalletViewModel: ObservableObject {
         let viewModel = WalletViewModel()
         viewModel.isSynced = true
         viewModel.balance = 23587
-        viewModel.items = [WalletItem(description: "On-chain", balance: 23587)]
+        viewModel.items = [WalletItem(description: "on Chain", balance: 23587), WalletItem(description: "in Lightning", balance: 143255)]
         return viewModel
     }
 }
