@@ -22,6 +22,7 @@
 		756A3139288AEAD2004978E2 /* BackButtonModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3138288AEAD2004978E2 /* BackButtonModifier.swift */; };
 		756A313B288AEFA2004978E2 /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313A288AEFA2004978E2 /* ReceiveView.swift */; };
 		756A313D288EBBAD004978E2 /* SendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313C288EBBAD004978E2 /* SendView.swift */; };
+		756A313F28902C6F004978E2 /* HostingTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313E28902C6F004978E2 /* HostingTabBarView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		756A3138288AEAD2004978E2 /* BackButtonModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackButtonModifier.swift; sourceTree = "<group>"; };
 		756A313A288AEFA2004978E2 /* ReceiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
 		756A313C288EBBAD004978E2 /* SendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendView.swift; sourceTree = "<group>"; };
+		756A313E28902C6F004978E2 /* HostingTabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostingTabBarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +121,7 @@
 				756A313C288EBBAD004978E2 /* SendView.swift */,
 				756A313228898C73004978E2 /* SingleTxView.swift */,
 				756A3136288AEAAD004978E2 /* TxsView.swift */,
+				756A313E28902C6F004978E2 /* HostingTabBarView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -201,6 +204,7 @@
 			files = (
 				756A312D28884452004978E2 /* WalletItem.swift in Sources */,
 				756A311F288821F4004978E2 /* Persistence.swift in Sources */,
+				756A313F28902C6F004978E2 /* HostingTabBarView.swift in Sources */,
 				756A313D288EBBAD004978E2 /* SendView.swift in Sources */,
 				756A313328898C73004978E2 /* SingleTxView.swift in Sources */,
 				756A3137288AEAAD004978E2 /* TxsView.swift in Sources */,
