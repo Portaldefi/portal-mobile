@@ -94,7 +94,7 @@ class WalletViewModel: ObservableObject {
                         default: return false
                         }
                     } })
-                    print(self.transactions.first!)
+                    print(self.transactions.first)
                 }
             }
 //          } catch let error {
