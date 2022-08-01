@@ -30,6 +30,11 @@ class WalletViewModel: ObservableObject {
         case failed(Error)
     }
     
+    enum SendError: Error {
+        case insufficientAmount
+        case error(String)
+    }
+    
     private(set) var key = "private_key"
     
     @Published private(set) var state = State.empty
@@ -64,62 +69,72 @@ class WalletViewModel: ObservableObject {
         } catch let error {
             state = State.failed(error)
         }
-        sync()
+        try? sync()
     }
     
-    func sync() {
-        switch self.state {
+    func sync() throws {
+        switch state {
         case .loaded(let wallet, let blockchain):
             self.syncState = .syncing
             self.isSynced = false
-//            do {
             DispatchQueue.global(qos: .userInitiated).async {
-                try! wallet.sync(blockchain: blockchain, progress: self.progressHandler)
-                let wallet_transactions = try! wallet.getTransactions()
-                DispatchQueue.main.async {
-                    self.syncState = .synced
-                    self.isSynced = true
-                    self.balance = try! wallet.getBalance()
-                    self.items = [WalletItem(description: "on Chain", balance: self.balance)]
-                    self.transactions = wallet_transactions.sorted(by: {
-                    switch $0 {
-                    case .confirmed(_, let confirmation_a):
-                        switch $1 {
-                        case .confirmed(_, let confirmation_b): return confirmation_a.timestamp > confirmation_b.timestamp
-                        default: return false
+                do {
+                    try wallet.sync(blockchain: blockchain, progress: self.progressHandler)
+                    let wallet_transactions = try wallet.getTransactions()
+                    DispatchQueue.main.async {
+                        self.syncState = .synced
+                        self.isSynced = true
+                        do {
+                            self.balance = try wallet.getBalance()
+                            self.items = [WalletItem(description: "on Chain", balance: self.balance)]
+                            self.transactions = wallet_transactions.sorted(by: {
+                                switch $0 {
+                                case .confirmed(_, let confirmation_a):
+                                    switch $1 {
+                                    case .confirmed(_, let confirmation_b): return confirmation_a.timestamp > confirmation_b.timestamp
+                                    default: return false
+                                    }
+                                default:
+                                    switch $1 {
+                                    case .unconfirmed(_): return true
+                                    default: return false
+                                    }
+                                } })
+                        } catch {
+                            print(error)
                         }
-                    default:
-                        switch $1 {
-                        case .unconfirmed(_): return true
-                        default: return false
-                        }
-                    } })
-                    print(self.transactions.first)
+                    }
+                } catch {
+                    print(error)
+                    self.syncState = .failed(error)
                 }
             }
-//          } catch let error {
-//              print(error)
-//              self.syncState = .failed(error)
-//          }
-        default: do { }
+        default:
             print("default")
         }
     }
     
-    func send(to: String, amount: String) {
-        switch self.state {
-        case .loaded(let wallet, _):
-            if let amountToSend = UInt64(amount) {
-                let txBuilder = TxBuilder().addRecipient(address: to, amount: amountToSend).enableRbf()
-                let psbt = try! txBuilder.finish(wallet: wallet)
-                let finalized = try! wallet.sign(psbt: psbt)
-                if finalized {
-                    let rawTransaction = psbt.serialize()
-                    print("Transaction: \(rawTransaction) with id: \(psbt.txid())")
+    func send(to: String, amount: String) throws {
+        switch state {
+        case .loaded(let wallet, let blockchain):
+            do {
+                let walletBalance = try wallet.getBalance()
+                if let amountToSend = UInt64(amount), walletBalance > amountToSend {
+                    let psbt = try TxBuilder().addRecipient(address: to, amount: amountToSend).enableRbf().finish(wallet: wallet)
+                    let finalized = try wallet.sign(psbt: psbt)
+                    if finalized {
+                        print("Tx id: \(psbt.txid())")
+                        try blockchain.broadcast(psbt: psbt)
+                        try sync()
+                    }
+                } else {
+                    throw SendError.insufficientAmount
                 }
+            } catch {
+                throw error
             }
-        default: do { }
-            print("default")
+        default:
+            throw SendError.error("Send error: wallet isn't loaded")
         }
     }
         
@@ -132,9 +147,8 @@ class WalletViewModel: ObservableObject {
             } catch {
                 return "ERROR"
             }
-        default: do {
-                return "ERROR"
-            }
+        default:
+            return "ERROR"
         }
     }
     
