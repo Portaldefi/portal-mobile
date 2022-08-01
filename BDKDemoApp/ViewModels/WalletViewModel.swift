@@ -53,8 +53,8 @@ class WalletViewModel: ObservableObject {
         let stringsArray = ["fiscal", "ribbon", "chief", "chest", "truly", "rough", "woman", "ugly", "opera", "language", "raccoon", "victory", "expose", "elder", "asthma", "curious", "special", "cactus", "train", "equip", "exchange", "artist", "journey", "dish"]
         let mnemonic = String(stringsArray.reduce(String(), { $0 + " " + $1}).dropFirst())
         let restoredExtendedKey = try! restoreExtendedKey(network: Network.testnet, mnemonic: mnemonic, password: "salty_password")
-        let descriptor = "wpkh([\(restoredExtendedKey.fingerprint)/44'/0'/0']\(restoredExtendedKey.xprv)/*)"
-        let changeDescriptor = "wpkh([\(restoredExtendedKey.fingerprint)/44'/0'/1']\(restoredExtendedKey.xprv)/*)"
+        let descriptor = "wpkh([\(restoredExtendedKey.fingerprint)/84'/0'/0']\(restoredExtendedKey.xprv)/*)"
+        let changeDescriptor = "wpkh([\(restoredExtendedKey.fingerprint)/84'/0'/1']\(restoredExtendedKey.xprv)/*)"
         
         print(restoredExtendedKey.mnemonic)
         print(restoredExtendedKey.xprv)
