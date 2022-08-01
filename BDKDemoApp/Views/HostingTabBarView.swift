@@ -31,12 +31,12 @@ struct HostingTabBarView: View {
                     Text("Activity")
                     Image(systemName: "magnifyingglass")
                 }
-            Text("DeFi")
-                .tag(2)
-                .tabItem {
-                    Text("DeFi")
-                    Image(systemName: "person.crop.circle")
-                }
+//            Text("DeFi")
+//                .tag(2)
+//                .tabItem {
+//                    Text("DeFi")
+//                    Image(systemName: "person.crop.circle")
+//                }
             Text("Scan")
                 .tag(3)
                 .tabItem {
