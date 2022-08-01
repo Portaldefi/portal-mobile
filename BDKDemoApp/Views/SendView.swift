@@ -9,8 +9,19 @@ import SwiftUI
 import Combine
 
 struct SendView: View {
-    @State var to: String = ""
-    @State var amount: String = "0"
+    @State private var to: String = ""
+    @State private var amount: String = "0"
+    private var signalAlert = PassthroughSubject<Error,Never>()
+    private var window = UIApplication.shared.connectedScenes
+    // Keep only active scenes, onscreen and visible to the user
+        .filter { $0.activationState == .foregroundActive }
+    // Keep only the first `UIWindowScene`
+        .first(where: { $0 is UIWindowScene })
+    // Get its associated windows
+        .flatMap({ $0 as? UIWindowScene })?.windows
+    // Finally, keep only the key window
+        .first(where: \.isKeyWindow)
+    
     @Environment(\.presentationMode) var presentationMode
     
     @ObservedObject var viewModel: WalletViewModel
@@ -47,7 +58,12 @@ struct SendView: View {
             Spacer()
             
             Button {
-                presentationMode.wrappedValue.dismiss()
+                do {
+                    try viewModel.send(to: to, amount: amount)
+                    presentationMode.wrappedValue.dismiss()
+                } catch {
+                    signalAlert.send(error)
+                }
             } label: {
                 Text("Send")
                     .foregroundColor(.black)
@@ -65,8 +81,23 @@ struct SendView: View {
             .frame(height: 50)
             .padding()
         }
-            .navigationTitle("Send Bitcoin")
-            .modifier(BackButtonModifier())
+        .navigationTitle("Send Bitcoin")
+        .modifier(BackButtonModifier())
+        .onReceive(signalAlert) { error in
+            showAlert(error: error)
+        }
+    }
+    
+    private func showAlert(error: Error) {
+        let alert =  UIAlertController(title: "Send error", message: "\(error)", preferredStyle: .alert)
+        let dismissAction = UIAlertAction(title: "Dismiss", style: .default) { (action) in
+            print("Alert dismissed")
+        }
+        alert.addAction(dismissAction)
+        
+        DispatchQueue.main.async {
+            window?.rootViewController?.present(alert, animated: true, completion: nil)
+        }
     }
 }
 
