@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PortalUI
 
 struct WalletView: View {
     @StateObject private var viewModel: WalletViewModel
@@ -16,7 +17,6 @@ struct WalletView: View {
     
     init(viewModel: WalletViewModel) {
         UINavigationBar.appearance().largeTitleTextAttributes = [.font : UIFont.monospacedSystemFont(ofSize: 28, weight: .bold), .foregroundColor: UIColor.white]
-        
         _viewModel = StateObject(wrappedValue: viewModel)
     }
     
@@ -24,12 +24,12 @@ struct WalletView: View {
         NavigationView {
             switch viewModel.state {
             case .empty:
-                VStack {Text("error")}
-            case .failed(_):
-                VStack {Text("error")}
+                VStack { Text("Empty") }
+            case .failed(let error):
+                VStack { Text(error.localizedDescription) }
             case .loading:
-                VStack {Text("error")}
-            case .loaded(_, _):
+                VStack { Text("Loading...") }
+            case .loaded:
                 ZStack {
                     Color(red: 26/255, green: 26/255, blue: 26/255, opacity: 1)
                     
@@ -68,7 +68,8 @@ struct WalletView: View {
                     .navigationBarHidden(true)
                 }
             }
-        }.onAppear(perform: viewModel.load)
+        }
+        .onAppear(perform: viewModel.sync)
     }
     
     func BalanceView(balance: UInt64) -> some View {
@@ -113,56 +114,25 @@ struct WalletView: View {
     
     var ActionButtonsView: some View {
         HStack(spacing: 10) {
-            Button {
+            PButton(
+                config: .labelAndIconLeft(label: "Receive", icon: "arrow.down.forward"),
+                style: .filled,
+                size: .small,
+                enabled: viewModel.isSynced
+            ) {
                 goToReceive.toggle()
-            } label: {
-                Text("Receive")
-                    .foregroundColor(.black)
-                    .font(.system(size: 16, design: .monospaced))
-                    .fontWeight(.bold)
-                    .frame(maxWidth: .infinity)
-                    .padding(8)
-                    .background(Color.blue)
-                    .background(in: RoundedRectangle(cornerRadius: 10))
-                    .frame(height: 40)
             }
-            .buttonStyle(.plain)
-            .frame(maxWidth: .infinity)
-            .frame(height: 40)
+            .disabled(!viewModel.isSynced)
             
-            Button {
-                
-            } label: {
-                Text("Swap")
-                    .foregroundColor(.black)
-                    .font(.system(size: 16, design: .monospaced))
-                    .fontWeight(.bold)
-                    .frame(maxWidth: .infinity)
-                    .padding(8)
-                    .background(Color.blue)
-                    .background(in: RoundedRectangle(cornerRadius: 10))
-                    .frame(height: 40)
-            }
-            .frame(maxWidth: .infinity)
-            .buttonStyle(.plain)
-            .frame(height: 40)
-            
-            Button {
+            PButton(
+                config: .labelAndIconLeft(label: "Send", icon: "arrow.up.forward"),
+                style: .filled,
+                size: .small,
+                enabled: viewModel.isSynced
+            ) {
                 goToSend.toggle()
-            } label: {
-                Text("Send")
-                    .foregroundColor(.black)
-                    .font(.system(size: 16, design: .monospaced))
-                    .fontWeight(.bold)
-                    .frame(maxWidth: .infinity)
-                    .padding(8)
-                    .background(Color.blue)
-                    .background(in: RoundedRectangle(cornerRadius: 10))
-                    .frame(height: 40)
             }
-            .buttonStyle(.plain)
-            .frame(maxWidth: .infinity)
-            .frame(height: 40)
+            .disabled(!viewModel.isSynced)
             
             NavigationLink(destination: ReceiveView(viewModel: viewModel), isActive: $goToReceive) { EmptyView() }
         }
