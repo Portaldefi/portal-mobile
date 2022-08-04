@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7502D68B289BD8EF00613323 /* PortalUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7502D68A289BD8EF00613323 /* PortalUI */; };
 		756A3116288821F3004978E2 /* BDKDemoAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3115288821F3004978E2 /* BDKDemoAppApp.swift */; };
 		756A3118288821F3004978E2 /* WalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3117288821F3004978E2 /* WalletView.swift */; };
 		756A311A288821F4004978E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 756A3119288821F4004978E2 /* Assets.xcassets */; };
@@ -26,6 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7502D68D289BDA2800613323 /* portal-ui-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "portal-ui-swift"; path = "../portal-ui-swift"; sourceTree = "<group>"; };
 		756A3112288821F3004978E2 /* BDKDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BDKDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		756A3115288821F3004978E2 /* BDKDemoAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BDKDemoAppApp.swift; sourceTree = "<group>"; };
 		756A3117288821F3004978E2 /* WalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletView.swift; sourceTree = "<group>"; };
@@ -49,6 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7502D68B289BD8EF00613323 /* PortalUI in Frameworks */,
 				756A312A2888252D004978E2 /* BitcoinDevKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -59,6 +62,7 @@
 		756A3109288821F3004978E2 = {
 			isa = PBXGroup;
 			children = (
+				7502D68D289BDA2800613323 /* portal-ui-swift */,
 				756A3114288821F3004978E2 /* BDKDemoApp */,
 				756A3113288821F3004978E2 /* Products */,
 			);
@@ -144,6 +148,7 @@
 			name = BDKDemoApp;
 			packageProductDependencies = (
 				756A31292888252D004978E2 /* BitcoinDevKit */,
+				7502D68A289BD8EF00613323 /* PortalUI */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* BDKDemoApp.app */;
@@ -175,6 +180,7 @@
 			mainGroup = 756A3109288821F3004978E2;
 			packageReferences = (
 				756A31282888252D004978E2 /* XCRemoteSwiftPackageReference "bdk-swift" */,
+				7502D689289BD8EF00613323 /* XCRemoteSwiftPackageReference "portal-ui-swift" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -343,6 +349,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BDKDemoApp/Preview Content\"";
+				DEVELOPMENT_TEAM = HBPT8C8527;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -371,6 +378,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BDKDemoApp/Preview Content\"";
+				DEVELOPMENT_TEAM = HBPT8C8527;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -415,6 +423,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		7502D689289BD8EF00613323 /* XCRemoteSwiftPackageReference "portal-ui-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/FabricLabs/portal-ui-swift";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		756A31282888252D004978E2 /* XCRemoteSwiftPackageReference "bdk-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bitcoindevkit/bdk-swift";
@@ -426,6 +442,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		7502D68A289BD8EF00613323 /* PortalUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7502D689289BD8EF00613323 /* XCRemoteSwiftPackageReference "portal-ui-swift" */;
+			productName = PortalUI;
+		};
 		756A31292888252D004978E2 /* BitcoinDevKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 756A31282888252D004978E2 /* XCRemoteSwiftPackageReference "bdk-swift" */;
