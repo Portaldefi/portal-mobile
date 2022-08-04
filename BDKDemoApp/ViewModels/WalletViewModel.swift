@@ -46,8 +46,11 @@ class WalletViewModel: ObservableObject {
     
     private(set) var progressHandler = ProgressHandler()
     
+    init() {
+        load()
+    }
     
-    func load() {
+    private func load() {
         state = .loading
         
         let stringsArray = ["fiscal", "ribbon", "chief", "chest", "truly", "rough", "woman", "ugly", "opera", "language", "raccoon", "victory", "expose", "elder", "asthma", "curious", "special", "cactus", "train", "equip", "exchange", "artist", "journey", "dish"]
@@ -69,48 +72,51 @@ class WalletViewModel: ObservableObject {
         } catch let error {
             state = State.failed(error)
         }
-        try? sync()
     }
     
-    func sync() throws {
-        switch state {
-        case .loaded(let wallet, let blockchain):
-            self.syncState = .syncing
-            self.isSynced = false
-            DispatchQueue.global(qos: .userInitiated).async {
-                do {
-                    try wallet.sync(blockchain: blockchain, progress: self.progressHandler)
-                    let wallet_transactions = try wallet.getTransactions()
-                    DispatchQueue.main.async {
-                        self.syncState = .synced
-                        self.isSynced = true
-                        do {
-                            self.balance = try wallet.getBalance()
-                            self.items = [WalletItem(description: "on Chain", balance: self.balance)]
-                            self.transactions = wallet_transactions.sorted(by: {
-                                switch $0 {
-                                case .confirmed(_, let confirmation_a):
-                                    switch $1 {
-                                    case .confirmed(_, let confirmation_b): return confirmation_a.timestamp > confirmation_b.timestamp
-                                    default: return false
-                                    }
-                                default:
-                                    switch $1 {
-                                    case .unconfirmed(_): return true
-                                    default: return false
-                                    }
-                                } })
-                        } catch {
-                            print(error)
+    func sync() {
+        guard case .loaded(let wallet, let blockchain) = state else { return }
+        
+        self.syncState = .syncing
+        self.isSynced = false
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                try wallet.sync(blockchain: blockchain, progress: self.progressHandler)
+                let txs = try wallet.getTransactions()
+                
+                let _balance = try wallet.getBalance()
+                let _items = [WalletItem(description: "on Chain", balance: _balance)]
+                
+                let _transactions = txs.sorted(by: {
+                    switch $0 {
+                    case .confirmed(_, let confirmation_a):
+                        switch $1 {
+                        case .confirmed(_, let confirmation_b):
+                            return confirmation_a.timestamp > confirmation_b.timestamp
+                        default:
+                            return false
                         }
-                    }
-                } catch {
-                    print(error)
-                    self.syncState = .failed(error)
+                    default:
+                        switch $1 {
+                        case .unconfirmed(_):
+                            return true
+                        default:
+                            return false
+                        }
+                    } })
+                
+                DispatchQueue.main.async {
+                    self.syncState = .synced
+                    self.isSynced = true
+                    self.balance = _balance
+                    self.items = _items
+                    self.transactions = _transactions
                 }
+            } catch {
+                print(error)
+                self.syncState = .failed(error)
             }
-        default:
-            print("default")
         }
     }
     
@@ -125,7 +131,7 @@ class WalletViewModel: ObservableObject {
                     if finalized {
                         print("Tx id: \(psbt.txid())")
                         try blockchain.broadcast(psbt: psbt)
-                        try sync()
+                        sync()
                     }
                 } else {
                     throw SendError.insufficientAmount
