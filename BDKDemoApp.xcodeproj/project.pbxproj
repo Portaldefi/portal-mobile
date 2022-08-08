@@ -27,7 +27,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		7502D68D289BDA2800613323 /* portal-ui-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "portal-ui-swift"; path = "../portal-ui-swift"; sourceTree = "<group>"; };
 		756A3112288821F3004978E2 /* BDKDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BDKDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		756A3115288821F3004978E2 /* BDKDemoAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BDKDemoAppApp.swift; sourceTree = "<group>"; };
 		756A3117288821F3004978E2 /* WalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletView.swift; sourceTree = "<group>"; };
@@ -62,7 +61,6 @@
 		756A3109288821F3004978E2 = {
 			isa = PBXGroup;
 			children = (
-				7502D68D289BDA2800613323 /* portal-ui-swift */,
 				756A3114288821F3004978E2 /* BDKDemoApp */,
 				756A3113288821F3004978E2 /* Products */,
 			);
