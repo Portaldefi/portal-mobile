@@ -54,10 +54,11 @@ class WalletViewModel: ObservableObject {
     private(set) var progressHandler = ProgressHandler()
     
     init() {
-        load()
+        setup()
+        loadCache()
     }
     
-    private func load() {
+    private func setup() {
         state = .loading
         
         let stringsArray = ["fiscal", "ribbon", "chief", "chest", "truly", "rough", "woman", "ugly", "opera", "language", "raccoon", "victory", "expose", "elder", "asthma", "curious", "special", "cactus", "train", "equip", "exchange", "artist", "journey", "dish"]
@@ -84,6 +85,34 @@ class WalletViewModel: ObservableObject {
         } else {
             state = State.dbNotFound
         }
+    }
+    
+    private func loadCache() {
+        guard case .loaded(let wallet, _) = state else { return }
+        
+        balance = try! wallet.getBalance()
+        
+        let txs = try! wallet.getTransactions().sorted(by: {
+            switch $0 {
+            case .confirmed(_, let confirmation_a):
+                switch $1 {
+                case .confirmed(_, let confirmation_b):
+                    return confirmation_a.timestamp > confirmation_b.timestamp
+                default:
+                    return false
+                }
+            default:
+                switch $1 {
+                case .unconfirmed(_):
+                    return true
+                default:
+                    return false
+                }
+            } })
+        
+        transactions = txs
+        
+        items = [WalletItem(description: "on Chain", balance: balance)]
     }
     
     func sync() {
