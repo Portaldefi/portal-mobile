@@ -78,7 +78,8 @@ struct WalletView: View {
         HStack {
             VStack(alignment: .leading, spacing: 12) {
                 VStack(spacing: 4) {
-                    if viewModel.isSynced {
+                    switch viewModel.syncState {
+                    case .syncing, .synced:
                         HStack(alignment: .bottom, spacing: 10) {
                             Spacer()
                             Text("\(balance)")
@@ -102,11 +103,14 @@ struct WalletView: View {
                                 .offset(y: 2)
                         }
                         .frame(height: 23)
-                    } else {
-                        Text("Syncing...")
-                            .font(.system(size: 32, design: .monospaced))
-                            .fontWeight(.semibold)
-                            .frame(height: 59)
+                        
+                        if case .syncing = viewModel.syncState {
+                            Text("Syncing...")
+                                .font(.system(size: 14, design: .monospaced))
+                                .fontWeight(.semibold)
+                        }
+                    case .empty, .failed:
+                        EmptyView()
                     }
                 }
             }
@@ -120,21 +124,21 @@ struct WalletView: View {
                 config: .labelAndIconLeft(label: "Receive", icon: "arrow.down.forward"),
                 style: .filled,
                 size: .small,
-                enabled: viewModel.isSynced
+                enabled: viewModel.syncState == .synced
             ) {
                 goToReceive.toggle()
             }
-            .disabled(!viewModel.isSynced)
+            .disabled(viewModel.syncState != .synced)
             
             PButton(
                 config: .labelAndIconLeft(label: "Send", icon: "arrow.up.forward"),
                 style: .filled,
                 size: .small,
-                enabled: viewModel.isSynced
+                enabled: viewModel.syncState == .synced
             ) {
                 goToSend.toggle()
             }
-            .disabled(!viewModel.isSynced)
+            .disabled(viewModel.syncState != .synced)
             
             NavigationLink(destination: ReceiveView(viewModel: viewModel), isActive: $goToReceive) { EmptyView() }
         }
