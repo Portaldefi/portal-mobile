@@ -24,11 +24,18 @@ class WalletViewModel: ObservableObject {
         case loaded(Wallet, Blockchain)
     }
     
-    enum SyncState {
+    enum SyncState: Equatable {
         case empty
         case syncing
         case synced
         case failed(Error)
+        
+        static func ==(lhs: SyncState, rhs: SyncState) -> Bool {
+            switch (lhs, rhs) {
+            case (.empty, .empty),(.syncing, .syncing), (.synced, .synced), (.failed, .failed) : return true
+            default: return false
+            }
+        }
     }
     
     enum SendError: Error {
@@ -82,7 +89,7 @@ class WalletViewModel: ObservableObject {
     func sync() {
         guard case .loaded(let wallet, let blockchain) = state else { return }
         
-        self.syncState = .syncing
+        syncState = .syncing
         
         DispatchQueue.global(qos: .userInitiated).async {
             do {
