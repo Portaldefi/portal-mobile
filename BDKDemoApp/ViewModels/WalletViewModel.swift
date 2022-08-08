@@ -17,6 +17,7 @@ class WalletViewModel: ObservableObject {
     }
     
     enum State {
+        case dbNotFound
         case empty
         case loading
         case failed(Error)
@@ -62,15 +63,20 @@ class WalletViewModel: ObservableObject {
         print(restoredExtendedKey.mnemonic)
         print(restoredExtendedKey.xprv)
         
-        let db = DatabaseConfig.memory
-        let electrum = ElectrumConfig(url: "ssl://electrum.blockstream.info:60002", socks5: nil, retry: 5, timeout: nil, stopGap: 10)
-        let blockchainConfig = BlockchainConfig.electrum(config: electrum)
-        do {
-            let blockchain = try Blockchain(config: blockchainConfig)
-            let wallet = try Wallet(descriptor: descriptor, changeDescriptor: changeDescriptor, network: Network.testnet, databaseConfig: db)
-            state = State.loaded(wallet, blockchain)
-        } catch let error {
-            state = State.failed(error)
+        if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
+            let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite")
+            let db = DatabaseConfig.sqlite(config: sqliteConfig)
+            let electrum = ElectrumConfig(url: "ssl://electrum.blockstream.info:60002", socks5: nil, retry: 5, timeout: nil, stopGap: 10)
+            let blockchainConfig = BlockchainConfig.electrum(config: electrum)
+            do {
+                let blockchain = try Blockchain(config: blockchainConfig)
+                let wallet = try Wallet(descriptor: descriptor, changeDescriptor: changeDescriptor, network: Network.testnet, databaseConfig: db)
+                state = State.loaded(wallet, blockchain)
+            } catch let error {
+                state = State.failed(error)
+            }
+        } else {
+            state = State.dbNotFound
         }
     }
     
@@ -84,10 +90,10 @@ class WalletViewModel: ObservableObject {
             do {
                 try wallet.sync(blockchain: blockchain, progress: self.progressHandler)
                 let txs = try wallet.getTransactions()
-                
+
                 let _balance = try wallet.getBalance()
                 let _items = [WalletItem(description: "on Chain", balance: _balance)]
-                
+
                 let _transactions = txs.sorted(by: {
                     switch $0 {
                     case .confirmed(_, let confirmation_a):
@@ -105,7 +111,7 @@ class WalletViewModel: ObservableObject {
                             return false
                         }
                     } })
-                
+
                 DispatchQueue.main.async {
                     self.syncState = .synced
                     self.isSynced = true
