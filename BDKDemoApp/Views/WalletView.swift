@@ -29,6 +29,8 @@ struct WalletView: View {
                 VStack { Text(error.localizedDescription) }
             case .loading:
                 VStack { Text("Loading...") }
+            case .dbNotFound:
+                VStack { Text("DB not founded...") }
             case .loaded:
                 ZStack {
                     Color(red: 26/255, green: 26/255, blue: 26/255, opacity: 1)
