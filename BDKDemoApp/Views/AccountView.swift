@@ -88,7 +88,7 @@ struct AccountView: View {
         HStack {
             HStack {
                 Image(systemName: "arrow.2.squarepath")
-                Text("Account name")
+                Text(viewModel.accountName)
                     .font(.system(size: 16, design: .monospaced))
                     .fontWeight(.bold)
             }
@@ -119,7 +119,7 @@ struct AccountView: View {
                         .frame(height: 32)
                         
                         HStack(spacing: 10) {
-                            Text("1 293,00")
+                            Text("\(balance * 30)")
                                 .font(.system(size: 16, design: .monospaced))
                                 .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
                             Text("USD")

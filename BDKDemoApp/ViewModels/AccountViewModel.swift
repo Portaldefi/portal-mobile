@@ -50,6 +50,7 @@ class AccountViewModel: ObservableObject {
     @Published private(set) var balance: UInt64 = 0
     @Published private(set) var transactions: [BitcoinDevKit.Transaction] = []
     @Published private(set) var items: [WalletItem] = []
+    @Published private(set) var accountName = String()
     
     private(set) var progressHandler = ProgressHandler()
     
@@ -61,14 +62,11 @@ class AccountViewModel: ObservableObject {
     private func setup() {
         state = .loading
         
-        let stringsArray = ["fiscal", "ribbon", "chief", "chest", "truly", "rough", "woman", "ugly", "opera", "language", "raccoon", "victory", "expose", "elder", "asthma", "curious", "special", "cactus", "train", "equip", "exchange", "artist", "journey", "dish"]
-        let mnemonic = String(stringsArray.reduce(String(), { $0 + " " + $1}).dropFirst())
-        let restoredExtendedKey = try! restoreExtendedKey(network: Network.testnet, mnemonic: mnemonic, password: "salty_password")
-        let descriptor = "wpkh([\(restoredExtendedKey.fingerprint)/84'/0'/0']\(restoredExtendedKey.xprv)/*)"
-        let changeDescriptor = "wpkh([\(restoredExtendedKey.fingerprint)/84'/0'/1']\(restoredExtendedKey.xprv)/*)"
+        let account = Portal.shared.accountManager.activeAccount!
+        accountName = account.name
         
-        print(restoredExtendedKey.mnemonic)
-        print(restoredExtendedKey.xprv)
+        let descriptor = "wpkh([\(account.extendedKey.fingerprint)/84'/0'/0']\(account.extendedKey.xprv)/*)"
+        let changeDescriptor = "wpkh([\(account.extendedKey.fingerprint)/84'/0'/1']\(account.extendedKey.xprv)/*)"
         
         if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
             let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite")
