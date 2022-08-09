@@ -19,7 +19,7 @@ struct HostingTabBarView: View {
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            WalletView(viewModel: WalletViewModel())
+            AccountView(viewModel: AccountViewModel())
                 .tag(0)
                 .tabItem {
                     Text("Wallet")

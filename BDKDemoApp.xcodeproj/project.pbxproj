@@ -9,14 +9,14 @@
 /* Begin PBXBuildFile section */
 		7502D68B289BD8EF00613323 /* PortalUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7502D68A289BD8EF00613323 /* PortalUI */; };
 		756A3116288821F3004978E2 /* BDKDemoAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3115288821F3004978E2 /* BDKDemoAppApp.swift */; };
-		756A3118288821F3004978E2 /* WalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3117288821F3004978E2 /* WalletView.swift */; };
+		756A3118288821F3004978E2 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3117288821F3004978E2 /* AccountView.swift */; };
 		756A311A288821F4004978E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 756A3119288821F4004978E2 /* Assets.xcassets */; };
 		756A311D288821F4004978E2 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 756A311C288821F4004978E2 /* Preview Assets.xcassets */; };
 		756A311F288821F4004978E2 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A311E288821F4004978E2 /* Persistence.swift */; };
 		756A3122288821F4004978E2 /* BDKDemoApp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 756A3120288821F4004978E2 /* BDKDemoApp.xcdatamodeld */; };
 		756A312A2888252D004978E2 /* BitcoinDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 756A31292888252D004978E2 /* BitcoinDevKit */; };
 		756A312D28884452004978E2 /* WalletItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A312C28884452004978E2 /* WalletItem.swift */; };
-		756A3131288844FD004978E2 /* WalletViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3130288844FD004978E2 /* WalletViewModel.swift */; };
+		756A3131288844FD004978E2 /* AccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3130288844FD004978E2 /* AccountViewModel.swift */; };
 		756A313328898C73004978E2 /* SingleTxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313228898C73004978E2 /* SingleTxView.swift */; };
 		756A313528898CA2004978E2 /* BasicTextStyleModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */; };
 		756A3137288AEAAD004978E2 /* TxsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3136288AEAAD004978E2 /* TxsView.swift */; };
@@ -24,18 +24,23 @@
 		756A313B288AEFA2004978E2 /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313A288AEFA2004978E2 /* ReceiveView.swift */; };
 		756A313D288EBBAD004978E2 /* SendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313C288EBBAD004978E2 /* SendView.swift */; };
 		756A313F28902C6F004978E2 /* HostingTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313E28902C6F004978E2 /* HostingTabBarView.swift */; };
+		756DDD6E28A272AB002EDC60 /* NoAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD6D28A272AB002EDC60 /* NoAccountView.swift */; };
+		756DDD7028A275AD002EDC60 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD6F28A275AD002EDC60 /* CreateAccountView.swift */; };
+		756DDD7228A27C11002EDC60 /* CreateAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD7128A27C11002EDC60 /* CreateAccountViewModel.swift */; };
+		756DDD7428A27C86002EDC60 /* RestoreAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD7328A27C86002EDC60 /* RestoreAccountView.swift */; };
+		756DDD7628A27DEA002EDC60 /* RestoreAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD7528A27DEA002EDC60 /* RestoreAccountViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		756A3112288821F3004978E2 /* BDKDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BDKDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		756A3115288821F3004978E2 /* BDKDemoAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BDKDemoAppApp.swift; sourceTree = "<group>"; };
-		756A3117288821F3004978E2 /* WalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletView.swift; sourceTree = "<group>"; };
+		756A3117288821F3004978E2 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
 		756A3119288821F4004978E2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		756A311C288821F4004978E2 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		756A311E288821F4004978E2 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		756A3121288821F4004978E2 /* BDKDemoApp.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = BDKDemoApp.xcdatamodel; sourceTree = "<group>"; };
 		756A312C28884452004978E2 /* WalletItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItem.swift; sourceTree = "<group>"; };
-		756A3130288844FD004978E2 /* WalletViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewModel.swift; sourceTree = "<group>"; };
+		756A3130288844FD004978E2 /* AccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewModel.swift; sourceTree = "<group>"; };
 		756A313228898C73004978E2 /* SingleTxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleTxView.swift; sourceTree = "<group>"; };
 		756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTextStyleModifier.swift; sourceTree = "<group>"; };
 		756A3136288AEAAD004978E2 /* TxsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxsView.swift; sourceTree = "<group>"; };
@@ -43,6 +48,11 @@
 		756A313A288AEFA2004978E2 /* ReceiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
 		756A313C288EBBAD004978E2 /* SendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendView.swift; sourceTree = "<group>"; };
 		756A313E28902C6F004978E2 /* HostingTabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostingTabBarView.swift; sourceTree = "<group>"; };
+		756DDD6D28A272AB002EDC60 /* NoAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoAccountView.swift; sourceTree = "<group>"; };
+		756DDD6F28A275AD002EDC60 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
+		756DDD7128A27C11002EDC60 /* CreateAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountViewModel.swift; sourceTree = "<group>"; };
+		756DDD7328A27C86002EDC60 /* RestoreAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoreAccountView.swift; sourceTree = "<group>"; };
+		756DDD7528A27DEA002EDC60 /* RestoreAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoreAccountViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,7 +120,9 @@
 		756A312E2888448F004978E2 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				756A3130288844FD004978E2 /* WalletViewModel.swift */,
+				756A3130288844FD004978E2 /* AccountViewModel.swift */,
+				756DDD7128A27C11002EDC60 /* CreateAccountViewModel.swift */,
+				756DDD7528A27DEA002EDC60 /* RestoreAccountViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -118,7 +130,10 @@
 		756A312F288844AD004978E2 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				756A3117288821F3004978E2 /* WalletView.swift */,
+				756DDD6D28A272AB002EDC60 /* NoAccountView.swift */,
+				756A3117288821F3004978E2 /* AccountView.swift */,
+				756DDD6F28A275AD002EDC60 /* CreateAccountView.swift */,
+				756DDD7328A27C86002EDC60 /* RestoreAccountView.swift */,
 				756A313A288AEFA2004978E2 /* ReceiveView.swift */,
 				756A313C288EBBAD004978E2 /* SendView.swift */,
 				756A313228898C73004978E2 /* SingleTxView.swift */,
@@ -209,14 +224,19 @@
 				756A312D28884452004978E2 /* WalletItem.swift in Sources */,
 				756A311F288821F4004978E2 /* Persistence.swift in Sources */,
 				756A313F28902C6F004978E2 /* HostingTabBarView.swift in Sources */,
+				756DDD7428A27C86002EDC60 /* RestoreAccountView.swift in Sources */,
 				756A313D288EBBAD004978E2 /* SendView.swift in Sources */,
+				756DDD7228A27C11002EDC60 /* CreateAccountViewModel.swift in Sources */,
 				756A313328898C73004978E2 /* SingleTxView.swift in Sources */,
 				756A3137288AEAAD004978E2 /* TxsView.swift in Sources */,
-				756A3118288821F3004978E2 /* WalletView.swift in Sources */,
-				756A3131288844FD004978E2 /* WalletViewModel.swift in Sources */,
+				756DDD6E28A272AB002EDC60 /* NoAccountView.swift in Sources */,
+				756A3118288821F3004978E2 /* AccountView.swift in Sources */,
+				756A3131288844FD004978E2 /* AccountViewModel.swift in Sources */,
+				756DDD7628A27DEA002EDC60 /* RestoreAccountViewModel.swift in Sources */,
 				756A313B288AEFA2004978E2 /* ReceiveView.swift in Sources */,
 				756A3122288821F4004978E2 /* BDKDemoApp.xcdatamodeld in Sources */,
 				756A3139288AEAD2004978E2 /* BackButtonModifier.swift in Sources */,
+				756DDD7028A275AD002EDC60 /* CreateAccountView.swift in Sources */,
 				756A313528898CA2004978E2 /* BasicTextStyleModifier.swift in Sources */,
 				756A3116288821F3004978E2 /* BDKDemoAppApp.swift in Sources */,
 			);

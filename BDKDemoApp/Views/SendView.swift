@@ -24,9 +24,9 @@ struct SendView: View {
     
     @Environment(\.presentationMode) var presentationMode
     
-    @ObservedObject var viewModel: WalletViewModel
+    @ObservedObject var viewModel: AccountViewModel
     
-    init(viewModel: WalletViewModel) {
+    init(viewModel: AccountViewModel) {
         _viewModel = ObservedObject(wrappedValue: viewModel)
     }
     
@@ -103,6 +103,6 @@ struct SendView: View {
 
 struct SendView_Previews: PreviewProvider {
     static var previews: some View {
-        SendView(viewModel: WalletViewModel.mocked())
+        SendView(viewModel: AccountViewModel.mocked())
     }
 }

@@ -13,11 +13,11 @@ let context = CIContext()
 let filter = CIFilter.qrCodeGenerator()
 
 struct ReceiveView: View {
-    @ObservedObject var viewModel: WalletViewModel
+    @ObservedObject var viewModel: AccountViewModel
     @State private var address: String = String()
     @State private var qrCode: UIImage = UIImage()
     
-    init(viewModel: WalletViewModel) {
+    init(viewModel: AccountViewModel) {
         _viewModel = ObservedObject(wrappedValue: viewModel)
     }
     
@@ -70,6 +70,6 @@ struct ReceiveView: View {
 
 struct ReceiveView_Previews: PreviewProvider {
     static var previews: some View {
-        ReceiveView(viewModel: WalletViewModel())
+        ReceiveView(viewModel: AccountViewModel())
     }
 }
