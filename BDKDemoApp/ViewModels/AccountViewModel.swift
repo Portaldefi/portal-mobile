@@ -1,5 +1,5 @@
 //
-//  WalletViewModel.swift
+//  AccountViewModel.swift
 //  BDKDemoApp
 //
 //  Created by farid on 7/20/22.
@@ -9,7 +9,7 @@ import Foundation
 import BitcoinDevKit
 import SwiftUI
 
-class WalletViewModel: ObservableObject {
+class AccountViewModel: ObservableObject {
     class ProgressHandler: BitcoinDevKit.Progress {
         func update(progress: Float, message: String?) {
             print("progress: \(progress), message: \(message ?? "-")")
@@ -210,8 +210,8 @@ class WalletViewModel: ObservableObject {
         return UIImage(systemName: "xmark.circle") ?? UIImage()
     }
     
-    static func mocked() -> WalletViewModel {
-        let viewModel = WalletViewModel()
+    static func mocked() -> AccountViewModel {
+        let viewModel = AccountViewModel()
         viewModel.balance = 23587
         viewModel.items = [WalletItem(description: "on Chain", balance: 23587), WalletItem(description: "in Lightning", balance: 143255)]
         return viewModel
