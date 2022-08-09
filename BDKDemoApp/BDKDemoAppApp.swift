@@ -13,7 +13,7 @@ struct BDKDemoAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HostingTabBarView()
+            RootView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .preferredColorScheme(.dark)
         }
