@@ -69,7 +69,7 @@ class AccountViewModel: ObservableObject {
         let changeDescriptor = "wpkh([\(account.extendedKey.fingerprint)/84'/0'/1']\(account.extendedKey.xprv)/*)"
         
         if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
-            let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite")
+            let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite" + "\(account.id)")
             let db = DatabaseConfig.sqlite(config: sqliteConfig)
             let electrum = ElectrumConfig(url: "ssl://electrum.blockstream.info:60002", socks5: nil, retry: 5, timeout: nil, stopGap: 10)
             let blockchainConfig = BlockchainConfig.electrum(config: electrum)
