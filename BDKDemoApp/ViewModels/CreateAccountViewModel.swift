@@ -17,6 +17,7 @@ class CreateAccountViewModel: ObservableObject {
     }
     
     func createAccount() {
-        
+        let account = Account(id: UUID().uuidString, index: 0, name: accountName, key: extendedKey)
+        Portal.shared.accountManager.save(account: account)
     }
 }
