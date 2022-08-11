@@ -65,8 +65,11 @@ class AccountViewModel: ObservableObject {
         let account = Portal.shared.accountManager.activeAccount!
         accountName = account.name
         
-        let descriptor = "wpkh([\(account.extendedKey.fingerprint)/84'/0'/0']\(account.extendedKey.xprv)/*)"
-        let changeDescriptor = "wpkh([\(account.extendedKey.fingerprint)/84'/0'/1']\(account.extendedKey.xprv)/*)"
+        let fingerprint = account.extendedKey.fingerprint
+        let xprv = account.extendedKey.xprv
+        
+        let descriptor = "wpkh([\(fingerprint)/84'/0'/0']\(xprv)/*)"
+        let changeDescriptor = "wpkh([\(fingerprint)/84'/0'/1']\(xprv)/*)"
         
         if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
             let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite" + "\(account.id)")
