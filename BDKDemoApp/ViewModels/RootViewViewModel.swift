@@ -9,18 +9,31 @@ import Foundation
 import Combine
 
 class RootViewViewModel: ObservableObject {
-    @Published var hasAccount: Bool = false
+    enum State {
+        case account, empty
+    }
+    @Published var state: State = .empty
     
     private var subscriptions = Set<AnyCancellable>()
 
-    init() {
-        hasAccount = Portal.shared.accountManager.activeAccount != nil
+    init(accountManager: IAccountManager) {
+        if accountManager.activeAccount != nil {
+            state = .account
+        }
         
-        Portal.shared.accountManager.onActiveAccountUpdate
+        accountManager.onActiveAccountUpdate
             .receive(on: RunLoop.main)
             .sink { [unowned self] account in
-                hasAccount = account != nil
+                guard account != nil, state != .account else { return }
+                state = .account
             }
             .store(in: &subscriptions)
+    }
+}
+
+extension RootViewViewModel {
+    static func config() -> RootViewViewModel {
+        let manager = Portal.shared.accountManager
+        return RootViewViewModel(accountManager: manager)
     }
 }
