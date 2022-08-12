@@ -62,7 +62,10 @@ class AccountViewModel: ObservableObject {
     private func setup() {
         state = .loading
         
-        let account = Portal.shared.accountManager.activeAccount!
+        guard let account = Portal.shared.accountManager.activeAccount else {
+            fatalError("\(#function): There is no account")
+        }
+        
         accountName = account.name
         
         let fingerprint = account.extendedKey.fingerprint
@@ -91,27 +94,31 @@ class AccountViewModel: ObservableObject {
     private func loadCache() {
         guard case .loaded(let wallet, _) = state else { return }
         
-        balance = try! wallet.getBalance()
-        
-        let txs = try! wallet.getTransactions().sorted(by: {
-            switch $0 {
-            case .confirmed(_, let confirmation_a):
-                switch $1 {
-                case .confirmed(_, let confirmation_b):
-                    return confirmation_a.timestamp > confirmation_b.timestamp
+        do {
+            balance = try wallet.getBalance()
+            
+            let txs = try wallet.getTransactions().sorted(by: {
+                switch $0 {
+                case .confirmed(_, let confirmation_a):
+                    switch $1 {
+                    case .confirmed(_, let confirmation_b):
+                        return confirmation_a.timestamp > confirmation_b.timestamp
+                    default:
+                        return false
+                    }
                 default:
-                    return false
-                }
-            default:
-                switch $1 {
-                case .unconfirmed(_):
-                    return true
-                default:
-                    return false
-                }
-            } })
-        
-        transactions = txs
+                    switch $1 {
+                    case .unconfirmed(_):
+                        return true
+                    default:
+                        return false
+                    }
+                } })
+            
+            transactions = txs
+        } catch {
+            state = State.failed(error)
+        }
         
         items = [WalletItem(description: "on Chain", balance: balance)]
     }
@@ -124,6 +131,13 @@ class AccountViewModel: ObservableObject {
         DispatchQueue.global(qos: .userInitiated).async {
             do {
                 try wallet.sync(blockchain: blockchain, progress: self.progressHandler)
+            } catch {
+                DispatchQueue.main.async {
+                    self.syncState = .failed(error)
+                }
+            }
+            
+            do {
                 let txs = try wallet.getTransactions()
 
                 let _balance = try wallet.getBalance()
@@ -154,8 +168,9 @@ class AccountViewModel: ObservableObject {
                     self.transactions = _transactions
                 }
             } catch {
-                print(error)
-                self.syncState = .failed(error)
+                DispatchQueue.main.async {
+                    self.state = .failed(error)
+                }
             }
         }
     }
