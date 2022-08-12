@@ -91,6 +91,12 @@ struct AccountView: View {
                 Text(viewModel.accountName)
                     .font(.system(size: 16, design: .monospaced))
                     .fontWeight(.bold)
+                if case .syncing = viewModel.syncState {
+                    Text("Syncing...")
+                        .font(.system(size: 14, design: .monospaced))
+                        .fontWeight(.semibold)
+                        .foregroundColor(.gray)
+                }
             }
             Spacer()
             Image(systemName: "gearshape.fill")
@@ -119,7 +125,7 @@ struct AccountView: View {
                         .frame(height: 32)
                         
                         HStack(spacing: 10) {
-                            Text("\(balance * 30)")
+                            Text("\(balance / 30)")
                                 .font(.system(size: 16, design: .monospaced))
                                 .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
                             Text("USD")
@@ -128,12 +134,6 @@ struct AccountView: View {
                                 .offset(y: 2)
                         }
                         .frame(height: 23)
-                        
-                        if case .syncing = viewModel.syncState {
-                            Text("Syncing...")
-                                .font(.system(size: 14, design: .monospaced))
-                                .fontWeight(.semibold)
-                        }
                     case .empty, .failed:
                         EmptyView()
                     }
