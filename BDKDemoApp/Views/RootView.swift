@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct RootView: View {
-    @StateObject private var viewModel = RootViewViewModel()
+    @StateObject private var viewModel = RootViewViewModel.config()
     
     var body: some View {
-        if viewModel.hasAccount {
-            HostingTabBarView()
-        } else {
+        switch viewModel.state {
+        case .empty:
             NoAccountView()
+        case .account:
+            HostingTabBarView()
         }
     }
 }
