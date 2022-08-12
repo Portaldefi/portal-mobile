@@ -225,7 +225,9 @@ class AccountViewModel: ObservableObject {
         
         return UIImage(systemName: "xmark.circle") ?? UIImage()
     }
-    
+}
+
+extension AccountViewModel {
     static func mocked() -> AccountViewModel {
         let viewModel = AccountViewModel()
         viewModel.balance = 23587
