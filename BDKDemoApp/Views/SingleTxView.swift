@@ -21,34 +21,10 @@ struct SingleTxView: View {
     var transaction: BitcoinDevKit.Transaction
     
     var body: some View {
-                VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 5) {
             switch transaction {
             case .unconfirmed(let details):
-                    HStack {
-                        Text("Received:").textStyle(BasicTextStyle(white: true, bold: true))
-                        Text(String(details.received)).textStyle(BasicTextStyle(white: true))
-                    }
-                    HStack {
-                        Text("Sent:").textStyle(BasicTextStyle(white: true, bold: true))
-                        Text(String(details.sent)).textStyle(BasicTextStyle(white: true))
-                    }
-                    HStack {
-                        Text("Fees:").textStyle(BasicTextStyle(white: true, bold: true))
-                        Text(String(details.fee ?? 0)).textStyle(BasicTextStyle(white: true))
-                    }
-                    HStack {
-                        Text("Txid:").textStyle(BasicTextStyle(white: true, bold: true))
-                        Text(details.txid).textStyle(BasicTextStyle(white: true))
-                    }
-            case .confirmed(let details, let confirmation):
-                    HStack {
-                        Text("Confirmed:").textStyle(BasicTextStyle(white: true, bold: true))
-                        Text((Date(timeIntervalSince1970: TimeInterval(confirmation.timestamp)).getFormattedDate(format: "yyyy-MM-dd HH:mm:ss"))).textStyle(BasicTextStyle(white: true))
-                    }
-                    HStack {
-                        Text("Block:").textStyle(BasicTextStyle(white: true, bold: true))
-                        Text(String(confirmation.height)).textStyle(BasicTextStyle(white: true))
-                    }
+                VStack(alignment: .leading, spacing: 5) {
                     HStack {
                         Text("Received:").textStyle(BasicTextStyle(white: true, bold: true))
                         Text(String(details.received)).textStyle(BasicTextStyle(white: true))
@@ -66,15 +42,42 @@ struct SingleTxView: View {
                         Text(details.txid).textStyle(BasicTextStyle(white: true))
                     }
                 }
+                .background(Color.gray)
+            case .confirmed(let details, let confirmation):
+                HStack {
+                    Text("Confirmed:").textStyle(BasicTextStyle(white: true, bold: true))
+                    Text((Date(timeIntervalSince1970: TimeInterval(confirmation.timestamp)).getFormattedDate(format: "yyyy-MM-dd HH:mm:ss"))).textStyle(BasicTextStyle(white: true))
+                }
+                HStack {
+                    Text("Block:").textStyle(BasicTextStyle(white: true, bold: true))
+                    Text(String(confirmation.height)).textStyle(BasicTextStyle(white: true))
+                }
+                HStack {
+                    Text("Received:").textStyle(BasicTextStyle(white: true, bold: true))
+                    Text(String(details.received)).textStyle(BasicTextStyle(white: true))
+                }
+                HStack {
+                    Text("Sent:").textStyle(BasicTextStyle(white: true, bold: true))
+                    Text(String(details.sent)).textStyle(BasicTextStyle(white: true))
+                }
+                HStack {
+                    Text("Fees:").textStyle(BasicTextStyle(white: true, bold: true))
+                    Text(String(details.fee ?? 0)).textStyle(BasicTextStyle(white: true))
+                }
+                HStack {
+                    Text("Txid:").textStyle(BasicTextStyle(white: true, bold: true))
+                    Text(details.txid).textStyle(BasicTextStyle(white: true))
+                }
+            }
         }.padding(10)
-        .background(Color("Shadow")).cornerRadius(5)
-        .contextMenu {
+            .background(Color("Shadow")).cornerRadius(5)
+            .contextMenu {
                 Button(action: {
                     UIPasteboard.general.string = transaction.getDetails().txid}) {
                         Text("Copy TXID")
                     }
             }
-        .padding(.vertical, 10)
+            .padding(.vertical, 10)
     }
 }
 

@@ -7,11 +7,12 @@
 
 import SwiftUI
 import Combine
+import BitcoinAddressValidator
 
 struct SendView: View {
     @State private var to: String = ""
     @State private var amount: String = "0"
-    private var signalAlert = PassthroughSubject<Error,Never>()
+    private var signalAlert = PassthroughSubject<Error, Never>()
     private var window = UIApplication.shared.connectedScenes
     // Keep only active scenes, onscreen and visible to the user
         .filter { $0.activationState == .foregroundActive }
@@ -25,6 +26,8 @@ struct SendView: View {
     @Environment(\.presentationMode) var presentationMode
     
     @ObservedObject var viewModel: AccountViewModel
+    
+    let validator = BitcoinAddressValidator()
     
     init(viewModel: AccountViewModel) {
         _viewModel = ObservedObject(wrappedValue: viewModel)
@@ -58,12 +61,13 @@ struct SendView: View {
             Spacer()
             
             Button {
-                do {
-                    try viewModel.send(to: to, amount: amount)
-                    presentationMode.wrappedValue.dismiss()
-                } catch {
+                viewModel.send(to: to, amount: amount, completion: { error in
+                    guard let error = error else {
+                        showConfirmationAlert()
+                        return
+                    }
                     signalAlert.send(error)
-                }
+                })
             } label: {
                 Text("Send")
                     .foregroundColor(.black)
@@ -75,7 +79,7 @@ struct SendView: View {
                     .background(in: RoundedRectangle(cornerRadius: 10))
                     .frame(height: 40)
             }
-            .disabled(to == "" || (Double(amount) ?? 0) == 0)
+            .disabled(!validator.isValid(address: to) || (Double(amount) ?? 0) == 0)
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity)
             .frame(height: 50)
@@ -92,6 +96,18 @@ struct SendView: View {
         let alert =  UIAlertController(title: "Send error", message: "\(error)", preferredStyle: .alert)
         let dismissAction = UIAlertAction(title: "Dismiss", style: .default) { (action) in
             print("Alert dismissed")
+        }
+        alert.addAction(dismissAction)
+        
+        DispatchQueue.main.async {
+            window?.rootViewController?.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func showConfirmationAlert() {
+        let alert =  UIAlertController(title: "\(amount) sat sent!", message: "to: \(to)", preferredStyle: .alert)
+        let dismissAction = UIAlertAction(title: "Ok", style: .default) { (action) in
+            presentationMode.wrappedValue.dismiss()
         }
         alert.addAction(dismissAction)
         

@@ -18,6 +18,19 @@ struct TxsView: View {
             } else {
                 ForEach(txs, id: \.self) { transaction in
                     SingleTxView(transaction: transaction)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            if case .confirmed(let details, _) = transaction {
+                                let urlString = "https://blockstream.info/testnet/tx/\(details.txid)"
+                                if let url = URL(string: urlString) {
+                                    #if os(iOS)
+                                    UIApplication.shared.open(url)
+                                    #elseif os(macOS)
+                                    NSWorkspace.shared.open(url)
+                                    #endif
+                                }
+                            }
+                        }
                 }
             }
         }

@@ -27,8 +27,12 @@ class RestoreAccountViewModel: ObservableObject {
     
     func restoreAccount() {
         let words = seed.components(separatedBy: " ").filter{ !$0.isEmpty && $0.count >= 3 }
-        let restoredKey = try! restoreExtendedKey(network: Network.testnet, mnemonic: words.joined(separator:" "), password: nil)
-        let account = Account(id: UUID().uuidString, index: 0, name: accountName, key: restoredKey)
-        Portal.shared.accountManager.save(account: account)
+        do {
+            let restoredKey = try restoreExtendedKey(network: Network.testnet, mnemonic: words.joined(separator:" "), password: nil)
+            let account = Account(id: UUID().uuidString, index: 0, name: accountName, key: restoredKey)
+            Portal.shared.accountManager.save(account: account)
+        } catch {
+            print("restore error: \(error)")
+        }
     }
 }

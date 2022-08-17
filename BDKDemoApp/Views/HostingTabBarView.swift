@@ -37,11 +37,11 @@ struct HostingTabBarView: View {
 //                    Text("DeFi")
 //                    Image(systemName: "person.crop.circle")
 //                }
-            Text("Scan")
-                .tag(3)
+            QRCodeScannerView()
+                .tag(2)
                 .tabItem {
                     Text("Scan")
-                    Image(systemName: "gear")
+                    Image(systemName: "target")
                 }
         }
     }

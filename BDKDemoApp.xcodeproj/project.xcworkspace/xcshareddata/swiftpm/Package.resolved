@@ -10,21 +10,39 @@
       }
     },
     {
+      "identity" : "bitcoin-address-validator-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cuhte3/bitcoin-address-validator-swift",
+      "state" : {
+        "branch" : "main",
+        "revision" : "8f316a289e8941f26f5e9bab8ebdca96a5a00204"
+      }
+    },
+    {
+      "identity" : "codescanner",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/twostraws/CodeScanner",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f5ee9a598419faeaf19bb08462bce5012ebf9564"
+      }
+    },
+    {
+      "identity" : "cryptoswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzyzanowskim/CryptoSwift.git",
+      "state" : {
+        "revision" : "039f56c5d7960f277087a0be51f5eb04ed0ec073",
+        "version" : "1.5.1"
+      }
+    },
+    {
       "identity" : "keychainaccess",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
       "state" : {
         "branch" : "master",
         "revision" : "6299daec1d74be12164fec090faf9ed14d0da9d6"
-      }
-    },
-    {
-      "identity" : "portal-ui-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/FabricLabs/portal-ui-swift",
-      "state" : {
-        "branch" : "main",
-        "revision" : "23a3bd607fb91f8d2ea53bc3a28b72dc1714c6f0"
       }
     }
   ],

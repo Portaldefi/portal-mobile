@@ -45,7 +45,7 @@ struct AccountView: View {
                         Group {
                             AccountView()
                             Divider()
-                            BalanceView(balance: viewModel.balance)
+                            BalanceView(balance: viewModel.balance, value: viewModel.value)
                                 .padding(.top, 18)
                                 .padding(.horizontal, 16)
                             ActionButtonsView
@@ -88,24 +88,27 @@ struct AccountView: View {
         HStack {
             HStack {
                 Image(systemName: "arrow.2.squarepath")
+                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                 Text(viewModel.accountName)
                     .font(.system(size: 16, design: .monospaced))
                     .fontWeight(.bold)
-                if case .syncing = viewModel.syncState {
-                    Text("Syncing...")
-                        .font(.system(size: 14, design: .monospaced))
-                        .fontWeight(.semibold)
-                        .foregroundColor(.gray)
-                }
+                    .foregroundColor(Color(red: 244/255, green: 244/255, blue: 244/255, opacity: 1))
             }
             Spacer()
+            if case .syncing = viewModel.syncState {
+                Text("Syncing...")
+                    .font(.system(size: 12, design: .monospaced))
+                    .fontWeight(.semibold)
+                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+            }
             Image(systemName: "gearshape.fill")
+                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
         }
         .frame(height: 48)
         .padding(.horizontal, 20)
     }
     
-    func BalanceView(balance: UInt64) -> some View {
+    func BalanceView(balance: String, value: String) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 12) {
                 VStack(spacing: 4) {
@@ -113,7 +116,7 @@ struct AccountView: View {
                     case .syncing, .synced:
                         HStack(alignment: .bottom, spacing: 10) {
                             Spacer()
-                            Text("\(balance)")
+                            Text(balance)
                                 .font(.system(size: 32, design: .monospaced))
                                 .fontWeight(.semibold)
                             Text("sats")
@@ -125,10 +128,10 @@ struct AccountView: View {
                         .frame(height: 32)
                         
                         HStack(spacing: 10) {
-                            Text("\(balance / 30)")
+                            Text(value)
                                 .font(.system(size: 16, design: .monospaced))
                                 .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
-                            Text("USD")
+                            Text("usd")
                                 .font(.system(size: 12, design: .monospaced))
                                 .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                                 .offset(y: 2)
@@ -153,7 +156,6 @@ struct AccountView: View {
             ) {
                 goToReceive.toggle()
             }
-            .disabled(viewModel.syncState != .synced)
             
             PButton(
                 config: .labelAndIconLeft(label: "Send", icon: "arrow.up.forward"),
@@ -163,7 +165,6 @@ struct AccountView: View {
             ) {
                 goToSend.toggle()
             }
-            .disabled(viewModel.syncState != .synced)
             
             NavigationLink(destination: ReceiveView(viewModel: viewModel), isActive: $goToReceive) { EmptyView() }
         }
@@ -205,18 +206,18 @@ struct AccountView: View {
                     Text("\(item.balance)")
                         .font(.system(size: 18, design: .monospaced))
                         .fontWeight(.semibold)
-                        .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
                     Text("sats")
                         .font(.system(size: 16, design: .monospaced))
-                        .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                 }
+                .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
                 .frame(height: 22)
+                
                 HStack(spacing: 10) {
                     Spacer()
-                    Text("≈ \(item.fiatValue)")
+                    Text(item.value)
                         .font(.system(size: 14, design: .monospaced))
                         .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
-                    Text("USD")
+                    Text("usd")
                         .font(.system(size: 12, design: .monospaced))
                         .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                 }
