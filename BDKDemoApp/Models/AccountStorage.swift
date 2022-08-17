@@ -25,11 +25,14 @@ class AccountStorage {
         guard let words = recoverStringArray(id: id, typeName: .mnemonic, keyName: .words) else {
             return nil
         }
+        
+        print("mnemonic: \(words.joined(separator: " "))")
+        
         guard let salt: String = recover(id: id, typeName: .mnemonic, keyName: .salt) else {
             return nil
         }
         
-        let key = try! restoreExtendedKey(network: Network.testnet, mnemonic: words.joined(separator:" "), password: salt)
+        let key = try! restoreExtendedKey(network: Network.testnet, mnemonic: words.joined(separator: " "), password: salt)
         
         return Account(record: record, key: key)
     }
