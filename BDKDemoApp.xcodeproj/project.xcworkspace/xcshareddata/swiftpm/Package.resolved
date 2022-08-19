@@ -10,15 +10,6 @@
       }
     },
     {
-      "identity" : "bitcoin-address-validator-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/cuhte3/bitcoin-address-validator-swift",
-      "state" : {
-        "branch" : "main",
-        "revision" : "8f316a289e8941f26f5e9bab8ebdca96a5a00204"
-      }
-    },
-    {
       "identity" : "codescanner",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/twostraws/CodeScanner",
@@ -43,6 +34,15 @@
       "state" : {
         "branch" : "master",
         "revision" : "6299daec1d74be12164fec090faf9ed14d0da9d6"
+      }
+    },
+    {
+      "identity" : "portal-ui-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/FabricLabs/portal-ui-swift",
+      "state" : {
+        "branch" : "main",
+        "revision" : "80cb78f9945a2458c5ea95017af55ea94b122f87"
       }
     }
   ],
