@@ -26,9 +26,7 @@ struct SendView: View {
     @Environment(\.presentationMode) var presentationMode
     
     @ObservedObject var viewModel: AccountViewModel
-    
-    let validator = BitcoinAddressValidator()
-    
+        
     init(viewModel: AccountViewModel) {
         _viewModel = ObservedObject(wrappedValue: viewModel)
     }
@@ -79,7 +77,7 @@ struct SendView: View {
                     .background(in: RoundedRectangle(cornerRadius: 10))
                     .frame(height: 40)
             }
-            .disabled(!validator.isValid(address: to) || (Double(amount) ?? 0) == 0)
+            .disabled(!BitcoinAddressValidator.isValid(address: to) || (Double(amount) ?? 0) == 0)
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity)
             .frame(height: 50)
