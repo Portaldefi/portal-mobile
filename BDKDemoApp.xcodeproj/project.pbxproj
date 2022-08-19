@@ -54,7 +54,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		4774D71828ACF6AA00B7988B /* bitcoin-address-validator-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "bitcoin-address-validator-swift"; path = "../bitcoin-address-validator-swift"; sourceTree = "<group>"; };
 		4774D71928AF916600B7988B /* QRCodeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeItem.swift; sourceTree = "<group>"; };
 		4774D71B28AF920100B7988B /* QRCodeParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeParser.swift; sourceTree = "<group>"; };
 		752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeScannerView.swift; sourceTree = "<group>"; };
@@ -116,7 +115,6 @@
 		756A3109288821F3004978E2 = {
 			isa = PBXGroup;
 			children = (
-				4774D71828ACF6AA00B7988B /* bitcoin-address-validator-swift */,
 				756A3114288821F3004978E2 /* BDKDemoApp */,
 				756A3113288821F3004978E2 /* Products */,
 			);
@@ -167,9 +165,9 @@
 				756DDD7728A28754002EDC60 /* KeychainStorage.swift */,
 				756DDD7828A28754002EDC60 /* LocalStorage.swift */,
 				756DDD9828A28FC6002EDC60 /* AccountManager.swift */,
-				756DDD9128A28C0A002EDC60 /* DB */,
 				4774D71928AF916600B7988B /* QRCodeItem.swift */,
 				4774D71B28AF920100B7988B /* QRCodeParser.swift */,
+				756DDD9128A28C0A002EDC60 /* DB */,
 			);
 			path = Models;
 			sourceTree = "<group>";
