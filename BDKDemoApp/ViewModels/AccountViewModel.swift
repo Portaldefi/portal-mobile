@@ -336,9 +336,7 @@ class AccountViewModel: ObservableObject {
         
         let fingerprint = account.extendedKey.fingerprint
         let xprv = account.extendedKey.xprv
-        
-        let key = ExtendedKeyInfo(mnemonic: <#T##String#>, xprv: <#T##String#>, fingerprint: <#T##String#>)
-        
+                
         let descriptor = "wpkh([\(fingerprint)/84'/0'/0']\(xprv)/*)"
         let changeDescriptor = "wpkh([\(fingerprint)/84'/0'/1']\(xprv)/*)"
         
