@@ -10,6 +10,7 @@
 		4774D71A28AF916600B7988B /* QRCodeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D71928AF916600B7988B /* QRCodeItem.swift */; };
 		4774D71C28AF920100B7988B /* QRCodeParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D71B28AF920100B7988B /* QRCodeParser.swift */; };
 		4774D71E28B4B06200B7988B /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D71D28B4B06200B7988B /* ActivityView.swift */; };
+		4774D72028B4B0C600B7988B /* ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D71F28B4B0C600B7988B /* ViewState.swift */; };
 		7502D68B289BD8EF00613323 /* PortalUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7502D68A289BD8EF00613323 /* PortalUI */; };
 		752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */; };
 		752A2D5328A507B900BC6BE2 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 752A2D5228A507B900BC6BE2 /* CodeScanner */; };
@@ -58,6 +59,7 @@
 		4774D71928AF916600B7988B /* QRCodeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeItem.swift; sourceTree = "<group>"; };
 		4774D71B28AF920100B7988B /* QRCodeParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeParser.swift; sourceTree = "<group>"; };
 		4774D71D28B4B06200B7988B /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
+		4774D71F28B4B0C600B7988B /* ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewState.swift; sourceTree = "<group>"; };
 		752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeScannerView.swift; sourceTree = "<group>"; };
 		756A3112288821F3004978E2 /* BDKDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BDKDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		756A3115288821F3004978E2 /* BDKDemoAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BDKDemoAppApp.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 				756DDD9828A28FC6002EDC60 /* AccountManager.swift */,
 				4774D71928AF916600B7988B /* QRCodeItem.swift */,
 				4774D71B28AF920100B7988B /* QRCodeParser.swift */,
+				4774D71F28B4B0C600B7988B /* ViewState.swift */,
 				756DDD9128A28C0A002EDC60 /* DB */,
 			);
 			path = Models;
@@ -332,6 +335,7 @@
 				756A3118288821F3004978E2 /* AccountView.swift in Sources */,
 				756A3131288844FD004978E2 /* AccountViewModel.swift in Sources */,
 				756DDD7628A27DEA002EDC60 /* RestoreAccountViewModel.swift in Sources */,
+				4774D72028B4B0C600B7988B /* ViewState.swift in Sources */,
 				756A313B288AEFA2004978E2 /* ReceiveView.swift in Sources */,
 				756A3122288821F4004978E2 /* BDKDemoApp.xcdatamodeld in Sources */,
 				756DDD7E28A28754002EDC60 /* DBLocalStorage.swift in Sources */,
