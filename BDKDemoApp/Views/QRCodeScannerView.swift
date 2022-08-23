@@ -246,18 +246,6 @@ struct QRCodeScannerView: View {
             .background(Color(red: 26/255, green: 26/255, blue: 26/255))
         }
     }
-    
-//    private func showAlert() {
-//        let alert =  UIAlertController(title: "No QR Code Found", message: "Make sure the image contains a valid QR Code clearly visible.", preferredStyle: .alert)
-//        let dismissAction = UIAlertAction(title: "Ok", style: .default) { (action) in
-//            print("Alert dismissed")
-//        }
-//        alert.addAction(dismissAction)
-//
-//        DispatchQueue.main.async {
-//            window?.rootViewController?.present(alert, animated: true, completion: nil)
-//        }
-//    }
 }
 
 struct QRCodeScannerView_Previews: PreviewProvider {
