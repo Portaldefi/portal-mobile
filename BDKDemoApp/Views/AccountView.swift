@@ -13,6 +13,7 @@ struct AccountView: View {
     @State private var goToReceive = false
     @State private var goToSend = false
     @State private var qrScannerOpened = false
+    @State private var qrItem: QRCodeItem? = nil
     
     @EnvironmentObject private var viewState: ViewState
     @EnvironmentObject private var viewModel: AccountViewModel
@@ -72,7 +73,7 @@ struct AccountView: View {
                                 }
                             }
                             NavigationLink(destination: TxsView(txs: viewModel.transactions), isActive: $goToTxs) { EmptyView() }
-                            NavigationLink(destination: SendView(), isActive: $goToSend) { EmptyView() }
+                            NavigationLink(destination: SendView(item: qrItem), isActive: $goToSend) { EmptyView() }
                         }
                         
                         Spacer()
@@ -89,7 +90,8 @@ struct AccountView: View {
             
         }) {
             QRCodeScannerView { item in
-                print(item)
+                qrItem = item
+                goToSend.toggle()
             }
         }
     }
