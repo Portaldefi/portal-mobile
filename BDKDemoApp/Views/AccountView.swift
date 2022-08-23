@@ -9,24 +9,21 @@ import SwiftUI
 import PortalUI
 
 struct AccountView: View {
-    @StateObject private var viewModel: AccountViewModel
-    
     @State private var goToTxs = false
     @State private var goToReceive = false
     @State private var goToSend = false
-    
     @State private var qrScannerOpened = false
-    @EnvironmentObject private var viewState: ViewState
     
-    init(viewModel: AccountViewModel) {
+    @EnvironmentObject private var viewState: ViewState
+    @EnvironmentObject private var viewModel: AccountViewModel
+    
+    init() {
         UINavigationBar
             .appearance()
             .largeTitleTextAttributes = [
                 .font : UIFont.monospacedSystemFont(ofSize: 28, weight: .bold),
                 .foregroundColor: UIColor.white
             ]
-        
-        _viewModel = StateObject(wrappedValue: viewModel)
     }
     
     var body: some View {
@@ -75,7 +72,7 @@ struct AccountView: View {
                                 }
                             }
                             NavigationLink(destination: TxsView(txs: viewModel.transactions), isActive: $goToTxs) { EmptyView() }
-                            NavigationLink(destination: SendView(viewModel: viewModel), isActive: $goToSend) { EmptyView() }
+                            NavigationLink(destination: SendView(), isActive: $goToSend) { EmptyView() }
                         }
                         
                         Spacer()
@@ -89,9 +86,11 @@ struct AccountView: View {
             qrScannerOpened.toggle()
         })
         .sheet(isPresented: $qrScannerOpened, onDismiss: {
-
+            
         }) {
-            QRCodeScannerView()
+            QRCodeScannerView { item in
+                print(item)
+            }
         }
     }
     
@@ -196,16 +195,22 @@ struct AccountView: View {
                             .frame(height: 16)
                         Spacer()
                     }
-                    HStack(spacing: 6) {
+                    HStack(spacing: 2) {
                         Spacer()
                             .frame(width: 16, height: 16)
-                        Text(item.description)
+                        Text("on")
                             .font(.system(size: 12, design: .monospaced))
                             .fontWeight(.bold)
                             .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                             .frame(height: 17)
-                        Image(systemName: "questionmark.circle.fill")
+                        Asset.chainIcon.resizable()
+                            .frame(width: 12, height: 12)
                             .foregroundColor(Color(red: 138/255, green: 138/255, blue: 138/255, opacity: 1))
+                        Text("Chain")
+                            .font(.system(size: 12, design: .monospaced))
+                            .fontWeight(.bold)
+                            .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                            .frame(height: 17)
                         Spacer()
                     }
                 }
@@ -241,7 +246,9 @@ struct AccountView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        AccountView(viewModel: AccountViewModel.mocked())
+        AccountView()
+            .environmentObject(ViewState())
+            .environmentObject(AccountViewModel.mocked())
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
             .preferredColorScheme(.dark)
     }

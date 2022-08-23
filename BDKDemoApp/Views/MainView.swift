@@ -15,9 +15,8 @@ struct Mainview: View {
     
     init() {
         views = [
-            AnyView(AccountView(viewModel: AccountViewModel())),
-            AnyView(ActivityView()),
-            AnyView(Spacer())
+            AnyView(AccountView()),
+            AnyView(ActivityView())
         ]
     }
     

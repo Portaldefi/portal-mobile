@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RootView: View {
     @StateObject private var viewModel = RootViewViewModel.config()
+    @StateObject private var accountViewModel = AccountViewModel()
     @StateObject private var viewState = ViewState()
     
     var body: some View {
@@ -18,6 +19,7 @@ struct RootView: View {
         case .account:
             Mainview()
                 .environmentObject(viewState)
+                .environmentObject(accountViewModel)
         }
     }
 }

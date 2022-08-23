@@ -24,12 +24,7 @@ struct SendView: View {
         .first(where: \.isKeyWindow)
     
     @Environment(\.presentationMode) var presentationMode
-    
-    @ObservedObject var viewModel: AccountViewModel
-        
-    init(viewModel: AccountViewModel) {
-        _viewModel = ObservedObject(wrappedValue: viewModel)
-    }
+    @EnvironmentObject private var viewModel: AccountViewModel
     
     var body: some View {
         VStack {
@@ -117,6 +112,7 @@ struct SendView: View {
 
 struct SendView_Previews: PreviewProvider {
     static var previews: some View {
-        SendView(viewModel: AccountViewModel.mocked())
+        SendView()
+            .environmentObject(AccountViewModel.mocked())
     }
 }
