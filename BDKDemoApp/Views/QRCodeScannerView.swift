@@ -54,34 +54,50 @@ struct QRCodeScannerView: View {
             VStack {
                 ZStack {
                     ZStack(alignment: .bottom) {
-                        CodeScannerView(
-                            codeTypes: [.qr],
-                            scanMode: .continuous,
-                            simulatedData: qrCodeSimulatedData,
-                            isTorchOn: torchOn,
-                            isGalleryPresented: $importFromLibrary
-                        ) { response in
-                            if case let .success(result) = response {
-                                detectedItems = QRCodeParser.current.parse(result.string)
-                                withAnimation {
-                                    scanState = .detected
-                                }
-                            } else if case let .failure(error) = response {
-                                switch error {
-                                case .badInput:
-                                    break
-                                case .badOutput:
-                                    showingAlert.toggle()
-                                case .permissionDenied:
-                                    break
-                                case .initError(_):
-                                    break
-                                }
-                            } else {
-                                withAnimation {
-                                    scanState = .detecting
+                        ZStack {
+                            CodeScannerView(
+                                codeTypes: [.qr],
+                                scanMode: .continuous,
+                                simulatedData: qrCodeSimulatedData,
+                                isTorchOn: torchOn,
+                                isGalleryPresented: $importFromLibrary
+                            ) { response in
+                                if case let .success(result) = response {
+                                    detectedItems = QRCodeParser.current.parse(result.string)
+                                    withAnimation {
+                                        scanState = .detected
+                                    }
+                                } else if case let .failure(error) = response {
+                                    switch error {
+                                    case .badInput:
+                                        break
+                                    case .badOutput:
+                                        showingAlert.toggle()
+                                    case .permissionDenied:
+                                        break
+                                    case .initError(_):
+                                        break
+                                    }
+                                } else {
+                                    withAnimation {
+                                        scanState = .detecting
+                                    }
                                 }
                             }
+                            
+#if targetEnvironment(simulator)
+                            RoundedRectangle(cornerRadius: 12)
+                                .foregroundColor(.gray)
+                                .zIndex(-1)
+#else
+                            CameraTargetOverlayView()
+                                .opacity(overlayOpacity)
+                                .onAppear {
+                                    withAnimation {
+                                        overlayOpacity = 1
+                                    }
+                                }
+#endif
                         }
                         
                         switch scanState {
@@ -128,29 +144,16 @@ struct QRCodeScannerView: View {
                             .transition(.move(edge: .bottom))
                         }
                     }
-                    
-#if targetEnvironment(simulator)
-                    RoundedRectangle(cornerRadius: 12)
-                        .foregroundColor(.gray)
-                        .zIndex(-1)
-#else
-                    CameraTargetOverlayView()
-                        .opacity(overlayOpacity)
-                        .onAppear {
-                            withAnimation {
-                                overlayOpacity = 1
-                            }
-                        }
-#endif
                 }
                 .cornerRadius(12)
                 .padding(16)
-                    
+                
                 HStack {
                     PButton(config: .onlyIcon(Asset.galeryIcon), style: .free, size: .big, enabled: true) {
                         importFromLibrary.toggle()
                     }
                     .frame(width: 60, height: 60)
+                    .scaleEffect(2)
                     
                     Spacer()
                     
@@ -158,6 +161,7 @@ struct QRCodeScannerView: View {
                         torchOn.toggle()
                     }
                     .frame(width: 60, height: 60)
+                    .scaleEffect(2)
                     
                     Spacer()
                     
