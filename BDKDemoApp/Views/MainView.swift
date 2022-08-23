@@ -25,9 +25,11 @@ struct Mainview: View {
             Button {
                 selectedTab = 0
             } label: {
-                VStack(spacing: 0) {
-                    Text("Wallet")
+                VStack(spacing: 4) {
                     Image(systemName: "house.fill")
+                    Text("Wallet")
+                        .font(.system(size: 14, design: .rounded))
+                        .fontWeight(.bold)
                 }
             }
             
@@ -36,9 +38,11 @@ struct Mainview: View {
             Button {
                 selectedTab = 1
             } label: {
-                VStack(spacing: 0) {
-                    Text("Activity")
+                VStack(spacing: 4) {
                     Image(systemName: "magnifyingglass")
+                    Text("Activity")
+                        .font(.system(size: 14, design: .rounded))
+                        .fontWeight(.bold)
                 }
             }
             
@@ -47,9 +51,11 @@ struct Mainview: View {
             Button {
                 viewState.showScanner.toggle()
             } label: {
-                VStack(spacing: 0) {
-                    Text("Scan")
+                VStack(spacing: 4) {
                     Image(systemName: "target")
+                    Text("Scan")
+                        .font(.system(size: 14, design: .rounded))
+                        .fontWeight(.bold)
                 }
             }
         }
@@ -62,7 +68,7 @@ struct Mainview: View {
         ZStack(alignment: .bottom) {
             views[selectedTab]
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                tabBar
+            tabBar
         }
     }
 }
