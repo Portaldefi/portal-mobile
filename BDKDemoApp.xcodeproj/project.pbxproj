@@ -11,6 +11,12 @@
 		4774D71C28AF920100B7988B /* QRCodeParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D71B28AF920100B7988B /* QRCodeParser.swift */; };
 		4774D71E28B4B06200B7988B /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D71D28B4B06200B7988B /* ActivityView.swift */; };
 		4774D72028B4B0C600B7988B /* ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D71F28B4B0C600B7988B /* ViewState.swift */; };
+		4774D72528B4FC2000B7988B /* StringFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72428B4FC2000B7988B /* StringFormatter.swift */; };
+		4774D72728B4FC5300B7988B /* Double+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72628B4FC5300B7988B /* Double+Extension.swift */; };
+		4774D72928B4FC7500B7988B /* UInt64+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72828B4FC7500B7988B /* UInt64+Extension.swift */; };
+		4774D72B28B4FC9B00B7988B /* FiatCurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72A28B4FC9B00B7988B /* FiatCurrency.swift */; };
+		4774D72D28B4FCCC00B7988B /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72C28B4FCCC00B7988B /* Currency.swift */; };
+		4774D72F28B4FD0D00B7988B /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72E28B4FD0D00B7988B /* Date+Extension.swift */; };
 		7502D68B289BD8EF00613323 /* PortalUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7502D68A289BD8EF00613323 /* PortalUI */; };
 		752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */; };
 		752A2D5328A507B900BC6BE2 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 752A2D5228A507B900BC6BE2 /* CodeScanner */; };
@@ -61,6 +67,12 @@
 		4774D71D28B4B06200B7988B /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		4774D71F28B4B0C600B7988B /* ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewState.swift; sourceTree = "<group>"; };
 		4774D72328B4F62500B7988B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		4774D72428B4FC2000B7988B /* StringFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringFormatter.swift; sourceTree = "<group>"; };
+		4774D72628B4FC5300B7988B /* Double+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Extension.swift"; sourceTree = "<group>"; };
+		4774D72828B4FC7500B7988B /* UInt64+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UInt64+Extension.swift"; sourceTree = "<group>"; };
+		4774D72A28B4FC9B00B7988B /* FiatCurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiatCurrency.swift; sourceTree = "<group>"; };
+		4774D72C28B4FCCC00B7988B /* Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency.swift; sourceTree = "<group>"; };
+		4774D72E28B4FD0D00B7988B /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeScannerView.swift; sourceTree = "<group>"; };
 		756A3112288821F3004978E2 /* BDKDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BDKDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		756A3115288821F3004978E2 /* BDKDemoAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BDKDemoAppApp.swift; sourceTree = "<group>"; };
@@ -117,6 +129,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4774D73028B4FD1800B7988B /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				4774D72628B4FC5300B7988B /* Double+Extension.swift */,
+				4774D72E28B4FD0D00B7988B /* Date+Extension.swift */,
+				4774D72828B4FC7500B7988B /* UInt64+Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		756A3109288821F3004978E2 = {
 			isa = PBXGroup;
 			children = (
@@ -140,6 +162,7 @@
 				756A3115288821F3004978E2 /* BDKDemoAppApp.swift */,
 				756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */,
 				756A3138288AEAD2004978E2 /* BackButtonModifier.swift */,
+				4774D73028B4FD1800B7988B /* Extensions */,
 				756DDD8528A287A7002EDC60 /* Protocols */,
 				756A312B2888443A004978E2 /* Models */,
 				756A312E2888448F004978E2 /* ViewModels */,
@@ -164,6 +187,9 @@
 			isa = PBXGroup;
 			children = (
 				756DDD9A28A291A1002EDC60 /* Portal.swift */,
+				4774D72428B4FC2000B7988B /* StringFormatter.swift */,
+				4774D72A28B4FC9B00B7988B /* FiatCurrency.swift */,
+				4774D72C28B4FCCC00B7988B /* Currency.swift */,
 				756A312C28884452004978E2 /* WalletItem.swift */,
 				756DDD8628A287CC002EDC60 /* Account.swift */,
 				756DDD7928A28754002EDC60 /* AccountStorage.swift */,
@@ -314,6 +340,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4774D72B28B4FC9B00B7988B /* FiatCurrency.swift in Sources */,
 				756DDD7B28A28754002EDC60 /* KeychainStorage.swift in Sources */,
 				756DDD8728A287CC002EDC60 /* Account.swift in Sources */,
 				756DDD7C28A28754002EDC60 /* LocalStorage.swift in Sources */,
@@ -325,6 +352,7 @@
 				756DDD9B28A291A1002EDC60 /* Portal.swift in Sources */,
 				756DDD9028A28C06002EDC60 /* AccountRecord+CoreDataClass.swift in Sources */,
 				756DDD7D28A28754002EDC60 /* AccountStorage.swift in Sources */,
+				4774D72928B4FC7500B7988B /* UInt64+Extension.swift in Sources */,
 				756A313D288EBBAD004978E2 /* SendView.swift in Sources */,
 				756DDD7228A27C11002EDC60 /* CreateAccountViewModel.swift in Sources */,
 				756A313328898C73004978E2 /* SingleTxView.swift in Sources */,
@@ -333,17 +361,21 @@
 				756A3137288AEAAD004978E2 /* TxsView.swift in Sources */,
 				4774D71A28AF916600B7988B /* QRCodeItem.swift in Sources */,
 				756DDD9328A28DE7002EDC60 /* RootView.swift in Sources */,
+				4774D72528B4FC2000B7988B /* StringFormatter.swift in Sources */,
 				756DDD6E28A272AB002EDC60 /* NoAccountView.swift in Sources */,
 				756A3118288821F3004978E2 /* AccountView.swift in Sources */,
 				756A3131288844FD004978E2 /* AccountViewModel.swift in Sources */,
+				4774D72728B4FC5300B7988B /* Double+Extension.swift in Sources */,
 				756DDD7628A27DEA002EDC60 /* RestoreAccountViewModel.swift in Sources */,
 				4774D72028B4B0C600B7988B /* ViewState.swift in Sources */,
+				4774D72D28B4FCCC00B7988B /* Currency.swift in Sources */,
 				756A313B288AEFA2004978E2 /* ReceiveView.swift in Sources */,
 				756A3122288821F4004978E2 /* BDKDemoApp.xcdatamodeld in Sources */,
 				756DDD7E28A28754002EDC60 /* DBLocalStorage.swift in Sources */,
 				756DDD8228A2879E002EDC60 /* IKeyChainStorage.swift in Sources */,
 				756DDD9928A28FC6002EDC60 /* AccountManager.swift in Sources */,
 				756A3139288AEAD2004978E2 /* BackButtonModifier.swift in Sources */,
+				4774D72F28B4FD0D00B7988B /* Date+Extension.swift in Sources */,
 				756DDD7028A275AD002EDC60 /* CreateAccountView.swift in Sources */,
 				756A313528898CA2004978E2 /* BasicTextStyleModifier.swift in Sources */,
 				4774D71E28B4B06200B7988B /* ActivityView.swift in Sources */,
