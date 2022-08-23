@@ -71,6 +71,10 @@ struct QRCodeParser {
                 return [QRCodeItem.publicKey(xpub: components.path)]
             } else if components.path.hasPrefix("XP") {
                 return [QRCodeItem.privateKey(key: components.path)]
+            } else if components.path.hasPrefix("ln") || components.path.hasPrefix("LN") {
+                return [
+                    QRCodeItem.bolt11(invoice: components.path)
+                ]
             } else {
                 return [QRCodeItem.unsupported]
             }
