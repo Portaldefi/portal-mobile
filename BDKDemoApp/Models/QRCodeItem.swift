@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct QRCodeItem {
+struct QRCodeItem: Identifiable {
     enum ItemType {
         case bip21(address: String, amount: String?, message: String?),
              bolt11(invoice: String),
@@ -17,6 +17,7 @@ struct QRCodeItem {
              unsupported
     }
     
+    let id = UUID()
     let type: ItemType
     
     static var unsupported: QRCodeItem {
