@@ -25,9 +25,7 @@ class AccountStorage {
         guard let words = recoverStringArray(id: id, typeName: .mnemonic, keyName: .words) else {
             return nil
         }
-        
-        print("mnemonic: \(words.joined(separator: " "))")
-        
+                
         guard let salt: String = recover(id: id, typeName: .mnemonic, keyName: .salt) else {
             return nil
         }
