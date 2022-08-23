@@ -319,10 +319,14 @@ class AccountViewModel: ObservableObject {
     private(set) var progressHandler = ProgressHandler()
     
     private let networkQueue = DispatchQueue(label: "com.portal.network.layer.queue", qos: .userInitiated)
+    private let mocked: Bool
     
-    init() {
-        setup()
-        loadCache()
+    init(mocked: Bool = false) {
+        self.mocked = mocked
+        if !mocked {
+            setup()
+            loadCache()
+        }
     }
     
     private func setup() {
@@ -393,6 +397,8 @@ class AccountViewModel: ObservableObject {
     }
     
     func sync() {
+        guard !mocked else { return }
+        
         setup()
         
         guard syncState != .syncing, case .loaded(let wallet, let blockchain) = state else { return }
@@ -507,8 +513,21 @@ class AccountViewModel: ObservableObject {
 
 extension AccountViewModel {
     static func mocked() -> AccountViewModel {
-        let viewModel = AccountViewModel()
+        let stringsArray = ["fiscal", "ribbon", "chief", "chest", "truly", "rough", "woman", "ugly", "opera", "language", "raccoon", "victory", "expose", "elder", "asthma", "curious", "special", "cactus", "train", "equip", "exchange", "artist", "journey", "dish"]
+        let mnemonic = String(stringsArray.reduce(String(), { $0 + " " + $1}).dropFirst())
+        let restoredExtendedKey = try! restoreExtendedKey(network: Network.testnet, mnemonic: mnemonic, password: "salty_password")
+        let descriptor = "wpkh([\(restoredExtendedKey.fingerprint)/44'/0'/0']\(restoredExtendedKey.xprv)/*)"
+        let changeDescriptor = "wpkh([\(restoredExtendedKey.fingerprint)/44'/0'/1']\(restoredExtendedKey.xprv)/*)"
+        
+        let wallet = try! Wallet(descriptor: descriptor, changeDescriptor: changeDescriptor, network: Network.testnet, databaseConfig: .memory)
+        let electrum = ElectrumConfig(url: "ssl://electrum.blockstream.info:60002", socks5: nil, retry: 5, timeout: nil, stopGap: 10)
+        let blockchainConfig = BlockchainConfig.electrum(config: electrum)
+        let blockchain = try! Blockchain(config: blockchainConfig)
+        let viewModel = AccountViewModel(mocked: true)
+        viewModel.state = .loaded(wallet, blockchain)
+        viewModel.syncState = .synced
         viewModel.balance = "23587"
+        viewModel.accountName = "Test"
         viewModel.items = [WalletItem(description: "on Chain", balance: "23587", value: "$56"), WalletItem(description: "in Lightning", balance: "143255", value: "$156")]
         return viewModel
     }
