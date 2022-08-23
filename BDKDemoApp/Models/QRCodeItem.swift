@@ -50,7 +50,7 @@ struct QRCodeItem: Identifiable {
         case .privKey:
             return "Chain"
         case .unsupported:
-            return "-"
+            return String()
         }
     }
     

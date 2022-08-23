@@ -16,7 +16,9 @@ struct QRCodeScannerView: View {
     @State private var torchOn  = false
     @State private var scanState: ScanState = .detecting
     @State private var detectedItems: [QRCodeItem] = []
-    @State private var showingAlert = false
+    @State private var showingNoQRAlert = false
+    @State private var showingNotSupportedQRAlert = false
+
     
     private var window = UIApplication.shared.connectedScenes
     // Keep only active scenes, onscreen and visible to the user
@@ -72,7 +74,7 @@ struct QRCodeScannerView: View {
                                     case .badInput:
                                         break
                                     case .badOutput:
-                                        showingAlert.toggle()
+                                        showingNoQRAlert.toggle()
                                     case .permissionDenied:
                                         break
                                     case .initError(_):
@@ -175,9 +177,15 @@ struct QRCodeScannerView: View {
                 .ignoresSafeArea()
             }
         }
-        .alert(isPresented: $showingAlert) {
+        .alert(isPresented: $showingNoQRAlert) {
             Alert(title: Text("No QR Code Found"),
                   message: Text("Make sure the image contains a valid QR Code clearly visible."),
+                  dismissButton: .default(Text("OK"))
+            )
+        }
+        .alert(isPresented: $showingNotSupportedQRAlert) {
+            Alert(title: Text("Not Supported Address or Wallet Detected"),
+                  message: Text("\nThe QR Code doesn’t contain a supported address type.\n\nSuppported Addresses:\n• Bitcoin Legacy\n• Bitcoin Segwit\n• Bitcoin Taproot\n• Lightning Invoice\n• Lightning Offer\n• Lightning Node ID\n• Lightning Address\n\nSuppported Wallet Keys:\nBitcoin Wallet Public Key\nBitcoin Wallet Private Key"),
                   dismissButton: .default(Text("OK"))
             )
         }
@@ -185,8 +193,13 @@ struct QRCodeScannerView: View {
     
     private func QRCodeItemView(item: QRCodeItem) -> some View {
         Button {
-            detected(item)
-            presentation.wrappedValue.dismiss()
+            switch item.type {
+            case .unsupported:
+                showingNotSupportedQRAlert.toggle()
+            default:
+                detected(item)
+                presentation.wrappedValue.dismiss()
+            }
         } label: {
             ZStack(alignment: .bottom) {
                 HStack {
@@ -206,18 +219,23 @@ struct QRCodeScannerView: View {
                             HStack(spacing: 6) {
                                 Spacer()
                                     .frame(width: 16, height: 16)
-                                Text("on")
-                                    .font(.system(size: 12, design: .monospaced))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
-                                    .frame(height: 17)
                                 
                                 switch item.type {
                                 case .bip21, .privKey, .pubKey:
+                                    Text("on")
+                                        .font(.system(size: 12, design: .monospaced))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                        .frame(height: 17)
                                     Asset.chainIcon
                                         .resizable()
                                         .frame(width: 12, height: 12)
                                 case .bolt11, .bolt12:
+                                    Text("on")
+                                        .font(.system(size: 12, design: .monospaced))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                        .frame(height: 17)
                                     Asset.lightningIcon
                                         .resizable()
                                         .frame(width: 12, height: 12)

@@ -28,6 +28,8 @@ struct SendView: View {
     @EnvironmentObject private var viewModel: AccountViewModel
     
     init(item: QRCodeItem?) {
+        UITableView.appearance().backgroundColor = .clear
+        
         self.item = item
         
         switch item?.type {
@@ -64,9 +66,6 @@ struct SendView: View {
                             }
                         }
                 }
-            }
-            .onAppear {
-                UITableView.appearance().backgroundColor = .clear
             }
             
             Spacer()
