@@ -20,6 +20,40 @@ struct QRCodeItem: Identifiable {
     let id = UUID()
     let type: ItemType
     
+    var title: String {
+        switch type {
+        case .bip21:
+            return "Bitcoin Address"
+        case .bolt11:
+            return "Bitcoin Payment Request"
+        case .bolt12:
+            return "Bitcoin Payment Request"
+        case .pubKey:
+            return "Bitcoin Public Key"
+        case .privKey:
+            return "Bitcoin Private Key"
+        case .unsupported:
+            return "Unsupported item"
+        }
+    }
+    
+    var description: String {
+        switch type {
+        case .bip21:
+            return "Chain"
+        case .bolt11:
+            return "Lightning"
+        case .bolt12:
+            return "Lightning"
+        case .pubKey:
+            return "Chain"
+        case .privKey:
+            return "Chain"
+        case .unsupported:
+            return "-"
+        }
+    }
+    
     static var unsupported: QRCodeItem {
         QRCodeItem(type: .unsupported)
     }
