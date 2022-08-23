@@ -98,7 +98,7 @@ struct AccountView: View {
     func AccountView() -> some View {
         HStack {
             HStack {
-                Image(systemName: "arrow.2.squarepath")
+                Asset.walletIcon
                     .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                 Text(viewModel.accountName)
                     .font(.system(size: 16, design: .monospaced))
@@ -112,7 +112,7 @@ struct AccountView: View {
                     .fontWeight(.semibold)
                     .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
             }
-            Image(systemName: "gearshape.fill")
+            Asset.gearIcon
                 .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
         }
         .frame(height: 48)
@@ -160,18 +160,18 @@ struct AccountView: View {
     var ActionButtonsView: some View {
         HStack(spacing: 10) {
             PButton(
-                config: .labelAndIconLeft(label: "Receive", icon: "arrow.down.forward"),
+                config: .labelAndIconLeft(label: "Receive", icon: Asset.receiveButtonIcon),
                 style: .filled,
-                size: .small,
+                size: .medium,
                 enabled: viewModel.syncState == .synced
             ) {
                 goToReceive.toggle()
             }
             
             PButton(
-                config: .labelAndIconLeft(label: "Send", icon: "arrow.up.forward"),
+                config: .labelAndIconLeft(label: "Send", icon: Asset.sendButtonIcon),
                 style: .filled,
-                size: .small,
+                size: .medium,
                 enabled: viewModel.syncState == .synced
             ) {
                 goToSend.toggle()

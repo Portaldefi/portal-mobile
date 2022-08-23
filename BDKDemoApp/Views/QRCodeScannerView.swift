@@ -116,21 +116,21 @@ struct QRCodeScannerView: View {
                 .padding(16)
                 
                 HStack {
-                    PButton(config: .onlyIcon("arrow.left"), style: .free, size: .big, enabled: true) {
+                    PButton(config: .onlyIcon(Asset.galeryIcon), style: .free, size: .big, enabled: true) {
                         importFromLibrary.toggle()
                     }
                     .frame(width: 60, height: 60)
                     
                     Spacer()
                     
-                    PButton(config: .onlyIcon("arrow.down"), style: .free, size: .big, enabled: true) {
+                    PButton(config: .onlyIcon(Asset.lightningIcon), style: .free, size: .big, enabled: true) {
                         torchOn.toggle()
                     }
                     .frame(width: 60, height: 60)
                     
                     Spacer()
                     
-                    PButton(config: .onlyIcon("arrow.right"), style: .outline, size: .big, enabled: true) {
+                    PButton(config: .onlyIcon(Asset.xIcon), style: .outline, size: .big, enabled: true) {
                         presentation.wrappedValue.dismiss()
                     }
                     .frame(width: 60, height: 60)

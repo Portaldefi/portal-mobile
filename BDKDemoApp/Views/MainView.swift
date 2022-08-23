@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PortalUI
 
 struct Mainview: View {
     private let views: [AnyView]
@@ -26,7 +27,7 @@ struct Mainview: View {
                 selectedTab = 0
             } label: {
                 VStack(spacing: 4) {
-                    Image(systemName: "house.fill")
+                    Asset.homeIcon
                     Text("Wallet")
                         .font(.system(size: 14, design: .rounded))
                         .fontWeight(.bold)
@@ -39,7 +40,7 @@ struct Mainview: View {
                 selectedTab = 1
             } label: {
                 VStack(spacing: 4) {
-                    Image(systemName: "magnifyingglass")
+                    Asset.activityIcon
                     Text("Activity")
                         .font(.system(size: 14, design: .rounded))
                         .fontWeight(.bold)
@@ -51,12 +52,7 @@ struct Mainview: View {
             Button {
                 viewState.showScanner.toggle()
             } label: {
-                VStack(spacing: 4) {
-                    Image(systemName: "target")
-                    Text("Scan")
-                        .font(.system(size: 14, design: .rounded))
-                        .fontWeight(.bold)
-                }
+                Asset.scanQRIcon
             }
         }
         .padding(.horizontal, 25.5)

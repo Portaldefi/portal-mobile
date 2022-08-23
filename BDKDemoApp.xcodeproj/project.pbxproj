@@ -192,6 +192,7 @@
 			isa = PBXGroup;
 			children = (
 				756DDD9228A28DE7002EDC60 /* RootView.swift */,
+				756A313E28902C6F004978E2 /* MainView.swift */,
 				756DDD6D28A272AB002EDC60 /* NoAccountView.swift */,
 				756A3117288821F3004978E2 /* AccountView.swift */,
 				756DDD6F28A275AD002EDC60 /* CreateAccountView.swift */,
@@ -200,7 +201,6 @@
 				756A313C288EBBAD004978E2 /* SendView.swift */,
 				756A313228898C73004978E2 /* SingleTxView.swift */,
 				756A3136288AEAAD004978E2 /* TxsView.swift */,
-				756A313E28902C6F004978E2 /* MainView.swift */,
 				752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */,
 				4774D71D28B4B06200B7988B /* ActivityView.swift */,
 			);
