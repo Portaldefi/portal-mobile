@@ -15,6 +15,9 @@ struct AccountView: View {
     @State private var goToReceive = false
     @State private var goToSend = false
     
+    @State private var qrScannerOpened = false
+    @EnvironmentObject private var viewState: ViewState
+    
     init(viewModel: AccountViewModel) {
         UINavigationBar
             .appearance()
@@ -82,6 +85,14 @@ struct AccountView: View {
             }
         }
         .onAppear(perform: viewModel.sync)
+        .onChange(of: viewState.showScanner, perform: { newValue in
+            qrScannerOpened.toggle()
+        })
+        .sheet(isPresented: $qrScannerOpened, onDismiss: {
+
+        }) {
+            QRCodeScannerView()
+        }
     }
     
     func AccountView() -> some View {
