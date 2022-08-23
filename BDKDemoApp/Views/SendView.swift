@@ -10,8 +10,9 @@ import Combine
 import BitcoinAddressValidator
 
 struct SendView: View {
-    @State private var to: String = ""
-    @State private var amount: String = "0"
+    private let item: QRCodeItem?
+    @State private var to: String
+    @State private var amount: String
     private var signalAlert = PassthroughSubject<Error, Never>()
     private var window = UIApplication.shared.connectedScenes
     // Keep only active scenes, onscreen and visible to the user
@@ -26,6 +27,23 @@ struct SendView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject private var viewModel: AccountViewModel
     
+    init(item: QRCodeItem?) {
+        self.item = item
+        
+        switch item?.type {
+        case .bip21(let address, let amount, _):
+            _to = State(initialValue: address)
+            guard let amount = amount else {
+                _amount = State(initialValue: "0")
+                return
+            }
+            _amount = State(initialValue: amount)
+        default:
+            _to = State(initialValue: String())
+            _amount = State(initialValue: "0")
+        }
+    }
+        
     var body: some View {
         VStack {
             Form {
@@ -112,7 +130,7 @@ struct SendView: View {
 
 struct SendView_Previews: PreviewProvider {
     static var previews: some View {
-        SendView()
+        SendView(item: nil)
             .environmentObject(AccountViewModel.mocked())
     }
 }
