@@ -59,7 +59,6 @@
 		756DDD9328A28DE7002EDC60 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD9228A28DE7002EDC60 /* RootView.swift */; };
 		756DDD9728A28F8F002EDC60 /* IAccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD9528A28F8F002EDC60 /* IAccountManager.swift */; };
 		756DDD9928A28FC6002EDC60 /* AccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD9828A28FC6002EDC60 /* AccountManager.swift */; };
-		756DDD9B28A291A1002EDC60 /* Portal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD9A28A291A1002EDC60 /* Portal.swift */; };
 		756DDD9D28A292D4002EDC60 /* RootViewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD9C28A292D4002EDC60 /* RootViewViewModel.swift */; };
 		75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */ = {isa = PBXBuildFile; productRef = 75AA211028A668A400DD2E89 /* BitcoinAddressValidator */; };
 /* End PBXBuildFile section */
@@ -115,7 +114,6 @@
 		756DDD9228A28DE7002EDC60 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		756DDD9528A28F8F002EDC60 /* IAccountManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAccountManager.swift; sourceTree = "<group>"; };
 		756DDD9828A28FC6002EDC60 /* AccountManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountManager.swift; sourceTree = "<group>"; };
-		756DDD9A28A291A1002EDC60 /* Portal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Portal.swift; sourceTree = "<group>"; };
 		756DDD9C28A292D4002EDC60 /* RootViewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -195,7 +193,6 @@
 		756A312B2888443A004978E2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				756DDD9A28A291A1002EDC60 /* Portal.swift */,
 				4774D72428B4FC2000B7988B /* StringFormatter.swift */,
 				4774D72A28B4FC9B00B7988B /* FiatCurrency.swift */,
 				4774D72C28B4FCCC00B7988B /* Currency.swift */,
@@ -361,7 +358,6 @@
 				756A311F288821F4004978E2 /* Persistence.swift in Sources */,
 				756A313F28902C6F004978E2 /* MainView.swift in Sources */,
 				756DDD7428A27C86002EDC60 /* RestoreAccountView.swift in Sources */,
-				756DDD9B28A291A1002EDC60 /* Portal.swift in Sources */,
 				756DDD9028A28C06002EDC60 /* AccountRecord+CoreDataClass.swift in Sources */,
 				756DDD7D28A28754002EDC60 /* AccountStorage.swift in Sources */,
 				4774D72928B4FC7500B7988B /* UInt64+Extension.swift in Sources */,
