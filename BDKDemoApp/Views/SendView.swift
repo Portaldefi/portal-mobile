@@ -7,64 +7,16 @@
 
 import SwiftUI
 import Combine
-import BitcoinAddressValidator
-import Factory
 import PortalUI
 
-class SendViewViewModel: ObservableObject {
-    private let item: QRCodeItem?
-    @Published var to = String()
-    @Published var amount = String()
-    
-    init(item: QRCodeItem?) {
-        self.item = item
-    }
-}
-
 struct SendView: View {
-    private let qrCodeItem: QRCodeItem?
-    private let walletItems: [WalletItem]
-    
-    @State private var to: String
-    @State private var amount: String
-    @State private var qrScannerOpened = false
-    @State private var selectedItem: WalletItem?
-    
-    private var signalAlert = PassthroughSubject<Error, Never>()
-    private var window = UIApplication.shared.connectedScenes
-    // Keep only active scenes, onscreen and visible to the user
-        .filter { $0.activationState == .foregroundActive }
-    // Keep only the first `UIWindowScene`
-        .first(where: { $0 is UIWindowScene })
-    // Get its associated windows
-        .flatMap({ $0 as? UIWindowScene })?.windows
-    // Finally, keep only the key window
-        .first(where: \.isKeyWindow)
-    
-    @Environment(\.presentationMode) var presentationMode
-    @ObservedObject private var viewModel = Container.accountViewModel()
-    @ObservedObject private var viewState = Container.viewState()
+    @Environment(\.presentationMode) var private presentationMode
+    @ObservedObject private var viewModel: SendViewViewModel
     @FocusState private var isFocused: Bool
-    
-    init(walletItems: [WalletItem], qrCodeItem: QRCodeItem?) {
+        
+    init(qrCodeItem: QRCodeItem?) {
         UITableView.appearance().backgroundColor = .clear
-        
-        self.walletItems = walletItems
-        self.qrCodeItem = qrCodeItem
-        
-        switch qrCodeItem?.type {
-        case .bip21(let address, let amount, _):
-            _to = State(initialValue: address)
-            guard let amount = amount else {
-                _amount = State(initialValue: String())
-                return
-            }
-            _amount = State(initialValue: amount)
-            _selectedItem = State(initialValue: walletItems.first)
-        default:
-            _to = State(initialValue: String())
-            _amount = State(initialValue: String())
-        }
+        viewModel = SendViewViewModel(qrCodeItem: qrCodeItem)
     }
     
     var body: some View {
@@ -73,11 +25,11 @@ struct SendView: View {
             
             VStack(spacing: 0) {
                 ZStack {
-                    if selectedItem != nil {
+                    if viewModel.selectedItem != nil {
                         HStack {
-                            PButton(config: .onlyIcon(Asset.arrowLeftIcon), style: .free, size: .big, enabled: selectedItem != nil) {
+                            PButton(config: .onlyIcon(Asset.arrowLeftIcon), style: .free, size: .big, enabled: viewModel.selectedItem != nil) {
                                 withAnimation {
-                                    selectedItem = nil
+                                    viewModel.selectedItem = nil
                                 }
                             }
                             .frame(width: 20)
@@ -98,7 +50,7 @@ struct SendView: View {
                         
                         ScrollView {
                             VStack {
-                                if let item = selectedItem {
+                                if let item = viewModel.selectedItem {
                                     WalletItemView(item: item)
                                         .padding(.horizontal)
                                         .overlay(
@@ -107,7 +59,7 @@ struct SendView: View {
                                         )
                                         .contentShape(Rectangle())
                                 } else {
-                                    ForEach(walletItems) { item in
+                                    ForEach(viewModel.walletItems) { item in
                                         WalletItemView(item: item)
                                             .padding(.horizontal)
                                             .overlay(
@@ -117,17 +69,17 @@ struct SendView: View {
                                             .contentShape(Rectangle())
                                             .onTapGesture {
                                                 withAnimation {
-                                                    selectedItem = item
+                                                    viewModel.selectedItem = item
                                                 }
                                             }
                                     }
                                 }
                             }
                         }
-                        .frame(height: CGFloat(walletItems.count) * 66)
+                        .frame(height: CGFloat(viewModel.walletItems.count) * 66)
                     }
                     
-                    if selectedItem != nil {
+                    if viewModel.selectedItem != nil {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
                                 Text("Amount")
@@ -139,11 +91,11 @@ struct SendView: View {
                                 .frame(width: 40)
                             }
                             
-                            TextField("Required", text: $amount)
+                            TextField("Required", text: $viewModel.amount)
                                 .focused($isFocused)
                                 .disableAutocorrection(true)
                                 .textInputAutocapitalization(.never)
-                                .keyboardType(.numberPad)
+                                .keyboardType(.decimalPad)
                                 .font(Font.system(size: 16, weight: .bold, design: .monospaced))
                                 .padding()
                                 .background(
@@ -152,12 +104,6 @@ struct SendView: View {
                                             Color(red: 26/255, green: 26/255, blue: 26/255)
                                         )
                                 )
-                                .onReceive(Just(amount)) { newValue in
-                                    let filtered = newValue.filter { "0123456789".contains($0) }
-                                    if filtered != newValue {
-                                        self.amount = filtered
-                                    }
-                                }
                         }
                         
                         VStack(alignment: .leading, spacing: 8) {
@@ -172,28 +118,27 @@ struct SendView: View {
                             }
                             
                             ZStack {
-                                TextField("Required", text: $to)
-                                    .focused($isFocused)
-                                    .disableAutocorrection(true)
-                                    .textInputAutocapitalization(.never)
-                                    .font(Font.system(size: 16, weight: .bold, design: .monospaced))
-                                    .padding()
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(
-                                                Color(red: 26/255, green: 26/255, blue: 26/255)
-                                            )
-                                    )
-                                
                                 HStack {
-                                    Spacer()
+                                    TextField("Required", text: $viewModel.to)
+                                        .focused($isFocused)
+                                        .disableAutocorrection(true)
+                                        .textInputAutocapitalization(.never)
+                                        .font(Font.system(size: 16, weight: .bold, design: .monospaced))
+                                    
                                     PButton(config: .onlyIcon(Asset.qrIcon), style: .free, size: .big, enabled: true) {
-                                        qrScannerOpened.toggle()
+                                        viewModel.qrScannerOpened.toggle()
                                     }
                                     .frame(width: 25, height: 25)
+                                    .border(Color.blue)
                                 }
-                                .padding(.horizontal)
+                                .padding()
                             }
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(
+                                        Color(red: 26/255, green: 26/255, blue: 26/255)
+                                    )
+                            )
                             
                             HStack {
                                 PButton(config: .labelAndIconLeft(label: "Annotate", icon: Asset.pencilIcon), style: .free, size: .small, enabled: false) {
@@ -207,19 +152,10 @@ struct SendView: View {
                         }
                     }
                 }
-                .onTapGesture {
-                    isFocused = false
-                }
                 
-                if selectedItem != nil {
+                if viewModel.selectedItem != nil {
                     Button {
-                        viewModel.send(to: to, amount: amount, completion: { error in
-                            guard let error = error else {
-                                showConfirmationAlert()
-                                return
-                            }
-                            signalAlert.send(error)
-                        })
+                        viewModel.send()
                     } label: {
                         Text("Continue")
                             .foregroundColor(.black)
@@ -231,7 +167,7 @@ struct SendView: View {
                             .background(in: RoundedRectangle(cornerRadius: 10))
                             .frame(height: 60)
                     }
-                    .disabled(!BitcoinAddressValidator.isValid(address: to) || (Double(amount) ?? 0) == 0)
+                    .disabled(!viewModel.sendButtonEnabled)
                     .buttonStyle(.plain)
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
@@ -241,54 +177,42 @@ struct SendView: View {
             .modifier(BackButtonModifier())
             .padding(.horizontal, 16)
         }
-        .navigationTitle("Send Bitcoin")
-        .onReceive(signalAlert) { error in
-            showAlert(error: error)
+        .onTapGesture {
+            isFocused = false
         }
-        .sheet(isPresented: $qrScannerOpened, onDismiss: {
+        .navigationTitle("Send Bitcoin")
+        .alert(isPresented: $viewModel.showSuccessAlet) {
+            Alert(title: Text("\(viewModel.amount) sat sent!"),
+                  message: Text("to: \(viewModel.to)"),
+                  dismissButton: .default(Text("OK"))
+            )
+        }
+        .alert(isPresented: $viewModel.showErrorAlert) {
+            Alert(title: Text("Send error"),
+                  message: Text("\(viewModel.sendError.debugDescription)"),
+                  dismissButton: .default(Text("OK"))
+            )
+        }
+        .sheet(isPresented: $viewModel.qrScannerOpened, onDismiss: {
             
         }) {
             QRCodeScannerView { item in
                 switch item.type {
                 case .bip21(let address, let amount, _):
-                    to = address
-                    guard let amount = amount else { return }
-                    self.amount = amount
+                    viewModel.to = address
+                    guard let _amount = amount else { return }
+                    viewModel.amount = _amount
                 default:
                     break
                 }
             }
         }
     }
-    
-    private func showAlert(error: Error) {
-        let alert =  UIAlertController(title: "Send error", message: "\(error)", preferredStyle: .alert)
-        let dismissAction = UIAlertAction(title: "Dismiss", style: .default) { (action) in
-            print("Alert dismissed")
-        }
-        alert.addAction(dismissAction)
-        
-        DispatchQueue.main.async {
-            window?.rootViewController?.present(alert, animated: true, completion: nil)
-        }
-    }
-    
-    private func showConfirmationAlert() {
-        let alert =  UIAlertController(title: "\(amount) sat sent!", message: "to: \(to)", preferredStyle: .alert)
-        let dismissAction = UIAlertAction(title: "Ok", style: .default) { (action) in
-            presentationMode.wrappedValue.dismiss()
-        }
-        alert.addAction(dismissAction)
-        
-        DispatchQueue.main.async {
-            window?.rootViewController?.present(alert, animated: true, completion: nil)
-        }
-    }
 }
 
 struct SendView_Previews: PreviewProvider {
     static var previews: some View {
-        SendView(walletItems: [WalletItem(description: "Bitcoin", balance: "0.00001", value: "0.5")], qrCodeItem: nil)
+        SendView(qrCodeItem: nil)
             .environmentObject(AccountViewModel.mocked())
     }
 }
