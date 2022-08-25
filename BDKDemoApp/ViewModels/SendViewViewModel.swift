@@ -10,7 +10,6 @@ import Factory
 import BitcoinAddressValidator
 
 class SendViewViewModel: ObservableObject {
-    let qrCodeItem: QRCodeItem?
     var walletItems: [WalletItem] = []
     
     @Published var to = String()
@@ -19,6 +18,7 @@ class SendViewViewModel: ObservableObject {
     @Published var showSuccessAlet = false
     @Published var showErrorAlert = false
     @Published var selectedItem: WalletItem?
+    @Published var qrCodeItem: QRCodeItem?
     
     @Published private(set) var sendError: Error?
     
@@ -28,19 +28,7 @@ class SendViewViewModel: ObservableObject {
         BitcoinAddressValidator.isValid(address: to) && (Double(amount) ?? 0) > 0
     }
     
-    init(qrCodeItem: QRCodeItem?) {
-        self.qrCodeItem = qrCodeItem
-        
-        switch qrCodeItem?.type {
-        case .bip21(let address, let amount, _):
-            selectedItem = walletItems.first
-            to = address
-            guard let amount = amount else { return }
-            self.amount = amount
-        default:
-            break
-        }
-        
+    init() {
         self.walletItems = account.items
     }
     
@@ -53,5 +41,18 @@ class SendViewViewModel: ObservableObject {
             self?.sendError = error
             self?.showErrorAlert.toggle()
         })
+    }
+    
+    func set(item: QRCodeItem?) {
+        guard let i = item else { return }
+        switch i.type {
+        case .bip21(let address, let amount, _):
+            selectedItem = walletItems.first
+            to = address
+            guard let amount = amount else { return }
+            self.amount = amount
+        default:
+            break
+        }
     }
 }
