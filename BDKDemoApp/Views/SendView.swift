@@ -10,13 +10,14 @@ import Combine
 import PortalUI
 
 struct SendView: View {
+    @Binding var item: QRCodeItem?
     @Environment(\.presentationMode) private var presentationMode
-    @ObservedObject private var viewModel: SendViewViewModel
+    @StateObject private var viewModel = SendViewViewModel()
     @FocusState private var isFocused: Bool
         
-    init(qrCodeItem: QRCodeItem?) {
+    init(qrItem: Binding<QRCodeItem?>) {
         UITableView.appearance().backgroundColor = .clear
-        viewModel = SendViewViewModel(qrCodeItem: qrCodeItem)
+        self._item = qrItem
     }
     
     var body: some View {
@@ -181,6 +182,10 @@ struct SendView: View {
             isFocused = false
         }
         .navigationTitle("Send Bitcoin")
+        .onAppear {
+            print(item)
+            viewModel.set(item: item)
+        }
         .alert(isPresented: $viewModel.showSuccessAlet) {
             Alert(title: Text("\(viewModel.amount) sat sent!"),
                   message: Text("to: \(viewModel.to)"),
@@ -197,6 +202,8 @@ struct SendView: View {
             
         }) {
             QRCodeScannerView { item in
+                viewModel.qrCodeItem = item
+                
                 switch item.type {
                 case .bip21(let address, let amount, _):
                     viewModel.to = address
@@ -212,7 +219,7 @@ struct SendView: View {
 
 struct SendView_Previews: PreviewProvider {
     static var previews: some View {
-        SendView(qrCodeItem: nil)
+        SendView(qrItem: .constant(nil))
             .environmentObject(AccountViewModel.mocked())
     }
 }

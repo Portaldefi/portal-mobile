@@ -66,7 +66,7 @@ struct QRCodeScannerView: View {
                             ) { response in
                                 if case let .success(result) = response {
                                     detectedItems = QRCodeParser.current.parse(result.string)
-                                    withAnimation {
+                                    withAnimation(.easeInOut(duration: 0.25)) {
                                         scanState = .detected
                                     }
                                 } else if case let .failure(error) = response {

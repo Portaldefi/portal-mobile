@@ -14,7 +14,7 @@ struct AccountView: View {
     @State private var goToReceive = false
     @State private var goToSend = false
     @State private var qrScannerOpened = false
-    @State private var qrItem: QRCodeItem? = nil
+    @State private var qrItem: QRCodeItem?
     
     @ObservedObject private var viewModel = Container.accountViewModel()
     @ObservedObject private var viewState = Container.viewState()
@@ -99,13 +99,16 @@ struct AccountView: View {
         }) {
             QRCodeScannerView { item in
                 qrItem = item
-                goToSend.toggle()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    goToSend.toggle()
+                }
             }
         }
         .sheet(isPresented: $goToSend, onDismiss: {
             
         }) {
-            SendView(qrCodeItem: qrItem)
+            SendView(qrItem: $qrItem)
         }
     }
     
