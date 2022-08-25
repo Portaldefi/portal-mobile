@@ -12,7 +12,7 @@ import CoreData
 import SwiftUI
 
 final class Portal {
-    static let shared = Portal()
+//    static let shared = Portal()
         
     private var anyCancellables: Set<AnyCancellable> = []
 
@@ -22,7 +22,7 @@ final class Portal {
     let dbStorage: IAccountStorage
     let accountManager: IAccountManager
             
-    private init() {
+    init() {
         let userDefaults = UserDefaults.standard
         
         localStorage = LocalStorage(storage: userDefaults)
