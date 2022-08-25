@@ -15,7 +15,7 @@ class RestoreAccountViewModel: ObservableObject {
     @Published var seed = String()
     @Published var restorable = false
     
-    @Injected(Container.service) private var service
+    @Injected(Container.accountManager) private var manager
     
     private var subscriptions = Set<AnyCancellable>()
     
@@ -33,7 +33,7 @@ class RestoreAccountViewModel: ObservableObject {
         do {
             let restoredKey = try restoreExtendedKey(network: Network.testnet, mnemonic: words.joined(separator:" "), password: nil)
             let account = Account(id: UUID().uuidString, index: 0, name: accountName, key: restoredKey)
-            service.accountManager.save(account: account)
+            manager.save(account: account)
         } catch {
             print("restore error: \(error)")
         }

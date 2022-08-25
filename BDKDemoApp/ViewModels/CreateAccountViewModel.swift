@@ -12,7 +12,7 @@ import Factory
 class CreateAccountViewModel: ObservableObject {
     @Published var accountName = String()
     @Published var extendedKey: ExtendedKeyInfo
-    @Injected(Container.service) private var service
+    @Injected(Container.accountManager) private var manager
     
     init() {
         extendedKey = try! generateExtendedKey(network: Network.testnet, wordCount: WordCount.words12, password: nil)
@@ -20,6 +20,6 @@ class CreateAccountViewModel: ObservableObject {
     
     func createAccount() {
         let account = Account(id: UUID().uuidString, index: 0, name: accountName, key: extendedKey)
-        service.accountManager.save(account: account)
+        manager.save(account: account)
     }
 }

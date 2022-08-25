@@ -16,14 +16,14 @@ class RootViewViewModel: ObservableObject {
     @Published var state: State = .empty
     
     private var subscriptions = Set<AnyCancellable>()
-    @Injected(Container.service) private var service
+    @Injected(Container.accountManager) private var manager
 
     init() {
-        if service.accountManager.activeAccount != nil {
+        if manager.activeAccount != nil {
             state = .account
         }
         
-        service.accountManager.onActiveAccountUpdate
+        manager.onActiveAccountUpdate
             .receive(on: RunLoop.main)
             .sink { [unowned self] account in
                 guard account != nil, state != .account else { return }
