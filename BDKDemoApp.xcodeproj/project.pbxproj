@@ -17,6 +17,9 @@
 		4774D72B28B4FC9B00B7988B /* FiatCurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72A28B4FC9B00B7988B /* FiatCurrency.swift */; };
 		4774D72D28B4FCCC00B7988B /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72C28B4FCCC00B7988B /* Currency.swift */; };
 		4774D72F28B4FD0D00B7988B /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72E28B4FD0D00B7988B /* Date+Extension.swift */; };
+		479A7AC928B756DF0057E100 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = 479A7AC828B756DF0057E100 /* Factory */; };
+		479A7ACB28B759510057E100 /* Portal+Injection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479A7ACA28B759510057E100 /* Portal+Injection.swift */; };
+		479A7ACD28B778CB0057E100 /* WalletItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479A7ACC28B778CA0057E100 /* WalletItemView.swift */; };
 		7502D68B289BD8EF00613323 /* PortalUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7502D68A289BD8EF00613323 /* PortalUI */; };
 		752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */; };
 		752A2D5328A507B900BC6BE2 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 752A2D5228A507B900BC6BE2 /* CodeScanner */; };
@@ -73,6 +76,9 @@
 		4774D72A28B4FC9B00B7988B /* FiatCurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiatCurrency.swift; sourceTree = "<group>"; };
 		4774D72C28B4FCCC00B7988B /* Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency.swift; sourceTree = "<group>"; };
 		4774D72E28B4FD0D00B7988B /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
+		479A7ACA28B759510057E100 /* Portal+Injection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Portal+Injection.swift"; sourceTree = "<group>"; };
+		479A7ACC28B778CA0057E100 /* WalletItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemView.swift; sourceTree = "<group>"; };
+		479A7ACE28B7883D0057E100 /* portal-ui-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "portal-ui-swift"; path = "../portal-ui-swift"; sourceTree = "<group>"; };
 		752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeScannerView.swift; sourceTree = "<group>"; };
 		756A3112288821F3004978E2 /* BDKDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BDKDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		756A3115288821F3004978E2 /* BDKDemoAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BDKDemoAppApp.swift; sourceTree = "<group>"; };
@@ -121,6 +127,7 @@
 				752A2D5328A507B900BC6BE2 /* CodeScanner in Frameworks */,
 				7502D68B289BD8EF00613323 /* PortalUI in Frameworks */,
 				756A312A2888252D004978E2 /* BitcoinDevKit in Frameworks */,
+				479A7AC928B756DF0057E100 /* Factory in Frameworks */,
 				756DDD8C28A28858002EDC60 /* KeychainAccess in Frameworks */,
 				75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */,
 			);
@@ -142,6 +149,7 @@
 		756A3109288821F3004978E2 = {
 			isa = PBXGroup;
 			children = (
+				479A7ACE28B7883D0057E100 /* portal-ui-swift */,
 				756A3114288821F3004978E2 /* BDKDemoApp */,
 				756A3113288821F3004978E2 /* Products */,
 			);
@@ -159,6 +167,7 @@
 			isa = PBXGroup;
 			children = (
 				4774D72328B4F62500B7988B /* Info.plist */,
+				479A7ACA28B759510057E100 /* Portal+Injection.swift */,
 				756A3115288821F3004978E2 /* BDKDemoAppApp.swift */,
 				756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */,
 				756A3138288AEAD2004978E2 /* BackButtonModifier.swift */,
@@ -221,8 +230,8 @@
 			children = (
 				756DDD9228A28DE7002EDC60 /* RootView.swift */,
 				756A313E28902C6F004978E2 /* MainView.swift */,
-				756DDD6D28A272AB002EDC60 /* NoAccountView.swift */,
 				756A3117288821F3004978E2 /* AccountView.swift */,
+				756DDD6D28A272AB002EDC60 /* NoAccountView.swift */,
 				756DDD6F28A275AD002EDC60 /* CreateAccountView.swift */,
 				756DDD7328A27C86002EDC60 /* RestoreAccountView.swift */,
 				756A313A288AEFA2004978E2 /* ReceiveView.swift */,
@@ -231,6 +240,7 @@
 				756A3136288AEAAD004978E2 /* TxsView.swift */,
 				752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */,
 				4774D71D28B4B06200B7988B /* ActivityView.swift */,
+				479A7ACC28B778CA0057E100 /* WalletItemView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -278,6 +288,7 @@
 				756DDD8B28A28858002EDC60 /* KeychainAccess */,
 				752A2D5228A507B900BC6BE2 /* CodeScanner */,
 				75AA211028A668A400DD2E89 /* BitcoinAddressValidator */,
+				479A7AC828B756DF0057E100 /* Factory */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* BDKDemoApp.app */;
@@ -313,6 +324,7 @@
 				756DDD8A28A28858002EDC60 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				752A2D5128A507B900BC6BE2 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 				75AA210F28A668A400DD2E89 /* XCRemoteSwiftPackageReference "bitcoin-address-validator-swift" */,
+				479A7AC728B756DF0057E100 /* XCRemoteSwiftPackageReference "Factory" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -358,6 +370,7 @@
 				756A313328898C73004978E2 /* SingleTxView.swift in Sources */,
 				4774D71C28AF920100B7988B /* QRCodeParser.swift in Sources */,
 				752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */,
+				479A7ACD28B778CB0057E100 /* WalletItemView.swift in Sources */,
 				756A3137288AEAAD004978E2 /* TxsView.swift in Sources */,
 				4774D71A28AF916600B7988B /* QRCodeItem.swift in Sources */,
 				756DDD9328A28DE7002EDC60 /* RootView.swift in Sources */,
@@ -365,6 +378,7 @@
 				756DDD6E28A272AB002EDC60 /* NoAccountView.swift in Sources */,
 				756A3118288821F3004978E2 /* AccountView.swift in Sources */,
 				756A3131288844FD004978E2 /* AccountViewModel.swift in Sources */,
+				479A7ACB28B759510057E100 /* Portal+Injection.swift in Sources */,
 				4774D72728B4FC5300B7988B /* Double+Extension.swift in Sources */,
 				756DDD7628A27DEA002EDC60 /* RestoreAccountViewModel.swift in Sources */,
 				4774D72028B4B0C600B7988B /* ViewState.swift in Sources */,
@@ -595,6 +609,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		479A7AC728B756DF0057E100 /* XCRemoteSwiftPackageReference "Factory" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hmlongco/Factory";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		7502D689289BD8EF00613323 /* XCRemoteSwiftPackageReference "portal-ui-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/FabricLabs/portal-ui-swift";
@@ -638,6 +660,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		479A7AC828B756DF0057E100 /* Factory */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 479A7AC728B756DF0057E100 /* XCRemoteSwiftPackageReference "Factory" */;
+			productName = Factory;
+		};
 		7502D68A289BD8EF00613323 /* PortalUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 7502D689289BD8EF00613323 /* XCRemoteSwiftPackageReference "portal-ui-swift" */;
