@@ -8,6 +8,7 @@
 import Foundation
 import BitcoinDevKit
 import SwiftUI
+import Factory
 
 class AccountViewModel: ObservableObject {
     class ProgressHandler: BitcoinDevKit.Progress {
@@ -53,6 +54,8 @@ class AccountViewModel: ObservableObject {
     @Published private(set) var items: [WalletItem] = []
     @Published private(set) var accountName = String()
     
+    @Injected(Container.service) private var service
+    
     private(set) var progressHandler = ProgressHandler()
     
     private let networkQueue = DispatchQueue(label: "com.portal.network.layer.queue", qos: .userInitiated)
@@ -69,7 +72,7 @@ class AccountViewModel: ObservableObject {
     private func setup() {
 //        state = .loading
         
-        guard let account = Portal.shared.accountManager.activeAccount else {
+        guard let account = service.accountManager.activeAccount else {
             fatalError("\(#function): There is no account")
         }
         

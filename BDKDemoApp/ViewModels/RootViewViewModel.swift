@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import Factory
 
 class RootViewViewModel: ObservableObject {
     enum State {
@@ -15,25 +16,19 @@ class RootViewViewModel: ObservableObject {
     @Published var state: State = .empty
     
     private var subscriptions = Set<AnyCancellable>()
+    @Injected(Container.service) private var service
 
-    init(accountManager: IAccountManager) {
-        if accountManager.activeAccount != nil {
+    init() {
+        if service.accountManager.activeAccount != nil {
             state = .account
         }
         
-        accountManager.onActiveAccountUpdate
+        service.accountManager.onActiveAccountUpdate
             .receive(on: RunLoop.main)
             .sink { [unowned self] account in
                 guard account != nil, state != .account else { return }
                 state = .account
             }
             .store(in: &subscriptions)
-    }
-}
-
-extension RootViewViewModel {
-    static func config() -> RootViewViewModel {
-        let manager = Portal.shared.accountManager
-        return RootViewViewModel(accountManager: manager)
     }
 }

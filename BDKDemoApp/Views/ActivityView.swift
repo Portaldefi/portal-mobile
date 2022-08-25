@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import Factory
 
 struct ActivityView: View {
-    @EnvironmentObject var viewState: ViewState
+    @Injected(Container.viewState) private var viewState
     @State private var qrScannerOpened = false
     
     var body: some View {

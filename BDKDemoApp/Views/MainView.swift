@@ -7,11 +7,12 @@
 
 import SwiftUI
 import PortalUI
+import Factory
 
 struct Mainview: View {
     private let views: [AnyView]
     @State var selectedTab: Int = 0
-    @EnvironmentObject var viewState: ViewState
+    @Injected(Container.viewState) private var viewState
     
     init() {
         views = [
