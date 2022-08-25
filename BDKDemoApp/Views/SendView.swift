@@ -10,7 +10,7 @@ import Combine
 import PortalUI
 
 struct SendView: View {
-    @Environment(\.presentationMode) var private presentationMode
+    @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel: SendViewViewModel
     @FocusState private var isFocused: Bool
         
