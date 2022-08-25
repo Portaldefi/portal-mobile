@@ -11,7 +11,7 @@ import Factory
 
 struct Mainview: View {
     private let views: [AnyView]
-    @State var selectedTab: Int = 0
+    @State private var selectedTab: Int = 0
     @Injected(Container.viewState) private var viewState
     
     init() {

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct RootView: View {
     @StateObject private var viewModel = RootViewViewModel()
-    @StateObject private var viewState = ViewState()
     
     var body: some View {
         switch viewModel.state {
@@ -17,7 +16,6 @@ struct RootView: View {
             NoAccountView()
         case .account:
             Mainview()
-                .environmentObject(viewState)
         }
     }
 }

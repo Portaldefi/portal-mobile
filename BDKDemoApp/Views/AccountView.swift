@@ -83,7 +83,6 @@ struct AccountView: View {
                             ) {
                                 EmptyView()
                             }
-//                            NavigationLink(destination: SendView(item: qrItem), isActive: $goToSend) { EmptyView() }
                         }
                         Spacer()
                     }
@@ -106,7 +105,7 @@ struct AccountView: View {
         .sheet(isPresented: $goToSend, onDismiss: {
             
         }) {
-            SendView(walletItems: viewModel.items, qrCodeItem: qrItem)
+            SendView(qrCodeItem: qrItem)
         }
     }
     
