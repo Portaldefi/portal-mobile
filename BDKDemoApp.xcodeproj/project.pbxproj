@@ -22,6 +22,7 @@
 		479A7ACD28B778CB0057E100 /* WalletItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479A7ACC28B778CA0057E100 /* WalletItemView.swift */; };
 		479A7AD028B7A92C0057E100 /* SendViewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479A7ACF28B7A92C0057E100 /* SendViewViewModel.swift */; };
 		479A7AD228B8F1530057E100 /* SendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479A7AD128B8F1530057E100 /* SendView.swift */; };
+		479A7AD428B8F30B0057E100 /* ReviewTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479A7AD328B8F30B0057E100 /* ReviewTransactionView.swift */; };
 		7502D68B289BD8EF00613323 /* PortalUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7502D68A289BD8EF00613323 /* PortalUI */; };
 		752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */; };
 		752A2D5328A507B900BC6BE2 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 752A2D5228A507B900BC6BE2 /* CodeScanner */; };
@@ -81,6 +82,7 @@
 		479A7ACC28B778CA0057E100 /* WalletItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemView.swift; sourceTree = "<group>"; };
 		479A7ACF28B7A92C0057E100 /* SendViewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendViewViewModel.swift; sourceTree = "<group>"; };
 		479A7AD128B8F1530057E100 /* SendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendView.swift; sourceTree = "<group>"; };
+		479A7AD328B8F30B0057E100 /* ReviewTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewTransactionView.swift; sourceTree = "<group>"; };
 		752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeScannerView.swift; sourceTree = "<group>"; };
 		756A3112288821F3004978E2 /* BDKDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BDKDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		756A3115288821F3004978E2 /* BDKDemoAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BDKDemoAppApp.swift; sourceTree = "<group>"; };
@@ -237,6 +239,7 @@
 				756A313A288AEFA2004978E2 /* ReceiveView.swift */,
 				756A313C288EBBAD004978E2 /* SendFromView.swift */,
 				479A7AD128B8F1530057E100 /* SendView.swift */,
+				479A7AD328B8F30B0057E100 /* ReviewTransactionView.swift */,
 				756A313228898C73004978E2 /* SingleTxView.swift */,
 				756A3136288AEAAD004978E2 /* TxsView.swift */,
 				752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */,
@@ -369,6 +372,7 @@
 				756DDD7228A27C11002EDC60 /* CreateAccountViewModel.swift in Sources */,
 				479A7AD228B8F1530057E100 /* SendView.swift in Sources */,
 				756A313328898C73004978E2 /* SingleTxView.swift in Sources */,
+				479A7AD428B8F30B0057E100 /* ReviewTransactionView.swift in Sources */,
 				4774D71C28AF920100B7988B /* QRCodeParser.swift in Sources */,
 				752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */,
 				479A7ACD28B778CB0057E100 /* WalletItemView.swift in Sources */,
