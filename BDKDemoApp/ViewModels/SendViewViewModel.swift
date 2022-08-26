@@ -21,6 +21,7 @@ class SendViewViewModel: ObservableObject {
     @Published var selectedItem: WalletItem?
     @Published var qrCodeItem: QRCodeItem?
     @Published var goToSend = false
+    @Published var goToReview = false
     
     @Published private(set) var sendError: Error?
     
