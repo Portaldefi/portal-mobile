@@ -108,7 +108,9 @@ struct AccountView: View {
         .sheet(isPresented: $goToSend, onDismiss: {
             
         }) {
-            SendView(qrItem: $qrItem)
+            NavigationView {
+                SendFromView(qrItem: $qrItem)
+            }
         }
     }
     
