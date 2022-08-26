@@ -29,7 +29,7 @@ extension SharedContainer {
         return AccountManager(accountStorage: accountStorage)
     }
     
-    static let sendViewModel = Factory<SendViewViewModel> {
+    static let sendViewModel = Factory<SendViewViewModel>(scope: .shared) {
         SendViewViewModel()
     }
     
