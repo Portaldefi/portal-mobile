@@ -12,7 +12,6 @@ import Factory
 
 struct QRCodeScannerView: View {
     private let qrCodeSimulatedData = "bitcoin:BC1QYLH3U67J673H6Y6ALV70M0PL2YZ53TZHVXGG7U?amount=0.00001&label=sbddesign%3A%20For%20lunch%20Tuesday&message=For%20lunch%20Tuesday&lightning=LNO1PG257ENXV4EZQCNEYPE82UM50YNHXGRWDAJX283QFWDPL28QQMC78YMLVHMXCSYWDK5WRJNJ36JRYG488QWLRNZYJCZS"
-    @State private var overlayOpacity: Double = 0
     @State private var importFromLibrary = false
     @State private var torchOn  = false
     @State private var goToSend = false
@@ -29,13 +28,6 @@ struct QRCodeScannerView: View {
     }
     
     @Environment(\.presentationMode) var presentation
-    
-    private var headerTitle: String {
-        guard detectedItems.count == 1 else {
-            return "\(detectedItems.count) Items detected"
-        }
-        return "Item detected"
-    }
     
     private let detected: (QRCodeItem) -> ()
     
@@ -60,8 +52,8 @@ struct QRCodeScannerView: View {
                                     isGalleryPresented: $importFromLibrary
                                 ) { response in
                                     if case let .success(result) = response {
-                                        detectedItems = QRCodeParser.current.parse(result.string)
                                         withAnimation(.easeInOut(duration: 0.25)) {
+                                            detectedItems = QRCodeParser.current.parse(result.string)
                                             scanState = .detected
                                         }
                                     } else if case let .failure(error) = response {
@@ -81,6 +73,12 @@ struct QRCodeScannerView: View {
                                         }
                                     }
                                 }
+                                .onTapGesture {
+                                    guard case .detected = scanState else { return }
+                                    withAnimation {
+                                        scanState = .detecting
+                                    }
+                                }
                                 
     #if targetEnvironment(simulator)
                                 RoundedRectangle(cornerRadius: 12)
@@ -88,12 +86,6 @@ struct QRCodeScannerView: View {
                                     .zIndex(-1)
     #else
                                 CameraTargetOverlayView()
-                                    .opacity(overlayOpacity)
-                                    .onAppear {
-                                        withAnimation {
-                                            overlayOpacity = 1
-                                        }
-                                    }
     #endif
                             }
                             
@@ -112,11 +104,11 @@ struct QRCodeScannerView: View {
                                             .stroke(Color(red: 42/255, green: 42/255, blue: 42/255, opacity: 1), lineWidth: 1)
                                     )
                                     .padding([.bottom, .horizontal], 8)
-                                    .transition(.move(edge: .bottom))
+                                    .transition(.move(edge: .bottom).combined(with: .opacity))
                             case .detected:
                                 VStack(spacing: 0) {
                                     HStack {
-                                        Text(headerTitle)
+                                        Text("Detected Items")
                                             .font(.system(size: 12, design: .monospaced))
                                             .padding(8)
                                             .frame(height: 33)
@@ -130,6 +122,7 @@ struct QRCodeScannerView: View {
                                     
                                     ForEach(detectedItems) {
                                         QRCodeItemView(item: $0)
+                                            .transition(.asymmetric(insertion: .move(edge: .bottom), removal: .move(edge: .top)))
                                     }
                                 }
                                 .cornerRadius(12)
@@ -138,7 +131,6 @@ struct QRCodeScannerView: View {
                                         .stroke(Color(red: 42/255, green: 42/255, blue: 42/255, opacity: 1), lineWidth: 1)
                                 )
                                 .padding([.bottom, .horizontal], 8)
-                                .transition(.move(edge: .bottom))
                             }
                         }
                     }
@@ -202,6 +194,9 @@ struct QRCodeScannerView: View {
                 showingNotSupportedQRAlert.toggle()
             default:
                 viewModel.qrCodeItem = item
+                detectedItems = []
+                scanState = .detecting
+                
 //                goToSend.toggle()
 //                detected(item)
 //                presentation.wrappedValue.dismiss()
@@ -246,7 +241,7 @@ struct QRCodeScannerView: View {
                                         .resizable()
                                         .frame(width: 12, height: 12)
                                 case .unsupported:
-                                    Image(systemName: "questionmark.circle.fill")
+                                    EmptyView()
                                 }
                                 
                                 Text(item.description)

@@ -9,7 +9,7 @@ import SwiftUI
 import Factory
 
 struct ActivityView: View {
-    @Injected(Container.viewState) private var viewState
+    @ObservedObject private var viewState = Container.viewState()
     @State private var qrScannerOpened = false
     
     var body: some View {

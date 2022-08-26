@@ -12,7 +12,7 @@ import Factory
 struct SendView: View {
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
-    @StateObject var viewModel = Container.sendViewModel()
+    @ObservedObject var viewModel = Container.sendViewModel()
     
     var body: some View {
         ZStack {
@@ -48,13 +48,6 @@ struct SendView: View {
                                         .stroke(Color(red: 42/255, green: 42/255, blue: 42/255), lineWidth: 1)
                                 )
                         }
-                        
-    //                    NavigationLink(
-    //                        destination: SendView(viewModel: viewModel),
-    //                        isActive: $viewModel.goToSend
-    //                    ) {
-    //                        EmptyView()
-    //                    }
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
@@ -129,7 +122,7 @@ struct SendView: View {
                     }
                     
                     Button {
-                        viewModel.send()
+                        viewModel.goToReview.toggle()
                     } label: {
                         Text("Continue")
                             .foregroundColor(.black)
@@ -154,6 +147,13 @@ struct SendView: View {
                 Spacer()
             }
             .padding(.horizontal, 16)
+            
+            NavigationLink(
+                destination: ReviewTransactionView(),
+                isActive: $viewModel.goToReview
+            ) {
+                EmptyView()
+            }
         }
         .navigationBarHidden(true)
     }

@@ -92,18 +92,19 @@ struct AccountView: View {
         }
         .onAppear(perform: viewModel.sync)
         .onChange(of: viewState.showScanner, perform: { newValue in
-            qrScannerOpened.toggle()
+            qrScannerOpened = newValue
         })
         .sheet(isPresented: $qrScannerOpened, onDismiss: {
-            
+            //viewState.showScanner = false
         }) {
             QRCodeScannerView { item in
-                qrItem = item
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    goToSend.toggle()
-                }
+//                qrItem = item
+//
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+//                    goToSend.toggle()
+//                }
             }
+//            .animation(nil)
         }
         .sheet(isPresented: $goToSend, onDismiss: {
             

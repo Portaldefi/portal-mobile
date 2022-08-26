@@ -81,10 +81,6 @@ struct SendFromView: View {
             .padding(.horizontal, 16)
         }
         .navigationBarHidden(true)
-//        .onAppear {
-//            print(item)
-//            viewModel.set(item: item)
-//        }
         .alert(isPresented: $viewModel.showSuccessAlet) {
             Alert(title: Text("\(viewModel.amount) sat sent!"),
                   message: Text("to: \(viewModel.to)"),
