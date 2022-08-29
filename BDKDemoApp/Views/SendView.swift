@@ -13,6 +13,7 @@ struct SendView: View {
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject var viewModel = Container.sendViewModel()
+    @Injected(Container.viewState) private var viewState
     
     var body: some View {
         ZStack {
@@ -28,10 +29,12 @@ struct SendView: View {
                         
                         Spacer()
                         
-                        PButton(config: .onlyIcon(Asset.qrIcon), style: .free, size: .medium, enabled: true) {
-                            viewModel.qrScannerOpened.toggle()
+                        if !viewState.showScanner {
+                            PButton(config: .onlyIcon(Asset.qrIcon), style: .free, size: .medium, enabled: true) {
+                                viewModel.qrScannerOpened.toggle()
+                            }
+                            .frame(width: 25, height: 25)
                         }
-                        .frame(width: 25, height: 25)
                     }
                     
                     Text("Send")
@@ -93,7 +96,7 @@ struct SendView: View {
                                 .font(.system(size: 14, weight: .bold, design: .monospaced))
                             Spacer()
 //                            PButton(config: .onlyLabel("Select from Contacts"), style: .free, size: .small, enabled: false) {
-//                                
+//
 //                            }
 //                            .frame(width: 200)
                         }
