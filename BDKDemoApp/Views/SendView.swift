@@ -21,12 +21,17 @@ struct SendView: View {
             VStack(spacing: 0) {
                 ZStack {
                     HStack {
-                        PButton(config: .onlyIcon(Asset.arrowLeftIcon), style: .free, size: .big, enabled: true) {
+                        PButton(config: .onlyIcon(Asset.arrowLeftIcon), style: .free, size: .medium, enabled: true) {
                             presentationMode.wrappedValue.dismiss()
                         }
                         .frame(width: 20)
                         
                         Spacer()
+                        
+                        PButton(config: .onlyIcon(Asset.qrIcon), style: .free, size: .medium, enabled: true) {
+                            viewModel.qrScannerOpened.toggle()
+                        }
+                        .frame(width: 25, height: 25)
                     }
                     
                     Text("Send")
@@ -55,7 +60,13 @@ struct SendView: View {
                             Text("Amount")
                                 .font(.system(size: 14, weight: .bold, design: .monospaced))
                             Spacer()
-                            PButton(config: .onlyLabel("Max"), style: .free, size: .small, enabled: false) {
+                            PButton(
+                                config: .onlyLabel("Max"),
+                                style: .free,
+                                size: .small,
+                                color: Color(red: 116/255, green: 138/255, blue: 254/255, opacity: 1),
+                                enabled: false
+                            ) {
                                 
                             }
                             .frame(width: 40)
@@ -95,11 +106,10 @@ struct SendView: View {
                                     .textInputAutocapitalization(.never)
                                     .font(Font.system(size: 16, weight: .bold, design: .monospaced))
                                 
-                                PButton(config: .onlyIcon(Asset.qrIcon), style: .free, size: .big, enabled: true) {
-                                    viewModel.qrScannerOpened.toggle()
-                                }
-                                .frame(width: 25, height: 25)
-                                .border(Color.blue)
+//                                PButton(config: .onlyIcon(Asset.qrIcon), style: .free, size: .medium, enabled: true) {
+//                                    viewModel.qrScannerOpened.toggle()
+//                                }
+//                                .frame(width: 25, height: 25)
                             }
                             .padding()
                         }
@@ -156,6 +166,34 @@ struct SendView: View {
             }
         }
         .navigationBarHidden(true)
+        .sheet(isPresented: $viewModel.qrScannerOpened, onDismiss: {
+            
+        }) {
+            QRCodeReaderView(config: .send) { item in
+                viewModel.qrCodeItem = item
+
+                switch item.type {
+                case .bip21(let address, let amount, _):
+                    viewModel.to = address
+                    guard let _amount = amount else { return }
+                    viewModel.amount = _amount
+                default:
+                    break
+                }
+            }
+//            QRCodeScannerView(config: .send) { item in
+//                viewModel.qrCodeItem = item
+//
+//                switch item.type {
+//                case .bip21(let address, let amount, _):
+//                    viewModel.to = address
+//                    guard let _amount = amount else { return }
+//                    viewModel.amount = _amount
+//                default:
+//                    break
+//                }
+//            }
+        }
     }
 }
 
