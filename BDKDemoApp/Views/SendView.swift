@@ -95,10 +95,6 @@ struct SendView: View {
                             Text("Address")
                                 .font(.system(size: 14, weight: .bold, design: .monospaced))
                             Spacer()
-//                            PButton(config: .onlyLabel("Select from Contacts"), style: .free, size: .small, enabled: false) {
-//
-//                            }
-//                            .frame(width: 200)
                         }
                         
                         ZStack {
@@ -108,11 +104,6 @@ struct SendView: View {
                                     .disableAutocorrection(true)
                                     .textInputAutocapitalization(.never)
                                     .font(Font.system(size: 16, weight: .bold, design: .monospaced))
-                                
-//                                PButton(config: .onlyIcon(Asset.qrIcon), style: .free, size: .medium, enabled: true) {
-//                                    viewModel.qrScannerOpened.toggle()
-//                                }
-//                                .frame(width: 25, height: 25)
                             }
                             .padding()
                         }
@@ -184,18 +175,6 @@ struct SendView: View {
                     break
                 }
             }
-//            QRCodeScannerView(config: .send) { item in
-//                viewModel.qrCodeItem = item
-//
-//                switch item.type {
-//                case .bip21(let address, let amount, _):
-//                    viewModel.to = address
-//                    guard let _amount = amount else { return }
-//                    viewModel.amount = _amount
-//                default:
-//                    break
-//                }
-//            }
         }
     }
 }
