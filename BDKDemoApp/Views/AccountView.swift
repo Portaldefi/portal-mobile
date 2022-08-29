@@ -97,14 +97,7 @@ struct AccountView: View {
         .sheet(isPresented: $qrScannerOpened, onDismiss: {
             //viewState.showScanner = false
         }) {
-            QRCodeScannerView { item in
-//                qrItem = item
-//
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-//                    goToSend.toggle()
-//                }
-            }
-//            .animation(nil)
+            QRCodeReaderView(config: .universal)
         }
         .sheet(isPresented: $goToSend, onDismiss: {
             
