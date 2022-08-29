@@ -20,7 +20,7 @@ struct ActivityView: View {
             .sheet(isPresented: $qrScannerOpened, onDismiss: {
 
             }) {
-                QRCodeScannerView { item in
+                QRCodeScannerView() { item in
                     print(item)
                 }
             }
