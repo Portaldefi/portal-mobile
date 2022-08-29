@@ -21,7 +21,7 @@ struct ReviewTransactionView: View {
             VStack(spacing: 0) {
                 ZStack {
                     HStack {
-                        PButton(config: .onlyIcon(Asset.arrowLeftIcon), style: .free, size: .big, enabled: true) {
+                        PButton(config: .onlyIcon(Asset.arrowLeftIcon), style: .free, size: .small, enabled: true) {
                             presentationMode.wrappedValue.dismiss()
                         }
                         .frame(width: 20)
