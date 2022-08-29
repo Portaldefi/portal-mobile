@@ -27,7 +27,7 @@ struct SendFromView: View {
             VStack(spacing: 0) {
                 ZStack {
                     HStack {
-                        PButton(config: .onlyIcon(Asset.xIcon), style: .free, size: .big, enabled: true) {
+                        PButton(config: .onlyIcon(Asset.xIcon), style: .free, size: .medium, enabled: true) {
                             presentationMode.wrappedValue.dismiss()
                         }
                         .frame(width: 20)
@@ -53,9 +53,7 @@ struct SendFromView: View {
                                             .padding(.horizontal)
                                             .contentShape(Rectangle())
                                             .onTapGesture {
-                                                withAnimation {
-                                                    viewModel.selectedItem = item
-                                                }
+                                                viewModel.selectedItem = item
                                             }
                                         Divider()
                                     }
@@ -69,7 +67,7 @@ struct SendFromView: View {
                         .frame(height: CGFloat(viewModel.walletItems.count) * 68)
                         
                         NavigationLink(
-                            destination: SendView(viewModel: viewModel),
+                            destination: SendView(),
                             isActive: $viewModel.goToSend
                         ) {
                             EmptyView()
@@ -92,22 +90,6 @@ struct SendFromView: View {
                   message: Text("\(viewModel.sendError.debugDescription)"),
                   dismissButton: .default(Text("OK"))
             )
-        }
-        .sheet(isPresented: $viewModel.qrScannerOpened, onDismiss: {
-            
-        }) {
-            QRCodeScannerView { item in
-                viewModel.qrCodeItem = item
-                
-                switch item.type {
-                case .bip21(let address, let amount, _):
-                    viewModel.to = address
-                    guard let _amount = amount else { return }
-                    viewModel.amount = _amount
-                default:
-                    break
-                }
-            }
         }
     }
 }
