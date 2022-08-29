@@ -95,7 +95,7 @@ struct AccountView: View {
             qrScannerOpened = newValue
         })
         .sheet(isPresented: $qrScannerOpened, onDismiss: {
-            //viewState.showScanner = false
+            viewState.showScanner.toggle()
         }) {
             QRCodeReaderView(config: .universal)
         }
