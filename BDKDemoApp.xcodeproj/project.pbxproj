@@ -64,6 +64,7 @@
 		756DDD9928A28FC6002EDC60 /* AccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD9828A28FC6002EDC60 /* AccountManager.swift */; };
 		756DDD9D28A292D4002EDC60 /* RootViewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD9C28A292D4002EDC60 /* RootViewViewModel.swift */; };
 		75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */ = {isa = PBXBuildFile; productRef = 75AA211028A668A400DD2E89 /* BitcoinAddressValidator */; };
+		75DFA55828BD010400F23E02 /* QRCodeReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -120,6 +121,7 @@
 		756DDD9528A28F8F002EDC60 /* IAccountManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAccountManager.swift; sourceTree = "<group>"; };
 		756DDD9828A28FC6002EDC60 /* AccountManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountManager.swift; sourceTree = "<group>"; };
 		756DDD9C28A292D4002EDC60 /* RootViewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewViewModel.swift; sourceTree = "<group>"; };
+		75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeReaderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -243,6 +245,7 @@
 				756A313228898C73004978E2 /* SingleTxView.swift */,
 				756A3136288AEAAD004978E2 /* TxsView.swift */,
 				752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */,
+				75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */,
 				4774D71D28B4B06200B7988B /* ActivityView.swift */,
 				479A7ACC28B778CA0057E100 /* WalletItemView.swift */,
 			);
@@ -372,6 +375,7 @@
 				756DDD7228A27C11002EDC60 /* CreateAccountViewModel.swift in Sources */,
 				479A7AD228B8F1530057E100 /* SendView.swift in Sources */,
 				756A313328898C73004978E2 /* SingleTxView.swift in Sources */,
+				75DFA55828BD010400F23E02 /* QRCodeReaderView.swift in Sources */,
 				479A7AD428B8F30B0057E100 /* ReviewTransactionView.swift in Sources */,
 				4774D71C28AF920100B7988B /* QRCodeParser.swift in Sources */,
 				752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */,
