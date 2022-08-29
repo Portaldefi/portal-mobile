@@ -92,10 +92,10 @@ struct SendView: View {
                             Text("Address")
                                 .font(.system(size: 14, weight: .bold, design: .monospaced))
                             Spacer()
-                            PButton(config: .onlyLabel("Select from Contacts"), style: .free, size: .small, enabled: false) {
-                                
-                            }
-                            .frame(width: 200)
+//                            PButton(config: .onlyLabel("Select from Contacts"), style: .free, size: .small, enabled: false) {
+//                                
+//                            }
+//                            .frame(width: 200)
                         }
                         
                         ZStack {
