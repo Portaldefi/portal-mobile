@@ -20,13 +20,16 @@ struct Mainview: View {
         ]
     }
     
-    private var gradiendColor: LinearGradient {
-        let gradient = Gradient(colors: [
-            Color(red: 116/255, green: 138/255, blue: 254/255),
-            Color(red: 166/255, green: 78/255, blue: 255/255)
-        ])
-
-        return LinearGradient(gradient: gradient, startPoint: .top, endPoint: .bottom)
+    private var gradiendColor: RadialGradient {
+        RadialGradient(
+            colors: [
+                Color(red: 116/255, green: 138/255, blue: 254/255),
+                Color(red: 166/255, green: 78/255, blue: 255/255)
+            ],
+            center: .center,
+            startRadius: 0,
+            endRadius: 270
+        )
     }
     
     var TabBar: some View {
@@ -54,7 +57,7 @@ struct Mainview: View {
                     .foregroundColor(Color.gray)
                 }
             }
-            .frame(width: 65, height: 65)
+            .frame(width: 65)
             
             Spacer()
             
@@ -78,10 +81,11 @@ struct Mainview: View {
                             .font(.system(size: 14, design: .rounded))
                             .fontWeight(.bold)
                     }
+                    .padding(6)
                     .foregroundColor(Color.gray)
                 }
             }
-            .frame(width: 65, height: 65)
+            .frame(width: 65)
             
             Spacer()
             
@@ -90,6 +94,7 @@ struct Mainview: View {
             } label: {
                 Asset.scanQRIcon
             }
+            .frame(width: 65)
         }
         .padding(.horizontal, 25.5)
         .frame(height: 65)
