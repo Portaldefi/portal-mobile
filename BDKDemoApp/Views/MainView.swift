@@ -11,8 +11,7 @@ import Factory
 
 struct Mainview: View {
     private let views: [AnyView]
-    @State private var selectedTab: Int = 0
-    @Injected(Container.viewState) private var viewState
+    @ObservedObject private var viewState = Container.viewState()
     
     init() {
         views = [
@@ -21,31 +20,68 @@ struct Mainview: View {
         ]
     }
     
-    var tabBar: some View {
+    private var gradiendColor: LinearGradient {
+        let gradient = Gradient(colors: [
+            Color(red: 116/255, green: 138/255, blue: 254/255),
+            Color(red: 166/255, green: 78/255, blue: 255/255)
+        ])
+
+        return LinearGradient(gradient: gradient, startPoint: .top, endPoint: .bottom)
+    }
+    
+    var TabBar: some View {
         HStack(spacing: 6.13) {
             Button {
-                selectedTab = 0
+                viewState.openTab(.wallet)
             } label: {
-                VStack(spacing: 4) {
-                    Asset.homeIcon
-                    Text("Wallet")
-                        .font(.system(size: 14, design: .rounded))
-                        .fontWeight(.bold)
+                if viewState.selectedTab == .wallet {
+                    gradiendColor
+                        .mask(
+                            VStack(spacing: 4) {
+                                Asset.homeIcon
+                                Text("Wallet")
+                                    .font(.system(size: 14, design: .rounded))
+                                    .fontWeight(.bold)
+                            }
+                        )
+                } else {
+                    VStack(spacing: 4) {
+                        Asset.homeIcon
+                        Text("Wallet")
+                            .font(.system(size: 14, design: .rounded))
+                            .fontWeight(.bold)
+                    }
+                    .foregroundColor(Color.gray)
                 }
             }
+            .frame(width: 65, height: 65)
             
             Spacer()
             
             Button {
-                selectedTab = 1
+                viewState.openTab(.activity)
             } label: {
-                VStack(spacing: 4) {
-                    Asset.activityIcon
-                    Text("Activity")
-                        .font(.system(size: 14, design: .rounded))
-                        .fontWeight(.bold)
+                if viewState.selectedTab == .activity {
+                    gradiendColor
+                        .mask(
+                            VStack(spacing: 4) {
+                                Asset.activityIcon
+                                Text("Activity")
+                                    .font(.system(size: 14, design: .rounded))
+                                    .fontWeight(.bold)
+                            }
+                        )
+                } else {
+                    VStack(spacing: 4) {
+                        Asset.activityIcon
+                        Text("Activity")
+                            .font(.system(size: 14, design: .rounded))
+                            .fontWeight(.bold)
+                    }
+                    .foregroundColor(Color.gray)
                 }
             }
+            .frame(width: 65, height: 65)
             
             Spacer()
             
@@ -62,9 +98,9 @@ struct Mainview: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            views[selectedTab]
+            views[viewState.selectedTab.rawValue]
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            tabBar
+            TabBar
         }
     }
 }
