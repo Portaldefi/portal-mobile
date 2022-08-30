@@ -13,7 +13,6 @@ struct AccountView: View {
     @State private var goToTxs = false
     @State private var goToReceive = false
     @State private var goToSend = false
-    @State private var qrScannerOpened = false
     @State private var qrItem: QRCodeItem?
     
     @ObservedObject private var viewModel = Container.accountViewModel()
@@ -91,11 +90,8 @@ struct AccountView: View {
             }
         }
         .onAppear(perform: viewModel.sync)
-        .onChange(of: viewState.showScanner, perform: { newValue in
-            qrScannerOpened = newValue
-        })
-        .sheet(isPresented: $qrScannerOpened, onDismiss: {
-            viewState.showScanner.toggle()
+        .sheet(isPresented: $viewState.showScanner, onDismiss: {
+            viewState.showScanner = false
         }) {
             QRCodeReaderView(config: .universal)
         }
