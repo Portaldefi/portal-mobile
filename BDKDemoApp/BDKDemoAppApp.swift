@@ -15,7 +15,6 @@ struct BDKDemoAppApp: App {
         WindowGroup {
             RootView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .preferredColorScheme(.dark)
         }
     }
 }

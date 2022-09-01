@@ -32,6 +32,9 @@ struct ReceiveView: View {
                     .frame(width: 350, height: 350)
                 Spacer()
                 Text(address)
+                    .font(.system(size: 13, design: .monospaced))
+                    .fontWeight(.bold)
+                    .padding()
                 Spacer()
                 Button {
                     address = viewModel.getAddress(new: true)

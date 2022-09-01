@@ -7,23 +7,24 @@
 
 import SwiftUI
 import PortalUI
+import Factory
 
 struct AccountView: View {
-    @StateObject private var viewModel: AccountViewModel
-    
     @State private var goToTxs = false
     @State private var goToReceive = false
     @State private var goToSend = false
+    @State private var qrItem: QRCodeItem?
     
-    init(viewModel: AccountViewModel) {
+    @ObservedObject private var viewModel = Container.accountViewModel()
+    @ObservedObject private var viewState = Container.viewState()
+    
+    init() {
         UINavigationBar
             .appearance()
             .largeTitleTextAttributes = [
                 .font : UIFont.monospacedSystemFont(ofSize: 28, weight: .bold),
                 .foregroundColor: UIColor.white
             ]
-        
-        _viewModel = StateObject(wrappedValue: viewModel)
     }
     
     var body: some View {
@@ -39,13 +40,18 @@ struct AccountView: View {
                 VStack { Text("DB not founded...") }
             case .loaded:
                 ZStack {
-                    Color(red: 26/255, green: 26/255, blue: 26/255, opacity: 1)
+                    Color(
+                        red: 26/255,
+                        green: 26/255,
+                        blue: 26/255,
+                        opacity: 1
+                    )
                     
                     VStack(spacing: 0) {
                         Group {
                             AccountView()
                             Divider()
-                            BalanceView(balance: viewModel.balance)
+                            BalanceView(balance: viewModel.balance, value: viewModel.value)
                                 .padding(.top, 18)
                                 .padding(.horizontal, 16)
                             ActionButtonsView
@@ -54,7 +60,6 @@ struct AccountView: View {
                                 .padding(.bottom, 24)
                         }
                         .background(Color(red: 16/255, green: 16/255, blue: 16/255, opacity: 1))
-
                         
                         ScrollView {
                             VStack(spacing: 0) {
@@ -71,10 +76,13 @@ struct AccountView: View {
                                         .overlay(.black)
                                 }
                             }
-                            NavigationLink(destination: TxsView(txs: viewModel.transactions), isActive: $goToTxs) { EmptyView() }
-                            NavigationLink(destination: SendView(viewModel: viewModel), isActive: $goToSend) { EmptyView() }
+                            NavigationLink(
+                                destination: TxsView(txs: viewModel.transactions),
+                                isActive: $goToTxs
+                            ) {
+                                EmptyView()
+                            }
                         }
-                        
                         Spacer()
                     }
                     .navigationBarHidden(true)
@@ -82,30 +90,45 @@ struct AccountView: View {
             }
         }
         .onAppear(perform: viewModel.sync)
+        .sheet(isPresented: $viewState.showScanner, onDismiss: {
+            viewState.showScanner = false
+        }) {
+            QRCodeReaderView(config: .universal)
+        }
+        .sheet(isPresented: $goToSend, onDismiss: {
+            
+        }) {
+            NavigationView {
+                SendFromView(qrItem: $qrItem)
+            }
+        }
     }
     
     func AccountView() -> some View {
         HStack {
             HStack {
-                Image(systemName: "arrow.2.squarepath")
+                Asset.walletIcon
+                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                 Text(viewModel.accountName)
                     .font(.system(size: 16, design: .monospaced))
                     .fontWeight(.bold)
-                if case .syncing = viewModel.syncState {
-                    Text("Syncing...")
-                        .font(.system(size: 14, design: .monospaced))
-                        .fontWeight(.semibold)
-                        .foregroundColor(.gray)
-                }
+                    .foregroundColor(Color(red: 244/255, green: 244/255, blue: 244/255, opacity: 1))
             }
             Spacer()
-            Image(systemName: "gearshape.fill")
+            if case .syncing = viewModel.syncState {
+                Text("Syncing...")
+                    .font(.system(size: 12, design: .monospaced))
+                    .fontWeight(.semibold)
+                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+            }
+            Asset.gearIcon
+                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
         }
         .frame(height: 48)
         .padding(.horizontal, 20)
     }
     
-    func BalanceView(balance: UInt64) -> some View {
+    func BalanceView(balance: String, value: String) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 12) {
                 VStack(spacing: 4) {
@@ -113,7 +136,7 @@ struct AccountView: View {
                     case .syncing, .synced:
                         HStack(alignment: .bottom, spacing: 10) {
                             Spacer()
-                            Text("\(balance)")
+                            Text(balance)
                                 .font(.system(size: 32, design: .monospaced))
                                 .fontWeight(.semibold)
                             Text("sats")
@@ -125,10 +148,10 @@ struct AccountView: View {
                         .frame(height: 32)
                         
                         HStack(spacing: 10) {
-                            Text("\(balance / 30)")
+                            Text(value)
                                 .font(.system(size: 16, design: .monospaced))
                                 .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
-                            Text("USD")
+                            Text("usd")
                                 .font(.system(size: 12, design: .monospaced))
                                 .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                                 .offset(y: 2)
@@ -146,90 +169,35 @@ struct AccountView: View {
     var ActionButtonsView: some View {
         HStack(spacing: 10) {
             PButton(
-                config: .labelAndIconLeft(label: "Receive", icon: "arrow.down.forward"),
+                config: .labelAndIconLeft(label: "Receive", icon: Asset.receiveButtonIcon),
                 style: .filled,
-                size: .small,
+                size: .medium,
                 enabled: viewModel.syncState == .synced
             ) {
                 goToReceive.toggle()
             }
-            .disabled(viewModel.syncState != .synced)
             
             PButton(
-                config: .labelAndIconLeft(label: "Send", icon: "arrow.up.forward"),
+                config: .labelAndIconLeft(label: "Send", icon: Asset.sendButtonIcon),
                 style: .filled,
-                size: .small,
+                size: .medium,
                 enabled: viewModel.syncState == .synced
             ) {
-                goToSend.toggle()
+                withAnimation {
+                    goToSend.toggle()
+                }
             }
-            .disabled(viewModel.syncState != .synced)
             
             NavigationLink(destination: ReceiveView(viewModel: viewModel), isActive: $goToReceive) { EmptyView() }
         }
-    }
-    
-    func WalletItemView(item: WalletItem) -> some View {
-        HStack {
-            VStack(spacing: 12) {
-                VStack(spacing: 4.2) {
-                    HStack(spacing: 6) {
-                        RoundedRectangle(cornerRadius: 8)
-                            .frame(width: 16, height: 16)
-                            .foregroundColor(Color.green)
-                        Text("Bitcoin")
-                            .font(.system(size: 14, design: .monospaced))
-                            .fontWeight(.bold)
-                            .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
-                            .frame(height: 16)
-                        Spacer()
-                    }
-                    HStack(spacing: 6) {
-                        Spacer()
-                            .frame(width: 16, height: 16)
-                        Text(item.description)
-                            .font(.system(size: 12, design: .monospaced))
-                            .fontWeight(.bold)
-                            .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
-                            .frame(height: 17)
-                        Image(systemName: "questionmark.circle.fill")
-                            .foregroundColor(Color(red: 138/255, green: 138/255, blue: 138/255, opacity: 1))
-                        Spacer()
-                    }
-                }
-            }
-            Spacer()
-            VStack(spacing: 0) {
-                HStack(spacing: 10) {
-                    Spacer()
-                    Text("\(item.balance)")
-                        .font(.system(size: 18, design: .monospaced))
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
-                    Text("sats")
-                        .font(.system(size: 16, design: .monospaced))
-                        .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
-                }
-                .frame(height: 22)
-                HStack(spacing: 10) {
-                    Spacer()
-                    Text("≈ \(item.fiatValue)")
-                        .font(.system(size: 14, design: .monospaced))
-                        .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
-                    Text("USD")
-                        .font(.system(size: 12, design: .monospaced))
-                        .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
-                }
-                .frame(height: 22)
-            }
-        }
-        .frame(height: 66)
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        AccountView(viewModel: AccountViewModel.mocked())
+        AccountView()
+            .environmentObject(ViewState())
+            .environmentObject(AccountViewModel.mocked())
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
             .preferredColorScheme(.dark)
     }

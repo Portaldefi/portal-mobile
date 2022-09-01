@@ -1,5 +1,5 @@
 //
-//  SendView.swift
+//  ReviewTransactionView.swift
 //  BDKDemoApp
 //
 //  Created by farid on 26/8/22.
@@ -9,11 +9,10 @@ import SwiftUI
 import PortalUI
 import Factory
 
-struct SendView: View {
+struct ReviewTransactionView: View {
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject var viewModel = Container.sendViewModel()
-    @Injected(Container.viewState) private var viewState
     
     var body: some View {
         ZStack {
@@ -22,22 +21,15 @@ struct SendView: View {
             VStack(spacing: 0) {
                 ZStack {
                     HStack {
-                        PButton(config: .onlyIcon(Asset.arrowLeftIcon), style: .free, size: .medium, enabled: true) {
+                        PButton(config: .onlyIcon(Asset.arrowLeftIcon), style: .free, size: .small, enabled: true) {
                             presentationMode.wrappedValue.dismiss()
                         }
                         .frame(width: 20)
                         
                         Spacer()
-                        
-                        if !viewState.showScanner {
-                            PButton(config: .onlyIcon(Asset.qrIcon), style: .free, size: .medium, enabled: true) {
-                                viewModel.qrScannerOpened.toggle()
-                            }
-                            .frame(width: 25, height: 25)
-                        }
                     }
                     
-                    Text("Send")
+                    Text("Review Transaction")
                         .font(.system(size: 16, weight: .bold, design: .monospaced))
                         .frame(height: 62)
                 }
@@ -59,50 +51,37 @@ struct SendView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("Amount")
-                                .font(.system(size: 14, weight: .bold, design: .monospaced))
-                            Spacer()
-                            PButton(
-                                config: .onlyLabel("Max"),
-                                style: .free,
-                                size: .small,
-                                color: Color(red: 116/255, green: 138/255, blue: 254/255, opacity: 1),
-                                enabled: false
-                            ) {
-                                
-                            }
-                            .frame(width: 40)
-                        }
+                        Text("Amount")
+                            .font(.system(size: 14, weight: .bold, design: .monospaced))
                         
-                        TextField("Required", text: $viewModel.amount)
-                            .focused($isFocused)
-                            .disableAutocorrection(true)
-                            .textInputAutocapitalization(.never)
-                            .keyboardType(.decimalPad)
-                            .font(Font.system(size: 16, weight: .bold, design: .monospaced))
-                            .padding()
+                        ZStack {
+                            HStack(alignment: .bottom) {
+                                Text(viewModel.amount)
+                                    .font(Font.system(size: 24, weight: .bold, design: .monospaced))
+                                Text("btc")
+                                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255))
+                                    .offset(y: -2)
+                                Spacer()
+                            }
+                            .padding(10)
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
                                     .fill(
                                         Color(red: 26/255, green: 26/255, blue: 26/255)
                                     )
                             )
+                        }
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("Address")
-                                .font(.system(size: 14, weight: .bold, design: .monospaced))
-                            Spacer()
-                        }
+                        Text("Recipient")
+                            .font(.system(size: 14, weight: .bold, design: .monospaced))
                         
                         ZStack {
                             HStack {
-                                TextField("Required", text: $viewModel.to)
+                                Text(viewModel.to)
                                     .focused($isFocused)
-                                    .disableAutocorrection(true)
-                                    .textInputAutocapitalization(.never)
                                     .font(Font.system(size: 16, weight: .bold, design: .monospaced))
                             }
                             .padding()
@@ -126,9 +105,9 @@ struct SendView: View {
                     }
                     
                     Button {
-                        viewModel.goToReview.toggle()
+                        viewModel.send()
                     } label: {
-                        Text("Continue")
+                        Text("Send")
                             .foregroundColor(.black)
                             .font(.system(size: 22, design: .monospaced))
                             .fontWeight(.bold)
@@ -151,36 +130,13 @@ struct SendView: View {
                 Spacer()
             }
             .padding(.horizontal, 16)
-            
-            NavigationLink(
-                destination: ReviewTransactionView(),
-                isActive: $viewModel.goToReview
-            ) {
-                EmptyView()
-            }
         }
         .navigationBarHidden(true)
-        .sheet(isPresented: $viewModel.qrScannerOpened, onDismiss: {
-            
-        }) {
-            QRCodeReaderView(config: .send) { item in
-                viewModel.qrCodeItem = item
-
-                switch item.type {
-                case .bip21(let address, let amount, _):
-                    viewModel.to = address
-                    guard let _amount = amount else { return }
-                    viewModel.amount = _amount
-                default:
-                    break
-                }
-            }
-        }
     }
 }
 
-struct SendView_Previews: PreviewProvider {
+struct ReviewTransactionView_Previews: PreviewProvider {
     static var previews: some View {
-        SendView()
+        ReviewTransactionView()
     }
 }

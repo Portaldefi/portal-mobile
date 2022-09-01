@@ -15,24 +15,30 @@ struct NoAccountView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                Color(red: 26/255, green: 26/255, blue: 26/255, opacity: 1).ignoresSafeArea()
+                Color(red: 10/255, green: 10/255, blue: 10/255, opacity: 1).ignoresSafeArea()
                 
                 VStack {
-                    Text("Welcome to Portal")
-                        .foregroundColor(.white)
-                        .font(.system(size: 16, design: .monospaced))
-                        .fontWeight(.bold)
+                    VStack(spacing: 51) {
+                        Asset.portalLogo
+                        Text("Your Gateway To\nUncensorable Finance")
+                            .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
+                            .font(.system(size: 21, design: .monospaced))
+                            .fontWeight(.bold)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.top, 144)
                     Spacer()
-                    PButton(config: .onlyLabel("Create account"), style: .filled, size: .medium, enabled: true) {
+                    PButton(config: .onlyLabel("Create account"), style: .filled, size: .big, enabled: true) {
                         createAccount.toggle()
                     }
-                    PButton(config: .onlyLabel("Restore account"), style: .filled, size: .medium, enabled: true) {
+                    PButton(config: .onlyLabel("Restore account"), style: .outline, size: .big, enabled: true) {
                         restoreAccount.toggle()
                     }
                     NavigationLink(destination: CreateAccountView(), isActive: $createAccount) { EmptyView() }
                     NavigationLink(destination: RestoreAccountView(), isActive: $restoreAccount) { EmptyView() }
                 }
-                .padding()
+                .padding(.bottom, 87)
+                .padding(.horizontal)
                 .navigationBarHidden(true)
             }
         }
