@@ -33,6 +33,10 @@ extension SharedContainer {
         SendViewViewModel()
     }
     
+    static let accountSettings = Factory<AccountSettings>(scope: .singleton) {
+        AccountSettings()
+    }
+    
     static let accountViewModel = Factory<AccountViewModel>(scope: .singleton) { AccountViewModel() }
     static let viewState = Factory<ViewState>(scope: .singleton, factory: { ViewState() })
 }
