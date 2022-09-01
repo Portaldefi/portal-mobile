@@ -84,6 +84,8 @@ extension Double {
             formatter.minimumFractionDigits = 0
             formatter.minimumIntegerDigits = 1
             return formatter.string(from: NSNumber(value: self)) ?? "-"
+        case .sat:
+            return "formatted string in sats"
         }
     }
 }

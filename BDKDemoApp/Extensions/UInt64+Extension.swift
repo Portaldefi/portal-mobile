@@ -32,6 +32,8 @@ extension UInt64 {
             formatter.minimumFractionDigits = 0
             formatter.minimumIntegerDigits = 1
             return formatter.string(from: NSNumber(value: self)) ?? "-"
+        case .sat:
+            return "formatted string in sats"
         }
     }
     
@@ -55,6 +57,8 @@ extension UInt64 {
             return double.ethFormatted()
         case .fiat(let currency):
             return localizedValueString(value: double * currency.rate, symbol: currency.symbol)
+        case .sat:
+            return "total amount sats"
         }
     }
 }

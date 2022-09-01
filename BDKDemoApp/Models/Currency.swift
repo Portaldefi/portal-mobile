@@ -13,6 +13,7 @@ enum Currency: Equatable {
     }
     
     case fiat(FiatCurrency)
+    case sat
     case btc
     case eth
     
@@ -20,6 +21,8 @@ enum Currency: Equatable {
         switch self {
         case .fiat(let currency):
             return currency.symbol
+        case .sat:
+            return "sats"
         case .btc:
             return "₿"
         case .eth:
@@ -33,6 +36,8 @@ enum Currency: Equatable {
             return currency.code
         case .btc:
             return "BTC"
+        case .sat:
+            return "sats"
         case .eth:
             return "ETH"
         }
@@ -44,6 +49,8 @@ enum Currency: Equatable {
             return currency.name
         case .btc:
             return "Bitcoin"
+        case .sat:
+            return "Satoshies"
         case .eth:
             return "Ethereum"
         }
