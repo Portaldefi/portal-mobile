@@ -102,18 +102,6 @@ struct SelectAssetView: View {
             .padding(.horizontal, 16)
         }
         .navigationBarHidden(true)
-        .alert(isPresented: $viewModel.showSuccessAlet) {
-            Alert(title: Text("\(viewModel.amount) sat sent!"),
-                  message: Text("to: \(viewModel.to)"),
-                  dismissButton: .default(Text("OK"))
-            )
-        }
-        .alert(isPresented: $viewModel.showErrorAlert) {
-            Alert(title: Text("Send error"),
-                  message: Text("\(viewModel.sendError.debugDescription)"),
-                  dismissButton: .default(Text("OK"))
-            )
-        }
     }
 }
 
