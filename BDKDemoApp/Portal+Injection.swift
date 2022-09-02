@@ -35,4 +35,7 @@ extension SharedContainer {
     
     static let accountViewModel = Factory<AccountViewModel>(scope: .singleton) { AccountViewModel() }
     static let viewState = Factory<ViewState>(scope: .singleton, factory: { ViewState() })
+    static let biometricAuthentification = Factory<BiometricAuthentication>(scope: .singleton) {
+        BiometricAuthentication()
+    }
 }
