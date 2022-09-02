@@ -18,6 +18,13 @@ struct ReviewTransactionView: View {
         ZStack {
             Color(red: 10/255, green: 10/255, blue: 10/255).ignoresSafeArea()
             
+            NavigationLink(
+                destination: ConfirmationView(),
+                isActive: $viewModel.txSent
+            ) {
+                EmptyView()
+            }
+            
             VStack(spacing: 0) {
                 ZStack {
                     HStack {
