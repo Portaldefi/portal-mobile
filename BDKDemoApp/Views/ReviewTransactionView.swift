@@ -12,7 +12,7 @@ import Factory
 struct ReviewTransactionView: View {
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
-    @ObservedObject var viewModel = Container.sendViewModel()
+    @ObservedObject private var viewModel: SendViewViewModel = Container.sendViewModel()
     
     var body: some View {
         ZStack {
@@ -105,7 +105,10 @@ struct ReviewTransactionView: View {
                     }
                     
                     Button {
-                        viewModel.send()
+                        viewModel.authenticateUser { success in
+                            guard success else { return }
+                            viewModel.send()
+                        }
                     } label: {
                         Text("Send")
                             .foregroundColor(.black)
