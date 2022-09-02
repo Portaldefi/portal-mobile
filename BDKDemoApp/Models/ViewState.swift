@@ -9,6 +9,8 @@ import Combine
 
 class ViewState: ObservableObject {
     @Published var showScanner: Bool = false
+    @Published var goToSend: Bool = false
+
     
     init() {}
 }
