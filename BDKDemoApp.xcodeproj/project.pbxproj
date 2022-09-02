@@ -28,6 +28,7 @@
 		752A2D5328A507B900BC6BE2 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 752A2D5228A507B900BC6BE2 /* CodeScanner */; };
 		7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */; };
 		7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0828C211DA00ED92C3 /* View+Extension.swift */; };
+		7545BC0B28C2339900ED92C3 /* ConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0A28C2339900ED92C3 /* ConfirmationView.swift */; };
 		756A3116288821F3004978E2 /* BDKDemoAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3115288821F3004978E2 /* BDKDemoAppApp.swift */; };
 		756A3118288821F3004978E2 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3117288821F3004978E2 /* AccountView.swift */; };
 		756A311A288821F4004978E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 756A3119288821F4004978E2 /* Assets.xcassets */; };
@@ -89,6 +90,7 @@
 		752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeScannerView.swift; sourceTree = "<group>"; };
 		7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthentication.swift; sourceTree = "<group>"; };
 		7545BC0828C211DA00ED92C3 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
+		7545BC0A28C2339900ED92C3 /* ConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationView.swift; sourceTree = "<group>"; };
 		756A3112288821F3004978E2 /* BDKDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BDKDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		756A3115288821F3004978E2 /* BDKDemoAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BDKDemoAppApp.swift; sourceTree = "<group>"; };
 		756A3117288821F3004978E2 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
@@ -248,6 +250,7 @@
 				756A313C288EBBAD004978E2 /* SelectAssetView.swift */,
 				479A7AD128B8F1530057E100 /* SendView.swift */,
 				479A7AD328B8F30B0057E100 /* ReviewTransactionView.swift */,
+				7545BC0A28C2339900ED92C3 /* ConfirmationView.swift */,
 				756A313228898C73004978E2 /* SingleTxView.swift */,
 				756A3136288AEAAD004978E2 /* TxsView.swift */,
 				752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */,
@@ -406,6 +409,7 @@
 				756DDD9928A28FC6002EDC60 /* AccountManager.swift in Sources */,
 				756A3139288AEAD2004978E2 /* BackButtonModifier.swift in Sources */,
 				479A7AD028B7A92C0057E100 /* SendViewViewModel.swift in Sources */,
+				7545BC0B28C2339900ED92C3 /* ConfirmationView.swift in Sources */,
 				4774D72F28B4FD0D00B7988B /* Date+Extension.swift in Sources */,
 				7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */,
 				756DDD7028A275AD002EDC60 /* CreateAccountView.swift in Sources */,
