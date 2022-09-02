@@ -20,6 +20,27 @@ struct SendFromView: View {
         self._item = qrItem
     }
     
+    private func AssetItemView(item: WalletItem) -> some View {
+        ZStack {
+            Color(red: 26/255, green: 26/255, blue: 26/255)
+            
+            WalletItemView(item: item)
+                .padding(.horizontal)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    viewModel.selectedItem = item
+                }
+        }
+        .if(viewModel.walletItems.count == 1) { zStack in
+            zStack
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color(red: 42/255, green: 42/255, blue: 42/255), lineWidth: 1)
+                )
+        }
+    }
+    
     var body: some View {
         ZStack {
             Color(red: 10/255, green: 10/255, blue: 10/255).ignoresSafeArea()
@@ -49,24 +70,8 @@ struct SendFromView: View {
                             VStack {
                                 VStack(spacing: 0) {
                                     ForEach(viewModel.walletItems) { item in
-                                        ZStack {
-                                            Color(red: 26/255, green: 26/255, blue: 26/255)
-                                            
-                                            WalletItemView(item: item)
-                                                .padding(.horizontal)
-                                                .contentShape(Rectangle())
-                                                .onTapGesture {
-                                                    viewModel.selectedItem = item
-                                                }
-                                        }
-                                        .if(viewModel.walletItems.count == 1) { zStack in
-                                            zStack
-                                                .cornerRadius(12)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 12)
-                                                        .stroke(Color(red: 42/255, green: 42/255, blue: 42/255), lineWidth: 1)
-                                                )
-                                        }
+                                        AssetItemView(item: item)
+                                        
                                         if viewModel.walletItems.count > 1 {
                                             Divider()
                                         }
