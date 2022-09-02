@@ -21,7 +21,19 @@ struct Mainview: View {
         ]
     }
     
-    var tabBar: some View {
+    private var gradiendColor: RadialGradient {
+        RadialGradient(
+            colors: [
+                Color(red: 116/255, green: 138/255, blue: 254/255),
+                Color(red: 166/255, green: 78/255, blue: 255/255)
+            ],
+            center: .bottomTrailing,
+            startRadius: 125,
+            endRadius: 845
+        )
+    }
+    
+    var TabBar: some View {
         HStack(spacing: 6.13) {
             Button {
                 selectedTab = 0
@@ -64,7 +76,7 @@ struct Mainview: View {
         ZStack(alignment: .bottom) {
             views[selectedTab]
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            tabBar
+            TabBar
         }
     }
 }
