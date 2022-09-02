@@ -103,7 +103,7 @@ struct AccountView: View {
             
         }) {
             NavigationView {
-                SendFromView(qrItem: $qrItem)
+                SelectAssetView(qrItem: $qrItem)
             }
         }
     }

@@ -1,5 +1,5 @@
 //
-//  SendFromView.swift
+//  SelectAssetView.swift
 //  BDKDemoApp
 //
 //  Created by farid on 7/25/22.
@@ -10,7 +10,7 @@ import Combine
 import PortalUI
 import Factory
 
-struct SendFromView: View {
+struct SelectAssetView: View {
     @Binding var item: QRCodeItem?
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel = Container.sendViewModel()
@@ -119,7 +119,7 @@ struct SendFromView: View {
 
 struct SendFromView_Previews: PreviewProvider {
     static var previews: some View {
-        SendFromView(qrItem: .constant(nil))
+        SelectAssetView(qrItem: .constant(nil))
             .environmentObject(AccountViewModel.mocked())
     }
 }
