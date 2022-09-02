@@ -16,8 +16,8 @@ struct AccountView: View {
     @State private var qrScannerOpened = false
     @State private var qrItem: QRCodeItem?
     
-    @ObservedObject private var viewModel = Container.accountViewModel()
-    @ObservedObject private var viewState = Container.viewState()
+    @ObservedObject private var viewModel: AccountViewModel = Container.accountViewModel()
+    @ObservedObject private var viewState: ViewState = Container.viewState()
     
     init() {
         UINavigationBar
@@ -150,6 +150,9 @@ struct AccountView: View {
                             Spacer()
                         }
                         .frame(height: 32)
+                        .onTapGesture {
+                            
+                        }
                         
                         HStack(spacing: 10) {
                             Text(value)
