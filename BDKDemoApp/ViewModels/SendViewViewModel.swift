@@ -17,8 +17,7 @@ class SendViewViewModel: ObservableObject {
     @Published var to = String()
     @Published var amount = String()
     @Published var qrScannerOpened = false
-    @Published var showSuccessAlet = false
-    @Published var showErrorAlert = false
+    @Published var txSent = false
     @Published var selectedItem: WalletItem?
     @Published var qrCodeItem: QRCodeItem?
     @Published var goToSend = false
@@ -61,12 +60,10 @@ class SendViewViewModel: ObservableObject {
     
     func send() {
         account.send(to: to, amount: amount, completion: { [weak self] error in
-            guard let error = error else {
-                self?.showSuccessAlet.toggle()
-                return
+            DispatchQueue.main.async {
+                self?.sendError = error
+                self?.txSent.toggle()
             }
-            self?.sendError = error
-            self?.showErrorAlert.toggle()
         })
     }
     
