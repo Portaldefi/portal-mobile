@@ -10,6 +10,7 @@ import PortalUI
 import Factory
 
 struct ReviewTransactionView: View {
+    @State private var isAuthorizated = false
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel: SendViewViewModel = Container.sendViewModel()
@@ -111,26 +112,33 @@ struct ReviewTransactionView: View {
                         .padding()
                     }
                     
-                    Button {
-                        viewModel.authenticateUser { success in
-                            guard success else { return }
-                            viewModel.send()
+                    if !isAuthorizated {
+                        Button {
+                            isAuthorizated = true
+                            viewModel.authenticateUser { success in
+                                isAuthorizated = false
+                                guard success else { return }
+                                viewModel.send()
+                            }
+                        } label: {
+                            Text("Send")
+                                .foregroundColor(.black)
+                                .font(.system(size: 22, design: .monospaced))
+                                .fontWeight(.bold)
+                                .frame(maxWidth: .infinity)
+                                .padding(16)
+                                .background(Color.blue)
+                                .background(in: RoundedRectangle(cornerRadius: 10))
+                                .frame(height: 60)
                         }
-                    } label: {
-                        Text("Send")
-                            .foregroundColor(.black)
-                            .font(.system(size: 22, design: .monospaced))
-                            .fontWeight(.bold)
-                            .frame(maxWidth: .infinity)
-                            .padding(16)
-                            .background(Color.blue)
-                            .background(in: RoundedRectangle(cornerRadius: 10))
-                            .frame(height: 60)
+                        .disabled(!viewModel.sendButtonEnabled)
+                        .buttonStyle(.plain)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 60)
+                    } else {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
                     }
-                    .disabled(!viewModel.sendButtonEnabled)
-                    .buttonStyle(.plain)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 60)
                 }
                 .contentShape(Rectangle())
                 .onTapGesture {
