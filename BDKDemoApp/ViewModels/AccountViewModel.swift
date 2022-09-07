@@ -70,7 +70,7 @@ class AccountViewModel: ObservableObject {
     }
     
     private func setup() {
-//        state = .loading
+        state = .loading
         
         guard let account = manager.activeAccount else {
             fatalError("\(#function): There is no account")
@@ -106,7 +106,7 @@ class AccountViewModel: ObservableObject {
         
         do {
             let _balance = try wallet.getBalance()
-            balance = _balance.totalValueString(currency: .btc)
+            balance = String(_balance).groupedByThree
             let currency = FiatCurrency(code: "USD", name: "Dollar", rate: 0.0004563)
             value = (Double(_balance) * currency.rate).formattedString(.fiat(currency))
             
@@ -158,7 +158,7 @@ class AccountViewModel: ObservableObject {
                 let txs = try wallet.getTransactions()
 
                 let _Balance = try wallet.getBalance()
-                let _balance = _Balance.totalValueString(currency: .btc)
+                let _balance = String(_Balance).groupedByThree
                 let currency = FiatCurrency(code: "USD", name: "Dollar", rate: 0.0004563)
                 let _value = (Double(_Balance) * currency.rate).formattedString(.fiat(currency))
                 let _items = [WalletItem(description: "on Chain", balance: _balance, value: _value)]
