@@ -51,10 +51,9 @@ struct AccountView: View {
                             AccountView()
                             Divider()
                             BalanceView(balance: viewModel.balance, value: viewModel.value)
-                                .padding(.top, 18)
+                                .frame(height: 124)
                                 .padding(.horizontal, 16)
                             ActionButtonsView
-                                .padding(.top, 28)
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 24)
                         }
@@ -109,15 +108,13 @@ struct AccountView: View {
                 Asset.walletIcon
                     .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                 Text(viewModel.accountName)
-                    .font(.system(size: 16, design: .monospaced))
-                    .fontWeight(.bold)
+                    .font(.Main.fixed(.bold, size: 16))
                     .foregroundColor(Color(red: 244/255, green: 244/255, blue: 244/255, opacity: 1))
             }
             Spacer()
             if case .syncing = viewModel.syncState {
                 Text("Syncing...")
-                    .font(.system(size: 12, design: .monospaced))
-                    .fontWeight(.semibold)
+                    .font(.Main.fixed(.semiBold, size: 12))
                     .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
             }
             Asset.gearIcon
@@ -129,18 +126,18 @@ struct AccountView: View {
     
     func BalanceView(balance: String, value: String) -> some View {
         HStack {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 10) {
                 VStack(spacing: 4) {
                     switch viewModel.syncState {
                     case .syncing, .synced:
-                        HStack(alignment: .bottom, spacing: 10) {
+                        HStack(alignment: .bottom, spacing: 6) {
                             Spacer()
                             Text(balance)
-                                .font(.system(size: 32, design: .monospaced))
-                                .fontWeight(.semibold)
+                                .font(.Main.fixed(.bold, size: 32))
+                                .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
                             Text("sats")
-                                .font(.system(size: 18, design: .monospaced))
-                                .foregroundColor(Color(red: 138/255, green: 138/255, blue: 138/255, opacity: 1))
+                                .font(.Main.fixed(.regular, size: 18))
+                                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                                 .padding(.bottom, 4)
                             Spacer()
                         }
@@ -149,12 +146,12 @@ struct AccountView: View {
                             
                         }
                         
-                        HStack(spacing: 10) {
+                        HStack(spacing: 4) {
                             Text(value)
-                                .font(.system(size: 16, design: .monospaced))
-                                .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
+                                .font(.Main.fixed(.medium, size: 16))
+                                .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
                             Text("usd")
-                                .font(.system(size: 12, design: .monospaced))
+                                .font(.Main.fixed(.medium, size: 12))
                                 .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                                 .offset(y: 2)
                         }

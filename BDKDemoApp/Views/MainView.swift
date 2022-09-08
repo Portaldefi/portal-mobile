@@ -43,16 +43,14 @@ struct Mainview: View {
                             VStack(spacing: 4) {
                                 Asset.homeIcon
                                 Text("Wallet")
-                                    .font(.system(size: 14, design: .rounded))
-                                    .fontWeight(.bold)
+                                    .font(.Main.fixed(.extraBold, size: 14))
                             }
                         )
                 } else {
                     VStack(spacing: 4) {
                         Asset.homeIcon
                         Text("Wallet")
-                            .font(.system(size: 14, design: .rounded))
-                            .fontWeight(.bold)
+                            .font(.Main.fixed(.extraBold, size: 14))
                     }
                     .foregroundColor(Color.gray)
                 }
@@ -70,22 +68,20 @@ struct Mainview: View {
                             VStack(spacing: 4) {
                                 Asset.activityIcon
                                 Text("Activity")
-                                    .font(.system(size: 14, design: .rounded))
-                                    .fontWeight(.bold)
+                                    .font(.Main.fixed(.extraBold, size: 14))
                             }
                         )
                 } else {
                     VStack(spacing: 4) {
                         Asset.activityIcon
                         Text("Activity")
-                            .font(.system(size: 14, design: .rounded))
-                            .fontWeight(.bold)
+                            .font(.Main.fixed(.extraBold, size: 14))
                     }
                     .padding(6)
                     .foregroundColor(Color.gray)
                 }
             }
-            .frame(width: 65)
+            .frame(width: 85)
             
             Spacer()
             

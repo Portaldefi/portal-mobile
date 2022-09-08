@@ -22,16 +22,16 @@ struct NoAccountView: View {
                         Asset.portalLogo
                         Text("Your Gateway To\nUncensorable Finance")
                             .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
-                            .font(.system(size: 21, design: .monospaced))
+                            .font(.Main.fixed(.bold, size: 21))
                             .fontWeight(.bold)
                             .multilineTextAlignment(.center)
                     }
                     .padding(.top, 144)
                     Spacer()
-                    PButton(config: .onlyLabel("Create account"), style: .filled, size: .big, enabled: true) {
+                    PButton(config: .onlyLabel("Create new wallet"), style: .filled, size: .big, enabled: true) {
                         createAccount.toggle()
                     }
-                    PButton(config: .onlyLabel("Restore account"), style: .outline, size: .big, enabled: true) {
+                    PButton(config: .onlyLabel("Import wallet"), style: .outline, size: .big, enabled: true) {
                         restoreAccount.toggle()
                     }
                     NavigationLink(destination: CreateAccountView(), isActive: $createAccount) { EmptyView() }

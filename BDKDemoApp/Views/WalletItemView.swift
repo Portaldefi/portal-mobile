@@ -19,8 +19,7 @@ struct WalletItemView: View {
                             .frame(width: 16, height: 16)
                             .foregroundColor(Color.green)
                         Text("Bitcoin")
-                            .font(.system(size: 14, design: .monospaced))
-                            .fontWeight(.bold)
+                            .font(.Main.fixed(.bold, size: 16))
                             .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
                             .frame(height: 16)
                         Spacer()
@@ -29,16 +28,14 @@ struct WalletItemView: View {
                         Spacer()
                             .frame(width: 16, height: 16)
                         Text("on")
-                            .font(.system(size: 12, design: .monospaced))
-                            .fontWeight(.bold)
+                            .font(.Main.fixed(.medium, size: 12))
                             .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                             .frame(height: 17)
                         Asset.chainIcon.resizable()
                             .frame(width: 12, height: 12)
                             .foregroundColor(Color(red: 138/255, green: 138/255, blue: 138/255, opacity: 1))
                         Text("Chain")
-                            .font(.system(size: 12, design: .monospaced))
-                            .fontWeight(.bold)
+                            .font(.Main.fixed(.medium, size: 12))
                             .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                             .frame(height: 17)
                         Spacer()
@@ -47,30 +44,32 @@ struct WalletItemView: View {
             }
             Spacer()
             VStack(spacing: 0) {
-                HStack(spacing: 10) {
+                HStack(spacing: 6) {
                     Spacer()
                     Text("\(item.balance)")
-                        .font(.system(size: 18, design: .monospaced))
-                        .fontWeight(.semibold)
+                        .font(.Main.fixed(.bold, size: 20))
+                        .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
                     Text("sats")
                         .font(.system(size: 16, design: .monospaced))
+                        .foregroundColor(Color(red: 170/255, green: 170/255, blue: 170/255, opacity: 1))
+                        .offset(y: 2)
                 }
-                .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
                 .frame(height: 22)
                 
-                HStack(spacing: 10) {
+                HStack(spacing: 4) {
                     Spacer()
                     Text(item.value)
-                        .font(.system(size: 14, design: .monospaced))
+                        .font(.Main.fixed(.medium, size: 16))
                         .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
                     Text("usd")
-                        .font(.system(size: 12, design: .monospaced))
+                        .font(.Main.fixed(.medium, size: 12))
                         .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                        .offset(y: 2)
                 }
                 .frame(height: 22)
             }
         }
-        .frame(height: 66)
+        .frame(height: 70)
     }
 }
 
