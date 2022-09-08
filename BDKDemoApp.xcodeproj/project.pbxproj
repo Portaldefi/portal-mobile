@@ -581,6 +581,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BDKDemoApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Portal;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera is needed for qr code scanning";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Using biometric authentification is suggested to confirm transactions";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -615,6 +616,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BDKDemoApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Portal;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera is needed for qr code scanning";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Using biometric authentification is suggested to confirm transactions";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
