@@ -55,6 +55,7 @@ class AccountViewModel: ObservableObject {
     @Published private(set) var accountName = String()
     
     @Injected(Container.accountManager) private var manager
+    @Injected(Container.marketData) private var marketData
     
     private(set) var progressHandler = ProgressHandler()
     
@@ -107,8 +108,9 @@ class AccountViewModel: ObservableObject {
         do {
             let _balance = try wallet.getBalance()
             balance = String(_balance).groupedByThree
-            let currency = FiatCurrency(code: "USD", name: "Dollar", rate: 0.0004563)
-            value = (Double(_balance) * currency.rate).formattedString(.fiat(currency))
+            let usd = marketData.fiatCurrencies.first(where: { $0.code == "USD"}) ?? FiatCurrency(code: "USD", name: "Dollar", rate: 0.0004563)
+            let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
+            value = (Double(_balance) * (btcPriceInUsd.double/100_000_000)).formattedString(.fiat(usd))
             
             let txs = try wallet.getTransactions().sorted(by: {
                 switch $0 {
@@ -159,8 +161,9 @@ class AccountViewModel: ObservableObject {
 
                 let _Balance = try wallet.getBalance()
                 let _balance = String(_Balance).groupedByThree
-                let currency = FiatCurrency(code: "USD", name: "Dollar", rate: 0.0004563)
-                let _value = (Double(_Balance) * currency.rate).formattedString(.fiat(currency))
+                let usd = self.marketData.fiatCurrencies.first(where: { $0.code == "USD"}) ?? FiatCurrency(code: "USD", name: "Dollar", rate: 0.0004563)
+                let btcPriceInUsd = self.marketData.btcTicker?[.usd].price ?? 1
+                let _value = (Double(_Balance) * (btcPriceInUsd.double / 100_000_000)).formattedString(.fiat(usd))
                 let _items = [WalletItem(description: "on Chain", balance: _balance, value: _value)]
 
                 let _transactions = txs.sorted(by: {
