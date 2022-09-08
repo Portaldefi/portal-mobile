@@ -33,6 +33,7 @@
 		7545BC3828C9E32A00ED92C3 /* FiatRatesResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3728C9E32A00ED92C3 /* FiatRatesResponse.swift */; };
 		7545BC3A28C9E3A200ED92C3 /* FiatSymbols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3928C9E3A200ED92C3 /* FiatSymbols.swift */; };
 		7545BC3C28C9E5B900ED92C3 /* MarketData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3B28C9E5B900ED92C3 /* MarketData.swift */; };
+		7545BC3E28C9E7AF00ED92C3 /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */; };
 		756A3116288821F3004978E2 /* BDKDemoAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3115288821F3004978E2 /* BDKDemoAppApp.swift */; };
 		756A3118288821F3004978E2 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3117288821F3004978E2 /* AccountView.swift */; };
 		756A311A288821F4004978E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 756A3119288821F4004978E2 /* Assets.xcassets */; };
@@ -99,6 +100,7 @@
 		7545BC3728C9E32A00ED92C3 /* FiatRatesResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FiatRatesResponse.swift; sourceTree = "<group>"; };
 		7545BC3928C9E3A200ED92C3 /* FiatSymbols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FiatSymbols.swift; sourceTree = "<group>"; };
 		7545BC3B28C9E5B900ED92C3 /* MarketData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketData.swift; sourceTree = "<group>"; };
+		7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
 		756A3112288821F3004978E2 /* BDKDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BDKDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		756A3115288821F3004978E2 /* BDKDemoAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BDKDemoAppApp.swift; sourceTree = "<group>"; };
 		756A3117288821F3004978E2 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
@@ -232,6 +234,7 @@
 				4774D71F28B4B0C600B7988B /* ViewState.swift */,
 				7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */,
 				7545BC3B28C9E5B900ED92C3 /* MarketData.swift */,
+				7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */,
 				756DDD9128A28C0A002EDC60 /* DB */,
 			);
 			path = Models;
@@ -401,6 +404,7 @@
 				479A7AD428B8F30B0057E100 /* ReviewTransactionView.swift in Sources */,
 				4774D71C28AF920100B7988B /* QRCodeParser.swift in Sources */,
 				752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */,
+				7545BC3E28C9E7AF00ED92C3 /* RepeatingTimer.swift in Sources */,
 				479A7ACD28B778CB0057E100 /* WalletItemView.swift in Sources */,
 				756A3137288AEAAD004978E2 /* TxsView.swift in Sources */,
 				4774D71A28AF916600B7988B /* QRCodeItem.swift in Sources */,
