@@ -7,8 +7,9 @@
 
 import Foundation
 import Combine
+import Coinpaprika
 
-class MarketData {
+final class MarketData {
     enum NetworkError: Error {
         case parametersNil
         case encodingFailed
@@ -39,6 +40,7 @@ class MarketData {
         
     }
     
+    private(set) var btcTicker: Ticker?
     private(set) var fiatCurrencies = [FiatCurrency]()
     
     private let jsonDecoder: JSONDecoder
@@ -91,6 +93,16 @@ class MarketData {
                 .store(in: &self.subscriptions)
 
         }
+        
+        Coinpaprika.API.ticker(id: "btc-bitcoin", quotes: [.usd]).perform { response in
+            switch response {
+                case .success(let ticker):
+                    self.btcTicker = ticker
+                case .failure(let error):
+                    print(error)
+              }
+        }
+        
         self.timer.resume()
     }
     
