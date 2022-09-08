@@ -29,9 +29,11 @@ struct QRCodeScannerView: View {
     @Environment(\.presentationMode) var presentation
     
     private let detected: (QRCodeItem) -> ()
+    private let onClose: () -> ()
     
-    init(detected: @escaping (QRCodeItem) -> ()) {
+    init(detected: @escaping (QRCodeItem) -> (), onClose: @escaping () -> () = {}) {
         self.detected = detected
+        self.onClose = onClose
     }
     
     var body: some View {
@@ -145,7 +147,7 @@ struct QRCodeScannerView: View {
                     Spacer()
                     
                     PButton(config: .onlyIcon(Asset.xIcon), style: .outline, size: .big, enabled: true) {
-                        presentation.wrappedValue.dismiss()
+                        onClose()
                     }
                     .frame(width: 60, height: 60)
                 }

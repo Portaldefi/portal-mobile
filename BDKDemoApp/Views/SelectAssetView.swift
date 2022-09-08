@@ -16,7 +16,6 @@ struct SelectAssetView: View {
     @ObservedObject private var viewModel = Container.sendViewModel()
     
     init(qrItem: Binding<QRCodeItem?>) {
-        UITableView.appearance().backgroundColor = .clear
         self._item = qrItem
     }
     

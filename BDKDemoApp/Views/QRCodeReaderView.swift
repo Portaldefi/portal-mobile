@@ -28,7 +28,7 @@ struct QRCodeReaderView: View {
     var body: some View {
         NavigationView {
             VStack {
-                QRCodeScannerView() { item in
+                QRCodeScannerView { item in
                     switch config {
                     case .universal:
                         viewModel.qrCodeItem = item
@@ -37,6 +37,8 @@ struct QRCodeReaderView: View {
                         completion(item)
                         presentation.wrappedValue.dismiss()
                     }
+                } onClose: {
+                    presentation.wrappedValue.dismiss()
                 }
                 
                 NavigationLink(

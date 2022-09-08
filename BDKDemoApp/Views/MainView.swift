@@ -11,8 +11,7 @@ import Factory
 
 struct Mainview: View {
     private let views: [AnyView]
-    @State private var selectedTab: Int = 0
-    @Injected(Container.viewState) private var viewState
+    @ObservedObject private var viewState = Container.viewState()
     
     init() {
         views = [
@@ -36,28 +35,57 @@ struct Mainview: View {
     var TabBar: some View {
         HStack(spacing: 6.13) {
             Button {
-                selectedTab = 0
+                viewState.openTab(.wallet)
             } label: {
-                VStack(spacing: 4) {
-                    Asset.homeIcon
-                    Text("Wallet")
-                        .font(.system(size: 14, design: .rounded))
-                        .fontWeight(.bold)
+                if viewState.selectedTab == .wallet {
+                    gradiendColor
+                        .mask(
+                            VStack(spacing: 4) {
+                                Asset.homeIcon
+                                Text("Wallet")
+                                    .font(.system(size: 14, design: .rounded))
+                                    .fontWeight(.bold)
+                            }
+                        )
+                } else {
+                    VStack(spacing: 4) {
+                        Asset.homeIcon
+                        Text("Wallet")
+                            .font(.system(size: 14, design: .rounded))
+                            .fontWeight(.bold)
+                    }
+                    .foregroundColor(Color.gray)
                 }
             }
+            .frame(width: 65)
             
             Spacer()
             
             Button {
-                selectedTab = 1
+                viewState.openTab(.activity)
             } label: {
-                VStack(spacing: 4) {
-                    Asset.activityIcon
-                    Text("Activity")
-                        .font(.system(size: 14, design: .rounded))
-                        .fontWeight(.bold)
+                if viewState.selectedTab == .activity {
+                    gradiendColor
+                        .mask(
+                            VStack(spacing: 4) {
+                                Asset.activityIcon
+                                Text("Activity")
+                                    .font(.system(size: 14, design: .rounded))
+                                    .fontWeight(.bold)
+                            }
+                        )
+                } else {
+                    VStack(spacing: 4) {
+                        Asset.activityIcon
+                        Text("Activity")
+                            .font(.system(size: 14, design: .rounded))
+                            .fontWeight(.bold)
+                    }
+                    .padding(6)
+                    .foregroundColor(Color.gray)
                 }
             }
+            .frame(width: 65)
             
             Spacer()
             
@@ -66,6 +94,7 @@ struct Mainview: View {
             } label: {
                 Asset.scanQRIcon
             }
+            .frame(width: 65)
         }
         .padding(.horizontal, 25.5)
         .frame(height: 65)
@@ -74,7 +103,7 @@ struct Mainview: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            views[selectedTab]
+            views[viewState.selectedTab.rawValue]
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             TabBar
         }
