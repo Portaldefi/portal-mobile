@@ -28,6 +28,15 @@
       }
     },
     {
+      "identity" : "coinpaprika-api-swift-client",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/coinpaprika/coinpaprika-api-swift-client",
+      "state" : {
+        "branch" : "master",
+        "revision" : "22daaef73cfd79360483cbc51632dc372f23206d"
+      }
+    },
+    {
       "identity" : "cryptoswift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/krzyzanowskim/CryptoSwift.git",

@@ -34,6 +34,7 @@
 		7545BC3A28C9E3A200ED92C3 /* FiatSymbols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3928C9E3A200ED92C3 /* FiatSymbols.swift */; };
 		7545BC3C28C9E5B900ED92C3 /* MarketData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3B28C9E5B900ED92C3 /* MarketData.swift */; };
 		7545BC3E28C9E7AF00ED92C3 /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */; };
+		7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */ = {isa = PBXBuildFile; productRef = 7545BC4028CA107100ED92C3 /* Coinpaprika */; };
 		756A3116288821F3004978E2 /* BDKDemoAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3115288821F3004978E2 /* BDKDemoAppApp.swift */; };
 		756A3118288821F3004978E2 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3117288821F3004978E2 /* AccountView.swift */; };
 		756A311A288821F4004978E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 756A3119288821F4004978E2 /* Assets.xcassets */; };
@@ -146,6 +147,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				752A2D5328A507B900BC6BE2 /* CodeScanner in Frameworks */,
+				7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */,
 				7502D68B289BD8EF00613323 /* PortalUI in Frameworks */,
 				756A312A2888252D004978E2 /* BitcoinDevKit in Frameworks */,
 				479A7AC928B756DF0057E100 /* Factory in Frameworks */,
@@ -320,6 +322,7 @@
 				752A2D5228A507B900BC6BE2 /* CodeScanner */,
 				75AA211028A668A400DD2E89 /* BitcoinAddressValidator */,
 				479A7AC828B756DF0057E100 /* Factory */,
+				7545BC4028CA107100ED92C3 /* Coinpaprika */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* BDKDemoApp.app */;
@@ -356,6 +359,7 @@
 				752A2D5128A507B900BC6BE2 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 				75AA210F28A668A400DD2E89 /* XCRemoteSwiftPackageReference "bitcoin-address-validator-swift" */,
 				479A7AC728B756DF0057E100 /* XCRemoteSwiftPackageReference "Factory" */,
+				7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -677,6 +681,14 @@
 				kind = branch;
 			};
 		};
+		7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/coinpaprika/coinpaprika-api-swift-client";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		756A31282888252D004978E2 /* XCRemoteSwiftPackageReference "bdk-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bitcoindevkit/bdk-swift";
@@ -718,6 +730,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 752A2D5128A507B900BC6BE2 /* XCRemoteSwiftPackageReference "CodeScanner" */;
 			productName = CodeScanner;
+		};
+		7545BC4028CA107100ED92C3 /* Coinpaprika */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */;
+			productName = Coinpaprika;
 		};
 		756A31292888252D004978E2 /* BitcoinDevKit */ = {
 			isa = XCSwiftPackageProductDependency;
