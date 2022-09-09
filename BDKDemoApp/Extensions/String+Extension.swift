@@ -19,4 +19,12 @@ extension String {
                 .reversed()
         )
     }
+    
+    var groupedByThreeFromLeft: String {
+        self
+            .enumerated()
+            .reduce(String()) {
+                $1.offset % 3 == 0 && $1.offset != 0 && $1.offset != count - 1 || $1.offset == count - 2 && self.count % 3 != 0 ? $0 + " \($1.element)" : $0 + "\($1.element)"
+            }
+    }
 }
