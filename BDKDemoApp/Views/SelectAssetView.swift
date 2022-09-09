@@ -14,6 +14,8 @@ struct SelectAssetView: View {
     @Binding var item: QRCodeItem?
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel = Container.sendViewModel()
+    @State private var notEnoughFunds = false
+    @State private var notEnoughFundsMessage = String()
     
     init(qrItem: Binding<QRCodeItem?>) {
         self._item = qrItem
@@ -56,12 +58,24 @@ struct SelectAssetView: View {
                                 VStack(spacing: 0) {
                                     Divider()
                                     ForEach(viewModel.walletItems) { item in
-                                        WalletItemView(item: item)
-                                            .padding(.horizontal)
-                                            .contentShape(Rectangle())
-                                            .onTapGesture {
-                                                viewModel.selectedItem = item
-                                            }
+                                        ZStack(alignment: .trailing) {
+                                            WalletItemView(item: item)
+                                                .if(item.balance == "0") { itemView in
+                                                    itemView.opacity(0.4)
+                                                }
+                                                .padding(.horizontal)
+                                                .contentShape(Rectangle())
+                                                .onTapGesture {
+                                                    guard item.balance != "0" else {
+                                                        notEnoughFundsMessage = "\(item.name) on \(item.description)"
+                                                        return notEnoughFunds.toggle()
+                                                    }
+                                                    viewModel.selectedItem = item
+                                                }
+                                            Asset.chevronRightIcon
+                                                .foregroundColor(Color(red: 74/255, green: 74/255, blue: 74/255))
+                                        }
+                                        
                                         Divider()
                                     }
                                 }
@@ -82,6 +96,12 @@ struct SelectAssetView: View {
             .padding(.horizontal, 16)
         }
         .navigationBarHidden(true)
+        .alert(isPresented: $notEnoughFunds) {
+            Alert(title: Text("Not Enough Funds"),
+                  message: Text("Your wallet doesn’t have \(notEnoughFundsMessage) to start this transfer."),
+                  dismissButton: .default(Text("OK"))
+            )
+        }
     }
 }
 

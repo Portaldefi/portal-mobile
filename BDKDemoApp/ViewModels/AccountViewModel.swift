@@ -8,6 +8,7 @@
 import Foundation
 import BitcoinDevKit
 import SwiftUI
+import PortalUI
 import Factory
 
 class AccountViewModel: ObservableObject {
@@ -48,7 +49,8 @@ class AccountViewModel: ObservableObject {
     
     @Published private(set) var state = State.empty
     @Published private(set) var syncState = SyncState.empty
-    @Published private(set) var balance: String = "0"
+    @Published private(set) var totalBalance: String = "0"
+    @Published private(set) var assetBalance: String = "0"
     @Published private(set) var value: String = "0"
     @Published private(set) var transactions: [BitcoinDevKit.Transaction] = []
     @Published private(set) var items: [WalletItem] = []
@@ -107,7 +109,8 @@ class AccountViewModel: ObservableObject {
         
         do {
             let _balance = try wallet.getBalance()
-            balance = String(_balance).groupedByThree
+            totalBalance = String(_balance).groupedByThree
+            assetBalance = String(Double(_balance)/100_000_000)
             let usd = marketData.fiatCurrencies.first(where: { $0.code == "USD"}) ?? FiatCurrency(code: "USD", name: "Dollar", rate: 0.0004563)
             let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
             value = (Double(_balance) * (btcPriceInUsd.double/100_000_000)).formattedString(.fiat(usd))
@@ -135,7 +138,35 @@ class AccountViewModel: ObservableObject {
             state = State.failed(error)
         }
         
-        items = [WalletItem(description: "on Chain", balance: balance, value: value)]
+        items = [
+            WalletItem(
+                icon: Asset.btcIcon,
+                chainIcon: Asset.chainIcon,
+                name: "Bitcoin",
+                description: "Chain",
+                balance: assetBalance,
+                unit: "btc",
+                value: value
+            ),
+            WalletItem(
+                icon: Asset.btcIcon,
+                chainIcon: Asset.lightningRounded,
+                name: "Bitcoin",
+                description: "Lightning",
+                balance: "0",
+                unit: "sats",
+                value: "$0"
+            ),
+            WalletItem(
+                icon: Asset.ethIcon,
+                chainIcon: Asset.chainIcon,
+                name: "Ethereum",
+                description: "Chain",
+                balance: "0",
+                unit: "eth",
+                value: "$0"
+            )
+        ]
     }
     
     func sync() {
@@ -161,10 +192,39 @@ class AccountViewModel: ObservableObject {
 
                 let _Balance = try wallet.getBalance()
                 let _balance = String(_Balance).groupedByThree
+                let _assetBalance = String(Double(_Balance)/100_000_000)
                 let usd = self.marketData.fiatCurrencies.first(where: { $0.code == "USD"}) ?? FiatCurrency(code: "USD", name: "Dollar", rate: 0.0004563)
                 let btcPriceInUsd = self.marketData.btcTicker?[.usd].price ?? 1
                 let _value = (Double(_Balance) * (btcPriceInUsd.double / 100_000_000)).formattedString(.fiat(usd))
-                let _items = [WalletItem(description: "on Chain", balance: _balance, value: _value)]
+                let _items = [
+                    WalletItem(
+                        icon: Asset.btcIcon,
+                        chainIcon: Asset.chainIcon,
+                        name: "Bitcoin",
+                        description: "Chain",
+                        balance: _assetBalance,
+                        unit: "btc",
+                        value: _value
+                    ),
+                    WalletItem(
+                        icon: Asset.btcIcon,
+                        chainIcon: Asset.lightningRounded,
+                        name: "Bitcoin",
+                        description: "Lightning",
+                        balance: "0",
+                        unit: "sats",
+                        value: "$0"
+                    ),
+                    WalletItem(
+                        icon: Asset.ethIcon,
+                        chainIcon: Asset.chainIcon,
+                        name: "Ethereum",
+                        description: "Chain",
+                        balance: "0",
+                        unit: "eth",
+                        value: "$0"
+                    )
+                ]
 
                 let _transactions = txs.sorted(by: {
                     switch $0 {
@@ -186,7 +246,7 @@ class AccountViewModel: ObservableObject {
 
                 DispatchQueue.main.async {
                     self.syncState = .synced
-                    self.balance = _balance
+                    self.totalBalance = _balance
                     self.items = _items
                     self.value = _value
                     self.transactions = _transactions
@@ -269,9 +329,12 @@ extension AccountViewModel {
         let viewModel = AccountViewModel(mocked: true)
         viewModel.state = .loaded(wallet, blockchain)
         viewModel.syncState = .synced
-        viewModel.balance = "23587"
+        viewModel.totalBalance = "23587"
         viewModel.accountName = "Test"
-        viewModel.items = [WalletItem(description: "on Chain", balance: "23587", value: "$56"), WalletItem(description: "in Lightning", balance: "143255", value: "$156")]
+        viewModel.items = [
+            WalletItem(icon: Asset.btcIcon, chainIcon: Asset.chainIcon, name: "Bitcoin", description: "Chain", balance: "23587", unit: "btc",  value: "$56"),
+            WalletItem(icon: Asset.btcIcon, chainIcon: Asset.chainIcon, name: "Bitcoin", description: "Lightning", balance: "143255", unit: "btc", value: "$156")
+        ]
         return viewModel
     }
 }

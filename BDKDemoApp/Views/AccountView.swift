@@ -50,7 +50,7 @@ struct AccountView: View {
                         Group {
                             AccountView()
                             Divider()
-                            BalanceView(balance: viewModel.balance, value: viewModel.value)
+                            BalanceView(balance: viewModel.totalBalance, value: viewModel.value)
                                 .frame(height: 124)
                                 .padding(.horizontal, 16)
                             ActionButtonsView
@@ -64,12 +64,17 @@ struct AccountView: View {
                                 ForEach(viewModel.items) { item in
                                     Divider()
                                         .overlay(.black)
-                                    WalletItemView(item: item)
-                                        .padding(.horizontal, 16)
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            goToTxs.toggle()
-                                        }
+                                    ZStack(alignment: .trailing) {
+                                        WalletItemView(item: item)
+                                            .padding(.leading, 16)
+                                            .padding(.trailing, 10)
+                                            .contentShape(Rectangle())
+                                            .onTapGesture {
+                                                goToTxs.toggle()
+                                            }
+                                        Asset.chevronRightIcon
+                                            .foregroundColor(Color(red: 74/255, green: 74/255, blue: 74/255))
+                                    }
                                     Divider()
                                         .overlay(.black)
                                 }
