@@ -8,11 +8,13 @@
 import SwiftUI
 import CoreImage.CIFilterBuiltins
 import BitcoinDevKit
+import PortalUI
 
 let context = CIContext()
 let filter = CIFilter.qrCodeGenerator()
 
 struct ReceiveView: View {
+    @Environment(\.presentationMode) private var presentationMode
     @ObservedObject var viewModel: AccountViewModel
     @State private var address: String = String()
     @State private var qrCode: UIImage = UIImage()
@@ -22,48 +24,98 @@ struct ReceiveView: View {
     }
     
     var body: some View {
-        VStack {
-            Spacer()
-            VStack {
-                Image(uiImage: qrCode)
-                    .interpolation(.none)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 350, height: 350)
-                Spacer()
-                Text(address)
-                    .font(.system(size: 13, design: .monospaced))
-                    .fontWeight(.bold)
-                    .padding()
-                Spacer()
-                Button {
-                    address = viewModel.getAddress(new: true)
-                    qrCode = viewModel.generateQRCode(from: "bitcoin:\(address)")
-                } label: {
-                    Text("Generate new address")
-                        .foregroundColor(.black)
-                        .font(.system(size: 16, design: .monospaced))
-                        .fontWeight(.bold)
-                        .frame(maxWidth: .infinity)
-                        .padding(8)
-                        .background(Color.blue)
-                        .background(in: RoundedRectangle(cornerRadius: 10))
-                        .frame(height: 50)
-                }
-                .buttonStyle(.plain)
-                .frame(maxWidth: .infinity)
-                .frame(height: 30)
-                .padding()
-            }.contextMenu {
-                Button(action: {
-                    UIPasteboard.general.string = address}) {
-                        Text("Copy to clipboard")
+        ZStack {
+            Color(red: 10/255, green: 10/255, blue: 10/255).ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                ZStack {
+                    HStack {
+                        PButton(config: .onlyIcon(Asset.arrowLeftIcon), style: .free, size: .medium, enabled: true) {
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                        .frame(width: 20)
+                        
+                        Spacer()
                     }
+                    
+                    Text("Receive")
+                        .font(.Main.fixed(.bold, size: 16))
+                        .foregroundColor(Color(red: 1, green: 1, blue: 1))
+                        .frame(height: 62)
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Account/Asset")
+                        .font(.Main.fixed(.bold, size: 16))
+                    HStack(spacing: 6) {
+                        Asset.btcIcon
+                            .resizable()
+                            .frame(width: 16, height: 16)
+                        Text("Bitcoin")
+                            .font(.Main.fixed(.bold, size: 14))
+                            .foregroundColor(Color(red: 1, green: 1, blue: 1))
+                        
+                        HStack(spacing: 6) {
+                            Text("on")
+                                .font(.Main.fixed(.medium, size: 14))
+                                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255))
+                            Asset.chainIcon
+                                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255))
+                            Text("Chain")
+                                .font(.Main.fixed(.medium, size: 14))
+                                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255))
+                            Spacer()
+                        }
+                    }
+                    .padding(15)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+                                Color(red: 26/255, green: 26/255, blue: 26/255)
+                            )
+                    )
+                    
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.white)
+                            .overlay {
+                                Image(uiImage: qrCode)
+                                    .interpolation(.none)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 250, height: 250)
+                            }
+                            .frame(width: 260, height: 260)
+                            .padding(.top, 24)
+                            .padding(.horizontal, 55)
+                            .padding(.bottom, 16)
+                        
+                        Asset.portalQrIcon
+                            .resizable()
+                            .frame(width: 65, height: 65)
+                    }
+                    
+                    Text(address.groupedByThreeFromLeft.uppercased())
+                        .font(.Main.fixed(.regular, size: 16))
+                        .padding(.horizontal, 55)
+
+                        
+                    
+                    Spacer()
+                    
+                    HStack(spacing: 8) {
+                        PButton(config: .onlyLabel("Share"), style: .filled, size: .big, enabled: true) {
+                            
+                        }
+                        PButton(config: .onlyLabel("Copy"), style: .filled, size: .big, enabled: true) {
+                            UIPasteboard.general.string = address
+                        }
+                    }
+                }
             }
-            Spacer()
+            .padding(.horizontal, 24)
         }
-        .navigationTitle("Receive Address")
-        .modifier(BackButtonModifier())
+        .navigationBarHidden(true)
         .onAppear(perform: {
             address = viewModel.getAddress()
             qrCode = viewModel.generateQRCode(from: "bitcoin:\(address)")
@@ -73,6 +125,6 @@ struct ReceiveView: View {
 
 struct ReceiveView_Previews: PreviewProvider {
     static var previews: some View {
-        ReceiveView(viewModel: AccountViewModel())
+        ReceiveView(viewModel: AccountViewModel.mocked())
     }
 }
