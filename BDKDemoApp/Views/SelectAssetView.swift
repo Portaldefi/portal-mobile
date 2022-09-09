@@ -64,6 +64,7 @@ struct SelectAssetView: View {
                                                     itemView.opacity(0.4)
                                                 }
                                                 .padding(.leading)
+                                                .padding(.trailing, 6)
                                                 .contentShape(Rectangle())
                                                 .onTapGesture {
                                                     guard item.balance != "0" else {
