@@ -20,6 +20,7 @@ class SendViewViewModel: ObservableObject {
     @Published var txSent = false
     @Published var selectedItem: WalletItem?
     @Published var qrCodeItem: QRCodeItem?
+    @Published var goToReceive = false
     @Published var goToSend = false
     @Published var goToReview = false
     

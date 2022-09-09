@@ -38,7 +38,7 @@ struct SendView: View {
                     }
                     
                     Text("Send")
-                        .font(.system(size: 16, weight: .bold, design: .monospaced))
+                        .font(.Main.fixed(.bold, size: 16))
                         .frame(height: 62)
                 }
                 

@@ -19,7 +19,7 @@ struct NoAccountView: View {
                 
                 VStack {
                     VStack(spacing: 51) {
-                        Asset.portalLogo
+                        Asset.portalIcon
                         Text("Your Gateway To\nUncensorable Finance")
                             .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
                             .font(.Main.fixed(.bold, size: 21))

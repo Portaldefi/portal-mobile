@@ -68,6 +68,7 @@ struct AccountView: View {
                                             .contentShape(Rectangle())
                                             .onTapGesture {
                                                 selectedItem = item
+                                                viewState.hideTabBar.toggle()
                                                 goToDetails.toggle()
                                             }
                                         Asset.chevronRightIcon
@@ -78,14 +79,13 @@ struct AccountView: View {
                                 }
                             }
                             NavigationLink(
-                                destination: AssetDetailsView(item: selectedItem, txs: viewModel.transactions),
+                                destination: AssetDetailsView(item: selectedItem, txs: selectedItem?.name == "Bitcoin" && selectedItem?.unit == "btc" ? viewModel.transactions : []),
                                 isActive: $goToDetails
                             ) {
                                 EmptyView()
                             }
                         }
                         .background(Color(red: 32/255, green: 32/255, blue: 32/255))
-                        Spacer()
                     }
                     .navigationBarHidden(true)
                 }
@@ -96,6 +96,13 @@ struct AccountView: View {
             viewState.showScanner = false
         }) {
             QRCodeReaderView(config: .universal)
+        }
+        .sheet(isPresented: $goToReceive, onDismiss: {
+            
+        }) {
+            NavigationView {
+                ReceiveView(viewModel: viewModel)
+            }
         }
         .sheet(isPresented: $viewState.goToSend, onDismiss: {
             
@@ -190,8 +197,6 @@ struct AccountView: View {
                     viewState.goToSend.toggle()
                 }
             }
-            
-            NavigationLink(destination: ReceiveView(viewModel: viewModel), isActive: $goToReceive) { EmptyView() }
         }
     }
 }
