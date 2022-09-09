@@ -14,6 +14,7 @@ struct AssetDetailsView: View {
     @State private var goToTxs = false
     @State private var goToReceive = false
     @Environment(\.presentationMode) private var presentationMode
+    @ObservedObject private var viewState: ViewState = Container.viewState()
     @ObservedObject private var viewModel: AccountViewModel = Container.accountViewModel()
     @ObservedObject private var sendViewModel = Container.sendViewModel()
     
@@ -29,6 +30,7 @@ struct AssetDetailsView: View {
                     HStack {
                         HStack(spacing: 0) {
                             PButton(config: .onlyIcon(Asset.chevronRightIcon), style: .free, size: .medium, enabled: true) {
+                                viewState.hideTabBar.toggle()
                                 presentationMode.wrappedValue.dismiss()
                             }
                             .frame(width: 20)
@@ -62,10 +64,8 @@ struct AssetDetailsView: View {
                 Divider()
                     .overlay(Color(red: 16/255, green: 16/255, blue: 16/255))
                 
-                ScrollView {
-                    if txs.isEmpty {
-                        Text("No transactions yet.").padding()
-                    } else {
+                ZStack {
+                    ScrollView {
                         ForEach(txs, id: \.self) { transaction in
                             SingleTxView(transaction: transaction)
                                 .padding(.horizontal, 8)
@@ -86,11 +86,24 @@ struct AssetDetailsView: View {
                                 .overlay(Color(red: 26/255, green: 26/255, blue: 26/255))
                         }
                     }
+                    .background(Color(red: 32/255, green: 32/255, blue: 32/255))
+                    
+                    if txs.isEmpty {
+                        Text("No transactions yet.")
+                            .font(.Main.fixed(.regular, size: 16))
+                            .padding()
+                    }
                 }
-                .background(Color(red: 32/255, green: 32/255, blue: 32/255))
             }
         }
         .navigationBarHidden(true)
+        .sheet(isPresented: $sendViewModel.goToReceive, onDismiss: {
+            
+        }) {
+            NavigationView {
+                ReceiveView(viewModel: viewModel)
+            }
+        }
         .sheet(isPresented: $sendViewModel.goToSend, onDismiss: {
             sendViewModel.goToSend = false
         }) {
@@ -106,23 +119,21 @@ struct AssetDetailsView: View {
                 config: .labelAndIconLeft(label: "Receive", icon: Asset.receiveButtonIcon),
                 style: .filled,
                 size: .medium,
-                enabled: viewModel.syncState == .synced
+                enabled: item?.name == "Bitcoin" && item?.unit == "btc"
             ) {
-                goToReceive.toggle()
+                sendViewModel.goToReceive.toggle()
             }
             
             PButton(
                 config: .labelAndIconLeft(label: "Send", icon: Asset.sendButtonIcon),
                 style: .filled,
                 size: .medium,
-                enabled: viewModel.syncState == .synced
+                enabled: item?.name == "Bitcoin" && item?.unit == "btc"
             ) {
                 if let item = item {
                     sendViewModel.selectedItem = item
                 }
             }
-            
-            NavigationLink(destination: ReceiveView(viewModel: viewModel), isActive: $goToReceive) { EmptyView() }
         }
     }
 }
