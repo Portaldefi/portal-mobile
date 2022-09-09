@@ -64,7 +64,7 @@ struct AccountView: View {
                                     ZStack(alignment: .trailing) {
                                         WalletItemView(item: item)
                                             .padding(.leading, 16)
-                                            .padding(.trailing, 10)
+                                            .padding(.trailing, 8)
                                             .contentShape(Rectangle())
                                             .onTapGesture {
                                                 selectedItem = item

@@ -54,14 +54,13 @@ struct WalletItemView: View {
                         Text(item.unit)
                             .font(.Main.fixed(.medium, size: 12))
                             .foregroundColor(Color(red: 170/255, green: 170/255, blue: 170/255, opacity: 1))
-                            .offset(y: -1)
                         Spacer()
                     }
-                    .frame(width: 50)
+                    .frame(width: 40)
                     Text("usd")
                         .font(.Main.fixed(.medium, size: 12))
                         .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
-                        .offset(x: -1, y: 5)
+                        .offset(x: -1, y: 7)
                 }
             }
         }

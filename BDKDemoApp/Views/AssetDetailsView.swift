@@ -51,7 +51,6 @@ struct AssetDetailsView: View {
                     if let walletItem = item {
                         WalletItemView(item: walletItem)
                             .padding(.leading, 16)
-                            .padding(.trailing, 8)
                             .padding(.vertical, 8)
                     }
                     
@@ -121,7 +120,6 @@ struct AssetDetailsView: View {
                 if let item = item {
                     sendViewModel.selectedItem = item
                 }
-//                viewState.goToSend.toggle()
             }
             
             NavigationLink(destination: ReceiveView(viewModel: viewModel), isActive: $goToReceive) { EmptyView() }
