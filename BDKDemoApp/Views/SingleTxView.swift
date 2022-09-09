@@ -7,6 +7,7 @@
 
 import SwiftUI
 import BitcoinDevKit
+import PortalUI
 
 extension BitcoinDevKit.Transaction {
     public func getDetails() -> TransactionDetails {
@@ -24,60 +25,124 @@ struct SingleTxView: View {
         VStack(alignment: .leading, spacing: 5) {
             switch transaction {
             case .unconfirmed(let details):
-                VStack(alignment: .leading, spacing: 5) {
-                    HStack {
-                        Text("Received:").textStyle(BasicTextStyle(white: true, bold: true))
-                        Text(String(details.received)).textStyle(BasicTextStyle(white: true))
+                HStack(spacing: 8) {
+                    if details.sent > 0 {
+                        Asset.txSentIcon.cornerRadius(16)
+                    } else {
+                        Asset.txReceivedIcon.cornerRadius(16)
                     }
-                    HStack {
-                        Text("Sent:").textStyle(BasicTextStyle(white: true, bold: true))
-                        Text(String(details.sent)).textStyle(BasicTextStyle(white: true))
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(details.txid)
+                            .lineLimit(1)
+                            .font(.Main.fixed(.bold, size: 16))
+                            .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255))
+                        Text("Not confirmed")
+                            .font(.Main.fixed(.regular, size: 14))
+                            .lineLimit(1)
+                            .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255))
                     }
-                    HStack {
-                        Text("Fees:").textStyle(BasicTextStyle(white: true, bold: true))
-                        Text(String(details.fee ?? 0)).textStyle(BasicTextStyle(white: true))
-                    }
-                    HStack {
-                        Text("Txid:").textStyle(BasicTextStyle(white: true, bold: true))
-                        Text(details.txid).textStyle(BasicTextStyle(white: true))
+                    .frame(width: 125)
+                    Spacer()
+                    HStack(spacing: 6) {
+                        VStack(alignment: .trailing, spacing: 0) {
+                            HStack {
+                                Text("\(details.sent > 0 ? "-" : "+")")
+                                    .font(.Main.fixed(.bold, size: 16))
+                                    .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
+                                Text(details.sent > 0 ? "\(Double(details.sent)/100_000_000)" : "\(Double(details.received)/100_000_000)")
+                                    .font(.Main.fixed(.medium, size: 16))
+                                    .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
+                            }
+                            HStack {
+                                Text("\(details.sent > 0 ? "-" : "+")")
+                                    .font(.Main.fixed(.bold, size: 16))
+                                Text("$4.55")
+                                    .font(.Main.fixed(.medium, size: 16))
+                                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                    .offset(x: 1)
+                            }
+                        }
+                        VStack(alignment: .leading, spacing: 0) {
+                            HStack {
+                                Text("btc")
+                                    .font(.Main.fixed(.medium, size: 12))
+                                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                    .offset(y: -1)
+                                Spacer()
+                            }
+                            .frame(width: 30)
+                            Text("usd")
+                                .font(.Main.fixed(.medium, size: 12))
+                                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                .offset(x: -1, y: 5)
+                        }
+
                     }
                 }
-                .background(Color.gray)
             case .confirmed(let details, let confirmation):
-                HStack {
-                    Text("Confirmed:").textStyle(BasicTextStyle(white: true, bold: true))
-                    Text((Date(timeIntervalSince1970: TimeInterval(confirmation.timestamp)).getFormattedDate(format: "yyyy-MM-dd HH:mm:ss"))).textStyle(BasicTextStyle(white: true))
-                }
-                HStack {
-                    Text("Block:").textStyle(BasicTextStyle(white: true, bold: true))
-                    Text(String(confirmation.height)).textStyle(BasicTextStyle(white: true))
-                }
-                HStack {
-                    Text("Received:").textStyle(BasicTextStyle(white: true, bold: true))
-                    Text(String(details.received)).textStyle(BasicTextStyle(white: true))
-                }
-                HStack {
-                    Text("Sent:").textStyle(BasicTextStyle(white: true, bold: true))
-                    Text(String(details.sent)).textStyle(BasicTextStyle(white: true))
-                }
-                HStack {
-                    Text("Fees:").textStyle(BasicTextStyle(white: true, bold: true))
-                    Text(String(details.fee ?? 0)).textStyle(BasicTextStyle(white: true))
-                }
-                HStack {
-                    Text("Txid:").textStyle(BasicTextStyle(white: true, bold: true))
-                    Text(details.txid).textStyle(BasicTextStyle(white: true))
-                }
-            }
-        }.padding(10)
-            .background(Color("Shadow")).cornerRadius(5)
-            .contextMenu {
-                Button(action: {
-                    UIPasteboard.general.string = transaction.getDetails().txid}) {
-                        Text("Copy TXID")
+                HStack(spacing: 8) {
+                    if details.sent > 0 {
+                        Asset.txSentIcon.cornerRadius(16)
+                    } else {
+                        Asset.txReceivedIcon.cornerRadius(16)
                     }
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(details.txid)
+                            .lineLimit(1)
+                            .font(.Main.fixed(.bold, size: 16))
+                            .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255))
+                        Text(Date(timeIntervalSince1970: TimeInterval(confirmation.timestamp)).formatted())
+                            .font(.Main.fixed(.regular, size: 14))
+                            .lineLimit(1)
+                            .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255))
+                    }
+                    .frame(width: 125)
+                    Spacer()
+                    HStack(spacing: 6) {
+                        VStack(alignment: .trailing, spacing: 0) {
+                            HStack {
+                                Text("\(details.sent > 0 ? "-" : "+")")
+                                    .font(.Main.fixed(.bold, size: 16))
+                                    .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
+                                Text(details.sent > 0 ? "\(Double(details.sent)/100_000_000)" : "\(Double(details.received)/100_000_000)")
+                                    .font(.Main.fixed(.medium, size: 16))
+                                    .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
+                            }
+                            HStack {
+                                Text("\(details.sent > 0 ? "-" : "+")")
+                                    .font(.Main.fixed(.bold, size: 16))
+                                Text("$4.55")
+                                    .font(.Main.fixed(.medium, size: 16))
+                                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                    .offset(x: 1)
+                            }
+                        }
+                        VStack(alignment: .leading, spacing: 0) {
+                            HStack {
+                                Text("btc")
+                                    .font(.Main.fixed(.medium, size: 12))
+                                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                    .offset(y: -1)
+                                Spacer()
+                            }
+                            .frame(width: 30)
+                            Text("usd")
+                                .font(.Main.fixed(.medium, size: 12))
+                                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                .offset(x: -1, y: 5)
+                        }
+
+                    }
+                }
             }
-            .padding(.vertical, 10)
+        }
+        .frame(height: 76)
+        .contextMenu {
+            Button(action: {
+                UIPasteboard.general.string = transaction.getDetails().txid}) {
+                    Text("Copy TXID")
+                }
+        }
     }
 }
 

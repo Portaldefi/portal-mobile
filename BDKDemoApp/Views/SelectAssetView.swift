@@ -63,7 +63,7 @@ struct SelectAssetView: View {
                                                 .if(item.balance == "0") { itemView in
                                                     itemView.opacity(0.4)
                                                 }
-                                                .padding(.horizontal)
+                                                .padding(.leading)
                                                 .contentShape(Rectangle())
                                                 .onTapGesture {
                                                     guard item.balance != "0" else {
@@ -77,6 +77,7 @@ struct SelectAssetView: View {
                                         }
                                         
                                         Divider()
+                                            .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
                                     }
                                 }
                             }

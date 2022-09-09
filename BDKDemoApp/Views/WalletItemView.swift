@@ -52,7 +52,7 @@ struct WalletItemView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack {
                         Text(item.unit)
-                            .font(.system(size: 16, design: .monospaced))
+                            .font(.Main.fixed(.medium, size: 12))
                             .foregroundColor(Color(red: 170/255, green: 170/255, blue: 170/255, opacity: 1))
                             .offset(y: -1)
                         Spacer()

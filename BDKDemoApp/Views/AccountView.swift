@@ -10,8 +10,9 @@ import PortalUI
 import Factory
 
 struct AccountView: View {
-    @State private var goToTxs = false
+    @State private var goToDetails = false
     @State private var goToReceive = false
+    @State private var selectedItem: WalletItem?
     @State private var qrItem: QRCodeItem?
     
     @ObservedObject private var viewModel: AccountViewModel = Container.accountViewModel()
@@ -39,17 +40,13 @@ struct AccountView: View {
                 VStack { Text("DB not founded...") }
             case .loaded:
                 ZStack {
-                    Color(
-                        red: 26/255,
-                        green: 26/255,
-                        blue: 26/255,
-                        opacity: 1
-                    )
+                    Color(red: 26/255, green: 26/255, blue: 26/255).ignoresSafeArea()
                     
                     VStack(spacing: 0) {
                         Group {
                             AccountView()
                             Divider()
+                                .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
                             BalanceView(balance: viewModel.totalBalance, value: viewModel.value)
                                 .frame(height: 124)
                                 .padding(.horizontal, 16)
@@ -57,35 +54,37 @@ struct AccountView: View {
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 24)
                         }
-                        .background(Color(red: 16/255, green: 16/255, blue: 16/255, opacity: 1))
+                        
+                        Divider()
+                            .overlay(Color(red: 16/255, green: 16/255, blue: 16/255))
                         
                         ScrollView {
                             VStack(spacing: 0) {
                                 ForEach(viewModel.items) { item in
-                                    Divider()
-                                        .overlay(.black)
                                     ZStack(alignment: .trailing) {
                                         WalletItemView(item: item)
                                             .padding(.leading, 16)
                                             .padding(.trailing, 10)
                                             .contentShape(Rectangle())
                                             .onTapGesture {
-                                                goToTxs.toggle()
+                                                selectedItem = item
+                                                goToDetails.toggle()
                                             }
                                         Asset.chevronRightIcon
                                             .foregroundColor(Color(red: 74/255, green: 74/255, blue: 74/255))
                                     }
                                     Divider()
-                                        .overlay(.black)
+                                        .overlay(Color(red: 22/255, green: 22/255, blue: 22/255))
                                 }
                             }
                             NavigationLink(
-                                destination: TxsView(txs: viewModel.transactions),
-                                isActive: $goToTxs
+                                destination: AssetDetailsView(item: selectedItem, txs: viewModel.transactions),
+                                isActive: $goToDetails
                             ) {
                                 EmptyView()
                             }
                         }
+                        .background(Color(red: 32/255, green: 32/255, blue: 32/255))
                         Spacer()
                     }
                     .navigationBarHidden(true)
