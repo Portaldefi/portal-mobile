@@ -8,10 +8,12 @@
 import Foundation
 
 extension Date {
-    func getFormattedDate(format: String) -> String {
-        let dateformat = DateFormatter()
-        dateformat.dateFormat = format
-        return dateformat.string(from: self)
+    func formatted() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_us")
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: self)
     }
 }
 
