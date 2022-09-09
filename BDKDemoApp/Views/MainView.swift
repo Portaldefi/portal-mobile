@@ -101,7 +101,10 @@ struct Mainview: View {
         ZStack(alignment: .bottom) {
             views[viewState.selectedTab.rawValue]
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            TabBar
+            
+            if !viewState.hideTabBar {
+                TabBar
+            }
         }
     }
 }
