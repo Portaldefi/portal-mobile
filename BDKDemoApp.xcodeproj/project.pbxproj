@@ -174,6 +174,16 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		7564C65028CF3C2E00ABA8CF /* Send */ = {
+			isa = PBXGroup;
+			children = (
+				479A7AD128B8F1530057E100 /* SendView.swift */,
+				479A7AD328B8F30B0057E100 /* ReviewTransactionView.swift */,
+				7545BC0A28C2339900ED92C3 /* ConfirmationView.swift */,
+			);
+			path = Send;
+			sourceTree = "<group>";
+		};
 		756A3109288821F3004978E2 = {
 			isa = PBXGroup;
 			children = (
@@ -262,6 +272,7 @@
 			children = (
 				756DDD9228A28DE7002EDC60 /* RootView.swift */,
 				756A313E28902C6F004978E2 /* MainView.swift */,
+				7564C65028CF3C2E00ABA8CF /* Send */,
 				756A3117288821F3004978E2 /* AccountView.swift */,
 				756A3136288AEAAD004978E2 /* AssetDetailsView.swift */,
 				756DDD6D28A272AB002EDC60 /* NoAccountView.swift */,
@@ -269,9 +280,6 @@
 				756DDD7328A27C86002EDC60 /* RestoreAccountView.swift */,
 				756A313A288AEFA2004978E2 /* ReceiveView.swift */,
 				756A313C288EBBAD004978E2 /* SelectAssetView.swift */,
-				479A7AD128B8F1530057E100 /* SendView.swift */,
-				479A7AD328B8F30B0057E100 /* ReviewTransactionView.swift */,
-				7545BC0A28C2339900ED92C3 /* ConfirmationView.swift */,
 				756A313228898C73004978E2 /* SingleTxView.swift */,
 				752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */,
 				75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */,
@@ -576,7 +584,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"BDKDemoApp/Preview Content\"";
 				DEVELOPMENT_TEAM = HBPT8C8527;
 				ENABLE_PREVIEWS = YES;
@@ -612,7 +620,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"BDKDemoApp/Preview Content\"";
 				DEVELOPMENT_TEAM = HBPT8C8527;
 				ENABLE_PREVIEWS = YES;

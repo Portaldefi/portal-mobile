@@ -62,6 +62,15 @@
         "branch" : "master",
         "revision" : "6299daec1d74be12164fec090faf9ed14d0da9d6"
       }
+    },
+    {
+      "identity" : "portal-ui-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/FabricLabs/portal-ui-swift",
+      "state" : {
+        "branch" : "main",
+        "revision" : "8d8fa9e073d246e2cbface05722282db21261a57"
+      }
     }
   ],
   "version" : 2
