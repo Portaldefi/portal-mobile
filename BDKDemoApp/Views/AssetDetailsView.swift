@@ -28,13 +28,12 @@ struct AssetDetailsView: View {
             VStack(spacing: 0) {
                 Group {
                     HStack {
-                        HStack(spacing: 0) {
-                            PButton(config: .onlyIcon(Asset.chevronRightIcon), style: .free, size: .medium, enabled: true) {
-                                viewState.hideTabBar.toggle()
+                        HStack(spacing: 14) {
+                            PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
+                                viewState.hideTabBar = false
                                 presentationMode.wrappedValue.dismiss()
                             }
                             .frame(width: 20)
-                            .rotationEffect(.degrees(180))
                             
                             Text("All Assets")
                                 .font(.Main.fixed(.bold, size: 16))
@@ -98,7 +97,7 @@ struct AssetDetailsView: View {
         }
         .navigationBarHidden(true)
         .sheet(isPresented: $sendViewModel.goToReceive, onDismiss: {
-            
+            sendViewModel.goToReceive = false
         }) {
             NavigationView {
                 ReceiveView(viewModel: viewModel)
@@ -121,7 +120,7 @@ struct AssetDetailsView: View {
                 size: .medium,
                 enabled: item?.name == "Bitcoin" && item?.unit == "btc"
             ) {
-                sendViewModel.goToReceive.toggle()
+                sendViewModel.goToReceive = true
             }
             
             PButton(

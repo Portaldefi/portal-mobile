@@ -68,8 +68,8 @@ struct AccountView: View {
                                             .contentShape(Rectangle())
                                             .onTapGesture {
                                                 selectedItem = item
-                                                viewState.hideTabBar.toggle()
-                                                goToDetails.toggle()
+                                                viewState.hideTabBar = true
+                                                goToDetails = true
                                             }
                                         Asset.chevronRightIcon
                                             .foregroundColor(Color(red: 74/255, green: 74/255, blue: 74/255))
