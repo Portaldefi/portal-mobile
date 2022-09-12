@@ -47,7 +47,6 @@ struct WalletItemView: View {
                     Text(item.value)
                         .font(.Main.fixed(.medium, size: 16))
                         .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
-                        .offset(x: 1)
                 }
                 VStack(alignment: .leading, spacing: 0) {
                     HStack {
@@ -60,7 +59,7 @@ struct WalletItemView: View {
                     Text("usd")
                         .font(.Main.fixed(.medium, size: 12))
                         .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
-                        .offset(x: -1, y: 7)
+                        .offset(y: 7)
                 }
             }
         }

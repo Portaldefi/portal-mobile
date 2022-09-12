@@ -30,7 +30,7 @@ struct ReceiveView: View {
             VStack(spacing: 0) {
                 ZStack {
                     HStack {
-                        PButton(config: .onlyIcon(Asset.arrowLeftIcon), style: .free, size: .medium, enabled: true) {
+                        PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
                             presentationMode.wrappedValue.dismiss()
                         }
                         .frame(width: 20)
