@@ -25,7 +25,7 @@ struct ReceiveView: View {
     
     var body: some View {
         ZStack {
-            Color(red: 10/255, green: 10/255, blue: 10/255).ignoresSafeArea()
+            Palette.grayScale0A.ignoresSafeArea()
             
             VStack(spacing: 0) {
                 ZStack {
@@ -58,21 +58,17 @@ struct ReceiveView: View {
                         HStack(spacing: 6) {
                             Text("on")
                                 .font(.Main.fixed(.medium, size: 14))
-                                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255))
                             Asset.chainIcon
-                                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255))
                             Text("Chain")
                                 .font(.Main.fixed(.medium, size: 14))
-                                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255))
                             Spacer()
                         }
+                        .foregroundColor(Palette.grayScale6A)
                     }
                     .padding(15)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(
-                                Color(red: 26/255, green: 26/255, blue: 26/255)
-                            )
+                            .fill(Palette.grayScale1A)
                     )
                     
                     ZStack {

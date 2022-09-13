@@ -19,26 +19,14 @@ struct Mainview: View {
             AnyView(ActivityView())
         ]
     }
-    
-    private var gradiendColor: RadialGradient {
-        RadialGradient(
-            colors: [
-                Color(red: 116/255, green: 138/255, blue: 254/255),
-                Color(red: 166/255, green: 78/255, blue: 255/255)
-            ],
-            center: .bottomTrailing,
-            startRadius: 125,
-            endRadius: 845
-        )
-    }
-    
+        
     var TabBar: some View {
         HStack(spacing: 6.13) {
             Button {
                 viewState.openTab(.wallet)
             } label: {
                 if viewState.selectedTab == .wallet {
-                    gradiendColor
+                    RadialGradient.main
                         .mask(
                             VStack(spacing: 4) {
                                 Asset.homeIcon
@@ -63,7 +51,7 @@ struct Mainview: View {
                 viewState.openTab(.activity)
             } label: {
                 if viewState.selectedTab == .activity {
-                    gradiendColor
+                    RadialGradient.main
                         .mask(
                             VStack(spacing: 4) {
                                 Asset.activityIcon
@@ -94,7 +82,7 @@ struct Mainview: View {
         }
         .padding(.horizontal, 25.5)
         .frame(height: 65)
-        .background(Color(red: 10/255, green: 10/255, blue: 10/255))
+        .background(Palette.grayScale0A)
     }
     
     var body: some View {

@@ -18,7 +18,7 @@ struct CreateAccountView: View {
     
     var body: some View {
         ZStack {
-            Color(red: 10/255, green: 10/255, blue: 10/255, opacity: 1).ignoresSafeArea()
+            Palette.grayScale0A.ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 8) {
                 ZStack {
@@ -49,9 +49,7 @@ struct CreateAccountView: View {
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(
-                                Color(red: 26/255, green: 26/255, blue: 26/255)
-                            )
+                            .fill(Palette.grayScale1A)
                     )
                 
                 Spacer()

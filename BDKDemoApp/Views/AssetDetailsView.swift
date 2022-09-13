@@ -23,7 +23,7 @@ struct AssetDetailsView: View {
     
     var body: some View {
         ZStack(alignment: .top) {
-            Color(red: 26/255, green: 26/255, blue: 26/255).ignoresSafeArea()
+            Palette.grayScale1A.ignoresSafeArea()
             
             VStack(spacing: 0) {
                 Group {
@@ -37,17 +37,17 @@ struct AssetDetailsView: View {
                             
                             Text("All Assets")
                                 .font(.Main.fixed(.bold, size: 16))
-                                .foregroundColor(Color(red: 244/255, green: 244/255, blue: 244/255, opacity: 1))
+                                .foregroundColor(Palette.grayScaleF4)
                         }
                         Spacer()
                         Asset.gearIcon
-                            .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                            .foregroundColor(Palette.grayScale6A)
                     }
                     .frame(height: 48)
                     .padding(.horizontal, 20)
                     
                     Divider()
-                        .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
+                        .overlay(Palette.grayScale2A)
                     
                     if let walletItem = item {
                         WalletItemView(item: walletItem)
@@ -61,7 +61,7 @@ struct AssetDetailsView: View {
                 }
                 
                 Divider()
-                    .overlay(Color(red: 16/255, green: 16/255, blue: 16/255))
+                    .overlay(Palette.grayScale10)
                 
                 ZStack {
                     ScrollView {
@@ -82,10 +82,10 @@ struct AssetDetailsView: View {
                                     }
                                 }
                             Divider()
-                                .overlay(Color(red: 26/255, green: 26/255, blue: 26/255))
+                                .overlay(Palette.grayScale1A)
                         }
                     }
-                    .background(Color(red: 32/255, green: 32/255, blue: 32/255))
+                    .background(Palette.grayScale20)
                     
                     if txs.isEmpty {
                         Text("No transactions yet.")

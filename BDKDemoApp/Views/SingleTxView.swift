@@ -35,11 +35,11 @@ struct SingleTxView: View {
                         Text(details.txid)
                             .lineLimit(1)
                             .font(.Main.fixed(.bold, size: 16))
-                            .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255))
+                            .foregroundColor(Palette.grayScaleCA)
                         Text("Not confirmed")
                             .font(.Main.fixed(.regular, size: 14))
                             .lineLimit(1)
-                            .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255))
+                            .foregroundColor(Palette.grayScale6A)
                     }
                     .frame(width: 125)
                     Spacer()
@@ -48,17 +48,17 @@ struct SingleTxView: View {
                             HStack {
                                 Text("\(details.sent > 0 ? "-" : "+")")
                                     .font(.Main.fixed(.bold, size: 16))
-                                    .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
+                                    .foregroundColor(Palette.grayScaleEA)
                                 Text(details.sent > 0 ? "\(Double(details.sent)/100_000_000)" : "\(Double(details.received)/100_000_000)")
                                     .font(.Main.fixed(.medium, size: 16))
-                                    .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
+                                    .foregroundColor(Palette.grayScaleEA)
                             }
                             HStack {
                                 Text("\(details.sent > 0 ? "-" : "+")")
                                     .font(.Main.fixed(.bold, size: 16))
                                 Text("$4.55")
                                     .font(.Main.fixed(.medium, size: 16))
-                                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                    .foregroundColor(Palette.grayScale6A)
                                     .offset(x: 1)
                             }
                         }
@@ -66,14 +66,14 @@ struct SingleTxView: View {
                             HStack {
                                 Text("btc")
                                     .font(.Main.fixed(.medium, size: 12))
-                                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                    .foregroundColor(Palette.grayScale6A)
                                     .offset(y: -1)
                                 Spacer()
                             }
                             .frame(width: 30)
                             Text("usd")
                                 .font(.Main.fixed(.medium, size: 12))
-                                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                .foregroundColor(Palette.grayScale6A)
                                 .offset(x: -1, y: 5)
                         }
 
@@ -90,11 +90,11 @@ struct SingleTxView: View {
                         Text(details.txid)
                             .lineLimit(1)
                             .font(.Main.fixed(.bold, size: 16))
-                            .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255))
+                            .foregroundColor(Palette.grayScaleCA)
                         Text(Date(timeIntervalSince1970: TimeInterval(confirmation.timestamp)).formatted())
                             .font(.Main.fixed(.regular, size: 14))
                             .lineLimit(1)
-                            .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255))
+                            .foregroundColor(Palette.grayScale6A)
                     }
                     .frame(width: 125)
                     Spacer()
@@ -103,17 +103,17 @@ struct SingleTxView: View {
                             HStack {
                                 Text("\(details.sent > 0 ? "-" : "+")")
                                     .font(.Main.fixed(.bold, size: 16))
-                                    .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
+                                    .foregroundColor(Palette.grayScaleEA)
                                 Text(details.sent > 0 ? "\(Double(details.sent)/100_000_000)" : "\(Double(details.received)/100_000_000)")
                                     .font(.Main.fixed(.medium, size: 16))
-                                    .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
+                                    .foregroundColor(Palette.grayScaleEA)
                             }
                             HStack {
                                 Text("\(details.sent > 0 ? "-" : "+")")
                                     .font(.Main.fixed(.bold, size: 16))
                                 Text("$4.55")
                                     .font(.Main.fixed(.medium, size: 16))
-                                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                    .foregroundColor(Palette.grayScale6A)
                                     .offset(x: 1)
                             }
                         }
@@ -121,14 +121,14 @@ struct SingleTxView: View {
                             HStack {
                                 Text("btc")
                                     .font(.Main.fixed(.medium, size: 12))
-                                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                    .foregroundColor(Palette.grayScale6A)
                                     .offset(y: -1)
                                 Spacer()
                             }
                             .frame(width: 30)
                             Text("usd")
                                 .font(.Main.fixed(.medium, size: 12))
-                                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                .foregroundColor(Palette.grayScale6A)
                                 .offset(x: -1, y: 5)
                         }
 

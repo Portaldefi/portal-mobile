@@ -18,21 +18,21 @@ struct WalletItemView: View {
                         item.icon
                         Text(item.name)
                             .font(.Main.fixed(.bold, size: 16))
-                            .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
+                            .foregroundColor(Palette.grayScaleCA)
                             .frame(height: 16)
                         Spacer()
                     }
                     HStack(spacing: 4) {
                         Text("on")
                             .font(.Main.fixed(.medium, size: 12))
-                            .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                            .foregroundColor(Palette.grayScale6A)
                             .frame(height: 17)
                         item.chainIcon.resizable()
                             .frame(width: 12, height: 12)
-                            .foregroundColor(Color(red: 138/255, green: 138/255, blue: 138/255, opacity: 1))
+                            .foregroundColor(Palette.grayScale8A)
                         Text(item.description)
                             .font(.Main.fixed(.medium, size: 12))
-                            .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                            .foregroundColor(Palette.grayScale6A)
                             .frame(height: 17)
                         Spacer()
                     }
@@ -43,22 +43,22 @@ struct WalletItemView: View {
                 VStack(alignment: .trailing, spacing: 0) {
                     Text("\(item.balance)")
                         .font(.Main.fixed(.bold, size: 20))
-                        .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
+                        .foregroundColor(Palette.grayScaleEA)
                     Text(item.value)
                         .font(.Main.fixed(.medium, size: 16))
-                        .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                        .foregroundColor(Palette.grayScale6A)
                 }
                 VStack(alignment: .leading, spacing: 0) {
                     HStack {
                         Text(item.unit)
                             .font(.Main.fixed(.medium, size: 12))
-                            .foregroundColor(Color(red: 170/255, green: 170/255, blue: 170/255, opacity: 1))
+                            .foregroundColor(Palette.grayScaleAA)
                         Spacer()
                     }
                     .frame(width: 40)
                     Text("usd")
                         .font(.Main.fixed(.medium, size: 12))
-                        .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                        .foregroundColor(Palette.grayScale6A)
                         .offset(y: 7)
                 }
             }

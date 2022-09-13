@@ -15,13 +15,13 @@ struct NoAccountView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                Color(red: 10/255, green: 10/255, blue: 10/255, opacity: 1).ignoresSafeArea()
+                Palette.grayScale0A.ignoresSafeArea()
                 
                 VStack {
                     VStack(spacing: 51) {
                         Asset.portalIcon
                         Text("Your Gateway To\nUncensorable Finance")
-                            .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
+                            .foregroundColor(Palette.grayScaleCA)
                             .font(.Main.fixed(.bold, size: 21))
                             .fontWeight(.bold)
                             .multilineTextAlignment(.center)

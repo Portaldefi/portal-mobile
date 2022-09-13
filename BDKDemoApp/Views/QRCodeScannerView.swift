@@ -38,7 +38,7 @@ struct QRCodeScannerView: View {
     
     var body: some View {
         ZStack {
-            Color(red: 10/255, green: 10/255, blue: 10/255, opacity: 1).ignoresSafeArea()
+            Palette.grayScale0A.ignoresSafeArea()
             
             VStack {
                 ZStack {
@@ -90,12 +90,12 @@ struct QRCodeScannerView: View {
                                 .padding(8)
                                 .frame(height: 33)
                                 .frame(maxWidth: .infinity)
-                                .background(Color(red: 10/255, green: 10/255, blue: 10/255, opacity: 1))
-                                .foregroundColor(Color(red: 138/255, green: 138/255, blue: 138/255, opacity: 1))
+                                .background(Palette.grayScale0A)
+                                .foregroundColor(Palette.grayScale8A)
                                 .cornerRadius(12)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color(red: 42/255, green: 42/255, blue: 42/255, opacity: 1), lineWidth: 1)
+                                        .stroke(Palette.grayScale2A, lineWidth: 1)
                                 )
                                 .padding([.bottom, .horizontal], 8)
                                 .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -106,11 +106,11 @@ struct QRCodeScannerView: View {
                                         .font(.Main.fixed(.medium, size: 12))
                                         .padding(8)
                                         .frame(height: 33)
-                                        .foregroundColor(Color(red: 138/255, green: 138/255, blue: 138/255, opacity: 1))
+                                        .foregroundColor(Palette.grayScale8A)
                                     Spacer()
                                 }
                                 .padding(.horizontal, 16)
-                                .background(Color(red: 10/255, green: 10/255, blue: 10/255))
+                                .background(Palette.grayScale0A)
                                 
                                 Divider()
                                 
@@ -123,7 +123,7 @@ struct QRCodeScannerView: View {
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(red: 42/255, green: 42/255, blue: 42/255, opacity: 1), lineWidth: 1)
+                                    .stroke(Palette.grayScale2A, lineWidth: 1)
                             )
                             .padding([.bottom, .horizontal], 8)
                         }
@@ -188,7 +188,7 @@ struct QRCodeScannerView: View {
                                     .foregroundColor(Color.green)
                                 Text(item.title)
                                     .font(.Main.fixed(.medium, size: 14))
-                                    .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255, opacity: 1))
+                                    .foregroundColor(Palette.grayScaleCA)
                                     .frame(height: 16)
                                 Spacer()
                             }
@@ -201,7 +201,7 @@ struct QRCodeScannerView: View {
                                     Text("on")
                                         .font(.Main.fixed(.medium, size: 12))
                                         .fontWeight(.bold)
-                                        .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                        .foregroundColor(Palette.grayScale6A)
                                         .frame(height: 17)
                                     Asset.chainIcon
                                         .resizable()
@@ -210,7 +210,7 @@ struct QRCodeScannerView: View {
                                     Text("on")
                                         .font(.Main.fixed(.medium, size: 12))
                                         .fontWeight(.bold)
-                                        .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                        .foregroundColor(Palette.grayScale6A)
                                         .frame(height: 17)
                                     Asset.lightningIcon
                                         .resizable()
@@ -222,9 +222,9 @@ struct QRCodeScannerView: View {
                                 Text(item.description)
                                     .font(.Main.fixed(.medium, size: 12))
                                     .fontWeight(.bold)
-                                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                    .foregroundColor(Palette.grayScale6A)
                                     .frame(height: 17)
-                                    .foregroundColor(Color(red: 138/255, green: 138/255, blue: 138/255, opacity: 1))
+                                    .foregroundColor(Palette.grayScale8A)
                                 Spacer()
                             }
                         }
@@ -233,7 +233,7 @@ struct QRCodeScannerView: View {
                     Spacer()
                     
                     Asset.chevronRightIcon
-                        .foregroundColor(Color(red: 74/255, green: 74/255, blue: 74/255))
+                        .foregroundColor(Palette.grayScale4A)
                 }
                 .padding(.horizontal)
                 .frame(height: 59)
@@ -241,7 +241,7 @@ struct QRCodeScannerView: View {
                 Divider()
                     .frame(maxWidth: .infinity, maxHeight: 1)
             }
-            .background(Color(red: 26/255, green: 26/255, blue: 26/255))
+            .background(Palette.grayScale1A)
         }
     }
 }

@@ -40,13 +40,13 @@ struct AccountView: View {
                 VStack { Text("DB not founded...") }
             case .loaded:
                 ZStack {
-                    Color(red: 26/255, green: 26/255, blue: 26/255).ignoresSafeArea()
+                    Palette.grayScale1A.ignoresSafeArea()
                     
                     VStack(spacing: 0) {
                         Group {
                             AccountView()
                             Divider()
-                                .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
+                                .overlay(Palette.grayScale2A)
                             BalanceView(balance: viewModel.totalBalance, value: viewModel.value)
                                 .frame(height: 124)
                                 .padding(.horizontal, 16)
@@ -56,7 +56,7 @@ struct AccountView: View {
                         }
                         
                         Divider()
-                            .overlay(Color(red: 16/255, green: 16/255, blue: 16/255))
+                            .overlay(Palette.grayScale10)
                         
                         ScrollView {
                             VStack(spacing: 0) {
@@ -72,7 +72,7 @@ struct AccountView: View {
                                                 goToDetails = true
                                             }
                                         Asset.chevronRightIcon
-                                            .foregroundColor(Color(red: 74/255, green: 74/255, blue: 74/255))
+                                            .foregroundColor(Palette.grayScale4A)
                                     }
                                     Divider()
                                         .overlay(Color(red: 22/255, green: 22/255, blue: 22/255))
@@ -85,7 +85,7 @@ struct AccountView: View {
                                 EmptyView()
                             }
                         }
-                        .background(Color(red: 32/255, green: 32/255, blue: 32/255))
+                        .background(Palette.grayScale20)
                     }
                     .navigationBarHidden(true)
                 }
@@ -117,19 +117,19 @@ struct AccountView: View {
         HStack {
             HStack {
                 Asset.walletIcon
-                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                    .foregroundColor(Palette.grayScale6A)
                 Text(viewModel.accountName)
                     .font(.Main.fixed(.bold, size: 16))
-                    .foregroundColor(Color(red: 244/255, green: 244/255, blue: 244/255, opacity: 1))
+                    .foregroundColor(Palette.grayScaleF4)
             }
             Spacer()
             if case .syncing = viewModel.syncState {
                 Text("Syncing...")
                     .font(.Main.fixed(.semiBold, size: 12))
-                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                    .foregroundColor(Palette.grayScale6A)
             }
             Asset.gearIcon
-                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                .foregroundColor(Palette.grayScale6A)
         }
         .frame(height: 48)
         .padding(.horizontal, 20)
@@ -145,10 +145,10 @@ struct AccountView: View {
                             Spacer()
                             Text(balance)
                                 .font(.Main.fixed(.bold, size: 32))
-                                .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
+                                .foregroundColor(Palette.grayScaleEA)
                             Text("sats")
                                 .font(.Main.fixed(.regular, size: 18))
-                                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                .foregroundColor(Palette.grayScale6A)
                                 .padding(.bottom, 4)
                             Spacer()
                         }
@@ -160,10 +160,10 @@ struct AccountView: View {
                         HStack(spacing: 4) {
                             Text(value)
                                 .font(.Main.fixed(.medium, size: 16))
-                                .foregroundColor(Color(red: 234/255, green: 234/255, blue: 234/255, opacity: 1))
+                                .foregroundColor(Palette.grayScaleEA)
                             Text("usd")
                                 .font(.Main.fixed(.medium, size: 12))
-                                .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255, opacity: 1))
+                                .foregroundColor(Palette.grayScale6A)
                                 .offset(y: 2)
                         }
                         .frame(height: 23)

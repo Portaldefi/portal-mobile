@@ -23,7 +23,7 @@ struct SelectAssetView: View {
         
     var body: some View {
         ZStack {
-            Color(red: 10/255, green: 10/255, blue: 10/255).ignoresSafeArea()
+            Palette.grayScale0A.ignoresSafeArea()
             
             VStack(spacing: 0) {
                 ZStack {
@@ -43,7 +43,7 @@ struct SelectAssetView: View {
                     
                     Text("Send")
                         .font(.Main.fixed(.bold, size: 16))
-                        .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255))
+                        .foregroundColor(Palette.grayScaleCA)
                         .frame(height: 62)
                 }
                 
@@ -51,7 +51,7 @@ struct SelectAssetView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Select Asset")
                             .font(.Main.fixed(.bold, size: 24))
-                            .foregroundColor(Color(red: 202/255, green: 202/255, blue: 202/255))
+                            .foregroundColor(Palette.grayScaleCA)
 
                         ScrollView {
                             VStack {
@@ -74,11 +74,11 @@ struct SelectAssetView: View {
                                                     viewModel.selectedItem = item
                                                 }
                                             Asset.chevronRightIcon
-                                                .foregroundColor(Color(red: 74/255, green: 74/255, blue: 74/255))
+                                                .foregroundColor(Palette.grayScale4A)
                                         }
                                         
                                         Divider()
-                                            .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
+                                            .overlay(Palette.grayScale2A)
                                     }
                                 }
                             }

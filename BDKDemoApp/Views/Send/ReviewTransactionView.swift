@@ -17,7 +17,7 @@ struct ReviewTransactionView: View {
     
     var body: some View {
         ZStack {
-            Color(red: 10/255, green: 10/255, blue: 10/255).ignoresSafeArea()
+            Palette.grayScale0A.ignoresSafeArea()
             
             NavigationLink(
                 destination: ConfirmationView(),
@@ -53,7 +53,7 @@ struct ReviewTransactionView: View {
                                 .contentShape(Rectangle())
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color(red: 42/255, green: 42/255, blue: 42/255), lineWidth: 1)
+                                        .stroke(Palette.grayScale2A, lineWidth: 1)
                                 )
                         }
                     }
@@ -68,16 +68,14 @@ struct ReviewTransactionView: View {
                                     .font(Font.system(size: 24, weight: .bold, design: .monospaced))
                                 Text("btc")
                                     .font(.system(size: 14, weight: .bold, design: .monospaced))
-                                    .foregroundColor(Color(red: 106/255, green: 106/255, blue: 106/255))
+                                    .foregroundColor(Palette.grayScale6A)
                                     .offset(y: -2)
                                 Spacer()
                             }
                             .padding(10)
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .fill(
-                                        Color(red: 26/255, green: 26/255, blue: 26/255)
-                                    )
+                                    .fill(Palette.grayScale1A)
                             )
                         }
                     }
@@ -96,9 +94,7 @@ struct ReviewTransactionView: View {
                         }
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(
-                                    Color(red: 26/255, green: 26/255, blue: 26/255)
-                                )
+                                .fill(Palette.grayScale1A)
                         )
                         
                         HStack {
@@ -131,7 +127,7 @@ struct ReviewTransactionView: View {
                                 .background(in: RoundedRectangle(cornerRadius: 10))
                                 .frame(height: 60)
                         }
-                        .disabled(!viewModel.sendButtonEnabled)
+                        .disabled(!viewModel.actionButtonEnabled)
                         .buttonStyle(.plain)
                         .frame(maxWidth: .infinity)
                         .frame(height: 60)

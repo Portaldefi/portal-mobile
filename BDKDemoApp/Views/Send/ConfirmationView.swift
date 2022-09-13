@@ -16,7 +16,7 @@ struct ConfirmationView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 10/255, green: 10/255, blue: 10/255).ignoresSafeArea()
+            Palette.grayScale0A.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 ZStack {
