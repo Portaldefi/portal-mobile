@@ -38,6 +38,7 @@
 		7545BC4328CA155100ED92C3 /* Decimal+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */; };
 		7564C65228CF3CF600ABA8CF /* SetRecipientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */; };
 		7564C65428CF3D3900ABA8CF /* SetAmountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65328CF3D3900ABA8CF /* SetAmountView.swift */; };
+		7564C65728CF6EC400ABA8CF /* SendFlowError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65628CF6EC400ABA8CF /* SendFlowError.swift */; };
 		756A3116288821F3004978E2 /* BDKDemoAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3115288821F3004978E2 /* BDKDemoAppApp.swift */; };
 		756A3118288821F3004978E2 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3117288821F3004978E2 /* AccountView.swift */; };
 		756A311A288821F4004978E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 756A3119288821F4004978E2 /* Assets.xcassets */; };
@@ -108,6 +109,7 @@
 		7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+Extension.swift"; sourceTree = "<group>"; };
 		7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetRecipientView.swift; sourceTree = "<group>"; };
 		7564C65328CF3D3900ABA8CF /* SetAmountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetAmountView.swift; sourceTree = "<group>"; };
+		7564C65628CF6EC400ABA8CF /* SendFlowError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendFlowError.swift; sourceTree = "<group>"; };
 		756A3112288821F3004978E2 /* BDKDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BDKDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		756A3115288821F3004978E2 /* BDKDemoAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BDKDemoAppApp.swift; sourceTree = "<group>"; };
 		756A3117288821F3004978E2 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
@@ -256,6 +258,7 @@
 				7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */,
 				7545BC3B28C9E5B900ED92C3 /* MarketData.swift */,
 				7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */,
+				7564C65628CF6EC400ABA8CF /* SendFlowError.swift */,
 				756DDD9128A28C0A002EDC60 /* DB */,
 			);
 			path = Models;
@@ -424,6 +427,7 @@
 				479A7AD228B8F1530057E100 /* SendView.swift in Sources */,
 				756A313328898C73004978E2 /* SingleTxView.swift in Sources */,
 				75DFA55828BD010400F23E02 /* QRCodeReaderView.swift in Sources */,
+				7564C65728CF6EC400ABA8CF /* SendFlowError.swift in Sources */,
 				479A7AD428B8F30B0057E100 /* ReviewTransactionView.swift in Sources */,
 				4774D71C28AF920100B7988B /* QRCodeParser.swift in Sources */,
 				752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */,

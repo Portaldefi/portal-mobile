@@ -40,11 +40,6 @@ class AccountViewModel: ObservableObject {
         }
     }
     
-    enum SendError: Error {
-        case insufficientAmount
-        case error(String)
-    }
-    
     private(set) var key = "private_key"
     
     @Published private(set) var state = State.empty
@@ -273,13 +268,13 @@ class AccountViewModel: ObservableObject {
                         completion(nil)
                     }
                 } else {
-                    completion(SendError.insufficientAmount)
+                    completion(SendFlowError.insufficientAmount)
                 }
             } catch {
                 completion(error)
             }
         default:
-            completion(SendError.error("Send error: wallet isn't loaded"))
+            completion(SendFlowError.error("Send error: wallet isn't loaded"))
         }
     }
     
