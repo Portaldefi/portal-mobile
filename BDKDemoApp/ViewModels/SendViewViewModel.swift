@@ -10,8 +10,13 @@ import Factory
 import BitcoinAddressValidator
 import Combine
 import LocalAuthentication.LAError
+import SwiftUI
+import PortalUI
 
 class SendViewViewModel: ObservableObject {
+    enum SendStep {
+        case recipient, amount, review, confirmation
+    }
     var walletItems: [WalletItem] = []
     
     @Published var to = String()
@@ -24,15 +29,48 @@ class SendViewViewModel: ObservableObject {
     @Published var goToSend = false
     @Published var goToReview = false
     
+    @Published private(set) var recipientAddressIsValid = true
     @Published private(set) var sendError: Error?
+    @Published private(set) var step: SendStep = .recipient
     
     private var subscriptions = Set<AnyCancellable>()
     
     @Injected(Container.accountViewModel) private var account
     @LazyInjected(Container.biometricAuthentification) private var biometrics
     
-    var sendButtonEnabled: Bool {
-        BitcoinAddressValidator.isValid(address: to) && (Double(amount) ?? 0) > 0
+    var actionButtonEnabled: Bool {
+        switch step {
+        case .recipient:
+            return !to.isEmpty
+        case .amount:
+            return !amount.isEmpty
+        case .review:
+            return false
+        case .confirmation:
+            return false
+        }
+    }
+    
+    var actionButtonTitle: String {
+        switch step {
+        case .recipient, .amount:
+            return "Continue"
+        case .review:
+            return "Send"
+        case .confirmation:
+            return "Done"
+        }
+    }
+    
+    var title: String {
+        switch step {
+        case .recipient, .amount:
+            return "Send"
+        case .review:
+            return "Review Transaction"
+        case .confirmation:
+            return "Confirmation"
+        }
     }
     
     init() {
@@ -55,6 +93,15 @@ class SendViewViewModel: ObservableObject {
                 break
             }
 
+        }
+        .store(in: &subscriptions)
+        
+        $to.sink { [unowned self] _ in
+            guard sendError != nil, recipientAddressIsValid != true else { return }
+            withAnimation {
+                self.sendError = nil
+                self.recipientAddressIsValid = true
+            }
         }
         .store(in: &subscriptions)
     }
@@ -122,5 +169,61 @@ class SendViewViewModel: ObservableObject {
                 completion(success)
             }            
         }
+    }
+    
+    func goBack() -> Bool {
+        var shouldCloseSendFlow = false
+        
+        switch step {
+        case .recipient:
+            shouldCloseSendFlow = true
+        case .amount:
+            step = .recipient
+        case .review:
+            step = .amount
+        case .confirmation:
+            step = .recipient
+        }
+        
+        return shouldCloseSendFlow
+    }
+    
+    func toReview() {
+        step = .review
+    }
+    
+    func onActionButtonPressed() {
+        switch step {
+        case .recipient:
+            if BitcoinAddressValidator.isValid(address: to) {
+                step = .amount
+            } else {
+                recipientAddressIsValid = false
+                sendError = SendFlowError.addressIsntValid
+            }
+        case .amount:
+            break
+        case .review:
+            break
+        case .confirmation:
+            break
+        }
+    }
+    
+    func pasteFromClipboard() {
+        let pasteboard = UIPasteboard.general
+        if let pastboardString = pasteboard.string {
+            to = pastboardString
+        }
+    }
+    
+    func openScanner() {
+        qrScannerOpened = true
+    }
+}
+
+extension SendViewViewModel {
+    static var mocked: SendViewViewModel {
+        SendViewViewModel()
     }
 }
