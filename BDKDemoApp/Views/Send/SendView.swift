@@ -16,81 +16,71 @@ struct SendView: View {
     @Injected(Container.viewState) private var viewState
     
     var body: some View {
-        ZStack {
-            Palette.grayScale0A.ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                ZStack {
-                    HStack {
-                        PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
-                            withAnimation {
-                                if viewModel.goBack() {
-                                    presentationMode.wrappedValue.dismiss()
-                                }
+        VStack(spacing: 0) {
+            ZStack {
+                HStack {
+                    PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
+                        withAnimation {
+                            if viewModel.goBack() {
+                                presentationMode.wrappedValue.dismiss()
                             }
                         }
-                        .frame(width: 20)
-                        
-                        Spacer()
                     }
+                    .frame(width: 20)
                     
-                    Text(viewModel.title)
-                        .frame(width: 300, height: 62)
-                        .font(.Main.fixed(.bold, size: 16))
-                        .animation(nil)
+                    Spacer()
                 }
                 
-                switch viewModel.step {
-                case .recipient:
-                    SetRecipientView(viewModel: viewModel)
-                        .transition(.slide.combined(with: .scale))
-                        .transition(.move(edge: .trailing).combined(with: .opacity))
-                case .amount:
-                    SetAmountView()
-                        .transition(.slide.combined(with: .scale))
-                        .transition(.move(edge: .trailing).combined(with: .opacity))
-                case .review:
-                    Text("Review")
-                        .transition(.slide.combined(with: .scale))
-                        .transition(.move(edge: .trailing).combined(with: .opacity))
-                case .confirmation:
-                    Text("Confirmation")
-                        .transition(.slide.combined(with: .scale))
-                        .transition(.move(edge: .trailing).combined(with: .opacity))
-                }
-                
-                Spacer()
-                
-                switch viewModel.step {
-                case .recipient, .amount, .review:
-                    PButton(config: .onlyLabel(viewModel.actionButtonTitle), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
-                        withAnimation {
-                            viewModel.onActionButtonPressed()
-                        }
-                    }
-                case .confirmation:
-                    PButton(config: .onlyLabel("Done"), style: .outline, size: .big, enabled: true) {
-                        
-                    }
-                }
+                Text(viewModel.title)
+                    .frame(width: 300, height: 62)
+                    .font(.Main.fixed(.bold, size: 16))
+                    .animation(nil)
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 8)
             
-            NavigationLink(
-                destination: ReviewTransactionView(),
-                isActive: $viewModel.goToReview
-            ) {
-                EmptyView()
+            switch viewModel.step {
+            case .recipient:
+                SetRecipientView(viewModel: viewModel)
+                    .transition(.slide.combined(with: .scale))
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+            case .amount:
+                SetAmountView()
+                    .transition(.slide.combined(with: .scale))
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+            case .review:
+                Text("Review")
+                    .transition(.slide.combined(with: .scale))
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+            case .confirmation:
+                Text("Confirmation")
+                    .transition(.slide.combined(with: .scale))
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+            
+            Spacer()
+            
+            switch viewModel.step {
+            case .recipient, .amount, .review:
+                PButton(config: .onlyLabel(viewModel.actionButtonTitle), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
+                    withAnimation {
+                        viewModel.onActionButtonPressed()
+                    }
+                }
+            case .confirmation:
+                PButton(config: .onlyLabel("Done"), style: .outline, size: .big, enabled: true) {
+                    
+                }
             }
         }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
+        .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .navigationBarHidden(true)
         .sheet(isPresented: $viewModel.qrScannerOpened, onDismiss: {
             viewModel.qrScannerOpened = false
         }) {
             QRCodeReaderView(config: .send) { item in
                 viewModel.qrCodeItem = item
-
+                
                 switch item.type {
                 case .bip21(let address, let amount, _):
                     viewModel.to = address

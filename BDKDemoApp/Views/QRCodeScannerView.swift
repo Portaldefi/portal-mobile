@@ -37,126 +37,122 @@ struct QRCodeScannerView: View {
     }
     
     var body: some View {
-        ZStack {
-            Palette.grayScale0A.ignoresSafeArea()
-            
-            VStack {
-                ZStack {
-                    ZStack(alignment: .bottom) {
-                        ZStack {
-                            CodeScannerView(
-                                codeTypes: [.qr],
-                                scanMode: .continuous,
-                                simulatedData: qrCodeSimulatedData,
-                                isTorchOn: torchOn,
-                                isGalleryPresented: $importFromLibrary
-                            ) { response in
-                                if case let .success(result) = response {
-                                    withAnimation(.easeInOut(duration: 0.25)) {
-                                        detectedItems = QRCodeParser.current.parse(result.string)
-                                        scanState = .detected
-                                    }
-                                } else if case let .failure(error) = response {
-                                    switch error {
-                                    case .badInput:
-                                        break
-                                    case .badOutput:
-                                        showingNoQRAlert.toggle()
-                                    case .permissionDenied:
-                                        break
-                                    case .initError(_):
-                                        break
-                                    }
-                                } else {
-                                    withAnimation {
-                                        scanState = .detecting
-                                    }
+        VStack {
+            ZStack {
+                ZStack(alignment: .bottom) {
+                    ZStack {
+                        CodeScannerView(
+                            codeTypes: [.qr],
+                            scanMode: .continuous,
+                            simulatedData: qrCodeSimulatedData,
+                            isTorchOn: torchOn,
+                            isGalleryPresented: $importFromLibrary
+                        ) { response in
+                            if case let .success(result) = response {
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    detectedItems = QRCodeParser.current.parse(result.string)
+                                    scanState = .detected
+                                }
+                            } else if case let .failure(error) = response {
+                                switch error {
+                                case .badInput:
+                                    break
+                                case .badOutput:
+                                    showingNoQRAlert.toggle()
+                                case .permissionDenied:
+                                    break
+                                case .initError(_):
+                                    break
+                                }
+                            } else {
+                                withAnimation {
+                                    scanState = .detecting
                                 }
                             }
-                            
-#if targetEnvironment(simulator)
-                            RoundedRectangle(cornerRadius: 12)
-                                .foregroundColor(.gray)
-                                .zIndex(-1)
-#else
-                            CameraTargetOverlayView()
-#endif
                         }
                         
-                        switch scanState {
-                        case .detecting:
-                            Text("Scan QR code to detect items")
-                                .font(.Main.fixed(.medium, size: 12))
-                                .padding(8)
-                                .frame(height: 33)
-                                .frame(maxWidth: .infinity)
-                                .background(Palette.grayScale0A)
-                                .foregroundColor(Palette.grayScale8A)
-                                .cornerRadius(12)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Palette.grayScale2A, lineWidth: 1)
-                                )
-                                .padding([.bottom, .horizontal], 8)
-                                .transition(.move(edge: .bottom).combined(with: .opacity))
-                        case .detected:
-                            VStack(spacing: 0) {
-                                HStack {
-                                    Text("Detected Items")
-                                        .font(.Main.fixed(.medium, size: 12))
-                                        .padding(8)
-                                        .frame(height: 33)
-                                        .foregroundColor(Palette.grayScale8A)
-                                    Spacer()
-                                }
-                                .padding(.horizontal, 16)
-                                .background(Palette.grayScale0A)
-                                
-                                Divider()
-                                
-                                ForEach(detectedItems) {
-                                    QRCodeItemView(item: $0)
-                                        .transition(.asymmetric(insertion: .move(edge: .bottom), removal: .move(edge: .top)))
-                                    Divider()
-                                }
-                            }
+#if targetEnvironment(simulator)
+                        RoundedRectangle(cornerRadius: 12)
+                            .foregroundColor(.gray)
+                            .zIndex(-1)
+#else
+                        CameraTargetOverlayView()
+#endif
+                    }
+                    
+                    switch scanState {
+                    case .detecting:
+                        Text("Scan QR code to detect items")
+                            .font(.Main.fixed(.medium, size: 12))
+                            .padding(8)
+                            .frame(height: 33)
+                            .frame(maxWidth: .infinity)
+                            .background(Palette.grayScale0A)
+                            .foregroundColor(Palette.grayScale8A)
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Palette.grayScale2A, lineWidth: 1)
                             )
                             .padding([.bottom, .horizontal], 8)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    case .detected:
+                        VStack(spacing: 0) {
+                            HStack {
+                                Text("Detected Items")
+                                    .font(.Main.fixed(.medium, size: 12))
+                                    .padding(8)
+                                    .frame(height: 33)
+                                    .foregroundColor(Palette.grayScale8A)
+                                Spacer()
+                            }
+                            .padding(.horizontal, 16)
+                            .background(Palette.grayScale0A)
+                            
+                            Divider()
+                            
+                            ForEach(detectedItems) {
+                                QRCodeItemView(item: $0)
+                                    .transition(.asymmetric(insertion: .move(edge: .bottom), removal: .move(edge: .top)))
+                                Divider()
+                            }
                         }
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Palette.grayScale2A, lineWidth: 1)
+                        )
+                        .padding([.bottom, .horizontal], 8)
                     }
                 }
-                .cornerRadius(12)
-                .padding(16)
-                
-                HStack {
-                    PButton(config: .onlyIcon(Asset.galeryIcon), style: .free, size: .big, enabled: true) {
-                        importFromLibrary.toggle()
-                    }
-                    .frame(width: 60, height: 60)
-                    
-                    Spacer()
-                    
-                    PButton(config: .onlyIcon(Asset.lightningIcon), style: .free, size: .big, enabled: true) {
-                        torchOn.toggle()
-                    }
-                    .frame(width: 60, height: 60)
-                    
-                    Spacer()
-                    
-                    PButton(config: .onlyIcon(Asset.xIcon), style: .outline, size: .big, enabled: true) {
-                        onClose()
-                    }
-                    .frame(width: 60, height: 60)
-                }
-                .padding(.horizontal, 24)
-                .frame(height: 84)
-                .ignoresSafeArea()
             }
+            .cornerRadius(12)
+            .padding(16)
+            
+            HStack {
+                PButton(config: .onlyIcon(Asset.galeryIcon), style: .free, size: .big, enabled: true) {
+                    importFromLibrary.toggle()
+                }
+                .frame(width: 60, height: 60)
+                
+                Spacer()
+                
+                PButton(config: .onlyIcon(Asset.lightningIcon), style: .free, size: .big, enabled: true) {
+                    torchOn.toggle()
+                }
+                .frame(width: 60, height: 60)
+                
+                Spacer()
+                
+                PButton(config: .onlyIcon(Asset.xIcon), style: .outline, size: .big, enabled: true) {
+                    onClose()
+                }
+                .frame(width: 60, height: 60)
+            }
+            .padding(.horizontal, 24)
+            .frame(height: 84)
         }
+        .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .navigationBarHidden(true)
         .alert(isPresented: $showingNoQRAlert) {
             Alert(title: Text("No QR Code Found"),

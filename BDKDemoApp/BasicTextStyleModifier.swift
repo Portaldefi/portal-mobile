@@ -29,3 +29,27 @@ struct BasicTextStyle_Previews: PreviewProvider {
         Text("Hello").textStyle(BasicTextStyle())
     }
 }
+
+struct BackgroundColorModifier: ViewModifier {
+    let color: Color
+    
+    func body(content: Content) -> some View {
+        ZStack(alignment: .top) {
+            color.ignoresSafeArea()
+            content
+        }
+    }
+}
+
+extension View {
+    func filledBackground<Style: ViewModifier>(_ style: Style) -> some View {
+        ModifiedContent(content: self, modifier: style)
+    }
+}
+
+struct BackgroundColorModifier_Previews: PreviewProvider {
+    static var previews: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .filledBackground(BackgroundColorModifier(color: Color.yellow))
+    }
+}

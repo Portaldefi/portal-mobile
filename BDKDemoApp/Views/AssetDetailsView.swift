@@ -22,79 +22,76 @@ struct AssetDetailsView: View {
     let txs: [BitcoinDevKit.Transaction]
     
     var body: some View {
-        ZStack(alignment: .top) {
-            Palette.grayScale1A.ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                Group {
-                    HStack {
-                        HStack(spacing: 14) {
-                            PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
-                                viewState.hideTabBar = false
-                                presentationMode.wrappedValue.dismiss()
-                            }
-                            .frame(width: 20)
-                            
-                            Text("All Assets")
-                                .font(.Main.fixed(.bold, size: 16))
-                                .foregroundColor(Palette.grayScaleF4)
+        VStack(spacing: 0) {
+            Group {
+                HStack {
+                    HStack(spacing: 14) {
+                        PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
+                            viewState.hideTabBar = false
+                            presentationMode.wrappedValue.dismiss()
                         }
-                        Spacer()
-                        Asset.gearIcon
-                            .foregroundColor(Palette.grayScale6A)
+                        .frame(width: 20)
+                        
+                        Text("All Assets")
+                            .font(.Main.fixed(.bold, size: 16))
+                            .foregroundColor(Palette.grayScaleF4)
                     }
-                    .frame(height: 48)
-                    .padding(.horizontal, 20)
-                    
-                    Divider()
-                        .overlay(Palette.grayScale2A)
-                    
-                    if let walletItem = item {
-                        WalletItemView(item: walletItem)
-                            .padding(.leading, 16)
-                            .padding(.vertical, 8)
-                    }
-                    
-                    ActionButtonsView
-                        .padding(.horizontal, 12)
-                        .padding(.bottom, 16)
+                    Spacer()
+                    Asset.gearIcon
+                        .foregroundColor(Palette.grayScale6A)
                 }
+                .frame(height: 48)
+                .padding(.horizontal, 20)
                 
                 Divider()
-                    .overlay(Palette.grayScale10)
+                    .overlay(Palette.grayScale2A)
                 
-                ZStack {
-                    ScrollView {
-                        ForEach(txs, id: \.self) { transaction in
-                            SingleTxView(transaction: transaction)
-                                .padding(.horizontal, 8)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    if case .confirmed(let details, _) = transaction {
-                                        let urlString = "https://blockstream.info/testnet/tx/\(details.txid)"
-                                        if let url = URL(string: urlString) {
-                                            #if os(iOS)
-                                            UIApplication.shared.open(url)
-                                            #elseif os(macOS)
-                                            NSWorkspace.shared.open(url)
-                                            #endif
-                                        }
+                if let walletItem = item {
+                    WalletItemView(item: walletItem)
+                        .padding(.leading, 16)
+                        .padding(.vertical, 8)
+                }
+                
+                ActionButtonsView
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 16)
+            }
+            
+            Divider()
+                .overlay(Palette.grayScale10)
+            
+            ZStack {
+                ScrollView {
+                    ForEach(txs, id: \.self) { transaction in
+                        SingleTxView(transaction: transaction)
+                            .padding(.horizontal, 8)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if case .confirmed(let details, _) = transaction {
+                                    let urlString = "https://blockstream.info/testnet/tx/\(details.txid)"
+                                    if let url = URL(string: urlString) {
+#if os(iOS)
+                                        UIApplication.shared.open(url)
+#elseif os(macOS)
+                                        NSWorkspace.shared.open(url)
+#endif
                                     }
                                 }
-                            Divider()
-                                .overlay(Palette.grayScale1A)
-                        }
+                            }
+                        Divider()
+                            .overlay(Palette.grayScale1A)
                     }
-                    .background(Palette.grayScale20)
-                    
-                    if txs.isEmpty {
-                        Text("No transactions yet.")
-                            .font(.Main.fixed(.regular, size: 16))
-                            .padding()
-                    }
+                }
+                .background(Palette.grayScale20)
+                
+                if txs.isEmpty {
+                    Text("No transactions yet.")
+                        .font(.Main.fixed(.regular, size: 16))
+                        .padding()
                 }
             }
         }
+        .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         .navigationBarHidden(true)
         .sheet(isPresented: $sendViewModel.goToReceive, onDismiss: {
             sendViewModel.goToReceive = false

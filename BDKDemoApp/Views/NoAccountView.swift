@@ -14,33 +14,30 @@ struct NoAccountView: View {
     
     var body: some View {
         NavigationView {
-            ZStack {
-                Palette.grayScale0A.ignoresSafeArea()
-                
-                VStack {
-                    VStack(spacing: 51) {
-                        Asset.portalIcon
-                        Text("Your Gateway To\nUncensorable Finance")
-                            .foregroundColor(Palette.grayScaleCA)
-                            .font(.Main.fixed(.bold, size: 21))
-                            .fontWeight(.bold)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.top, 144)
-                    Spacer()
-                    PButton(config: .onlyLabel("Create new wallet"), style: .filled, size: .big, enabled: true) {
-                        createAccount.toggle()
-                    }
-                    PButton(config: .onlyLabel("Import wallet"), style: .outline, size: .big, enabled: true) {
-                        restoreAccount.toggle()
-                    }
-                    NavigationLink(destination: CreateAccountView(), isActive: $createAccount) { EmptyView() }
-                    NavigationLink(destination: RestoreAccountView(), isActive: $restoreAccount) { EmptyView() }
+            VStack {
+                VStack(spacing: 51) {
+                    Asset.portalIcon
+                    Text("Your Gateway To\nUncensorable Finance")
+                        .foregroundColor(Palette.grayScaleCA)
+                        .font(.Main.fixed(.bold, size: 21))
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
                 }
-                .padding(.bottom, 87)
-                .padding(.horizontal)
-                .navigationBarHidden(true)
+                .padding(.top, 144)
+                Spacer()
+                PButton(config: .onlyLabel("Create new wallet"), style: .filled, size: .big, enabled: true) {
+                    createAccount.toggle()
+                }
+                PButton(config: .onlyLabel("Import wallet"), style: .outline, size: .big, enabled: true) {
+                    restoreAccount.toggle()
+                }
+                NavigationLink(destination: CreateAccountView(), isActive: $createAccount) { EmptyView() }
+                NavigationLink(destination: RestoreAccountView(), isActive: $restoreAccount) { EmptyView() }
             }
+            .padding(.bottom, 87)
+            .padding(.horizontal)
+            .navigationBarHidden(true)
+            .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         }
     }
 }

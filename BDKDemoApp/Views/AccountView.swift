@@ -39,56 +39,53 @@ struct AccountView: View {
             case .dbNotFound:
                 VStack { Text("DB not founded...") }
             case .loaded:
-                ZStack {
-                    Palette.grayScale1A.ignoresSafeArea()
-                    
-                    VStack(spacing: 0) {
-                        Group {
-                            AccountView()
-                            Divider()
-                                .overlay(Palette.grayScale2A)
-                            BalanceView(balance: viewModel.totalBalance, value: viewModel.value)
-                                .frame(height: 124)
-                                .padding(.horizontal, 16)
-                            ActionButtonsView
-                                .padding(.horizontal, 16)
-                                .padding(.bottom, 24)
-                        }
-                        
+                VStack(spacing: 0) {
+                    Group {
+                        AccountView()
                         Divider()
-                            .overlay(Palette.grayScale10)
-                        
-                        ScrollView {
-                            VStack(spacing: 0) {
-                                ForEach(viewModel.items) { item in
-                                    ZStack(alignment: .trailing) {
-                                        WalletItemView(item: item)
-                                            .padding(.leading, 16)
-                                            .padding(.trailing, 8)
-                                            .contentShape(Rectangle())
-                                            .onTapGesture {
-                                                selectedItem = item
-                                                viewState.hideTabBar = true
-                                                goToDetails = true
-                                            }
-                                        Asset.chevronRightIcon
-                                            .foregroundColor(Palette.grayScale4A)
-                                    }
-                                    Divider()
-                                        .overlay(Color(red: 22/255, green: 22/255, blue: 22/255))
+                            .overlay(Palette.grayScale2A)
+                        BalanceView(balance: viewModel.totalBalance, value: viewModel.value)
+                            .frame(height: 124)
+                            .padding(.horizontal, 16)
+                        ActionButtonsView
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, 24)
+                    }
+                    
+                    Divider()
+                        .overlay(Palette.grayScale10)
+                    
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            ForEach(viewModel.items) { item in
+                                ZStack(alignment: .trailing) {
+                                    WalletItemView(item: item)
+                                        .padding(.leading, 16)
+                                        .padding(.trailing, 8)
+                                        .contentShape(Rectangle())
+                                        .onTapGesture {
+                                            selectedItem = item
+                                            viewState.hideTabBar = true
+                                            goToDetails = true
+                                        }
+                                    Asset.chevronRightIcon
+                                        .foregroundColor(Palette.grayScale4A)
                                 }
-                            }
-                            NavigationLink(
-                                destination: AssetDetailsView(item: selectedItem, txs: selectedItem?.name == "Bitcoin" && selectedItem?.unit == "btc" ? viewModel.transactions : []),
-                                isActive: $goToDetails
-                            ) {
-                                EmptyView()
+                                Divider()
+                                    .overlay(Color(red: 22/255, green: 22/255, blue: 22/255))
                             }
                         }
-                        .background(Palette.grayScale20)
+                        NavigationLink(
+                            destination: AssetDetailsView(item: selectedItem, txs: selectedItem?.name == "Bitcoin" && selectedItem?.unit == "btc" ? viewModel.transactions : []),
+                            isActive: $goToDetails
+                        ) {
+                            EmptyView()
+                        }
                     }
-                    .navigationBarHidden(true)
+                    .background(Palette.grayScale20)
                 }
+                .navigationBarHidden(true)
+                .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
             }
         }
         .onAppear(perform: viewModel.sync)
