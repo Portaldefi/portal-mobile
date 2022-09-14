@@ -39,6 +39,9 @@
 		7564C65228CF3CF600ABA8CF /* SetRecipientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */; };
 		7564C65428CF3D3900ABA8CF /* SetAmountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65328CF3D3900ABA8CF /* SetAmountView.swift */; };
 		7564C65728CF6EC400ABA8CF /* SendFlowError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65628CF6EC400ABA8CF /* SendFlowError.swift */; };
+		7564C65B28D08F6F00ABA8CF /* AmountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65A28D08F6F00ABA8CF /* AmountView.swift */; };
+		7564C65E28D1F89E00ABA8CF /* DataField in Frameworks */ = {isa = PBXBuildFile; productRef = 7564C65D28D1F89E00ABA8CF /* DataField */; };
+		7564C66028D219CB00ABA8CF /* Coin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65F28D219CB00ABA8CF /* Coin.swift */; };
 		756A3116288821F3004978E2 /* BDKDemoAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3115288821F3004978E2 /* BDKDemoAppApp.swift */; };
 		756A3118288821F3004978E2 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3117288821F3004978E2 /* AccountView.swift */; };
 		756A311A288821F4004978E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 756A3119288821F4004978E2 /* Assets.xcassets */; };
@@ -110,6 +113,8 @@
 		7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetRecipientView.swift; sourceTree = "<group>"; };
 		7564C65328CF3D3900ABA8CF /* SetAmountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetAmountView.swift; sourceTree = "<group>"; };
 		7564C65628CF6EC400ABA8CF /* SendFlowError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendFlowError.swift; sourceTree = "<group>"; };
+		7564C65A28D08F6F00ABA8CF /* AmountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountView.swift; sourceTree = "<group>"; };
+		7564C65F28D219CB00ABA8CF /* Coin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coin.swift; sourceTree = "<group>"; };
 		756A3112288821F3004978E2 /* BDKDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BDKDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		756A3115288821F3004978E2 /* BDKDemoAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BDKDemoAppApp.swift; sourceTree = "<group>"; };
 		756A3117288821F3004978E2 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
@@ -161,6 +166,7 @@
 				479A7AC928B756DF0057E100 /* Factory in Frameworks */,
 				756DDD8C28A28858002EDC60 /* KeychainAccess in Frameworks */,
 				75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */,
+				7564C65E28D1F89E00ABA8CF /* DataField in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -188,6 +194,7 @@
 				7545BC0A28C2339900ED92C3 /* ConfirmationView.swift */,
 				7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */,
 				7564C65328CF3D3900ABA8CF /* SetAmountView.swift */,
+				7564C65A28D08F6F00ABA8CF /* AmountView.swift */,
 			);
 			path = Send;
 			sourceTree = "<group>";
@@ -244,6 +251,7 @@
 				7545BC3928C9E3A200ED92C3 /* FiatSymbols.swift */,
 				4774D72428B4FC2000B7988B /* StringFormatter.swift */,
 				4774D72A28B4FC9B00B7988B /* FiatCurrency.swift */,
+				7564C65F28D219CB00ABA8CF /* Coin.swift */,
 				4774D72C28B4FCCC00B7988B /* Currency.swift */,
 				756A312C28884452004978E2 /* WalletItem.swift */,
 				756DDD8628A287CC002EDC60 /* Account.swift */,
@@ -343,6 +351,7 @@
 				75AA211028A668A400DD2E89 /* BitcoinAddressValidator */,
 				479A7AC828B756DF0057E100 /* Factory */,
 				7545BC4028CA107100ED92C3 /* Coinpaprika */,
+				7564C65D28D1F89E00ABA8CF /* DataField */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* BDKDemoApp.app */;
@@ -380,6 +389,7 @@
 				75AA210F28A668A400DD2E89 /* XCRemoteSwiftPackageReference "bitcoin-address-validator-swift" */,
 				479A7AC728B756DF0057E100 /* XCRemoteSwiftPackageReference "Factory" */,
 				7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */,
+				7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -453,6 +463,7 @@
 				756DDD8228A2879E002EDC60 /* IKeyChainStorage.swift in Sources */,
 				756DDD9928A28FC6002EDC60 /* AccountManager.swift in Sources */,
 				756A3139288AEAD2004978E2 /* BackButtonModifier.swift in Sources */,
+				7564C66028D219CB00ABA8CF /* Coin.swift in Sources */,
 				7545BC3A28C9E3A200ED92C3 /* FiatSymbols.swift in Sources */,
 				479A7AD028B7A92C0057E100 /* SendViewViewModel.swift in Sources */,
 				7545BC0B28C2339900ED92C3 /* ConfirmationView.swift in Sources */,
@@ -463,6 +474,7 @@
 				7545BC0D28C7948900ED92C3 /* String+Extension.swift in Sources */,
 				4774D71E28B4B06200B7988B /* ActivityView.swift in Sources */,
 				756DDD8428A2879E002EDC60 /* IAccountStorage.swift in Sources */,
+				7564C65B28D08F6F00ABA8CF /* AmountView.swift in Sources */,
 				756A3116288821F3004978E2 /* BDKDemoAppApp.swift in Sources */,
 				756DDD9728A28F8F002EDC60 /* IAccountManager.swift in Sources */,
 				756DDD9D28A292D4002EDC60 /* RootViewViewModel.swift in Sources */,
@@ -717,6 +729,14 @@
 				kind = branch;
 			};
 		};
+		7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marcusrossel/data-field.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		756A31282888252D004978E2 /* XCRemoteSwiftPackageReference "bdk-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bitcoindevkit/bdk-swift";
@@ -763,6 +783,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */;
 			productName = Coinpaprika;
+		};
+		7564C65D28D1F89E00ABA8CF /* DataField */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field" */;
+			productName = DataField;
 		};
 		756A31292888252D004978E2 /* BitcoinDevKit */ = {
 			isa = XCSwiftPackageProductDependency;
