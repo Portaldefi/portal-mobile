@@ -84,6 +84,9 @@
 		75D8C59228D8867600228298 /* IAccountStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59128D8867600228298 /* IAccountStorage.swift */; };
 		75D8C59628D88A1100228298 /* IAppConfigProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59528D88A1100228298 /* IAppConfigProvider.swift */; };
 		75D8C59828D88A5600228298 /* AppConfigProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59728D88A5600228298 /* AppConfigProvider.swift */; };
+		75D8C59B28D88BE500228298 /* IAdapterFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59A28D88BE500228298 /* IAdapterFactory.swift */; };
+		75D8C59D28D88BFB00228298 /* IAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59C28D88BFB00228298 /* IAdapter.swift */; };
+		75D8C59F28D88C4F00228298 /* Wallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59E28D88C4F00228298 /* Wallet.swift */; };
 		75DFA55828BD010400F23E02 /* QRCodeReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */; };
 /* End PBXBuildFile section */
 
@@ -159,6 +162,9 @@
 		75D8C59128D8867600228298 /* IAccountStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAccountStorage.swift; sourceTree = "<group>"; };
 		75D8C59528D88A1100228298 /* IAppConfigProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAppConfigProvider.swift; sourceTree = "<group>"; };
 		75D8C59728D88A5600228298 /* AppConfigProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConfigProvider.swift; sourceTree = "<group>"; };
+		75D8C59A28D88BE500228298 /* IAdapterFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAdapterFactory.swift; sourceTree = "<group>"; };
+		75D8C59C28D88BFB00228298 /* IAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAdapter.swift; sourceTree = "<group>"; };
+		75D8C59E28D88C4F00228298 /* Wallet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Wallet.swift; sourceTree = "<group>"; };
 		75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeReaderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -256,6 +262,7 @@
 		756A312B2888443A004978E2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				75D8C59E28D88C4F00228298 /* Wallet.swift */,
 				7545BC3728C9E32A00ED92C3 /* FiatRatesResponse.swift */,
 				7545BC3928C9E3A200ED92C3 /* FiatSymbols.swift */,
 				4774D72428B4FC2000B7988B /* StringFormatter.swift */,
@@ -316,6 +323,8 @@
 			isa = PBXGroup;
 			children = (
 				756DDD8128A2879E002EDC60 /* IAccountRecordStorage.swift */,
+				75D8C59A28D88BE500228298 /* IAdapterFactory.swift */,
+				75D8C59C28D88BFB00228298 /* IAdapter.swift */,
 				75D8C59128D8867600228298 /* IAccountStorage.swift */,
 				756DDD7F28A2879E002EDC60 /* IKeyChainStorage.swift */,
 				756DDD8028A2879E002EDC60 /* ILocalStorage.swift */,
@@ -453,6 +462,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				75D8C59F28D88C4F00228298 /* Wallet.swift in Sources */,
 				4774D72B28B4FC9B00B7988B /* FiatCurrency.swift in Sources */,
 				756DDD7B28A28754002EDC60 /* KeychainStorage.swift in Sources */,
 				756DDD8728A287CC002EDC60 /* Account.swift in Sources */,
@@ -467,6 +477,7 @@
 				756DDD9028A28C06002EDC60 /* AccountRecord+CoreDataClass.swift in Sources */,
 				7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */,
 				756DDD7D28A28754002EDC60 /* AccountStorage.swift in Sources */,
+				75D8C59B28D88BE500228298 /* IAdapterFactory.swift in Sources */,
 				4774D72928B4FC7500B7988B /* UInt64+Extension.swift in Sources */,
 				756A313D288EBBAD004978E2 /* SelectAssetView.swift in Sources */,
 				756DDD7228A27C11002EDC60 /* CreateAccountViewModel.swift in Sources */,
@@ -507,6 +518,7 @@
 				479A7AD028B7A92C0057E100 /* SendViewViewModel.swift in Sources */,
 				7545BC0B28C2339900ED92C3 /* ConfirmationView.swift in Sources */,
 				4774D72F28B4FD0D00B7988B /* Date+Extension.swift in Sources */,
+				75D8C59D28D88BFB00228298 /* IAdapter.swift in Sources */,
 				7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */,
 				756DDD7028A275AD002EDC60 /* CreateAccountView.swift in Sources */,
 				75D8C59828D88A5600228298 /* AppConfigProvider.swift in Sources */,

@@ -23,7 +23,7 @@ class AccountViewModel: ObservableObject {
         case empty
         case loading
         case failed(Error)
-        case loaded(Wallet, Blockchain)
+        case loaded(BitcoinDevKit.Wallet, Blockchain)
     }
     
     enum SyncState: Equatable {
@@ -89,7 +89,7 @@ class AccountViewModel: ObservableObject {
             let blockchainConfig = BlockchainConfig.electrum(config: electrum)
             do {
                 let blockchain = try Blockchain(config: blockchainConfig)
-                let wallet = try Wallet(descriptor: descriptor, changeDescriptor: changeDescriptor, network: Network.testnet, databaseConfig: db)
+                let wallet = try BitcoinDevKit.Wallet(descriptor: descriptor, changeDescriptor: changeDescriptor, network: Network.testnet, databaseConfig: db)
                 state = State.loaded(wallet, blockchain)
             } catch let error {
                 state = State.failed(error)
@@ -317,7 +317,7 @@ extension AccountViewModel {
         let descriptor = "wpkh([\(restoredExtendedKey.fingerprint)/44'/0'/0']\(restoredExtendedKey.xprv)/*)"
         let changeDescriptor = "wpkh([\(restoredExtendedKey.fingerprint)/44'/0'/1']\(restoredExtendedKey.xprv)/*)"
         
-        let wallet = try! Wallet(descriptor: descriptor, changeDescriptor: changeDescriptor, network: Network.testnet, databaseConfig: .memory)
+        let wallet = try! BitcoinDevKit.Wallet(descriptor: descriptor, changeDescriptor: changeDescriptor, network: Network.testnet, databaseConfig: .memory)
         let electrum = ElectrumConfig(url: "ssl://electrum.blockstream.info:60002", socks5: nil, retry: 5, timeout: nil, stopGap: 10)
         let blockchainConfig = BlockchainConfig.electrum(config: electrum)
         let blockchain = try! Blockchain(config: blockchainConfig)
