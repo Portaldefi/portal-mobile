@@ -223,6 +223,7 @@
 			isa = PBXGroup;
 			children = (
 				4774D72328B4F62500B7988B /* Info.plist */,
+				75D8C59328D8887300228298 /* Core */,
 				479A7ACA28B759510057E100 /* Portal+Injection.swift */,
 				756A3115288821F3004978E2 /* BDKDemoAppApp.swift */,
 				756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */,
@@ -259,10 +260,6 @@
 				4774D72C28B4FCCC00B7988B /* AccountCurrency.swift */,
 				756A312C28884452004978E2 /* WalletItem.swift */,
 				756DDD8628A287CC002EDC60 /* Account.swift */,
-				756DDD7928A28754002EDC60 /* AccountStorage.swift */,
-				756DDD7A28A28754002EDC60 /* DBLocalStorage.swift */,
-				756DDD7728A28754002EDC60 /* KeychainStorage.swift */,
-				756DDD7828A28754002EDC60 /* LocalStorage.swift */,
 				756DDD9828A28FC6002EDC60 /* AccountManager.swift */,
 				4774D71928AF916600B7988B /* QRCodeItem.swift */,
 				4774D71B28AF920100B7988B /* QRCodeParser.swift */,
@@ -331,6 +328,25 @@
 				756DDD8D28A28C06002EDC60 /* AccountRecord+CoreDataProperties.swift */,
 			);
 			path = DB;
+			sourceTree = "<group>";
+		};
+		75D8C59328D8887300228298 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				75D8C59428D8889E00228298 /* Storage */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		75D8C59428D8889E00228298 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				756DDD7928A28754002EDC60 /* AccountStorage.swift */,
+				756DDD7A28A28754002EDC60 /* DBLocalStorage.swift */,
+				756DDD7728A28754002EDC60 /* KeychainStorage.swift */,
+				756DDD7828A28754002EDC60 /* LocalStorage.swift */,
+			);
+			path = Storage;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
