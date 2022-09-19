@@ -70,7 +70,7 @@
 		756DDD7E28A28754002EDC60 /* DBLocalStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD7A28A28754002EDC60 /* DBLocalStorage.swift */; };
 		756DDD8228A2879E002EDC60 /* IKeyChainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD7F28A2879E002EDC60 /* IKeyChainStorage.swift */; };
 		756DDD8328A2879E002EDC60 /* ILocalStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD8028A2879E002EDC60 /* ILocalStorage.swift */; };
-		756DDD8428A2879E002EDC60 /* IAccountStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD8128A2879E002EDC60 /* IAccountStorage.swift */; };
+		756DDD8428A2879E002EDC60 /* IAccountRecordStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD8128A2879E002EDC60 /* IAccountRecordStorage.swift */; };
 		756DDD8728A287CC002EDC60 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD8628A287CC002EDC60 /* Account.swift */; };
 		756DDD8928A287EA002EDC60 /* IAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD8828A287EA002EDC60 /* IAccount.swift */; };
 		756DDD8C28A28858002EDC60 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 756DDD8B28A28858002EDC60 /* KeychainAccess */; };
@@ -144,7 +144,7 @@
 		756DDD7A28A28754002EDC60 /* DBLocalStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DBLocalStorage.swift; sourceTree = "<group>"; };
 		756DDD7F28A2879E002EDC60 /* IKeyChainStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IKeyChainStorage.swift; sourceTree = "<group>"; };
 		756DDD8028A2879E002EDC60 /* ILocalStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ILocalStorage.swift; sourceTree = "<group>"; };
-		756DDD8128A2879E002EDC60 /* IAccountStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAccountStorage.swift; sourceTree = "<group>"; };
+		756DDD8128A2879E002EDC60 /* IAccountRecordStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAccountRecordStorage.swift; sourceTree = "<group>"; };
 		756DDD8628A287CC002EDC60 /* Account.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		756DDD8828A287EA002EDC60 /* IAccount.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAccount.swift; sourceTree = "<group>"; };
 		756DDD8D28A28C06002EDC60 /* AccountRecord+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountRecord+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -312,7 +312,7 @@
 		756DDD8528A287A7002EDC60 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
-				756DDD8128A2879E002EDC60 /* IAccountStorage.swift */,
+				756DDD8128A2879E002EDC60 /* IAccountRecordStorage.swift */,
 				756DDD7F28A2879E002EDC60 /* IKeyChainStorage.swift */,
 				756DDD8028A2879E002EDC60 /* ILocalStorage.swift */,
 				756DDD9528A28F8F002EDC60 /* IAccountManager.swift */,
@@ -477,7 +477,7 @@
 				756A313528898CA2004978E2 /* BasicTextStyleModifier.swift in Sources */,
 				7545BC0D28C7948900ED92C3 /* String+Extension.swift in Sources */,
 				4774D71E28B4B06200B7988B /* ActivityView.swift in Sources */,
-				756DDD8428A2879E002EDC60 /* IAccountStorage.swift in Sources */,
+				756DDD8428A2879E002EDC60 /* IAccountRecordStorage.swift in Sources */,
 				7564C65B28D08F6F00ABA8CF /* AmountView.swift in Sources */,
 				756A3116288821F3004978E2 /* BDKDemoAppApp.swift in Sources */,
 				756DDD9728A28F8F002EDC60 /* IAccountManager.swift in Sources */,

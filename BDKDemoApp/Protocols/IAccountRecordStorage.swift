@@ -1,5 +1,5 @@
 //
-//  IAccountStorage.swift
+//  IAccountRecordStorage.swift
 //  Portal
 //
 //  Created by Farid on 22.07.2021.
@@ -8,7 +8,7 @@
 import Foundation
 import CoreData
 
-protocol IAccountStorage {
+protocol IAccountRecordStorage {
     var context: NSManagedObjectContext { get }
     var accountRecords: [AccountRecord] { get }
     func save(accountRecord: AccountRecord)

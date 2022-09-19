@@ -11,9 +11,9 @@ import BitcoinDevKit
 class AccountStorage {
     private let localStorage: ILocalStorage
     private let secureStorage: IKeychainStorage
-    private let accountStorage: IAccountStorage
+    private let accountStorage: IAccountRecordStorage
 
-    init(localStorage: ILocalStorage, secureStorage: IKeychainStorage, accountStorage: IAccountStorage) {
+    init(localStorage: ILocalStorage, secureStorage: IKeychainStorage, accountStorage: IAccountRecordStorage) {
         self.localStorage = localStorage
         self.secureStorage = secureStorage
         self.accountStorage = accountStorage

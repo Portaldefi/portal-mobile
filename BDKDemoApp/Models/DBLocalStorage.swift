@@ -17,7 +17,7 @@ final class DBlocalStorage {
     }
 }
 
-extension DBlocalStorage: IAccountStorage {
+extension DBlocalStorage: IAccountRecordStorage {
     var accountRecords: [AccountRecord] {
         var accountRecords: [AccountRecord] = []
 
