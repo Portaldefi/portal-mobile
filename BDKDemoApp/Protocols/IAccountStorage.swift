@@ -12,8 +12,8 @@ protocol IAccountStorage {
     var context: NSManagedObjectContext { get }
     var accountRecords: [AccountRecord] { get }
     func save(accountRecord: AccountRecord)
-    func update(account: Account)
-    func deleteAccount(_ account: Account) throws
+    func update(account: IAccount)
+    func deleteAccount(_ account: IAccount) throws
     func deleteAllAccountRecords()
     func clear()
 }

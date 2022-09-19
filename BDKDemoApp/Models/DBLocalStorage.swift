@@ -39,11 +39,11 @@ extension DBlocalStorage: IAccountStorage {
         }
     }
     
-    func update(account: Account) {
+    func update(account: IAccount) {
         
     }
         
-    func deleteAccount(_ account: Account) throws {
+    func deleteAccount(_ account: IAccount) throws {
         if let record = accountRecords.first(where: { $0.id == account.id }) {
             context.performAndWait {
                 context.delete(record)

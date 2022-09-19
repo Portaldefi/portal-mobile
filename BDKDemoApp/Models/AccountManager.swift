@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 final class AccountManager {
-    var onActiveAccountUpdate = PassthroughSubject<Account?, Never>()
+    var onActiveAccountUpdate = PassthroughSubject<IAccount?, Never>()
 
     private let accountStorage: AccountStorage
     
@@ -29,15 +29,15 @@ final class AccountManager {
 }
 
 extension AccountManager: IAccountManager {
-    var activeAccount: Account? {
+    var activeAccount: IAccount? {
         accountStorage.activeAccount
     }
     
-    var accounts: [Account] {
+    var accounts: [IAccount] {
         accountStorage.allAccounts
     }
     
-    func account(id: String) -> Account? {
+    func account(id: String) -> IAccount? {
         accounts.first(where: { $0.id == id })
     }
     
@@ -46,17 +46,17 @@ extension AccountManager: IAccountManager {
         onActiveAccountUpdate.send(accountStorage.activeAccount)
     }
     
-    func save(account: Account) {
+    func save(account: IAccount) {
         accountStorage.save(account: account)
         onActiveAccountUpdate.send(account)
     }
     
-    func delete(account: Account) {
+    func delete(account: IAccount) {
         accountStorage.delete(account: account)
         nextActiveAccount()
     }
     
-    func update(account: Account) {
+    func update(account: IAccount) {
         accountStorage.update(account: account)
         onActiveAccountUpdate.send(account)
     }

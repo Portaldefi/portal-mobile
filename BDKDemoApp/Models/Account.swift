@@ -48,6 +48,10 @@ extension Account: Hashable {
 }
 
 class MockedAccount: IAccount {
+    var extendedKey: ExtendedKeyInfo {
+        ExtendedKeyInfo(mnemonic: "", xprv: "", fingerprint: "")
+    }
+    
     var index: Int = 0
     
     var id: String {
