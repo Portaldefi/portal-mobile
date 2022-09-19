@@ -93,6 +93,7 @@
 		75D8C5A728D88E0900228298 /* IBalanceAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C5A428D88E0900228298 /* IBalanceAdapter.swift */; };
 		75D8C5A928D88F8D00228298 /* AdapterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C5A828D88F8D00228298 /* AdapterState.swift */; };
 		75D8C5AB28D8907D00228298 /* AdapterFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C5AA28D8907D00228298 /* AdapterFactory.swift */; };
+		75D8C5AE28D8939A00228298 /* BitcoinAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C5AD28D8939A00228298 /* BitcoinAdapter.swift */; };
 		75DFA55828BD010400F23E02 /* QRCodeReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */; };
 /* End PBXBuildFile section */
 
@@ -177,6 +178,7 @@
 		75D8C5A428D88E0900228298 /* IBalanceAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IBalanceAdapter.swift; sourceTree = "<group>"; };
 		75D8C5A828D88F8D00228298 /* AdapterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdapterState.swift; sourceTree = "<group>"; };
 		75D8C5AA28D8907D00228298 /* AdapterFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdapterFactory.swift; sourceTree = "<group>"; };
+		75D8C5AD28D8939A00228298 /* BitcoinAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinAdapter.swift; sourceTree = "<group>"; };
 		75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeReaderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -367,6 +369,7 @@
 				75D8C5AC28D8908200228298 /* Factories */,
 				75D8C59928D88A6700228298 /* Providers */,
 				75D8C59428D8889E00228298 /* Storage */,
+				75D8C5AF28D8939E00228298 /* Adapters */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -396,6 +399,14 @@
 				75D8C5AA28D8907D00228298 /* AdapterFactory.swift */,
 			);
 			path = Factories;
+			sourceTree = "<group>";
+		};
+		75D8C5AF28D8939E00228298 /* Adapters */ = {
+			isa = PBXGroup;
+			children = (
+				75D8C5AD28D8939A00228298 /* BitcoinAdapter.swift */,
+			);
+			path = Adapters;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -524,6 +535,7 @@
 				4774D72528B4FC2000B7988B /* StringFormatter.swift in Sources */,
 				756DDD6E28A272AB002EDC60 /* NoAccountView.swift in Sources */,
 				756A3118288821F3004978E2 /* AccountView.swift in Sources */,
+				75D8C5AE28D8939A00228298 /* BitcoinAdapter.swift in Sources */,
 				7545BC3828C9E32A00ED92C3 /* FiatRatesResponse.swift in Sources */,
 				756A3131288844FD004978E2 /* AccountViewModel.swift in Sources */,
 				7564C66228D85AA800ABA8CF /* Exchanger.swift in Sources */,
