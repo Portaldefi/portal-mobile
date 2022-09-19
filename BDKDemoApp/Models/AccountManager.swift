@@ -11,9 +11,9 @@ import Combine
 final class AccountManager {
     var onActiveAccountUpdate = PassthroughSubject<IAccount?, Never>()
 
-    private let accountStorage: AccountStorage
+    private let accountStorage: IAccountStorage
     
-    init(accountStorage: AccountStorage) {
+    init(accountStorage: IAccountStorage) {
         self.accountStorage = accountStorage
     }
         

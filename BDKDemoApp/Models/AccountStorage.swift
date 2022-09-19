@@ -84,7 +84,7 @@ class AccountStorage {
     }
 }
 
-extension AccountStorage {
+extension AccountStorage: IAccountStorage {
     var activeAccount: IAccount? {
         guard
             let currentAccountID = localStorage.getCurrentAccountID(),
