@@ -92,6 +92,7 @@
 		75D8C5A628D88E0900228298 /* ITransactionAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C5A328D88E0900228298 /* ITransactionAdapter.swift */; };
 		75D8C5A728D88E0900228298 /* IBalanceAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C5A428D88E0900228298 /* IBalanceAdapter.swift */; };
 		75D8C5A928D88F8D00228298 /* AdapterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C5A828D88F8D00228298 /* AdapterState.swift */; };
+		75D8C5AB28D8907D00228298 /* AdapterFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C5AA28D8907D00228298 /* AdapterFactory.swift */; };
 		75DFA55828BD010400F23E02 /* QRCodeReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */; };
 /* End PBXBuildFile section */
 
@@ -175,6 +176,7 @@
 		75D8C5A328D88E0900228298 /* ITransactionAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ITransactionAdapter.swift; sourceTree = "<group>"; };
 		75D8C5A428D88E0900228298 /* IBalanceAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IBalanceAdapter.swift; sourceTree = "<group>"; };
 		75D8C5A828D88F8D00228298 /* AdapterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdapterState.swift; sourceTree = "<group>"; };
+		75D8C5AA28D8907D00228298 /* AdapterFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdapterFactory.swift; sourceTree = "<group>"; };
 		75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeReaderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -362,6 +364,7 @@
 		75D8C59328D8887300228298 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				75D8C5AC28D8908200228298 /* Factories */,
 				75D8C59928D88A6700228298 /* Providers */,
 				75D8C59428D8889E00228298 /* Storage */,
 			);
@@ -385,6 +388,14 @@
 				75D8C59728D88A5600228298 /* AppConfigProvider.swift */,
 			);
 			path = Providers;
+			sourceTree = "<group>";
+		};
+		75D8C5AC28D8908200228298 /* Factories */ = {
+			isa = PBXGroup;
+			children = (
+				75D8C5AA28D8907D00228298 /* AdapterFactory.swift */,
+			);
+			path = Factories;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -552,6 +563,7 @@
 				75D8C5A628D88E0900228298 /* ITransactionAdapter.swift in Sources */,
 				75D8C5A128D88D9C00228298 /* IAdapterManager.swift in Sources */,
 				756DDD8928A287EA002EDC60 /* IAccount.swift in Sources */,
+				75D8C5AB28D8907D00228298 /* AdapterFactory.swift in Sources */,
 				7545BC3C28C9E5B900ED92C3 /* MarketData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
