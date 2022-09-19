@@ -15,7 +15,7 @@
 		4774D72728B4FC5300B7988B /* Double+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72628B4FC5300B7988B /* Double+Extension.swift */; };
 		4774D72928B4FC7500B7988B /* UInt64+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72828B4FC7500B7988B /* UInt64+Extension.swift */; };
 		4774D72B28B4FC9B00B7988B /* FiatCurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72A28B4FC9B00B7988B /* FiatCurrency.swift */; };
-		4774D72D28B4FCCC00B7988B /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72C28B4FCCC00B7988B /* Currency.swift */; };
+		4774D72D28B4FCCC00B7988B /* AccountCurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72C28B4FCCC00B7988B /* AccountCurrency.swift */; };
 		4774D72F28B4FD0D00B7988B /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72E28B4FD0D00B7988B /* Date+Extension.swift */; };
 		479A7AC928B756DF0057E100 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = 479A7AC828B756DF0057E100 /* Factory */; };
 		479A7ACB28B759510057E100 /* Portal+Injection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479A7ACA28B759510057E100 /* Portal+Injection.swift */; };
@@ -94,7 +94,7 @@
 		4774D72628B4FC5300B7988B /* Double+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Extension.swift"; sourceTree = "<group>"; };
 		4774D72828B4FC7500B7988B /* UInt64+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UInt64+Extension.swift"; sourceTree = "<group>"; };
 		4774D72A28B4FC9B00B7988B /* FiatCurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiatCurrency.swift; sourceTree = "<group>"; };
-		4774D72C28B4FCCC00B7988B /* Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency.swift; sourceTree = "<group>"; };
+		4774D72C28B4FCCC00B7988B /* AccountCurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountCurrency.swift; sourceTree = "<group>"; };
 		4774D72E28B4FD0D00B7988B /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		479A7ACA28B759510057E100 /* Portal+Injection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Portal+Injection.swift"; sourceTree = "<group>"; };
 		479A7ACC28B778CA0057E100 /* WalletItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemView.swift; sourceTree = "<group>"; };
@@ -254,7 +254,7 @@
 				4774D72428B4FC2000B7988B /* StringFormatter.swift */,
 				4774D72A28B4FC9B00B7988B /* FiatCurrency.swift */,
 				7564C65F28D219CB00ABA8CF /* Coin.swift */,
-				4774D72C28B4FCCC00B7988B /* Currency.swift */,
+				4774D72C28B4FCCC00B7988B /* AccountCurrency.swift */,
 				756A312C28884452004978E2 /* WalletItem.swift */,
 				756DDD8628A287CC002EDC60 /* Account.swift */,
 				756DDD7928A28754002EDC60 /* AccountStorage.swift */,
@@ -460,7 +460,7 @@
 				756DDD7628A27DEA002EDC60 /* RestoreAccountViewModel.swift in Sources */,
 				4774D72028B4B0C600B7988B /* ViewState.swift in Sources */,
 				7545BC4328CA155100ED92C3 /* Decimal+Extension.swift in Sources */,
-				4774D72D28B4FCCC00B7988B /* Currency.swift in Sources */,
+				4774D72D28B4FCCC00B7988B /* AccountCurrency.swift in Sources */,
 				756A313B288AEFA2004978E2 /* ReceiveView.swift in Sources */,
 				756A3122288821F4004978E2 /* BDKDemoApp.xcdatamodeld in Sources */,
 				756DDD7E28A28754002EDC60 /* DBLocalStorage.swift in Sources */,

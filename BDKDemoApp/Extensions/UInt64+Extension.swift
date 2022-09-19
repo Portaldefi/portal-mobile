@@ -8,7 +8,7 @@
 import Foundation
 
 extension UInt64 {
-    func formattedString(_ currency: Currency, decimals: Int = 0) -> String {
+    func formattedString(_ currency: AccountCurrency, decimals: Int = 0) -> String {
         let formatter = NumberFormatter()
 
         switch currency {
@@ -46,7 +46,7 @@ extension UInt64 {
         return formatter.string(from: NSNumber(value: value)) ?? "#"
     }
     
-    func totalValueString(currency: Currency) -> String {
+    func totalValueString(currency: AccountCurrency) -> String {
         let double = Double(self)
         switch currency {
         case .btc:

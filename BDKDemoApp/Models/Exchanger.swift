@@ -11,7 +11,7 @@ import Factory
 
 class Exchanger: ObservableObject {
     private let coin: Coin
-    private let currency: Currency
+    private let currency: AccountCurrency
     private var subscriptions = Set<AnyCancellable>()
     
     enum Side: Int, Hashable {
@@ -41,7 +41,7 @@ class Exchanger: ObservableObject {
         }
     }
     
-    init(coin: Coin, currency: Currency) {
+    init(coin: Coin, currency: AccountCurrency) {
         self.coin = coin
         self.currency = currency
         

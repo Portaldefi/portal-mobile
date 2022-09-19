@@ -1,5 +1,5 @@
 //
-//  Currency.swift
+//  AccountCurrency.swift
 //  BDKDemoApp
 //
 //  Created by farid on 23/8/22.
@@ -7,8 +7,8 @@
 
 import Foundation
 
-enum Currency: Equatable {
-    static func == (lhs: Currency, rhs: Currency) -> Bool {
+enum AccountCurrency: Equatable {
+    static func == (lhs: AccountCurrency, rhs: AccountCurrency) -> Bool {
         lhs.symbol == rhs.symbol
     }
     

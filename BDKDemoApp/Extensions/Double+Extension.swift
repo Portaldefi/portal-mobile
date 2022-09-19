@@ -60,7 +60,7 @@ extension Double {
         return String(formatter.string(from: number) ?? "")
     }
     
-    func formattedString(_ currency: Currency, decimals: Int = 5) -> String {
+    func formattedString(_ currency: AccountCurrency, decimals: Int = 5) -> String {
         let formatter = NumberFormatter()
 
         switch currency {
