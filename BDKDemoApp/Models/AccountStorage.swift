@@ -19,7 +19,7 @@ class AccountStorage {
         self.accountStorage = accountStorage
     }
 
-    private func createAccount(record: AccountRecord) -> Account? {
+    private func createAccount(record: AccountRecord) -> IAccount? {
         let id = record.id
 
         guard let words = recoverStringArray(id: id, typeName: .mnemonic, keyName: .words) else {
