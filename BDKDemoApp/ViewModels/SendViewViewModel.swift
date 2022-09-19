@@ -20,7 +20,6 @@ class SendViewViewModel: ObservableObject {
     var walletItems: [WalletItem] = []
     
     @Published var to = String()
-    @Published var amount = String()
     @Published var qrScannerOpened = false
     @Published var txSent = false
     @Published var selectedItem: WalletItem?
@@ -33,9 +32,16 @@ class SendViewViewModel: ObservableObject {
     @Published private(set) var sendError: Error?
     @Published private(set) var step: SendStep = .recipient
     
+    @ObservedObject var exchanger = Exchanger(
+        coin: .bitcoin(),
+        currency: .fiat(
+            FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)
+        )
+    )
+    
     private var subscriptions = Set<AnyCancellable>()
     
-    @Injected(Container.accountViewModel) private var account
+    @ObservedObject private var account: AccountViewModel = Container.accountViewModel()
     @LazyInjected(Container.biometricAuthentification) private var biometrics
     
     var actionButtonEnabled: Bool {
@@ -43,7 +49,7 @@ class SendViewViewModel: ObservableObject {
         case .recipient:
             return !to.isEmpty
         case .amount:
-            return !amount.isEmpty
+            return exchanger.isValid && Double(exchanger.cryptoAmount) ?? 0 > 0
         case .review:
             return false
         case .confirmation:
@@ -88,7 +94,7 @@ class SendViewViewModel: ObservableObject {
                 self.selectedItem = walletItems.first
                 self.to = address
                 guard let amount = amount else { return }
-                self.amount = amount
+                self.exchanger.cryptoAmount = amount
             default:
                 break
             }
@@ -104,10 +110,33 @@ class SendViewViewModel: ObservableObject {
             }
         }
         .store(in: &subscriptions)
+        
+        Publishers.CombineLatest(exchanger.$cryptoAmount, exchanger.$currencyAmount).sink { [unowned self] _ in
+            objectWillChange.send()
+        }
+        .store(in: &subscriptions)
+        
+        account.$items.sink { items in
+            self.walletItems = items
+        }
+        .store(in: &subscriptions)
+        
+        exchanger.$cryptoAmount.sink { newValue in
+            withAnimation {
+                guard !newValue.isEmpty, Double(newValue) ?? 0 > 0 else {
+                    if self.exchanger.fee != String() {
+                        self.exchanger.fee = String()
+                    }
+                    return
+                }
+                self.exchanger.fee = "0.000234"
+            }
+        }
+        .store(in: &subscriptions)
     }
     
     func send() {
-        account.send(to: to, amount: amount, completion: { [weak self] error in
+        account.send(to: to, amount: exchanger.cryptoAmount, completion: { [weak self] error in
             DispatchQueue.main.async {
                 self?.sendError = error
                 self?.txSent.toggle()
@@ -202,7 +231,7 @@ class SendViewViewModel: ObservableObject {
                 sendError = SendFlowError.addressIsntValid
             }
         case .amount:
-            break
+            step = .review
         case .review:
             break
         case .confirmation:

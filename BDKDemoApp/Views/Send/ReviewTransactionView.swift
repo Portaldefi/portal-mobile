@@ -61,7 +61,7 @@ struct ReviewTransactionView: View {
                     
                     ZStack {
                         HStack(alignment: .bottom) {
-                            Text(viewModel.amount)
+                            Text(viewModel.exchanger.cryptoAmount)
                                 .font(Font.system(size: 24, weight: .bold, design: .monospaced))
                             Text("btc")
                                 .font(.system(size: 14, weight: .bold, design: .monospaced))

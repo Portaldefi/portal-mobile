@@ -43,9 +43,13 @@ struct SendView: View {
                     .transition(.slide.combined(with: .scale))
                     .transition(.move(edge: .trailing).combined(with: .opacity))
             case .amount:
-                SetAmountView()
-                    .transition(.slide.combined(with: .scale))
-                    .transition(.move(edge: .trailing).combined(with: .opacity))
+                SetAmountView(
+                    assetBalance: viewModel.selectedItem!.balance,
+                    totalValue: viewModel.selectedItem!.value,
+                    exchanger: viewModel.exchanger
+                )
+                .transition(.slide.combined(with: .scale))
+                .transition(.move(edge: .trailing).combined(with: .opacity))
             case .review:
                 Text("Review")
                     .transition(.slide.combined(with: .scale))
@@ -72,7 +76,7 @@ struct SendView: View {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.bottom, 8)
+        .padding(.bottom, 16)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .navigationBarHidden(true)
         .sheet(isPresented: $viewModel.qrScannerOpened, onDismiss: {
@@ -85,7 +89,7 @@ struct SendView: View {
                 case .bip21(let address, let amount, _):
                     viewModel.to = address
                     guard let _amount = amount else { return }
-                    viewModel.amount = _amount
+                    viewModel.exchanger.cryptoAmount = _amount
                 default:
                     break
                 }
