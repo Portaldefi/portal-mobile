@@ -190,7 +190,7 @@ class AccountViewModel: ObservableObject {
                 let _assetBalance = String(Double(_Balance)/100_000_000)
                 let usd = self.marketData.fiatCurrencies.first(where: { $0.code == "USD"}) ?? FiatCurrency(code: "USD", name: "Dollar", rate: 0.0004563)
                 let btcPriceInUsd = self.marketData.btcTicker?[.usd].price ?? 1
-                let _value = (Double(_Balance) * (btcPriceInUsd.double / 100_000_000)).formattedString(.fiat(usd))
+                let _value = (Double(_Balance) * (btcPriceInUsd.double / 100_000_000)).formattedString(.btc)
                 let _items = [
                     WalletItem(
                         icon: Asset.btcIcon,
