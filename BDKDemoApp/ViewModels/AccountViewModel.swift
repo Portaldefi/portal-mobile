@@ -39,9 +39,7 @@ class AccountViewModel: ObservableObject {
             }
         }
     }
-    
-    private(set) var key = "private_key"
-    
+        
     @Published private(set) var state = State.empty
     @Published private(set) var syncState = SyncState.empty
     @Published private(set) var totalBalance: String = "0"

@@ -11,7 +11,7 @@ class AdapterFactory: IAdapterFactory {
     func adapter(wallet: Wallet) -> IAdapter? {
         switch wallet.coin.type {
         case .bitcoin:
-            return nil//try? BitcoinAdapter(wallet: wallet, syncMode: .fast)
+            return try? BitcoinAdapter(wallet: wallet)
         default:
             return nil
         }

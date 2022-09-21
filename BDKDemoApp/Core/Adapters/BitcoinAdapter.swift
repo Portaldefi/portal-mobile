@@ -15,7 +15,7 @@ class ProgressHandler: BitcoinDevKit.Progress {
     }
 }
 
-final class BitcoinAdapter {    
+final class BitcoinAdapter {
     enum BtcAdapterError: Error {
         case dbNotFound
         
@@ -26,9 +26,7 @@ final class BitcoinAdapter {
             }
         }
     }
-    
-    private let progressHandler = ProgressHandler()
-    
+        
     private let stateUpdatedSubject = PassthroughSubject<Void, Never>()
     private let balanceUpdatedSubject = PassthroughSubject<Void, Never>()
     private let transactionsSubject = CurrentValueSubject<[BitcoinDevKit.Transaction], Never>([])
@@ -36,7 +34,7 @@ final class BitcoinAdapter {
     private let wallet: BitcoinDevKit.Wallet
     private let blockchain: BitcoinDevKit.Blockchain
     private let updateTimer = RepeatingTimer(timeInterval: 10)
-
+    private let progressHandler = ProgressHandler()
     private let networkQueue = DispatchQueue(label: "com.portal.network.layer.queue", qos: .userInitiated)
     
     private var adapterState: AdapterState = .empty
@@ -52,20 +50,21 @@ final class BitcoinAdapter {
         
         if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
             let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite" + "\(account.id)")
-            let db = DatabaseConfig.sqlite(config: sqliteConfig)
+            let dbConfig = DatabaseConfig.sqlite(config: sqliteConfig)
             let electrum = ElectrumConfig(url: "ssl://electrum.blockstream.info:60002", socks5: nil, retry: 5, timeout: nil, stopGap: 10)
             let blockchainConfig = BlockchainConfig.electrum(config: electrum)
+            
             do {
                 self.blockchain = try Blockchain(config: blockchainConfig)
                 self.wallet = try BitcoinDevKit.Wallet(
                     descriptor: descriptor,
                     changeDescriptor: changeDescriptor,
                     network: Network.testnet,
-                    databaseConfig: db
+                    databaseConfig: dbConfig
                 )
                 self.loadCache()
-                self.updateTimer.eventHandler = { [unowned self] in
-                    self.sync()
+                self.updateTimer.eventHandler = { [weak self] in
+                    self?.sync()
                 }
             } catch {
                 throw error
@@ -82,15 +81,6 @@ final class BitcoinAdapter {
         } catch {
             update(state: .failed(error))
         }
-    }
-    
-    private func update(state: AdapterState) {
-        adapterState = state
-        stateUpdatedSubject.send()
-    }
-    
-    private func update(txs: [BitcoinDevKit.Transaction]) {
-        transactionsSubject.send(txs)
     }
     
     private func sync() {
@@ -148,19 +138,15 @@ final class BitcoinAdapter {
                 } })
         )
     }
-        
-//    func generateQRCode(from string: String) -> UIImage {
-//        let data = Data(string.utf8)
-//        filter.setValue(data, forKey: "inputMessage")
-//
-//        if let outputImage = filter.outputImage {
-//            if let cgimg = context.createCGImage(outputImage, from: outputImage.extent) {
-//                return UIImage(cgImage: cgimg)
-//            }
-//        }
-//
-//        return UIImage(systemName: "xmark.circle") ?? UIImage()
-//    }
+    
+    private func update(state: AdapterState) {
+        adapterState = state
+        stateUpdatedSubject.send()
+    }
+    
+    private func update(txs: [BitcoinDevKit.Transaction]) {
+        transactionsSubject.send(txs)
+    }
 }
 
 extension BitcoinAdapter {
@@ -181,6 +167,24 @@ extension BitcoinAdapter {
         } catch {
             completion(error)
         }
+    }
+}
+
+extension BitcoinAdapter: IAdapter {
+    func start() {
+        updateTimer.resume()
+    }
+    
+    func stop() {
+        updateTimer.suspend()
+    }
+    
+    func refresh() {
+        sync()
+    }
+    
+    var debugInfo: String {
+        "Btc adapter debug"
     }
 }
 
