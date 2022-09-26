@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 final class AccountManager {
-    var onActiveAccountUpdate = PassthroughSubject<IAccount?, Never>()
+    var onActiveAccountUpdate = PassthroughSubject<Account?, Never>()
 
     private let accountStorage: IAccountStorage
     
@@ -29,15 +29,15 @@ final class AccountManager {
 }
 
 extension AccountManager: IAccountManager {
-    var activeAccount: IAccount? {
+    var activeAccount: Account? {
         accountStorage.activeAccount
     }
     
-    var accounts: [IAccount] {
+    var accounts: [Account] {
         accountStorage.allAccounts
     }
     
-    func account(id: String) -> IAccount? {
+    func account(id: String) -> Account? {
         accounts.first(where: { $0.id == id })
     }
     
@@ -46,17 +46,17 @@ extension AccountManager: IAccountManager {
         onActiveAccountUpdate.send(accountStorage.activeAccount)
     }
     
-    func save(account: IAccount) {
+    func save(account: Account) {
         accountStorage.save(account: account)
         onActiveAccountUpdate.send(account)
     }
     
-    func delete(account: IAccount) {
+    func delete(account: Account) {
         accountStorage.delete(account: account)
         nextActiveAccount()
     }
     
-    func update(account: IAccount) {
+    func update(account: Account) {
         accountStorage.update(account: account)
         onActiveAccountUpdate.send(account)
     }
@@ -71,5 +71,51 @@ extension AccountManager: IAccountManager {
     
     func addCoin(coin: String) {
         
+    }
+}
+
+extension AccountManager {
+    private class AccountManagerMock: IAccountManager {
+        var onActiveAccountUpdate = PassthroughSubject<Account?, Never>()
+        
+        var accounts: [Account] = []
+        
+        var activeAccount: Account? = nil
+        
+        func account(id: String) -> Account? {
+            nil
+        }
+        
+        func updateWalletCurrency(code: String) {
+            
+        }
+        
+        func addCoin(coin: String) {
+            
+        }
+        
+        func setActiveAccount(id: String) {
+            
+        }
+        
+        func save(account: Account) {
+            
+        }
+        
+        func update(account: Account) {
+            
+        }
+        
+        func delete(account: Account) {
+            
+        }
+        
+        func clear() {
+            
+        }
+    }
+    
+    static var mocked: IAccountManager {
+        AccountManagerMock()
     }
 }
