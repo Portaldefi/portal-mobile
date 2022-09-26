@@ -33,7 +33,7 @@ final class BitcoinAdapter {
     
     private let wallet: BitcoinDevKit.Wallet
     private let blockchain: BitcoinDevKit.Blockchain
-    private let updateTimer = RepeatingTimer(timeInterval: 10)
+    private let updateTimer = RepeatingTimer(timeInterval: 60)
     private let progressHandler = ProgressHandler()
     private let networkQueue = DispatchQueue(label: "com.portal.network.layer.queue", qos: .userInitiated)
     
@@ -54,20 +54,21 @@ final class BitcoinAdapter {
             let electrum = ElectrumConfig(url: "ssl://electrum.blockstream.info:60002", socks5: nil, retry: 5, timeout: nil, stopGap: 10)
             let blockchainConfig = BlockchainConfig.electrum(config: electrum)
             
-            do {
-                self.blockchain = try Blockchain(config: blockchainConfig)
-                self.wallet = try BitcoinDevKit.Wallet(
-                    descriptor: descriptor,
-                    changeDescriptor: changeDescriptor,
-                    network: Network.testnet,
-                    databaseConfig: dbConfig
-                )
-                self.loadCache()
-                self.updateTimer.eventHandler = { [weak self] in
-                    self?.sync()
-                }
-            } catch {
-                throw error
+            self.blockchain = try Blockchain(config: blockchainConfig)
+            
+            self.wallet = try BitcoinDevKit.Wallet(
+                descriptor: descriptor,
+                changeDescriptor: changeDescriptor,
+                network: Network.testnet,
+                databaseConfig: dbConfig
+            )
+            
+            adapterState = .loaded
+            
+            self.loadCache()
+            
+            self.updateTimer.eventHandler = { [weak self] in
+                self?.sync()
             }
         } else {
             throw BtcAdapterError.dbNotFound
@@ -86,6 +87,8 @@ final class BitcoinAdapter {
     private func sync() {
         guard adapterState != .empty, adapterState != .syncing else { return }
         
+        print("Syncing btc network...")
+        
         update(state: .syncing)
         
         networkQueue.async {
@@ -93,6 +96,7 @@ final class BitcoinAdapter {
                 try self.wallet.sync(blockchain: self.blockchain, progress: self.progressHandler)
             } catch {
                 DispatchQueue.main.async {
+                    print("Btc network synced error: \(error)")
                     self.update(state: .failed(error))
                 }
             }
@@ -102,10 +106,12 @@ final class BitcoinAdapter {
                 try self.fetchTransactions()
 
                 DispatchQueue.main.async {
+                    print("Btc network synced...")
                     self.update(state: .synced)
                 }
             } catch {
                 DispatchQueue.main.async {
+                    print("Btc network synced error: \(error)")
                     self.update(state: .failed(error))
                 }
             }
