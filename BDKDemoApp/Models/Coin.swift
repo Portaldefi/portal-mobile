@@ -8,21 +8,49 @@
 
 import Foundation
 import SwiftUI
+import PortalUI
 
 struct Coin: Identifiable {
-    var id: UUID = UUID()
-    
     enum CoinType {
         case bitcoin
+        case lightningBitcoin
         case ethereum
         case erc20(address: String)
     }
     
+    let id: UUID = UUID()
     let type: CoinType
     let code: String
     let name: String
     let decimal: Int
     let icon: String
+    
+    var unit: String {
+        switch type {
+        case .bitcoin, .ethereum, .erc20:
+            return code
+        case .lightningBitcoin:
+            return "sats"
+        }
+    }
+    
+    var description: String {
+        switch type {
+        case .bitcoin, .ethereum, .erc20:
+            return "Chain"
+        case .lightningBitcoin:
+            return "Lightning"
+        }
+    }
+    
+    var chainIcon: Image {
+        switch type {
+        case .bitcoin, .ethereum, .erc20:
+            return Asset.chainIcon
+        case .lightningBitcoin:
+            return Asset.lightningIcon
+        }
+    }
     
     var color: Color {
         switch type {
@@ -61,14 +89,12 @@ struct Coin: Identifiable {
 }
 
 extension Coin: Hashable {
-
     public static func ==(lhs: Coin, rhs: Coin) -> Bool {
-        lhs.code == rhs.code && lhs.name == rhs.name
+        lhs.code == rhs.code && lhs.name == rhs.name && lhs.unit == rhs.unit
     }
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(code)
         hasher.combine(name)
     }
-
 }
