@@ -8,11 +8,11 @@
 import Foundation
 
 protocol IAccountStorage {
-    var activeAccount: IAccount? { get }
-    var allAccounts: [IAccount] { get }
-    func save(account: IAccount)
-    func delete(account: IAccount)
+    var activeAccount: Account? { get }
+    var allAccounts: [Account] { get }
+    func save(account: Account)
+    func delete(account: Account)
     func clear()
     func setCurrentAccount(id: String)
-    func update(account: IAccount)
+    func update(account: Account)
 }
