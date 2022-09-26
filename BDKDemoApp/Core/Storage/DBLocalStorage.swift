@@ -39,11 +39,11 @@ extension DBlocalStorage: IAccountRecordStorage {
         }
     }
     
-    func update(account: IAccount) {
+    func update(account: Account) {
         
     }
         
-    func deleteAccount(_ account: IAccount) throws {
+    func deleteAccount(_ account: Account) throws {
         if let record = accountRecords.first(where: { $0.id == account.id }) {
             context.performAndWait {
                 context.delete(record)
@@ -62,6 +62,53 @@ extension DBlocalStorage: IAccountRecordStorage {
     
     func clear() {
 
+    }
+}
+
+extension DBlocalStorage {
+    fileprivate class DBLocalStorageMock: IAccountRecordStorage {
+        var context: NSManagedObjectContext {
+            let managedObjectModel = NSManagedObjectModel.mergedModel(from: [Bundle.main])!
+            
+            let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
+            
+            do {
+                try persistentStoreCoordinator.addPersistentStore(ofType: NSInMemoryStoreType, configurationName: nil, at: nil, options: nil)
+            } catch {
+                print("Adding in-memory persistent store failed")
+            }
+            
+            let managedObjectContext = NSManagedObjectContext.init(concurrencyType: .mainQueueConcurrencyType)
+            managedObjectContext.persistentStoreCoordinator = persistentStoreCoordinator
+            
+            return managedObjectContext
+        }
+        
+        var accountRecords: [AccountRecord] = []
+        
+        func save(accountRecord: AccountRecord) {
+            
+        }
+        
+        func update(account: Account) {
+            
+        }
+        
+        func deleteAccount(_ account: Account) throws {
+            
+        }
+        
+        func deleteAllAccountRecords() {
+            
+        }
+        
+        func clear() {
+            
+        }
+    }
+    
+    static var mocked: IAccountRecordStorage {
+        DBLocalStorageMock()
     }
 }
 
