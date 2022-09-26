@@ -29,12 +29,33 @@ extension SharedContainer {
         return AccountManager(accountStorage: accountStorage)
     }
     
+    static let adapterManager = Factory<IAdapterManager>(scope: .singleton) {
+        let adapterFactory = AdapterFactory()
+        let walletManager = Container.walletManager()
+        return AdapterManager(adapterFactory: adapterFactory, walletManager: walletManager)
+    }
+    
+    static let walletManager = Factory<IWalletManager>(scope: .singleton) {
+        let accountManager = Container.accountManager()
+        let coinManager = CoinManagerMocked()
+        let walletStorage = WalletStorage(coinManager: coinManager, accountManager: accountManager)
+        return WalletManager(accountManager: accountManager, storage: walletStorage)
+    }
+    
     static let sendViewModel = Factory<SendViewViewModel>(scope: .shared) {
         SendViewViewModel()
     }
     
     static let accountViewModel = Factory<AccountViewModel>(scope: .singleton) {
-        AccountViewModel()
+        let accountManager = Container.accountManager()
+        let walletManager = Container.walletManager()
+        let adapterManager = Container.adapterManager()
+        
+        return AccountViewModel(
+            accountManager: accountManager,
+            walletManager: walletManager,
+            adapterManager: adapterManager
+        )
     }
     
     static let viewState = Factory<ViewState>(scope: .singleton, factory: {
