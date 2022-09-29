@@ -8,7 +8,7 @@
 import Foundation
 import BitcoinDevKit
 
-class Account: IAccount {
+class Account {
     let id: String
     let index: Int
     let extendedKey: ExtendedKeyInfo
@@ -47,18 +47,18 @@ extension Account: Hashable {
     }
 }
 
-class MockedAccount: IAccount {
-    var extendedKey: ExtendedKeyInfo {
-        ExtendedKeyInfo(mnemonic: "", xprv: "", fingerprint: "")
-    }
-    
-    var index: Int = 0
-    
-    var id: String {
-        UUID().uuidString
-    }
-    
-    var name: String {
-        "Mocked"
+extension Account {
+    static var mocked: Account {
+        let id = UUID().uuidString
+        let index = 0
+        let name = "Mocked"
+        let key = ExtendedKeyInfo(mnemonic: "", xprv: "", fingerprint: "")
+        
+        return Account(
+            id: id,
+            index: index,
+            name: name,
+            key: key
+        )
     }
 }
