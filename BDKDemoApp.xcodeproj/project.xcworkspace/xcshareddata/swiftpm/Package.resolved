@@ -73,12 +73,21 @@
       }
     },
     {
+      "identity" : "kingfisher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/onevcat/Kingfisher",
+      "state" : {
+        "revision" : "be1a1acb283a702b99b630f586877ba02234b4cb",
+        "version" : "7.3.2"
+      }
+    },
+    {
       "identity" : "portal-ui-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/FabricLabs/portal-ui-swift",
       "state" : {
         "branch" : "main",
-        "revision" : "909378097294afb633ec9d2c9d0828e05b547fbc"
+        "revision" : "ccf27186f443540b80e4c6b21928a0dbb0b6edd9"
       }
     }
   ],
