@@ -15,8 +15,9 @@ import PortalUI
 
 class SendViewViewModel: ObservableObject {
     enum SendStep {
-        case recipient, amount, review, confirmation
+        case recipient, amount, review, signing, sent
     }
+    private let balanceAdapter: IBalanceAdapter
     var walletItems: [WalletItem] = []
     
     @Published var to = String()
@@ -28,13 +29,19 @@ class SendViewViewModel: ObservableObject {
     @Published var goToSend = false
     @Published var goToReview = false
     
+    @Published var balanceString = String()
+    @Published var valueString = String()
+    @Published var fee: String?
+    @Published var useAllFundsEnabled = true
+
     @Published private(set) var recipientAddressIsValid = true
     @Published private(set) var sendError: Error?
     @Published private(set) var step: SendStep = .recipient
+    @Published var feesPickerSelection = 1
     
-    @ObservedObject var exchanger = Exchanger(
-        coin: .bitcoin(),
-        currency: .fiat(
+    @Published var exchanger = Exchanger(
+        base: .bitcoin(),
+        quote: .fiat(
             FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)
         )
     )
@@ -42,6 +49,8 @@ class SendViewViewModel: ObservableObject {
     private var subscriptions = Set<AnyCancellable>()
     
     @ObservedObject private var account: AccountViewModel = Container.accountViewModel()
+    @Injected(Container.marketData) private var marketData
+    @Injected(Container.viewState) private var viewState
     @LazyInjected(Container.biometricAuthentification) private var biometrics
     
     var actionButtonEnabled: Bool {
@@ -49,10 +58,10 @@ class SendViewViewModel: ObservableObject {
         case .recipient:
             return !to.isEmpty
         case .amount:
-            return exchanger.isValid && Double(exchanger.cryptoAmount) ?? 0 > 0
+            return exchanger.amountIsValid && Double(exchanger.cryptoAmount) ?? 0 > 0
         case .review:
-            return false
-        case .confirmation:
+            return true
+        case .signing, .sent:
             return false
         }
     }
@@ -63,8 +72,8 @@ class SendViewViewModel: ObservableObject {
             return "Continue"
         case .review:
             return "Send"
-        case .confirmation:
-            return "Done"
+        case .signing, .sent:
+            return String()
         }
     }
     
@@ -74,12 +83,20 @@ class SendViewViewModel: ObservableObject {
             return "Send"
         case .review:
             return "Review Transaction"
-        case .confirmation:
-            return "Confirmation"
+        case .signing:
+            return "Singing..."
+        case .sent:
+            return "Signed!"
         }
     }
     
-    init() {
+    init(balanceAdapter: IBalanceAdapter) {
+        self.balanceAdapter = balanceAdapter
+        
+        self.balanceString = balanceAdapter.balance.formatted()
+        let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
+        self.valueString = (balanceAdapter.balance * btcPriceInUsd).double.usdFormatted()
+        
         self.walletItems = account.items
         
         $selectedItem.sink { [unowned self] item in
@@ -111,37 +128,52 @@ class SendViewViewModel: ObservableObject {
         }
         .store(in: &subscriptions)
         
-        Publishers.CombineLatest(exchanger.$cryptoAmount, exchanger.$currencyAmount).sink { [unowned self] _ in
-            objectWillChange.send()
-        }
-        .store(in: &subscriptions)
-        
         account.$items.sink { items in
             self.walletItems = items
         }
         .store(in: &subscriptions)
         
-        exchanger.$cryptoAmount.sink { newValue in
+        marketData.onMarketDataUpdate.receive(on: RunLoop.main).sink { [weak self] _ in
+            guard let self = self else { return }
+            let btcPriceInUsd = self.marketData.btcTicker?[.usd].price ?? 1
+            self.valueString = (balanceAdapter.balance * btcPriceInUsd).double.usdFormatted()
+        }
+        .store(in: &subscriptions)
+        
+        exchanger.$cryptoAmount.sink { [weak self] _ in
+            guard let self = self else { return }
             withAnimation {
-                guard !newValue.isEmpty, Double(newValue) ?? 0 > 0 else {
-                    if self.exchanger.fee != String() {
-                        self.exchanger.fee = String()
+                guard
+                    let doubleValue = Double(self.exchanger.cryptoAmount),
+                    doubleValue > 0,
+                    self.exchanger.amountIsValid
+                else {
+                    self.fee = nil
+                    self.useAllFundsEnabled = true
+                    if self.viewState.showFeesPicker {
+                        self.viewState.showFeesPicker = false
                     }
                     return
                 }
-                self.exchanger.fee = "0.000234"
+                self.fee = "3"
+                self.useAllFundsEnabled = !(self.exchanger.cryptoAmount == self.balanceString)
             }
+        }
+        .store(in: &subscriptions)
+        
+        exchanger.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
         }
         .store(in: &subscriptions)
     }
     
     func send() {
-        account.send(to: to, amount: exchanger.cryptoAmount, completion: { [weak self] error in
-            DispatchQueue.main.async {
-                self?.sendError = error
-                self?.txSent.toggle()
-            }
-        })
+//        account.send(to: to, amount: exchanger.cryptoAmount, completion: { [weak self] error in
+//            DispatchQueue.main.async {
+//                self?.sendError = error
+//                self?.txSent.toggle()
+//            }
+//        })
     }
     
     func authenticateUser(_ completion: @escaping (Bool) -> ()) {
@@ -210,7 +242,9 @@ class SendViewViewModel: ObservableObject {
             step = .recipient
         case .review:
             step = .amount
-        case .confirmation:
+        case .signing:
+            step = .review
+        case .sent:
             step = .recipient
         }
         
@@ -233,8 +267,14 @@ class SendViewViewModel: ObservableObject {
         case .amount:
             step = .review
         case .review:
+            step = .signing
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
+                self.step = .sent
+            })
+        case .signing:
             break
-        case .confirmation:
+        case .sent:
             break
         }
     }
@@ -249,10 +289,29 @@ class SendViewViewModel: ObservableObject {
     func openScanner() {
         qrScannerOpened = true
     }
+    
+    func useAllFunds() {
+        exchanger.cryptoAmount = balanceString
+        exchanger.cryptoAmount = balanceString
+    }
 }
 
 extension SendViewViewModel {
     static var mocked: SendViewViewModel {
-        SendViewViewModel()
+        SendViewViewModel(balanceAdapter: BalanceAdapterMocked())
+    }
+    
+    static func config(coin: Coin) -> SendViewViewModel {
+        let adapterManager: IAdapterManager = Container.adapterManager()
+        let walletManager: IWalletManager = Container.walletManager()
+
+        guard
+            let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
+            let balanceAdapter = adapterManager.balanceAdapter(for: wallet)
+        else {
+            fatalError("coudn't fetch dependencies")
+        }
+
+        return SendViewViewModel(balanceAdapter: balanceAdapter)
     }
 }
