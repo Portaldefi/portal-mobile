@@ -80,7 +80,7 @@ extension AccountManager {
         
         var accounts: [Account] = []
         
-        var activeAccount: Account? = nil
+        var activeAccount: Account? = Account.mocked
         
         func account(id: String) -> Account? {
             nil
