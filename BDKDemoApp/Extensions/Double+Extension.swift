@@ -86,4 +86,13 @@ extension Double {
             return formatter.string(from: NSNumber(value: self)) ?? "-"
         }
     }
+    
+    func usdFormatted() -> String {
+        let formatter = NumberFormatter()
+        formatter.groupingSize = 3
+        formatter.maximumFractionDigits = 2
+        formatter.minimumFractionDigits = 0
+        formatter.minimumIntegerDigits = 1
+        return formatter.string(from: NSNumber(value: self)) ?? "-"
+    }
 }
