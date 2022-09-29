@@ -19,7 +19,7 @@ class AccountStorage {
         self.accountStorage = accountStorage
     }
 
-    private func createAccount(record: AccountRecord) -> IAccount? {
+    private func createAccount(record: AccountRecord) -> Account? {
         let id = record.id
 
         guard let words = recoverStringArray(id: id, typeName: .mnemonic, keyName: .words) else {
@@ -35,14 +35,14 @@ class AccountStorage {
         return Account(record: record, key: key)
     }
 
-    private func createRecord(account: IAccount) throws -> AccountRecord {
+    private func createRecord(account: Account) throws -> AccountRecord {
         let typeName: TypeName = .mnemonic
         _ = try store(stringArray: account.extendedKey.mnemonic.components(separatedBy: " "), id: account.id, typeName: typeName, keyName: .words)
         _ = try store(String(), id: account.id, typeName: typeName, keyName: .salt)
         return AccountRecord(id: account.id, index: account.index, name: account.name, context: accountStorage.context)
     }
 
-    private func clearSecureStorage(account: IAccount) throws {
+    private func clearSecureStorage(account: Account) throws {
         let id = account.id
         try secureStorage.removeValue(for: secureKey(id: id, typeName: .mnemonic, keyName: .words))
         try secureStorage.removeValue(for: secureKey(id: id, typeName: .mnemonic, keyName: .salt))
@@ -85,7 +85,7 @@ class AccountStorage {
 }
 
 extension AccountStorage: IAccountStorage {
-    var activeAccount: IAccount? {
+    var activeAccount: Account? {
         guard
             let currentAccountID = localStorage.getCurrentAccountID(),
             let record = accountStorage.accountRecords.first(where: { $0.id == currentAccountID })
@@ -94,18 +94,18 @@ extension AccountStorage: IAccountStorage {
         return createAccount(record: record)
     }
 
-    var allAccounts: [IAccount] {
+    var allAccounts: [Account] {
         accountStorage.accountRecords.compactMap { createAccount(record: $0) }
     }
 
-    func save(account: IAccount) {
+    func save(account: Account) {
         if let record = try? createRecord(account: account) {
             accountStorage.save(accountRecord: record)
             localStorage.setCurrentAccountID(record.id)
         }
     }
 
-    func delete(account: IAccount) {
+    func delete(account: Account) {
         try? accountStorage.deleteAccount(account)
         try? clearSecureStorage(account: account)
     }
@@ -118,7 +118,7 @@ extension AccountStorage: IAccountStorage {
         localStorage.setCurrentAccountID(id)
     }
 
-    func update(account: IAccount) {
+    func update(account: Account) {
         accountStorage.update(account: account)
     }
 }
@@ -134,5 +134,15 @@ extension AccountStorage {
         case salt
         case data
         case privateKey
+    }
+}
+
+extension AccountStorage {
+    static var mocked: IAccountStorage {
+        AccountStorage(
+            localStorage: LocalStorage.mocked,
+            secureStorage: KeychainStorage.mocked,
+            accountStorage: DBlocalStorage.mocked
+        )
     }
 }
