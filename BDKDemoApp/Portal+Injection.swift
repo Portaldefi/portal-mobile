@@ -43,18 +43,20 @@ extension SharedContainer {
     }
     
     static let sendViewModel = Factory<SendViewViewModel>(scope: .shared) {
-        SendViewViewModel()
+        SendViewViewModel.config(coin: .bitcoin())
     }
     
     static let accountViewModel = Factory<AccountViewModel>(scope: .singleton) {
         let accountManager = Container.accountManager()
         let walletManager = Container.walletManager()
         let adapterManager = Container.adapterManager()
+        let marketData = Container.marketData()
         
         return AccountViewModel(
             accountManager: accountManager,
             walletManager: walletManager,
-            adapterManager: adapterManager
+            adapterManager: adapterManager,
+            marketData: marketData
         )
     }
     
