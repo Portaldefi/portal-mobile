@@ -10,8 +10,9 @@ import Combine
 import Factory
 
 class Exchanger: ObservableObject {
-    private let coin: Coin
-    private let currency: AccountCurrency
+    private let balanceAdapter: IBalanceAdapter
+    private let base: Coin
+    private let quote: AccountCurrency
     private var subscriptions = Set<AnyCancellable>()
     
     enum Side: Int, Hashable {
@@ -20,18 +21,16 @@ class Exchanger: ObservableObject {
         
     @Published var cryptoAmount: String = "0"
     @Published var currencyAmount: String = "0"
-    @Published var isValid: Bool = true
-    @Published var fee: String?
+    @Published var amountIsValid: Bool = true
 
     @Published var side: Side = .crypto
     
     @Injected(Container.marketData) private var marketData
-    @Injected(Container.accountViewModel) private var account
     
     private var price: Double {
         let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
         
-        switch currency {
+        switch quote {
         case .btc:
             return btcPriceInUsd.double
         case .eth:
@@ -41,9 +40,21 @@ class Exchanger: ObservableObject {
         }
     }
     
-    init(coin: Coin, currency: AccountCurrency) {
-        self.coin = coin
-        self.currency = currency
+    init(base: Coin, quote: AccountCurrency) {
+        self.base = base
+        self.quote = quote
+        
+        let adapterManager: IAdapterManager = Container.adapterManager()
+        let walletManager: IWalletManager = Container.walletManager()
+                
+        guard
+            let wallet = walletManager.activeWallets.first(where: { $0.coin == base }),
+            let balanceAdapter = adapterManager.balanceAdapter(for: wallet)
+        else {
+            fatalError("coudn't fetch dependencies")
+        }
+        
+        self.balanceAdapter = balanceAdapter
         
         subscribe()
     }
@@ -51,10 +62,10 @@ class Exchanger: ObservableObject {
     private func subscribe() {
         $cryptoAmount
             .removeDuplicates()
-            .map { Double($0) ?? 0 }
+            .map { Double($0.replacingOccurrences(of: ",", with: ".")) ?? 0 }
             .map { [unowned self] doubleValue -> String in
                 withAnimation(.spring(response: 0.45, dampingFraction: 0.65, blendDuration: 0)) {
-                    self.isValid = doubleValue <= Double(self.account.assetBalance) ?? 0
+                    self.amountIsValid = doubleValue <= self.balanceAdapter.balance.double
                 }
                 return "\((doubleValue * (price)).rounded(toPlaces: 2))"
             }
@@ -70,7 +81,7 @@ class Exchanger: ObservableObject {
         
         $currencyAmount
             .removeDuplicates()
-            .map { Double($0) ?? 0 }
+            .map { Double($0.replacingOccurrences(of: ",", with: ".")) ?? 0 }
             .map { [unowned self] in
                 "\(($0/price).rounded(toPlaces: 6).toString())"
             }
@@ -79,15 +90,6 @@ class Exchanger: ObservableObject {
                     self.cryptoAmount = String()
                 } else {
                     self.cryptoAmount = value
-                }
-                let doubleAmount = Double(self.cryptoAmount) ?? 0
-                let balanceAMount = Double(self.account.assetBalance) ?? 0
-                let oldValue = self.isValid
-                let newValue = doubleAmount <= balanceAMount
-                if oldValue != newValue {
-                    withAnimation(.spring(response: 0.45, dampingFraction: 0.65, blendDuration: 0)) {
-                        self.isValid = newValue
-                    }
                 }
             }
             .store(in: &subscriptions)
