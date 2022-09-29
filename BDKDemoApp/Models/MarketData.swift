@@ -47,6 +47,7 @@ final class MarketData {
     private let timer: RepeatingTimer
     private let apiKey: String
     
+    var onMarketDataUpdate = PassthroughSubject<Void, Never>()
     private var subscriptions = Set<AnyCancellable>()
     
     private var urlSession: URLSession
@@ -89,6 +90,7 @@ final class MarketData {
                             FiatCurrency(code: $0.key, name: $0.value, rate: $1.value)
                         }
                     )
+                    self.onMarketDataUpdate.send()
                 }
                 .store(in: &self.subscriptions)
 
@@ -98,6 +100,7 @@ final class MarketData {
             switch response {
                 case .success(let ticker):
                     self.btcTicker = ticker
+                    self.onMarketDataUpdate.send()
                 case .failure(let error):
                     print(error)
               }
@@ -152,12 +155,27 @@ final class MarketData {
                 .store(in: &subscriptions)
         }
     }
-    
+}
+
+extension MarketData: IMarketDataRepository {
     func pause() {
         timer.suspend()
     }
     
     func resume() {
         timer.resume()
+    }
+}
+
+extension MarketData {
+    static var mocked: IMarketDataRepository {
+        MarketDataMoked()
+    }
+    private class MarketDataMoked: IMarketDataRepository {
+        var onMarketDataUpdate = PassthroughSubject<Void, Never>()
+        var btcTicker: Ticker?
+        var fiatCurrencies: [FiatCurrency] = []
+        func pause() {}
+        func resume() {}
     }
 }
