@@ -83,7 +83,7 @@ struct QRCodeScannerView: View {
                     switch scanState {
                     case .detecting:
                         Text("Scan QR code to detect items")
-                            .font(.Main.fixed(.medium, size: 12))
+                            .font(.Main.fixed(.monoMedium, size: 12))
                             .padding(8)
                             .frame(height: 33)
                             .frame(maxWidth: .infinity)
@@ -100,7 +100,7 @@ struct QRCodeScannerView: View {
                         VStack(spacing: 0) {
                             HStack {
                                 Text("Detected Items")
-                                    .font(.Main.fixed(.medium, size: 12))
+                                    .font(.Main.fixed(.monoMedium, size: 12))
                                     .padding(8)
                                     .frame(height: 33)
                                     .foregroundColor(Palette.grayScale8A)
@@ -183,7 +183,7 @@ struct QRCodeScannerView: View {
                                     .frame(width: 16, height: 16)
                                     .foregroundColor(Color.green)
                                 Text(item.title)
-                                    .font(.Main.fixed(.medium, size: 14))
+                                    .font(.Main.fixed(.monoMedium, size: 14))
                                     .foregroundColor(Palette.grayScaleCA)
                                     .frame(height: 16)
                                 Spacer()
@@ -195,7 +195,7 @@ struct QRCodeScannerView: View {
                                 switch item.type {
                                 case .bip21, .privKey, .pubKey:
                                     Text("on")
-                                        .font(.Main.fixed(.medium, size: 12))
+                                        .font(.Main.fixed(.monoMedium, size: 12))
                                         .fontWeight(.bold)
                                         .foregroundColor(Palette.grayScale6A)
                                         .frame(height: 17)
@@ -204,7 +204,7 @@ struct QRCodeScannerView: View {
                                         .frame(width: 12, height: 12)
                                 case .bolt11, .bolt12:
                                     Text("on")
-                                        .font(.Main.fixed(.medium, size: 12))
+                                        .font(.Main.fixed(.monoMedium, size: 12))
                                         .fontWeight(.bold)
                                         .foregroundColor(Palette.grayScale6A)
                                         .frame(height: 17)
@@ -216,7 +216,7 @@ struct QRCodeScannerView: View {
                                 }
                                 
                                 Text(item.description)
-                                    .font(.Main.fixed(.medium, size: 12))
+                                    .font(.Main.fixed(.monoMedium, size: 12))
                                     .fontWeight(.bold)
                                     .foregroundColor(Palette.grayScale6A)
                                     .frame(height: 17)

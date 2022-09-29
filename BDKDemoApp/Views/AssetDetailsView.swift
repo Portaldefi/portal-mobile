@@ -33,7 +33,7 @@ struct AssetDetailsView: View {
                         .frame(width: 20)
                         
                         Text("All Assets")
-                            .font(.Main.fixed(.bold, size: 16))
+                            .font(.Main.fixed(.monoBold, size: 16))
                             .foregroundColor(Palette.grayScaleF4)
                     }
                     Spacer()
@@ -86,7 +86,7 @@ struct AssetDetailsView: View {
                 
                 if txs.isEmpty {
                     Text("No transactions yet.")
-                        .font(.Main.fixed(.regular, size: 16))
+                        .font(.Main.fixed(.monoRegular, size: 16))
                         .padding()
                 }
             }
@@ -97,7 +97,7 @@ struct AssetDetailsView: View {
             sendViewModel.goToReceive = false
         }) {
             NavigationView {
-                ReceiveView(viewModel: viewModel)
+                ReceiveView(coin: .bitcoin())
             }
         }
         .sheet(isPresented: $sendViewModel.goToSend, onDismiss: {
@@ -115,7 +115,7 @@ struct AssetDetailsView: View {
                 config: .labelAndIconLeft(label: "Receive", icon: Asset.receiveButtonIcon),
                 style: .filled,
                 size: .medium,
-                enabled: item?.name == "Bitcoin" && item?.unit == "btc"
+                enabled: item?.viewModel.coin.name == "Bitcoin" && item?.viewModel.coin.unit == "BTC"
             ) {
                 sendViewModel.goToReceive = true
             }
@@ -124,7 +124,7 @@ struct AssetDetailsView: View {
                 config: .labelAndIconLeft(label: "Send", icon: Asset.sendButtonIcon),
                 style: .filled,
                 size: .medium,
-                enabled: item?.name == "Bitcoin" && item?.unit == "btc"
+                enabled: item?.viewModel.coin.name == "Bitcoin" && item?.viewModel.coin.unit == "BTC"
             ) {
                 if let item = item {
                     sendViewModel.selectedItem = item
@@ -136,7 +136,7 @@ struct AssetDetailsView: View {
 
 struct TxsView_Previews: PreviewProvider {
     static var previews: some View {
-        AssetDetailsView(item: WalletItem(icon: Asset.btcIcon, chainIcon: Asset.chainIcon, name: "Bitcoin", description: "Chain", balance: "0", unit: "btc", value: "$0"), txs: [])
+        AssetDetailsView(item: WalletItem.mockedBtc, txs: [])
     }
 }
 

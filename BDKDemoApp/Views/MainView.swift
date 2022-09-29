@@ -14,6 +14,13 @@ struct Mainview: View {
     @ObservedObject private var viewState = Container.viewState()
     
     init() {
+        UINavigationBar
+            .appearance()
+            .largeTitleTextAttributes = [
+                .font : UIFont.monospacedSystemFont(ofSize: 28, weight: .bold),
+                .foregroundColor: UIColor.white
+            ]
+        
         views = [
             AnyView(AccountView()),
             AnyView(ActivityView())
@@ -31,14 +38,14 @@ struct Mainview: View {
                             VStack(spacing: 4) {
                                 Asset.homeIcon
                                 Text("Wallet")
-                                    .font(.Main.fixed(.extraBold, size: 14))
+                                    .font(.Main.fixed(.bold, size: 14))
                             }
                         )
                 } else {
                     VStack(spacing: 4) {
                         Asset.homeIcon
                         Text("Wallet")
-                            .font(.Main.fixed(.extraBold, size: 14))
+                            .font(.Main.fixed(.bold, size: 14))
                     }
                     .foregroundColor(Color.gray)
                 }
@@ -56,14 +63,14 @@ struct Mainview: View {
                             VStack(spacing: 4) {
                                 Asset.activityIcon
                                 Text("Activity")
-                                    .font(.Main.fixed(.extraBold, size: 14))
+                                    .font(.Main.fixed(.bold, size: 14))
                             }
                         )
                 } else {
                     VStack(spacing: 4) {
                         Asset.activityIcon
                         Text("Activity")
-                            .font(.Main.fixed(.extraBold, size: 14))
+                            .font(.Main.fixed(.bold, size: 14))
                     }
                     .padding(6)
                     .foregroundColor(Color.gray)

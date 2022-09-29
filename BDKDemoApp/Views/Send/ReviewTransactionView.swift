@@ -24,125 +24,92 @@ struct ReviewTransactionView: View {
         }
         
         VStack(spacing: 0) {
-            ZStack {
-                HStack {
-                    PButton(config: .onlyIcon(Asset.arrowLeftIcon), style: .free, size: .small, enabled: true) {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                    .frame(width: 20)
-                    
-                    Spacer()
-                }
-                
-                Text("Review Transaction")
-                    .font(.system(size: 16, weight: .bold, design: .monospaced))
-                    .frame(height: 62)
+            HStack(alignment: .top, spacing: 16) {
+                Text("Recipient")
+                    .font(.Main.fixed(.monoBold, size: 14))
+                    .foregroundColor(Palette.grayScaleAA)
+
+                Text(viewModel.to)
+                    .font(.Main.fixed(.monoRegular, size: 16))
+                    .foregroundColor(Palette.grayScaleF4)
             }
+            .padding(.vertical, 16)
             
-            VStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 8) {
-                    if let item = viewModel.selectedItem {
-                        Text("From")
-                            .font(.system(size: 14, weight: .bold, design: .monospaced))
+            Divider()
+            
+            HStack(alignment: .top, spacing: 16) {
+                Text("Amount")
+                    .font(.Main.fixed(.monoBold, size: 14))
+                    .foregroundColor(Palette.grayScaleAA)
+                
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 0) {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(viewModel.exchanger.cryptoAmount)
+                            .font(.Main.fixed(.monoBold, size: 32))
+                            .foregroundColor(Palette.grayScaleEA)
+                            .frame(height: 26)
                         
-                        WalletItemView(item: item)
-                            .padding(.horizontal)
-                            .contentShape(Rectangle())
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Palette.grayScale2A, lineWidth: 1)
-                            )
+                        Text("btc")
+                            .font(.Main.fixed(.monoRegular, size: 18))
+                            .foregroundColor(Palette.grayScale6A)
+                    }
+                    
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(viewModel.exchanger.currencyAmount)
+                            .font(.Main.fixed(.monoMedium, size: 16))
+                            .foregroundColor(Palette.grayScale6A)
+                        
+                        Text("usd")
+                            .font(.Main.fixed(.monoMedium, size: 12))
+                            .foregroundColor(Palette.grayScale6A)
                     }
                 }
+            }
+            .padding(.vertical, 16)
+
+            Divider()
+            
+            HStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Fees")
+                        .font(.Main.fixed(.monoBold, size: 14))
+                        .foregroundColor(Palette.grayScaleAA)
+                    Text("Fast ~ 10-20 mins")
+                        .font(.Main.fixed(.monoBold, size: 14))
+                        .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
+                }
                 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Amount")
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
-                    
-                    ZStack {
-                        HStack(alignment: .bottom) {
-                            Text(viewModel.exchanger.cryptoAmount)
-                                .font(Font.system(size: 24, weight: .bold, design: .monospaced))
-                            Text("btc")
-                                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                Spacer()
+                
+                if let fee = viewModel.fee {
+                    VStack {
+                        HStack(spacing: 4) {
+                            Text(fee)
+                                .font(.Main.fixed(.monoBold, size: 16))
+                                .foregroundColor(Palette.grayScaleEA)
+
+                            Text("sat/vByte")
+                                .font(.Main.fixed(.monoMedium, size: 11))
                                 .foregroundColor(Palette.grayScale6A)
-                                .offset(y: -2)
-                            Spacer()
+                                .frame(width: 34)
                         }
-                        .padding(10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Palette.grayScale1A)
-                        )
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
-                }
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Recipient")
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
-                    
-                    ZStack {
-                        HStack {
-                            Text(viewModel.to)
-                                .focused($isFocused)
-                                .font(Font.system(size: 16, weight: .bold, design: .monospaced))
-                        }
-                        .padding()
-                    }
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Palette.grayScale1A)
-                    )
-                    
-                    HStack {
-                        PButton(config: .labelAndIconLeft(label: "Annotate", icon: Asset.pencilIcon), style: .free, size: .small, enabled: false) {
-                            
-                        }
-                        PButton(config: .labelAndIconLeft(label: "Tag", icon: Asset.tagIcon), style: .free, size: .small, enabled: false) {
-                            
-                        }
-                    }
-                    .padding()
-                }
-                
-                if !isAuthorizated {
-                    Button {
-                        isAuthorizated = true
-                        viewModel.authenticateUser { success in
-                            isAuthorizated = false
-                            guard success else { return }
-                            viewModel.send()
-                        }
-                    } label: {
-                        Text("Send")
-                            .foregroundColor(.black)
-                            .font(.system(size: 22, design: .monospaced))
-                            .fontWeight(.bold)
-                            .frame(maxWidth: .infinity)
-                            .padding(16)
-                            .background(Color.blue)
-                            .background(in: RoundedRectangle(cornerRadius: 10))
-                            .frame(height: 60)
-                    }
-                    .disabled(!viewModel.actionButtonEnabled)
-                    .buttonStyle(.plain)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 60)
                 } else {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle())
                 }
             }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                isFocused = false
-            }
+            .padding(.vertical, 16)
+            
+            Divider()
             
             Spacer()
         }
         .padding(.horizontal, 16)
         .navigationBarHidden(true)
-        .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
     }
 }
 

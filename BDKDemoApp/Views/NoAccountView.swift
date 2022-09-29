@@ -19,7 +19,7 @@ struct NoAccountView: View {
                     Asset.portalIcon
                     Text("Your Gateway To\nUncensorable Finance")
                         .foregroundColor(Palette.grayScaleCA)
-                        .font(.Main.fixed(.bold, size: 21))
+                        .font(.Main.fixed(.monoBold, size: 21))
                         .fontWeight(.bold)
                         .multilineTextAlignment(.center)
                 }

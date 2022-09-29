@@ -6,21 +6,14 @@
 //
 
 import SwiftUI
-import CoreImage.CIFilterBuiltins
-import BitcoinDevKit
 import PortalUI
-
-let context = CIContext()
-let filter = CIFilter.qrCodeGenerator()
 
 struct ReceiveView: View {
     @Environment(\.presentationMode) private var presentationMode
-    @ObservedObject var viewModel: AccountViewModel
-    @State private var address: String = String()
-    @State private var qrCode: UIImage = UIImage()
+    @ObservedObject var viewModel: ReceiveViewModel
     
-    init(viewModel: AccountViewModel) {
-        _viewModel = ObservedObject(wrappedValue: viewModel)
+    init(coin: Coin) {
+        viewModel = ReceiveViewModel.config(coin: coin)
     }
     
     var body: some View {
@@ -36,28 +29,28 @@ struct ReceiveView: View {
                 }
                 
                 Text("Receive")
-                    .font(.Main.fixed(.bold, size: 16))
+                    .font(.Main.fixed(.monoBold, size: 16))
                     .foregroundColor(Color(red: 1, green: 1, blue: 1))
                     .frame(height: 62)
             }
             
             VStack(alignment: .leading, spacing: 8) {
                 Text("Account/Asset")
-                    .font(.Main.fixed(.bold, size: 16))
+                    .font(.Main.fixed(.monoBold, size: 16))
                 HStack(spacing: 6) {
                     Asset.btcIcon
                         .resizable()
                         .frame(width: 16, height: 16)
                     Text("Bitcoin")
-                        .font(.Main.fixed(.bold, size: 14))
+                        .font(.Main.fixed(.monoBold, size: 14))
                         .foregroundColor(Color(red: 1, green: 1, blue: 1))
                     
                     HStack(spacing: 6) {
                         Text("on")
-                            .font(.Main.fixed(.medium, size: 14))
+                            .font(.Main.fixed(.monoMedium, size: 14))
                         Asset.chainIcon
                         Text("Chain")
-                            .font(.Main.fixed(.medium, size: 14))
+                            .font(.Main.fixed(.monoMedium, size: 14))
                         Spacer()
                     }
                     .foregroundColor(Palette.grayScale6A)
@@ -72,7 +65,7 @@ struct ReceiveView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color.white)
                         .overlay {
-                            Image(uiImage: qrCode)
+                            Image(uiImage: viewModel.qrCode)
                                 .interpolation(.none)
                                 .resizable()
                                 .scaledToFit()
@@ -88,11 +81,9 @@ struct ReceiveView: View {
                         .frame(width: 65, height: 65)
                 }
                 
-                Text(address.groupedByThreeFromLeft.uppercased())
-                    .font(.Main.fixed(.regular, size: 16))
+                Text(viewModel.receiveAddress.groupedByThreeFromLeft.uppercased())
+                    .font(.Main.fixed(.monoRegular, size: 16))
                     .padding(.horizontal, 55)
-                
-                
                 
                 Spacer()
                 
@@ -101,7 +92,7 @@ struct ReceiveView: View {
                         
                     }
                     PButton(config: .onlyLabel("Copy"), style: .filled, size: .big, enabled: true) {
-                        UIPasteboard.general.string = address
+                        viewModel.copyToClipboard()
                     }
                 }
             }
@@ -110,14 +101,13 @@ struct ReceiveView: View {
         .navigationBarHidden(true)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .onAppear(perform: {
-            address = viewModel.getAddress()
-            qrCode = viewModel.generateQRCode(from: "bitcoin:\(address)")
+            viewModel.generateQRCode()
         })
     }
 }
 
 struct ReceiveView_Previews: PreviewProvider {
     static var previews: some View {
-        ReceiveView(viewModel: AccountViewModel.mocked())
+        ReceiveView(coin: .bitcoin())
     }
 }

@@ -18,77 +18,58 @@ struct AccountView: View {
     @ObservedObject private var viewModel: AccountViewModel = Container.accountViewModel()
     @ObservedObject private var viewState: ViewState = Container.viewState()
     
-    init() {
-        UINavigationBar
-            .appearance()
-            .largeTitleTextAttributes = [
-                .font : UIFont.monospacedSystemFont(ofSize: 28, weight: .bold),
-                .foregroundColor: UIColor.white
-            ]
-    }
-    
     var body: some View {
         NavigationView {
-            switch viewModel.state {
-            case .empty:
-                VStack { Text("Empty") }
-            case .failed(let error):
-                VStack { Text(error.localizedDescription) }
-            case .loading:
-                VStack { Text("Loading...") }
-            case .dbNotFound:
-                VStack { Text("DB not founded...") }
-            case .loaded:
-                VStack(spacing: 0) {
-                    Group {
-                        AccountView()
-                        Divider()
-                            .overlay(Palette.grayScale2A)
-                        BalanceView(balance: viewModel.totalBalance, value: viewModel.value)
-                            .frame(height: 124)
-                            .padding(.horizontal, 16)
-                        ActionButtonsView
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, 24)
-                    }
-                    
+            VStack(spacing: 0) {
+                Group {
+                    AccountView()
                     Divider()
-                        .overlay(Palette.grayScale10)
-                    
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            ForEach(viewModel.items) { item in
-                                ZStack(alignment: .trailing) {
-                                    WalletItemView(item: item)
-                                        .padding(.leading, 16)
-                                        .padding(.trailing, 8)
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            selectedItem = item
-                                            viewState.hideTabBar = true
-                                            goToDetails = true
-                                        }
-                                    Asset.chevronRightIcon
-                                        .foregroundColor(Palette.grayScale4A)
-                                }
-                                Divider()
-                                    .overlay(Color(red: 22/255, green: 22/255, blue: 22/255))
+                        .overlay(Palette.grayScale2A)
+                    BalanceView(balance: viewModel.totalBalance, value: viewModel.totalValue)
+                        .frame(height: 124)
+                        .padding(.horizontal, 16)
+                    ActionButtonsView
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 24)
+                }
+                
+                Divider()
+                    .overlay(Palette.grayScale10)
+                
+                ScrollView {
+                    VStack(spacing: 0) {
+                        ForEach(viewModel.items) { item in
+                            ZStack(alignment: .trailing) {
+                                WalletItemView(item: item)
+                                    .padding(.leading, 16)
+                                    .padding(.trailing, 8)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        selectedItem = item
+                                        viewState.hideTabBar = true
+                                        goToDetails = true
+                                    }
+                                Asset.chevronRightIcon
+                                    .foregroundColor(Palette.grayScale4A)
                             }
-                        }
-                        NavigationLink(
-                            destination: AssetDetailsView(item: selectedItem, txs: selectedItem?.name == "Bitcoin" && selectedItem?.unit == "btc" ? viewModel.transactions : []),
-                            isActive: $goToDetails
-                        ) {
-                            EmptyView()
+                            Divider()
+                                .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
                         }
                     }
-                    .background(Palette.grayScale20)
+                    .padding(.horizontal, 16)
+                    
+                    NavigationLink(
+                        destination: AssetDetailsView(item: selectedItem, txs: []),
+                        isActive: $goToDetails
+                    ) {
+                        EmptyView()
+                    }
                 }
-                .navigationBarHidden(true)
-                .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
+                .background(Palette.grayScale20)
             }
+            .navigationBarHidden(true)
+            .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         }
-        .onAppear(perform: viewModel.sync)
         .sheet(isPresented: $viewState.showScanner, onDismiss: {
             viewState.showScanner = false
         }) {
@@ -98,7 +79,7 @@ struct AccountView: View {
             
         }) {
             NavigationView {
-                ReceiveView(viewModel: viewModel)
+                ReceiveView(coin: .bitcoin())
             }
         }
         .sheet(isPresented: $viewState.goToSend, onDismiss: {
@@ -120,11 +101,6 @@ struct AccountView: View {
                     .foregroundColor(Palette.grayScaleF4)
             }
             Spacer()
-            if case .syncing = viewModel.syncState {
-                Text("Syncing...")
-                    .font(.Main.fixed(.semiBold, size: 12))
-                    .foregroundColor(Palette.grayScale6A)
-            }
             Asset.gearIcon
                 .foregroundColor(Palette.grayScale6A)
         }
@@ -136,37 +112,32 @@ struct AccountView: View {
         HStack {
             VStack(alignment: .leading, spacing: 10) {
                 VStack(spacing: 4) {
-                    switch viewModel.syncState {
-                    case .syncing, .synced:
-                        HStack(alignment: .bottom, spacing: 6) {
-                            Spacer()
-                            Text(balance)
-                                .font(.Main.fixed(.bold, size: 32))
-                                .foregroundColor(Palette.grayScaleEA)
-                            Text("sats")
-                                .font(.Main.fixed(.regular, size: 18))
-                                .foregroundColor(Palette.grayScale6A)
-                                .padding(.bottom, 4)
-                            Spacer()
-                        }
-                        .frame(height: 32)
-                        .onTapGesture {
-                            
-                        }
-                        
-                        HStack(spacing: 4) {
-                            Text(value)
-                                .font(.Main.fixed(.medium, size: 16))
-                                .foregroundColor(Palette.grayScaleEA)
-                            Text("usd")
-                                .font(.Main.fixed(.medium, size: 12))
-                                .foregroundColor(Palette.grayScale6A)
-                                .offset(y: 2)
-                        }
-                        .frame(height: 23)
-                    case .empty, .failed:
-                        EmptyView()
+                    HStack(alignment: .bottom, spacing: 6) {
+                        Spacer()
+                        Text(balance)
+                            .font(.Main.fixed(.monoBold, size: 32))
+                            .foregroundColor(Palette.grayScaleEA)
+                        Text("btc")
+                            .font(.Main.fixed(.monoRegular, size: 18))
+                            .foregroundColor(Palette.grayScale6A)
+                            .padding(.bottom, 4)
+                        Spacer()
                     }
+                    .frame(height: 32)
+                    .onTapGesture {
+                        
+                    }
+                    
+                    HStack(spacing: 4) {
+                        Text(value)
+                            .font(.Main.fixed(.monoMedium, size: 16))
+                            .foregroundColor(Palette.grayScaleEA)
+                        Text("usd")
+                            .font(.Main.fixed(.monoMedium, size: 12))
+                            .foregroundColor(Palette.grayScale6A)
+                            .offset(y: 2)
+                    }
+                    .frame(height: 23)
                 }
             }
             Spacer()
@@ -179,7 +150,7 @@ struct AccountView: View {
                 config: .labelAndIconLeft(label: "Receive", icon: Asset.receiveButtonIcon),
                 style: .filled,
                 size: .medium,
-                enabled: viewModel.syncState == .synced
+                enabled: true
             ) {
                 goToReceive.toggle()
             }
@@ -188,7 +159,7 @@ struct AccountView: View {
                 config: .labelAndIconLeft(label: "Send", icon: Asset.sendButtonIcon),
                 style: .filled,
                 size: .medium,
-                enabled: viewModel.syncState == .synced
+                enabled: true
             ) {
                 withAnimation {
                     viewState.goToSend.toggle()
@@ -200,9 +171,8 @@ struct AccountView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
+        let _ = Container.accountViewModel.register { AccountViewModel.mocked }
         AccountView()
-            .environmentObject(ViewState())
-            .environmentObject(AccountViewModel.mocked())
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
             .preferredColorScheme(.dark)
     }

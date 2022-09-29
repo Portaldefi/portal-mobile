@@ -13,7 +13,8 @@ import Combine
 struct AmountView: View {
     private let warningColor = Color(red: 1, green: 0.321, blue: 0.321)
     @ObservedObject private var exchanger: Exchanger
-    @FocusState private var focusedField: Exchanger.Side? 
+    @FocusState private var focusedField: Exchanger.Side?
+    @ObservedObject private var viewState = Container.viewState()
     
     init(exchanger: Exchanger) {
         self.exchanger = exchanger
@@ -48,10 +49,10 @@ struct AmountView: View {
                             .fixedSize(horizontal: true, vertical: true)
                             .disableAutocorrection(true)
                             .textInputAutocapitalization(.never)
-                            .font(.Main.fixed(.bold, size: 32))
-                            .foregroundColor(exchanger.isValid ? Palette.grayScaleCA : warningColor)
+                            .font(.Main.fixed(.monoBold, size: 32))
+                            .foregroundColor(exchanger.amountIsValid ? Palette.grayScaleEA : warningColor)
                         Text("btc")
-                            .font(.Main.fixed(.regular, size: 18))
+                            .font(.Main.fixed(.monoRegular, size: 18))
                             .foregroundColor(Palette.grayScale6A)
                             .offset(y: 5)
                         Spacer()
@@ -62,11 +63,11 @@ struct AmountView: View {
                     HStack(spacing: 4) {
                         Text(exchanger.currencyAmount.isEmpty ? "0" : exchanger.currencyAmount)
                             .animation(nil)
-                            .font(.Main.fixed(.medium, size: 16))
+                            .font(.Main.fixed(.monoMedium, size: 16))
                             .foregroundColor(Palette.grayScale6A)
                         Text("usd")
                             .animation(nil)
-                            .font(.Main.fixed(.medium, size: 12))
+                            .font(.Main.fixed(.monoMedium, size: 12))
                             .foregroundColor(Palette.grayScale6A)
                             .offset(y: 2)
                     }
@@ -80,10 +81,10 @@ struct AmountView: View {
                             .fixedSize(horizontal: true, vertical: true)
                             .disableAutocorrection(true)
                             .textInputAutocapitalization(.never)
-                            .font(.Main.fixed(.bold, size: 32))
-                            .foregroundColor(exchanger.isValid ? Palette.grayScaleCA : warningColor)
+                            .font(.Main.fixed(.monoBold, size: 32))
+                            .foregroundColor(exchanger.amountIsValid ? Palette.grayScaleEA : warningColor)
                         Text("usd")
-                            .font(.Main.fixed(.regular, size: 18))
+                            .font(.Main.fixed(.monoRegular, size: 18))
                             .foregroundColor(Palette.grayScale6A)
                             .offset(y: 5)
                     }
@@ -92,10 +93,10 @@ struct AmountView: View {
                     HStack(spacing: 4) {
                         Spacer()
                         Text(exchanger.cryptoAmount.isEmpty ? "0" : exchanger.cryptoAmount)
-                            .font(.Main.fixed(.medium, size: 16))
+                            .font(.Main.fixed(.monoMedium, size: 16))
                             .foregroundColor(Palette.grayScale6A)
                         Text("btc")
-                            .font(.Main.fixed(.medium, size: 12))
+                            .font(.Main.fixed(.monoMedium, size: 12))
                             .foregroundColor(Palette.grayScale6A)
                             .offset(y: 2)
                         Spacer()
@@ -126,14 +127,29 @@ struct AmountView: View {
         }
         .frame(height: 90)
         .padding(.horizontal, 16)
-        .background(Palette.grayScale1A)
-        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color(red: 58/255, green: 58/255, blue: 58/255), lineWidth: 1)
+                .foregroundColor(Color.clear)
+        )
         .onChange(of: exchanger.side, perform: { newValue in
             switch newValue {
             case .crypto:
                 focusedField = .crypto
             case .currency:
                 focusedField = .currency
+            }
+        })
+        .onChange(of: viewState.showFeesPicker, perform: { newValue in
+            if newValue {
+                focusedField = nil
+            } else {
+                switch exchanger.side {
+                case .crypto:
+                    focusedField = .crypto
+                case .currency:
+                    focusedField = .currency
+                }
             }
         })
         .onAppear {
@@ -145,8 +161,8 @@ struct AmountView: View {
 struct AmountView_Previews: PreviewProvider {
     static var previews: some View {
         AmountView(exchanger: Exchanger(
-            coin: .bitcoin(),
-            currency: .fiat(
+            base: .bitcoin(),
+            quote: .fiat(
                 FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)
             )
         ))

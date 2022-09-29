@@ -34,10 +34,10 @@ struct SingleTxView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         Text(details.txid)
                             .lineLimit(1)
-                            .font(.Main.fixed(.bold, size: 16))
+                            .font(.Main.fixed(.monoBold, size: 16))
                             .foregroundColor(Palette.grayScaleCA)
                         Text("Not confirmed")
-                            .font(.Main.fixed(.regular, size: 14))
+                            .font(.Main.fixed(.monoRegular, size: 14))
                             .lineLimit(1)
                             .foregroundColor(Palette.grayScale6A)
                     }
@@ -47,17 +47,17 @@ struct SingleTxView: View {
                         VStack(alignment: .trailing, spacing: 0) {
                             HStack {
                                 Text("\(details.sent > 0 ? "-" : "+")")
-                                    .font(.Main.fixed(.bold, size: 16))
+                                    .font(.Main.fixed(.monoBold, size: 16))
                                     .foregroundColor(Palette.grayScaleEA)
                                 Text(details.sent > 0 ? "\(Double(details.sent)/100_000_000)" : "\(Double(details.received)/100_000_000)")
-                                    .font(.Main.fixed(.medium, size: 16))
+                                    .font(.Main.fixed(.monoMedium, size: 16))
                                     .foregroundColor(Palette.grayScaleEA)
                             }
                             HStack {
                                 Text("\(details.sent > 0 ? "-" : "+")")
-                                    .font(.Main.fixed(.bold, size: 16))
+                                    .font(.Main.fixed(.monoBold, size: 16))
                                 Text("$4.55")
-                                    .font(.Main.fixed(.medium, size: 16))
+                                    .font(.Main.fixed(.monoMedium, size: 16))
                                     .foregroundColor(Palette.grayScale6A)
                                     .offset(x: 1)
                             }
@@ -65,14 +65,14 @@ struct SingleTxView: View {
                         VStack(alignment: .leading, spacing: 0) {
                             HStack {
                                 Text("btc")
-                                    .font(.Main.fixed(.medium, size: 12))
+                                    .font(.Main.fixed(.monoMedium, size: 12))
                                     .foregroundColor(Palette.grayScale6A)
                                     .offset(y: -1)
                                 Spacer()
                             }
                             .frame(width: 30)
                             Text("usd")
-                                .font(.Main.fixed(.medium, size: 12))
+                                .font(.Main.fixed(.monoMedium, size: 12))
                                 .foregroundColor(Palette.grayScale6A)
                                 .offset(x: -1, y: 5)
                         }
@@ -89,10 +89,10 @@ struct SingleTxView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         Text(details.txid)
                             .lineLimit(1)
-                            .font(.Main.fixed(.bold, size: 16))
+                            .font(.Main.fixed(.monoBold, size: 16))
                             .foregroundColor(Palette.grayScaleCA)
                         Text(Date(timeIntervalSince1970: TimeInterval(confirmation.timestamp)).formatted())
-                            .font(.Main.fixed(.regular, size: 14))
+                            .font(.Main.fixed(.monoRegular, size: 14))
                             .lineLimit(1)
                             .foregroundColor(Palette.grayScale6A)
                     }
@@ -102,17 +102,17 @@ struct SingleTxView: View {
                         VStack(alignment: .trailing, spacing: 0) {
                             HStack {
                                 Text("\(details.sent > 0 ? "-" : "+")")
-                                    .font(.Main.fixed(.bold, size: 16))
+                                    .font(.Main.fixed(.monoBold, size: 16))
                                     .foregroundColor(Palette.grayScaleEA)
                                 Text(details.sent > 0 ? "\(Double(details.sent)/100_000_000)" : "\(Double(details.received)/100_000_000)")
-                                    .font(.Main.fixed(.medium, size: 16))
+                                    .font(.Main.fixed(.monoMedium, size: 16))
                                     .foregroundColor(Palette.grayScaleEA)
                             }
                             HStack {
                                 Text("\(details.sent > 0 ? "-" : "+")")
-                                    .font(.Main.fixed(.bold, size: 16))
+                                    .font(.Main.fixed(.monoBold, size: 16))
                                 Text("$4.55")
-                                    .font(.Main.fixed(.medium, size: 16))
+                                    .font(.Main.fixed(.monoMedium, size: 16))
                                     .foregroundColor(Palette.grayScale6A)
                                     .offset(x: 1)
                             }
@@ -120,14 +120,14 @@ struct SingleTxView: View {
                         VStack(alignment: .leading, spacing: 0) {
                             HStack {
                                 Text("btc")
-                                    .font(.Main.fixed(.medium, size: 12))
+                                    .font(.Main.fixed(.monoMedium, size: 12))
                                     .foregroundColor(Palette.grayScale6A)
                                     .offset(y: -1)
                                 Spacer()
                             }
                             .frame(width: 30)
                             Text("usd")
-                                .font(.Main.fixed(.medium, size: 12))
+                                .font(.Main.fixed(.monoMedium, size: 12))
                                 .foregroundColor(Palette.grayScale6A)
                                 .offset(x: -1, y: 5)
                         }

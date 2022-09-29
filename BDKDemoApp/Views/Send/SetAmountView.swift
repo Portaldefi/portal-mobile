@@ -7,17 +7,15 @@
 
 import SwiftUI
 import PortalUI
+import Factory
 
 struct SetAmountView: View {
     private let warningColor = Color(red: 1, green: 0.321, blue: 0.321)
-    private let assetBalance: String
-    private let totalValue: String
-    @ObservedObject var exchanger: Exchanger
+    @ObservedObject private var viewModel: SendViewViewModel
+    @Injected(Container.viewState) private var viewState
     
-    init(assetBalance: String, totalValue: String, exchanger: Exchanger) {
-        self.assetBalance = assetBalance
-        self.totalValue = totalValue
-        self.exchanger = exchanger
+    init(viewModel: SendViewViewModel) {
+        self.viewModel = viewModel
     }
     
     var body: some View {
@@ -28,42 +26,45 @@ struct SetAmountView: View {
                         .font(.Main.fixed(.bold, size: 24))
                         .foregroundColor(Palette.grayScaleCA)
                     Spacer()
-                    PButton(
-                        config: .onlyLabel("Use all funds"),
-                        style: .free,
-                        size: .medium,
-                        color: Color(red: 116/255, green: 138/255, blue: 254/255),
-                        enabled: true
-                    ) {
-                        
+                    
+                    Button {
+                        viewModel.useAllFunds()
+                    } label: {
+                        RadialGradient.main
+                            .mask {
+                                Text("Use all funds")
+                                    .font(.Main.fixed(.monoBold, size: 16))
+                            }
                     }
+                    .buttonStyle(.plain)
                     .frame(width: 125)
+                    .disabled(!viewModel.useAllFundsEnabled)
                 }
                 
-                AmountView(exchanger: exchanger)
+                AmountView(exchanger: viewModel.exchanger)
             }
             
             HStack(alignment: .top) {
                 Text("Asset Balance")
-                    .font(.Main.fixed(.bold, size: 14))
+                    .font(.Main.fixed(.monoBold, size: 14))
                     .foregroundColor(Palette.grayScaleAA)
                 
                 Spacer()
                 
                 VStack(alignment: .trailing) {
-                    switch exchanger.side {
+                    switch viewModel.exchanger.side {
                     case .crypto:
                         HStack(spacing: 0) {
-                            Text(assetBalance)
-                                .font(.Main.fixed(.medium, size: 16))
-                                .if(exchanger.side == .crypto, then: { text in
-                                    text.foregroundColor(exchanger.isValid ? Palette.grayScaleCA : warningColor)
+                            Text(viewModel.balanceString)
+                                .font(.Main.fixed(.monoMedium, size: 16))
+                                .if(viewModel.exchanger.side == .crypto, then: { text in
+                                    text.foregroundColor(viewModel.exchanger.amountIsValid ?  Palette.grayScaleCA : warningColor)
                                 }, else: { text in
                                     text.foregroundColor(Palette.grayScaleCA)
                                 })
                             
                             Text("btc")
-                                .font(.Main.fixed(.medium, size: 11))
+                                .font(.Main.fixed(.monoMedium, size: 11))
                                 .foregroundColor(Palette.grayScale6A)
                                 .frame(width: 34)
                                 .offset(y: 2)
@@ -71,16 +72,16 @@ struct SetAmountView: View {
                         .transition(.move(edge: .bottom).combined(with: .opacity))
 
                         HStack(spacing: 0) {
-                            Text(totalValue)
-                                .font(.Main.fixed(.medium, size: 16))
-                                .if(exchanger.side == .currency, then: { text in
-                                    text.foregroundColor(exchanger.isValid ? Palette.grayScale6A : warningColor)
+                            Text(viewModel.valueString)
+                                .font(.Main.fixed(.monoMedium, size: 16))
+                                .if(viewModel.exchanger.side == .currency, then: { text in
+                                    text.foregroundColor(viewModel.exchanger.amountIsValid ?  Palette.grayScaleCA : warningColor)
                                 }, else: { text in
                                     text.foregroundColor(Palette.grayScale6A)
                                 })
 
                             Text("usd")
-                                .font(.Main.fixed(.medium, size: 11))
+                                .font(.Main.fixed(.monoMedium, size: 11))
                                 .foregroundColor(Palette.grayScale6A)
                                 .frame(width: 34)
                                 .offset(y: 2)
@@ -89,16 +90,16 @@ struct SetAmountView: View {
 
                     case .currency:
                         HStack(spacing: 0) {
-                            Text(totalValue)
-                                .font(.Main.fixed(.medium, size: 16))
-                                .if(exchanger.side == .currency, then: { text in
-                                    text.foregroundColor(exchanger.isValid ? Palette.grayScaleCA : warningColor)
+                            Text(viewModel.valueString)
+                                .font(.Main.fixed(.monoMedium, size: 16))
+                                .if(viewModel.exchanger.side == .currency, then: { text in
+                                    text.foregroundColor(viewModel.exchanger.amountIsValid ?  Palette.grayScaleCA : warningColor)
                                 }, else: { text in
                                     text.foregroundColor(Palette.grayScaleCA)
                                 })
 
                             Text("usd")
-                                .font(.Main.fixed(.medium, size: 11))
+                                .font(.Main.fixed(.monoMedium, size: 11))
                                 .foregroundColor(Palette.grayScale6A)
                                 .frame(width: 34)
                                 .offset(y: 2)
@@ -106,16 +107,16 @@ struct SetAmountView: View {
                         .transition(.move(edge: .bottom).combined(with: .opacity))
 
                         HStack(spacing: 0) {
-                            Text(assetBalance)
-                                .font(.Main.fixed(.medium, size: 16))
-                                .if(exchanger.side == .crypto, then: { text in
-                                    text.foregroundColor(exchanger.isValid ? Palette.grayScale6A : warningColor)
+                            Text(viewModel.balanceString)
+                                .font(.Main.fixed(.monoMedium, size: 16))
+                                .if(viewModel.exchanger.side == .crypto, then: { text in
+                                    text.foregroundColor(viewModel.exchanger.amountIsValid ?  Palette.grayScaleCA : warningColor)
                                 }, else: { text in
                                     text.foregroundColor(Palette.grayScale6A)
                                 })
                             
                             Text("btc")
-                                .font(.Main.fixed(.medium, size: 11))
+                                .font(.Main.fixed(.monoMedium, size: 11))
                                 .foregroundColor(Palette.grayScale6A)
                                 .frame(width: 34)
                                 .offset(y: 2)
@@ -127,90 +128,63 @@ struct SetAmountView: View {
             }
             .frame(height: 72)
             
-            if let fee = exchanger.fee, !fee.isEmpty {
+            if let fee = viewModel.fee, !fee.isEmpty {
                 Divider()
                 
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 0) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text("Fees")
-                            .font(.Main.fixed(.bold, size: 14))
+                            .font(.Main.fixed(.monoBold, size: 14))
                             .foregroundColor(Palette.grayScaleAA)
-//                        if exchanger.fee != nil {
-                            Text("Fast ~ 10-20 mins")
-                                .font(.Main.fixed(.bold, size: 14))
-                                .foregroundColor(Color(red: 0.434, green: 0.871, blue: 0.582))
-//                        } else {
-//                            Spacer()
-//                                .frame(height: 14)
-//                        }
+                        Text("Fast ~ 10-20 mins")
+                            .font(.Main.fixed(.monoBold, size: 14))
+                            .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
                     }
                     
                     Spacer()
                     
-                    if let fee = exchanger.fee {
-                        VStack(alignment: .trailing) {
+                    if let fee = viewModel.fee {
+                        VStack {
                             HStack(spacing: 4) {
                                 Text(fee)
-                                    .font(.Main.fixed(.bold, size: 16))
+                                    .font(.Main.fixed(.monoBold, size: 16))
                                     .foregroundColor(Palette.grayScaleEA)
 
-                                Text("btc")
-                                    .font(.Main.fixed(.medium, size: 11))
+                                Text("sat/vByte")
+                                    .font(.Main.fixed(.monoMedium, size: 11))
                                     .foregroundColor(Palette.grayScale6A)
                                     .frame(width: 34)
-                                    .offset(y: 2)
                             }
-                            HStack(spacing: 4) {
-                                Text("1.21")
-                                    .font(.Main.fixed(.medium, size: 16))
-                                    .foregroundColor(Palette.grayScale6A)
-
-                                Text("usd")
-                                    .font(.Main.fixed(.medium, size: 11))
-                                    .foregroundColor(Palette.grayScale6A)
-                                    .frame(width: 34)
-                                    .offset(y: 2)
-                            }
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
                     } else {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle())
                     }
+                    
+                    Asset.chevronRightIcon
+                        .foregroundColor(Palette.grayScale4A)
                 }
                 .frame(height: 72)
                 .transition(.opacity)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    withAnimation {
+                        
+                        viewState.showFeesPicker.toggle()
+                    }
+                }
             } else {
                 Spacer()
                     .frame(height: 72)
-            }
-            
-            Spacer()
-            
-            if !exchanger.isValid {
-                HStack {
-                    Text("Not Enough Funds")
-                        .font(.Main.fixed(.bold, size: 16))
-                        .foregroundColor(warningColor)
-                        .transition(.scale)
-                    Spacer()
-                }
-                .padding(.bottom, 18)
-            }
+            }            
         }
     }
 }
 
 struct SetAmountView_Previews: PreviewProvider {
     static var previews: some View {
-        SetAmountView(
-            assetBalance: "0.001245", totalValue: "2.14",
-            exchanger: Exchanger(
-                coin: .bitcoin(),
-                currency: .fiat(
-                    FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)
-                )
-            )
-        )
-        .padding()
+        SetAmountView(viewModel: SendViewViewModel.mocked)
+            .padding()
     }
 }

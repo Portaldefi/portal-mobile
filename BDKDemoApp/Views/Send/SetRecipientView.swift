@@ -18,35 +18,32 @@ struct SetRecipientView: View {
     var body: some View {
         VStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Choose Recipient")
+                Text("Set Recipient")
                     .font(.Main.fixed(.bold, size: 24))
                     .foregroundColor(Palette.grayScaleCA)
                 
                 TextField("Enter address", text: $viewModel.to)
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
-                    .font(.Main.fixed(.regular, size: 16))
+                    .font(.Main.fixed(.monoRegular, size: 16))
                     .foregroundColor(
                         viewModel.recipientAddressIsValid ? Palette.grayScaleAA : Color(red: 255/255, green: 82/255, blue: 82/255)
                     )
                     .padding()
-                    .background(Palette.grayScale1A)
                     .cornerRadius(12)
-                    .if(!viewModel.recipientAddressIsValid, then: { textField in
-                        textField
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(red: 255/255, green: 82/255, blue: 82/255), lineWidth: 2)
-                                    .foregroundColor(Color.clear)
-                            )
+                    .if(!viewModel.recipientAddressIsValid, then: {
+                        $0.overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color(red: 255/255, green: 82/255, blue: 82/255), lineWidth: 1)
+                                .foregroundColor(Color.clear)
+                        )
+                    }, else: {
+                        $0.overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color(red: 58/255, green: 58/255, blue: 58/255), lineWidth: 1)
+                                .foregroundColor(Color.clear)
+                        )
                     })
-                
-                    if let errorMessage = viewModel.sendError as? SendFlowError {
-                        Text(errorMessage.description)
-                            .font(.Main.fixed(.regular, size: 16))
-                            .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
-                            .transition(.scale.combined(with: .opacity))
-                    }
             }
             
             HStack(spacing: 16) {
