@@ -16,6 +16,7 @@ class ViewState: ObservableObject {
     @Published var hideTabBar: Bool = false
     @Published var showScanner: Bool = false
     @Published var goToSend: Bool = false
+    @Published var showFeesPicker: Bool = false
     @Published private(set) var selectedTab: Tab = .wallet
     
     init() {}
