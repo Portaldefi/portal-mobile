@@ -99,10 +99,7 @@ class SendViewViewModel: ObservableObject {
         
         self.walletItems = account.items
         
-        $selectedItem.sink { [unowned self] item in
-            self.goToSend = item != nil
-        }
-        .store(in: &subscriptions)
+        $selectedItem.map{ $0 != nil }.assign(to: &$goToSend)
         
         $qrCodeItem.sink { [unowned self] item in
             guard let item = item else { return }

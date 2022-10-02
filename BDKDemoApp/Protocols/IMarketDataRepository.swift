@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import Coinpaprika
 
 protocol IMarketDataRepository {
     var onMarketDataUpdate: PassthroughSubject<Void, Never> { get }

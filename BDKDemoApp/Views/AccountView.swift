@@ -59,7 +59,7 @@ struct AccountView: View {
                     .padding(.horizontal, 16)
                     
                     NavigationLink(
-                        destination: AssetDetailsView(item: selectedItem, txs: []),
+                        destination: AssetDetailsView(item: selectedItem),
                         isActive: $goToDetails
                     ) {
                         EmptyView()
