@@ -11,15 +11,14 @@ import PortalUI
 import Factory
 
 struct AssetDetailsView: View {
-    @State private var goToTxs = false
-    @State private var goToReceive = false
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewState: ViewState = Container.viewState()
-    @ObservedObject private var viewModel: AccountViewModel = Container.accountViewModel()
-    @ObservedObject private var sendViewModel = Container.sendViewModel()
+    @ObservedObject private var sendViewModel: SendViewViewModel = Container.sendViewModel()
+    @ObservedObject private var viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
+    @State private var showTxDetails = false
+    @State private var selectedTx: BitcoinDevKit.Transaction?
     
     let item: WalletItem?
-    let txs: [BitcoinDevKit.Transaction]
     
     var body: some View {
         VStack(spacing: 0) {
@@ -62,20 +61,14 @@ struct AssetDetailsView: View {
             
             ZStack {
                 ScrollView {
-                    ForEach(txs, id: \.self) { transaction in
+                    ForEach(viewModel.transactions, id: \.self) { transaction in
                         SingleTxView(transaction: transaction)
                             .padding(.horizontal, 8)
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                if case .confirmed(let details, _) = transaction {
-                                    let urlString = "https://blockstream.info/testnet/tx/\(details.txid)"
-                                    if let url = URL(string: urlString) {
-#if os(iOS)
-                                        UIApplication.shared.open(url)
-#elseif os(macOS)
-                                        NSWorkspace.shared.open(url)
-#endif
-                                    }
+                                if case .confirmed = transaction {
+                                    selectedTx = transaction
+                                    showTxDetails = true
                                 }
                             }
                         Divider()
@@ -84,7 +77,7 @@ struct AssetDetailsView: View {
                 }
                 .background(Palette.grayScale20)
                 
-                if txs.isEmpty {
+                if viewModel.transactions.isEmpty {
                     Text("No transactions yet.")
                         .font(.Main.fixed(.monoRegular, size: 16))
                         .padding()
@@ -105,6 +98,13 @@ struct AssetDetailsView: View {
         }) {
             NavigationView {
                 SendView()
+            }
+        }
+        .sheet(isPresented: $showTxDetails, onDismiss: {
+            showTxDetails = false
+        }) {
+            if let tx = selectedTx {
+                TransactionDetailsView(coin: viewModel.coin, tx: tx)
             }
         }
     }
@@ -136,7 +136,7 @@ struct AssetDetailsView: View {
 
 struct TxsView_Previews: PreviewProvider {
     static var previews: some View {
-        AssetDetailsView(item: WalletItem.mockedBtc, txs: [])
+        AssetDetailsView(item: WalletItem.mockedBtc)
     }
 }
 
