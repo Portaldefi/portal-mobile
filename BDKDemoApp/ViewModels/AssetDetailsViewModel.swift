@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import BitcoinDevKit
+import Factory
 
 class AssetDetailsViewModel: ObservableObject {
     let coin: Coin

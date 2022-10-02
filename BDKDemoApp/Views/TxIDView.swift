@@ -52,6 +52,6 @@ struct TxIDView: View {
 
 struct TxIDView_Previews: PreviewProvider {
     static var previews: some View {
-        TxIDView()
+        TxIDView(txID: "239yeiuhsadkhasiudhy928ye", explorerURL: nil)
     }
 }
