@@ -14,7 +14,7 @@ struct AssetDetailsView: View {
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewState: ViewState = Container.viewState()
     @ObservedObject private var sendViewModel: SendViewViewModel = Container.sendViewModel()
-    @ObservedObject private var viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
+    @StateObject private var viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
     @State private var showTxDetails = false
     @State private var selectedTx: BitcoinDevKit.Transaction?
     
