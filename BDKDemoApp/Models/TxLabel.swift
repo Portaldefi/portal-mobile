@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TxLable: Identifiable {
+struct TxLable: Identifiable, Hashable {
     let id: UUID = UUID()
-    let label: String
+    var label: String
 }
