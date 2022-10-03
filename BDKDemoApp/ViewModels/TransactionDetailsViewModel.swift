@@ -24,6 +24,8 @@ class TransactionDetailsViewModel: ObservableObject {
     
     @Published var editingNotes = false
     @Published var editingLabels = false
+    @Published var showAddLabelInterface = false
+    @Published var newLabelTitle: String?
     
     var title: String {
         details.sent > 0 ? "Sent" : "Recieved"
@@ -71,17 +73,7 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     @Published var notes = String()
-    
-    var labels: [TxLable] {
-        []/*[
-            TxLable(label: "Taxes"),
-            TxLable(label: "Buisness"),
-            TxLable(label: "Friend"),
-            TxLable(label: "Do Not Spend"),
-            TxLable(label: "Savings"),
-            TxLable(label: "Food")
-        ]*/
-    }
+    @Published var labels: [TxLable] = []
     
     var explorerUrl: URL? {
         switch coin.type {
