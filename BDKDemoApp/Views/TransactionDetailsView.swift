@@ -71,13 +71,22 @@ struct TransactionDetailsView: View {
                     }
                 )
                 .cornerRadius(8)
-                .transition(.move(edge: .bottom))
                 .offset(y: 5)
+                .transition(.move(edge: .bottom))
+                .zIndex(1)
             } else if viewModel.editingLabels {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Palette.grayScaleAA)
-                    .frame(height: 216)
-                    .transition(.move(edge: .bottom))
+                LabelsManagerView(
+                    viewModel: .init(selectedLabels: viewModel.labels),
+                    onSaveAcion: {
+                        viewModel.labels = $0
+                        withAnimation {
+                            viewModel.editingLabels.toggle()
+                        }
+                    }
+                )
+                .transition(.move(edge: .bottom))
+                .zIndex(1)
+                .ignoresSafeArea(.keyboard)
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
