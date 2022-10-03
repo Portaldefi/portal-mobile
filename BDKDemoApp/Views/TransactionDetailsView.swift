@@ -18,63 +18,96 @@ struct TransactionDetailsView: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                NavigationView()
-                
-                TxSummaryView()
-                
-                Divider().frame(height: 1)
-
+        ZStack(alignment: .bottom) {
+            ScrollView {
                 VStack(spacing: 0) {
-                    TxRecipientView(recipient: viewModel.recipientString)
+                    NavigationView()
                     
-                    Divider()
+                    TxSummaryView()
                     
-                    TxFeesView(fees: viewModel.feeString)
+                    Divider().frame(height: 1)
+
+                    VStack(spacing: 0) {
+                        TxRecipientView(recipient: viewModel.recipientString)
+                        
+                        Divider()
+                        
+                        TxFeesView(fees: viewModel.feeString)
+                        
+                        Divider()
+                        
+                        TxIDView(txID: viewModel.txIdString, explorerURL: viewModel.explorerUrl)
+                        
+                        Divider()
+                        
+                        NotesView()
+                        
+                        Divider()
+                        
+                        LabelsView()
+                        
+                        Divider()
+                    }
                     
-                    Divider()
-                    
-                    TxIDView(txID: viewModel.txIdString, explorerURL: viewModel.explorerUrl)
-                    
-                    Divider()
-                    
-                    NotesButton()
-                    
-                    Divider()
-                    
-                    LabelsButton()
-                    
-                    Divider()
                 }
-                
+                .padding(.horizontal, 16)
             }
-            .padding(.horizontal, 16)
+            
+            if viewModel.editingNotes {
+                TextEditorView(
+                    title: "Note",
+                    placeholder: "Write a note",
+                    initialText: viewModel.notes,
+                    onCancelAction: {
+                        withAnimation {
+                            viewModel.editingNotes.toggle()
+                        }
+                    }, onSaveAction: { notes in
+                        viewModel.notes = notes
+                        
+                        withAnimation {
+                            viewModel.editingNotes.toggle()
+                        }
+                    }
+                )
+                .cornerRadius(8)
+                .transition(.move(edge: .bottom))
+                .offset(y: 5)
+            } else if viewModel.editingLabels {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Palette.grayScaleAA)
+                    .frame(height: 216)
+                    .transition(.move(edge: .bottom))
+            }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .navigationBarHidden(true)
     }
     
-    private func NotesButton() -> some View {
-        HStack {
-            PButton(config: .labelAndIconLeft(label: "Add Note", icon: Asset.pencilIcon), style: .free,size: .small, applyGradient: true, enabled: true) {
+    private func NavigationView() -> some View {
+        ZStack {
+            HStack {
+                PButton(config: .onlyIcon(Asset.xIcon), style: .free, size: .medium, applyGradient: true, enabled: true) {
+                    withAnimation {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+                .frame(width: 30, height: 30)
                 
-            }
-            .frame(width: 120)
-            
-            Spacer()
-        }
-        .frame(height: 62)
-    }
-    
-    private func LabelsButton() -> some View {
-        HStack {
-            PButton(config: .labelAndIconLeft(label: "Add Label", icon: Asset.tagIcon), style: .free, size: .small, applyGradient: true, enabled: true) {
+                Spacer()
                 
+                PButton(config: .onlyLabel("Share"), style: .free, size: .small, applyGradient: true, enabled: true) {
+                    withAnimation {
+                        
+                    }
+                }
+                .frame(width: 48, height: 16)
             }
-            .frame(width: 120)
             
-            Spacer()
+            Text(viewModel.title)
+                .frame(width: 300, height: 62)
+                .font(.Main.fixed(.monoBold, size: 16))
+            
         }
         .frame(height: 62)
     }
@@ -92,46 +125,68 @@ struct TransactionDetailsView: View {
         .padding(.bottom, 24)
     }
     
-    private func NavigationView() -> some View {
-        ZStack {
-            HStack {
-                PButton(config: .onlyIcon(Asset.xIcon), style: .free, size: .medium, applyGradient: true, enabled: true) {
+    private func NotesView() -> some View {
+        Group {
+            if viewModel.notes.isEmpty {
+                Button {
                     withAnimation {
-                        presentationMode.wrappedValue.dismiss()
+                        viewModel.editingNotes.toggle()
                     }
+                } label: {
+                    HStack {
+                        PButton(config: .labelAndIconLeft(label: "Add Note", icon: Asset.pencilIcon), style: .free,size: .small, applyGradient: true, enabled: true) {
+                            withAnimation {
+                                viewModel.editingNotes.toggle()
+                            }
+                        }
+                        .frame(width: 120)
+                        
+                        Spacer()
+                    }
+                    .frame(height: 62)
                 }
-                .frame(width: 30, height: 30)
-                
-                Spacer()
-                
-                PButton(config: .onlyLabel("Share"), style: .free, size: .small, applyGradient: true, enabled: true) {
+            } else {
+                Button {
                     withAnimation {
-                        presentationMode.wrappedValue.dismiss()
+                        viewModel.editingNotes.toggle()
                     }
+                } label: {
+                    TxNotesView(notes: viewModel.notes)
                 }
-                .frame(width: 48, height: 16)
             }
-            
-            Text(viewModel.title)
-                .frame(width: 300, height: 62)
-                .font(.Main.fixed(.monoBold, size: 16))
-            
         }
-        .frame(height: 62)
     }
-}
-
-extension BitcoinDevKit.Transaction {
-    static var mockedConfirmed: BitcoinDevKit.Transaction {
-        let details = TransactionDetails(
-            fee: 141,
-            received: 55000,
-            sent: 0,
-            txid: "088719f8db335b69c1e1a57b06d6925c941e99bf55607394e0902283a70fd44e"
-        )
-        let blockTime = BlockTime(height: 2345912, timestamp: 1662707961)
-        
-        return BitcoinDevKit.Transaction.confirmed(details: details, confirmation: blockTime)
+    
+    private func LabelsView() -> some View {
+        Group {
+            if viewModel.labels.isEmpty {
+                Button {
+                    withAnimation {
+                        viewModel.editingLabels.toggle()
+                    }
+                } label: {
+                    HStack {
+                        PButton(config: .labelAndIconLeft(label: "Add Label", icon: Asset.tagIcon), style: .free, size: .small, applyGradient: true, enabled: true) {
+                            withAnimation {
+                                viewModel.editingLabels.toggle()
+                            }
+                        }
+                        .frame(width: 120)
+                        
+                        Spacer()
+                    }
+                    .frame(height: 62)
+                }
+            } else {
+                Button {
+                    withAnimation {
+                        viewModel.editingLabels.toggle()
+                    }
+                } label: {
+                    TxLabelsView(labels: viewModel.labels)
+                }
+            }
+        }
     }
 }
 
