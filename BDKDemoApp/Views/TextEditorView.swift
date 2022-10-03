@@ -69,7 +69,7 @@ struct TextEditorView: View {
                         .padding(16)
                 }
             }
-            .background(Palette.grayScale1A)
+            .background(Color(red: 28/255, green: 28/255, blue: 30/255))
             .cornerRadius(8)
             .padding(.bottom, 16)
         }
