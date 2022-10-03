@@ -17,9 +17,13 @@ class TransactionDetailsViewModel: ObservableObject {
     enum TxSide {
         case sent, recieved
     }
+    
     let coin: Coin
     let details: TransactionDetails
     let blockTime: BlockTime?
+    
+    @Published var editingNotes = false
+    @Published var editingLabels = false
     
     var title: String {
         details.sent > 0 ? "Sent" : "Recieved"
@@ -64,6 +68,19 @@ class TransactionDetailsViewModel: ObservableObject {
             return 0
         }
         return currentBlockHeight - Int(blockTime.height)
+    }
+    
+    @Published var notes = String()
+    
+    var labels: [TxLable] {
+        []/*[
+            TxLable(label: "Taxes"),
+            TxLable(label: "Buisness"),
+            TxLable(label: "Friend"),
+            TxLable(label: "Do Not Spend"),
+            TxLable(label: "Savings"),
+            TxLable(label: "Food")
+        ]*/
     }
     
     var explorerUrl: URL? {
