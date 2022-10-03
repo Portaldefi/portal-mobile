@@ -10,11 +10,11 @@ import PortalUI
 import BitcoinDevKit
 
 struct TransactionDetailsView: View {
-    @ObservedObject private var viewModel: TransactionDetailsViewModel
+    @StateObject private var viewModel: TransactionDetailsViewModel
     @Environment(\.presentationMode) private var presentationMode
     
     init(coin: Coin, tx: BitcoinDevKit.Transaction) {
-        viewModel = TransactionDetailsViewModel.config(coin: coin, tx: tx)
+        _viewModel = StateObject(wrappedValue: TransactionDetailsViewModel.config(coin: coin, tx: tx))
     }
     
     var body: some View {
