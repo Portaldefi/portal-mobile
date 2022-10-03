@@ -16,9 +16,10 @@ class TextFieldAlertViewController: UIViewController {
     ///   - message: to be used as optional message of the UIAlertController
     ///   - text: binding for the text typed into the UITextField
     ///   - isPresented: binding to be set to false when the alert is dismissed (`Done` button tapped)
-    init(title: String, message: String?, text: Binding<String?>, onAcionButton: @escaping (String?) -> (), isPresented: Binding<Bool>?) {
+    init(title: String, message: String?, text: Binding<String?>, actionButtonTitle: String, onAcionButton: @escaping (String?) -> (), isPresented: Binding<Bool>?) {
         self.alertTitle = title
         self.message = message
+        self.actionButtonTitle = actionButtonTitle
         self.onAcionButton = onAcionButton
         self._text = text
         self.isPresented = isPresented
@@ -32,6 +33,7 @@ class TextFieldAlertViewController: UIViewController {
     // MARK: - Dependencies
     private let alertTitle: String
     private let message: String?
+    private let actionButtonTitle: String
     private let onAcionButton: (String?) -> ()
 
     @Binding private var text: String?
@@ -67,7 +69,7 @@ class TextFieldAlertViewController: UIViewController {
             self?.isPresented?.wrappedValue = false
         }
         vc.addAction(cancelAction)
-        let createAction = UIAlertAction(title: "Create", style: .default) { [weak self] _ in
+        let createAction = UIAlertAction(title: actionButtonTitle, style: .default) { [weak self] _ in
             guard let self = self else { return }
             self.onAcionButton(self.text)
             self.isPresented?.wrappedValue = false

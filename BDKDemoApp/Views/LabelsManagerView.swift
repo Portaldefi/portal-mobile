@@ -74,6 +74,7 @@ struct LabelsManagerView: View {
             TextFieldAlert(
                 title: "Create new label",
                 message: "Set a name for your new label:",
+                actionButtonTitle: "Create",
                 onAcionButton: { text in
                     viewModel.createLabel()
                 },
@@ -84,6 +85,7 @@ struct LabelsManagerView: View {
             TextFieldAlert(
                 title: "Edit Label",
                 message: "Update the name for '\(viewModel.newLabelTitle!)'",
+                actionButtonTitle: "Update",
                 onAcionButton: { text in
                     guard let newTitle = text, !newTitle.isEmpty else { return }
                     viewModel.updateItem(title: newTitle)
