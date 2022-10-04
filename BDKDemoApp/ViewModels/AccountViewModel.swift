@@ -60,6 +60,16 @@ class AccountViewModel: ObservableObject {
                 self.updateValue()
             }
             .store(in: &subscriptions)
+        
+        if let account = accountManager.activeAccount {
+            accountName = account.name
+        }
+        
+        accountManager.onActiveAccountUpdate.sink { [weak self] account in
+            guard let account = account else { return }
+            self?.accountName = account.name
+        }
+        .store(in: &subscriptions)
     }
     
     private func updateBalance() {
