@@ -96,6 +96,10 @@ extension AdapterManager: IAdapterManager {
     func depositAdapter(for wallet: Wallet) -> IDepositAdapter? {
         queue.sync { adapters[wallet] as? IDepositAdapter }
     }
+    
+    func sendAdapter(for wallet: Wallet) -> ISendAdapter? {
+        queue.sync { adapters[wallet] as? ISendAdapter }
+    }
 
     func refresh() {
         queue.async {
@@ -123,6 +127,10 @@ extension AdapterManager: IAdapterManager {
 
 extension AdapterManager {
     private class AdapterManagerMocked: IAdapterManager {
+        func sendAdapter(for wallet: Wallet) -> ISendAdapter? {
+            nil
+        }
+        
         var adapterReady = CurrentValueSubject<Bool, Never>(true)
         
         func adapter(for wallet: Wallet) -> IAdapter? {
