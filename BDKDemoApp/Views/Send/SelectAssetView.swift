@@ -12,8 +12,8 @@ import Factory
 
 struct SelectAssetView: View {
     @Binding var item: QRCodeItem?
-    @Environment(\.presentationMode) private var presentationMode
-    @ObservedObject private var viewModel = Container.sendViewModel()
+//    @Environment(\.presentationMode) private var presentationMode
+    @ObservedObject private var viewModel: SendViewViewModel = Container.sendViewModel()
     @State private var notEnoughFunds = false
     @State private var notEnoughFundsMessage = String()
     
@@ -22,73 +22,41 @@ struct SelectAssetView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                HStack {
-                    PButton(
-                        config: .onlyIcon(Asset.xIcon),
-                        style: .free,
-                        size: .medium,
-                        enabled: true
-                    ) {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                    .frame(width: 20)
-                    
-                    Spacer()
-                }
-                
-                Text("Send")
-                    .font(.Main.fixed(.bold, size: 16))
-                    .foregroundColor(Palette.grayScaleCA)
-                    .frame(height: 62)
-            }
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Select Asset")
+                .font(.Main.fixed(.bold, size: 24))
+                .foregroundColor(Palette.grayScaleCA)
             
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Select Asset")
-                    .font(.Main.fixed(.bold, size: 24))
-                    .foregroundColor(Palette.grayScaleCA)
-                
-                ScrollView {
-                    VStack {
-                        VStack(spacing: 0) {
-                            Divider()
-                            ForEach(viewModel.walletItems) { item in
-                                ZStack(alignment: .trailing) {
-                                    WalletItemView(item: item)
-                                        .padding(.leading)
-                                        .padding(.trailing, 6)
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            guard item.viewModel.balance > 0 else {
-                                                notEnoughFundsMessage = "\(item.viewModel.coin.code) on \(item.viewModel.coin.description)"
-                                                return notEnoughFunds.toggle()
-                                            }
-                                            viewModel.selectedItem = item
+            ScrollView {
+                VStack {
+                    VStack(spacing: 0) {
+                        Divider()
+                        ForEach(viewModel.walletItems) { item in
+                            ZStack(alignment: .trailing) {
+                                WalletItemView(item: item)
+                                    .padding(.leading)
+                                    .padding(.trailing, 6)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        guard item.viewModel.balance > 0 else {
+                                            notEnoughFundsMessage = "\(item.viewModel.coin.code) on \(item.viewModel.coin.description)"
+                                            return notEnoughFunds.toggle()
                                         }
-                                    Asset.chevronRightIcon
-                                        .foregroundColor(Palette.grayScale4A)
-                                }
-                                
-                                Divider()
-                                    .overlay(Palette.grayScale2A)
+                                        viewModel.selectedItem = item
+                                    }
+                                Asset.chevronRightIcon
+                                    .foregroundColor(Palette.grayScale4A)
                             }
+                            
+                            Divider()
+                                .overlay(Palette.grayScale2A)
                         }
                     }
                 }
-                .frame(height: CGFloat(viewModel.walletItems.count) * 72)
-                
-                NavigationLink(
-                    destination: SendView(),
-                    isActive: $viewModel.goToSend
-                ) {
-                    EmptyView()
-                }
             }
+            .frame(height: CGFloat(viewModel.walletItems.count) * 72)            
         }
         .padding(.horizontal, 16)
-        .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
-        .navigationBarHidden(true)
         .alert(isPresented: $notEnoughFunds) {
             Alert(title: Text("Not Enough Funds"),
                   message: Text("Your wallet doesn’t have \(notEnoughFundsMessage) to start this transfer."),

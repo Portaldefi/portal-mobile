@@ -66,21 +66,6 @@ struct SetRecipientView: View {
                 }
             }
         }
-        .sheet(isPresented: $viewModel.qrScannerOpened) {
-            QRCodeReaderView(config: .send) { item in
-                switch item.type {
-                case .bip21(let address, let amount, _):
-                    viewModel.to = address
-                    guard let _amount = amount else { return }
-                    viewModel.exchanger.cryptoAmount = _amount
-                    withAnimation {
-                        viewModel.toReview()
-                    }
-                default:
-                    break
-                }
-            }
-        }
     }
 }
 

@@ -128,7 +128,7 @@ struct SetAmountView: View {
             }
             .frame(height: 72)
             
-            if let fee = viewModel.fee, !fee.isEmpty {
+            if viewModel.recomendedFees != nil {
                 Divider()
                 
                 HStack(spacing: 0) {
@@ -136,17 +136,17 @@ struct SetAmountView: View {
                         Text("Fees")
                             .font(.Main.fixed(.monoBold, size: 14))
                             .foregroundColor(Palette.grayScaleAA)
-                        Text("Fast ~ 10-20 mins")
+                        Text(viewModel.fee.description)
                             .font(.Main.fixed(.monoBold, size: 14))
                             .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
                     }
                     
                     Spacer()
                     
-                    if let fee = viewModel.fee {
+                    if let fees = viewModel.recomendedFees {
                         VStack {
-                            HStack(spacing: 4) {
-                                Text(fee)
+                            HStack(spacing: 8) {
+                                Text("\(fees.fee(viewModel.fee))")
                                     .font(.Main.fixed(.monoBold, size: 16))
                                     .foregroundColor(Palette.grayScaleEA)
 

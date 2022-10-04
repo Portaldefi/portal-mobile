@@ -23,12 +23,10 @@ struct AmountView: View {
     func limitText(_ upper: Int) {
         switch exchanger.side {
         case .crypto:
-            print(exchanger.cryptoAmount.count)
             if exchanger.cryptoAmount.count > upper {
                 exchanger.cryptoAmount = String(exchanger.cryptoAmount.prefix(upper))
             }
         case .currency:
-            print(exchanger.cryptoAmount.count)
             if exchanger.currencyAmount.count > upper {
                 exchanger.currencyAmount = String(exchanger.currencyAmount.prefix(upper))
             }

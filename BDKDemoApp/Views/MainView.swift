@@ -77,11 +77,13 @@ struct Mainview: View {
                 }
             }
             .frame(width: 85)
+            .opacity(0.65)
+            .disabled(true)
             
             Spacer()
             
             Button {
-                viewState.showScanner.toggle()
+                viewState.showQRCodeScannerFromTabBar.toggle()
             } label: {
                 Asset.scanQRIcon
             }

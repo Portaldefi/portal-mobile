@@ -11,14 +11,17 @@ import Factory
 import BitcoinDevKit
 
 struct ReviewTransactionView: View {
-    @State private var isAuthorizated = false
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel: SendViewViewModel = Container.sendViewModel()
     
     var body: some View {
         NavigationLink(
-            destination: TransactionDetailsView(coin: .bitcoin(), tx: BitcoinDevKit.Transaction.mockedConfirmed),
+            destination:
+                TransactionDetailsView(
+                    coin: .bitcoin(),
+                    tx: viewModel.unconfirmedTx != nil ? viewModel.unconfirmedTx! : BitcoinDevKit.Transaction.mockedConfirmed
+                ),
             isActive: $viewModel.txSent
         ) {
             EmptyView()
@@ -77,17 +80,17 @@ struct ReviewTransactionView: View {
                     Text("Fees")
                         .font(.Main.fixed(.monoBold, size: 14))
                         .foregroundColor(Palette.grayScaleAA)
-                    Text("Fast ~ 10-20 mins")
+                    Text(viewModel.fee.description)
                         .font(.Main.fixed(.monoBold, size: 14))
                         .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
                 }
                 
                 Spacer()
                 
-                if let fee = viewModel.fee {
+                if let fees = viewModel.recomendedFees {
                     VStack {
                         HStack(spacing: 4) {
-                            Text(fee)
+                            Text("\(fees.fee(viewModel.fee))")
                                 .font(.Main.fixed(.monoBold, size: 16))
                                 .foregroundColor(Palette.grayScaleEA)
 

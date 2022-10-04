@@ -27,8 +27,8 @@ struct TxNotesView: View {
             .padding(.vertical, 16)
             
             Asset.chevronRightIcon
-                .foregroundColor(Palette.grayScaleF4)
-                .offset(x: 16)
+                .foregroundColor(Palette.grayScale4A)
+                .offset(x: 20)
         }
     }
 }
@@ -36,6 +36,7 @@ struct TxNotesView: View {
 struct TxNotesView_Previews: PreviewProvider {
     static var previews: some View {
         TxNotesView(notes: "Design Services. Payment 1/5 and some longer text to test the expandability of the component|")
+            .padding()
             .previewLayout(.sizeThatFits)
     }
 }

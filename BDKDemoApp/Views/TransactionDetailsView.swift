@@ -28,7 +28,9 @@ struct TransactionDetailsView: View {
                     Divider().frame(height: 1)
 
                     VStack(spacing: 0) {
-                        TxRecipientView(recipient: viewModel.recipientString)
+                        if let recipient = viewModel.recipientString {
+                            TxRecipientView(recipient: recipient)
+                        }
                         
                         Divider()
                         
@@ -98,7 +100,17 @@ struct TransactionDetailsView: View {
             HStack {
                 PButton(config: .onlyIcon(Asset.xIcon), style: .free, size: .medium, applyGradient: true, enabled: true) {
                     withAnimation {
-                        presentationMode.wrappedValue.dismiss()
+                        if viewModel.viewState.goToSend {
+                            viewModel.viewState.goToSend = false
+                        } else if viewModel.viewState.goToSendFromDetails {
+                            viewModel.viewState.goToSendFromDetails = false
+                        } else if viewModel.viewState.showQRCodeScannerFromTabBar {
+                            viewModel.viewState.showQRCodeScannerFromTabBar = false
+                        } else if viewModel.viewState.showQRCodeScannerFromRecipientView {
+                            viewModel.viewState.showQRCodeScannerFromRecipientView = false
+                        } else {
+                            presentationMode.wrappedValue.dismiss()
+                        }
                     }
                 }
                 .frame(width: 30, height: 30)

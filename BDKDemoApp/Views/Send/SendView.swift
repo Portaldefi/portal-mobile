@@ -22,7 +22,7 @@ struct SendView: View {
                     ZStack {
                         if viewModel.step != .signing && viewModel.step != .sent  {
                             HStack {
-                                PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
+                                PButton(config: viewModel.step == .selectAsset ? .onlyIcon(Asset.xIcon): .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
                                     withAnimation {
                                         if viewModel.goBack() {
                                             presentationMode.wrappedValue.dismiss()
@@ -38,8 +38,8 @@ struct SendView: View {
                         Text(viewModel.title)
                             .frame(width: 300, height: 62)
                             .font(.Main.fixed(.monoBold, size: 16))
-                            .animation(nil)
                     }
+                    .animation(nil)
                     
                     switch viewModel.step {
                     case .recipient:
@@ -51,6 +51,9 @@ struct SendView: View {
                     case .review, .signing, .sent:
                         ReviewTransactionView()
                             .transition(.move(edge: .bottom).combined(with: .opacity))
+                    case .selectAsset:
+                        SelectAssetView(qrItem: $viewModel.qrCodeItem)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
                     
                     Spacer()
@@ -58,7 +61,7 @@ struct SendView: View {
                 .padding(.horizontal, 16)
             }
             
-            if viewState.showFeesPicker {
+            if viewState.showFeesPicker, let fees = viewModel.recomendedFees {
                 ZStack(alignment: .top) {
                     VStack(spacing: 0) {
                         Divider()
@@ -80,7 +83,8 @@ struct SendView: View {
                             VStack(alignment: .leading, spacing: 0) {
                                 Button {
                                     withAnimation {
-                                        viewModel.feesPickerSelection = 1
+                                        viewModel.fee = .fast
+                                        viewModel.viewState.showFeesPicker = false
                                     }
                                 } label: {
                                     HStack {
@@ -89,7 +93,7 @@ struct SendView: View {
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .stroke(Palette.grayScale2A, lineWidth: 2)
                                                     .frame(width: 24, height: 24)
-                                                if viewModel.feesPickerSelection == 1 {
+                                                if viewModel.fee == .fast {
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(
                                                             RadialGradient.main
@@ -109,7 +113,7 @@ struct SendView: View {
                                             Text("~10 mins")
                                                 .font(.Main.fixed(.monoRegular, size: 16))
                                                 .foregroundColor(Palette.grayScaleF4)
-                                            Text("4 sat/vByte")
+                                            Text("\(fees.fastestFee) sat/vByte")
                                                 .font(.Main.fixed(.monoRegular, size: 14))
                                                 .foregroundColor(Palette.grayScale8A)
                                         }
@@ -124,7 +128,8 @@ struct SendView: View {
                                 
                                 Button {
                                     withAnimation {
-                                        viewModel.feesPickerSelection = 2
+                                        viewModel.fee = .normal
+                                        viewModel.viewState.showFeesPicker = false
                                     }
                                 } label: {
                                     HStack {
@@ -133,7 +138,7 @@ struct SendView: View {
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .stroke(Palette.grayScale2A, lineWidth: 2)
                                                     .frame(width: 24, height: 24)
-                                                if viewModel.feesPickerSelection == 2 {
+                                                if viewModel.fee == .normal {
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(
                                                             RadialGradient.main
@@ -150,10 +155,10 @@ struct SendView: View {
                                         Spacer()
                                         
                                         VStack(alignment: .trailing, spacing: 4) {
-                                            Text("~3 hrs")
+                                            Text("~30 min")
                                                 .font(.Main.fixed(.monoRegular, size: 16))
                                                 .foregroundColor(Palette.grayScaleF4)
-                                            Text("2 sat/vByte")
+                                            Text("\(fees.halfHourFee) sat/vByte")
                                                 .font(.Main.fixed(.monoRegular, size: 14))
                                                 .foregroundColor(Palette.grayScale8A)
                                         }
@@ -168,7 +173,8 @@ struct SendView: View {
                                 
                                 Button {
                                     withAnimation {
-                                        viewModel.feesPickerSelection = 3
+                                        viewModel.fee = .slow
+                                        viewModel.viewState.showFeesPicker = false
                                     }
                                 } label: {
                                     HStack {
@@ -177,7 +183,7 @@ struct SendView: View {
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .stroke(Palette.grayScale2A, lineWidth: 2)
                                                     .frame(width: 24, height: 24)
-                                                if viewModel.feesPickerSelection == 3 {
+                                                if viewModel.fee == .slow {
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(
                                                             RadialGradient.main
@@ -194,10 +200,10 @@ struct SendView: View {
                                         Spacer()
                                         
                                         VStack(alignment: .trailing, spacing: 4) {
-                                            Text("~1 day")
+                                            Text("~60 min")
                                                 .font(.Main.fixed(.monoRegular, size: 16))
                                                 .foregroundColor(Palette.grayScaleF4)
-                                            Text("1 sat/vByte")
+                                            Text("\(fees.hourFee) sat/vByte")
                                                 .font(.Main.fixed(.monoRegular, size: 14))
                                                 .foregroundColor(Palette.grayScale8A)
                                         }
@@ -212,9 +218,9 @@ struct SendView: View {
                                 Divider()
                                 
                                 Button {
-                                    withAnimation {
-                                        viewModel.feesPickerSelection = 4
-                                    }
+//                                    withAnimation {
+//                                        viewModel.fee = .custom
+//                                    }
                                 } label: {
                                     HStack {
                                         HStack(spacing: 12) {
@@ -222,7 +228,7 @@ struct SendView: View {
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .stroke(Palette.grayScale2A, lineWidth: 2)
                                                     .frame(width: 24, height: 24)
-                                                if viewModel.feesPickerSelection == 4 {
+                                                if viewModel.fee == .custom {
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(
                                                             RadialGradient.main
@@ -258,75 +264,81 @@ struct SendView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 
             } else {
-                VStack(spacing: 0) {
-                    Divider()
-                        .frame(height: 1)
-                        .overlay(Palette.grayScale4A)
-                    
-                    VStack(alignment: .leading, spacing: 16) {
-                        if let errorMessage = viewModel.sendError as? SendFlowError {
-                            Text(errorMessage.description)
-                                .font(.Main.fixed(.monoRegular, size: 16))
-                                .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
-                                .transition(.move(edge: .bottom).combined(with: .opacity))
-                        } else if !viewModel.exchanger.amountIsValid {
-                            Text("Invalid Amount")
-                                .font(.Main.fixed(.monoRegular, size: 16))
-                                .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
-                                .transition(.move(edge: .bottom).combined(with: .opacity))
-                        }
+                if viewModel.step != .selectAsset {
+                    VStack(spacing: 0) {
+                        Divider()
+                            .frame(height: 1)
+                            .overlay(Palette.grayScale4A)
                         
-                        HStack {
-                            switch viewModel.step {
-                            case .recipient, .amount, .review:
-                                PButton(config: .onlyLabel(viewModel.actionButtonTitle), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
-                                    withAnimation {
-                                        viewModel.onActionButtonPressed()
-                                    }
-                                }
-                            case .signing:
-                                HStack(spacing: 16) {
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle())
-                                    Text("Signing transaction...")
-                                        .font(.Main.fixed(.monoBold, size: 16))
-                                        .foregroundColor(Palette.grayScaleF4)
-                                }
-                                .frame(height: 60)
-                            case .sent:
-                                HStack(spacing: 12) {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .resizable()
-                                        .frame(width: 28, height: 28)
-                                        .foregroundColor(Color.green)
-                                    Text("Signed!")
-                                        .font(.Main.fixed(.monoBold, size: 16))
-                                        .foregroundColor(Palette.grayScaleF4)
-                                }
-                                .frame(height: 60)
+                        VStack(alignment: .leading, spacing: 16) {
+                            if let errorMessage = viewModel.sendError as? SendFlowError {
+                                Text(errorMessage.description)
+                                    .font(.Main.fixed(.monoRegular, size: 16))
+                                    .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
+                                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                            } else if !viewModel.exchanger.amountIsValid {
+                                Text("Invalid Amount")
+                                    .font(.Main.fixed(.monoRegular, size: 16))
+                                    .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
+                                    .transition(.move(edge: .bottom).combined(with: .opacity))
                             }
+                            
+                            HStack {
+                                switch viewModel.step {
+                                case .recipient, .amount, .review:
+                                    PButton(config: .onlyLabel(viewModel.actionButtonTitle), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
+                                        withAnimation {
+                                            viewModel.onActionButtonPressed()
+                                        }
+                                    }
+                                case .signing:
+                                    HStack(spacing: 16) {
+                                        ProgressView()
+                                            .progressViewStyle(CircularProgressViewStyle())
+                                        Text("Signing transaction...")
+                                            .font(.Main.fixed(.monoBold, size: 16))
+                                            .foregroundColor(Palette.grayScaleF4)
+                                    }
+                                    .frame(height: 60)
+                                case .sent:
+                                    HStack(spacing: 12) {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .resizable()
+                                            .frame(width: 28, height: 28)
+                                            .foregroundColor(Color.green)
+                                        Text("Signed!")
+                                            .font(.Main.fixed(.monoBold, size: 16))
+                                            .foregroundColor(Palette.grayScaleF4)
+                                    }
+                                    .frame(height: 60)
+                                case .selectAsset:
+                                    EmptyView()
+                                }
+                            }
+                            
                         }
-                        
+                        .padding(16)
                     }
-                    .padding(16)
+                    .background(
+                        Palette.grayScale2A.edgesIgnoringSafeArea(.bottom)
+                    )
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(1)
                 }
-                .background(
-                    Palette.grayScale2A.edgesIgnoringSafeArea(.bottom)
-                )
-                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .navigationBarHidden(true)
-        .sheet(isPresented: $viewModel.qrScannerOpened) {
+        .sheet(isPresented: $viewModel.viewState.showQRCodeScannerFromRecipientView) {
             QRCodeReaderView(config: .send) { item in
-                viewModel.qrCodeItem = item
-                
                 switch item.type {
                 case .bip21(let address, let amount, _):
                     viewModel.to = address
                     guard let _amount = amount else { return }
                     viewModel.exchanger.cryptoAmount = _amount
+                    withAnimation {
+                        viewModel.toReview()
+                    }
                 default:
                     break
                 }

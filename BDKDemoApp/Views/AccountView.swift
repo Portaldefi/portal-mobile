@@ -70,7 +70,7 @@ struct AccountView: View {
             .navigationBarHidden(true)
             .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         }
-        .sheet(isPresented: $viewState.showScanner) {
+        .sheet(isPresented: $viewState.showQRCodeScannerFromTabBar) {
             QRCodeReaderView(config: .universal)
         }
         .sheet(isPresented: $goToReceive) {
@@ -80,7 +80,7 @@ struct AccountView: View {
         }
         .sheet(isPresented: $viewState.goToSend) {
             NavigationView {
-                SelectAssetView(qrItem: $qrItem)
+                SendView()
             }
         }
     }

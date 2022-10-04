@@ -20,8 +20,8 @@ struct ConfirmationView: View {
                 HStack {
                     Spacer()
                     PButton(config: .onlyIcon(Asset.xIcon), style: .free, size: .small, enabled: true) {
-                        if viewState.showScanner {
-                            viewState.showScanner.toggle()
+                        if viewState.showQRCodeScannerFromTabBar {
+                            viewState.showQRCodeScannerFromTabBar.toggle()
                         } else {
                             viewState.goToSend.toggle()
                         }

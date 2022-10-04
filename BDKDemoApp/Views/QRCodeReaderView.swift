@@ -15,7 +15,6 @@ struct QRCodeReaderView: View {
         case send, universal
     }
     
-    @Injected(Container.sendViewModel) private var viewModel
     @Environment(\.presentationMode) private var presentation
     private(set) var completion: (QRCodeItem) -> ()
     private let config: Config
@@ -31,7 +30,8 @@ struct QRCodeReaderView: View {
                 QRCodeScannerView { item in
                     switch config {
                     case .universal:
-                        viewModel.qrCodeItem = item
+                        let vm = Container.sendViewModel()
+                        vm.qrCodeItem = item
                         goToSend.toggle()
                     case .send:
                         completion(item)

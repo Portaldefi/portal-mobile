@@ -20,7 +20,7 @@ struct ReceiveView: View {
         VStack(spacing: 0) {
             ZStack {
                 HStack {
-                    PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
+                    PButton(config: .onlyIcon(Asset.xIcon), style: .free, size: .medium, enabled: true) {
                         presentationMode.wrappedValue.dismiss()
                     }
                     .frame(width: 20)
@@ -93,6 +93,7 @@ struct ReceiveView: View {
                     }
                     PButton(config: .onlyLabel("Copy"), style: .filled, size: .big, enabled: true) {
                         viewModel.copyToClipboard()
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
             }

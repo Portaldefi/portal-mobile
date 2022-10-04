@@ -19,9 +19,7 @@ struct QRCodeScannerView: View {
     @State private var showingNoQRAlert = false
     @State private var showingNotSupportedQRAlert = false
     @State private var qrItem: QRCodeItem?
-    
-    @ObservedObject var viewModel = Container.sendViewModel()
-    
+        
     enum ScanState {
         case detecting, detected
     }

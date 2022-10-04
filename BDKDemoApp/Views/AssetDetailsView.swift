@@ -13,7 +13,6 @@ import Factory
 struct AssetDetailsView: View {
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewState: ViewState = Container.viewState()
-    @ObservedObject private var sendViewModel: SendViewViewModel = Container.sendViewModel()
     @StateObject private var viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
     @State private var showTxDetails = false
     @State private var selectedTx: BitcoinDevKit.Transaction?
@@ -84,12 +83,12 @@ struct AssetDetailsView: View {
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         .navigationBarHidden(true)
-        .sheet(isPresented: $sendViewModel.goToReceive) {
+        .sheet(isPresented: $viewState.goToReceive) {
             NavigationView {
                 ReceiveView(coin: .bitcoin())
             }
         }
-        .sheet(isPresented: $sendViewModel.goToSend) {
+        .sheet(isPresented: $viewState.goToSendFromDetails) {
             NavigationView {
                 SendView()
             }
@@ -109,7 +108,7 @@ struct AssetDetailsView: View {
                 size: .medium,
                 enabled: item?.viewModel.coin.name == "Bitcoin" && item?.viewModel.coin.unit == "BTC"
             ) {
-                sendViewModel.goToReceive = true
+                viewState.goToReceive = true
             }
             
             PButton(
@@ -119,7 +118,9 @@ struct AssetDetailsView: View {
                 enabled: item?.viewModel.coin.name == "Bitcoin" && item?.viewModel.coin.unit == "BTC"
             ) {
                 if let item = item {
-                    sendViewModel.selectedItem = item
+                    let sendViewViewModel = Container.sendViewModel()
+                    sendViewViewModel.selectedItem = item
+                    viewState.goToSendFromDetails = true
                 }
             }
         }

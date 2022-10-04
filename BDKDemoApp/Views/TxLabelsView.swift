@@ -29,8 +29,8 @@ struct TxLabelsView: View {
             .padding(.vertical, 16)
             
             Asset.chevronRightIcon
-                .foregroundColor(Palette.grayScaleF4)
-                .offset(x: 16)
+                .foregroundColor(Palette.grayScale4A)
+                .offset(x: 20)
         }
     }
 }

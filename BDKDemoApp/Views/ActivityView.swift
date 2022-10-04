@@ -14,15 +14,15 @@ struct ActivityView: View {
     
     var body: some View {
         Text("Activity")
-            .onChange(of: viewState.showScanner, perform: { newValue in
-                qrScannerOpened.toggle()
-            })
-            .sheet(isPresented: $qrScannerOpened, onDismiss: {
-
-            }) {
-                QRCodeScannerView() { item in
-                    print(item)
-                }
-            }
+//            .onChange(of: viewState.showScanner, perform: { newValue in
+//                qrScannerOpened.toggle()
+//            })
+//            .sheet(isPresented: $qrScannerOpened, onDismiss: {
+//
+//            }) {
+//                QRCodeScannerView() { item in
+//                    print(item)
+//                }
+//            }
     }
 }
