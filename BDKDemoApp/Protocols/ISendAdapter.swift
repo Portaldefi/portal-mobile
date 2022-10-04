@@ -8,5 +8,5 @@
 import Foundation
 
 protocol ISendAdapter {
-    func send(to: String, amount: String, completion: @escaping (Error?) -> Void)
+    func send(to: String, amount: String, completion: @escaping (String?, Error?) -> Void)
 }
