@@ -39,9 +39,9 @@ class TransactionDetailsViewModel: ObservableObject {
     var amountString: String {
         switch txSide {
         case .sent:
-            return "\(Double(details.sent)/100_000_000)"
+            return (Double(details.sent)/100_000_000).toString(decimal: 8)
         case .recieved:
-            return "\(Double(details.received)/100_000_000)"
+            return (Double(details.received)/100_000_000).toString(decimal: 8)
         }
     }
     
@@ -49,23 +49,23 @@ class TransactionDetailsViewModel: ObservableObject {
         "1.29"
     }
     
-    var recipientString: String {
-        "bc1q...zsx1"
+    var recipientString: String? {
+        storage.object(forKey: details.txid + "recipient") as? String
     }
     
     var dateString: String {
         guard let blockTime = blockTime else {
-            return String()
+            return Date().extendedDate()
         }
         
         return Date(timeIntervalSince1970: TimeInterval(blockTime.timestamp)).extendedDate()
     }
     
     var feeString: String {
-        guard let fee = details.fee else { return "-" }
+        guard let fee = details.fee else { return "0.000000141" }
         return String(format: "%.8f", Double(fee)/100_000_000)
     }
-    
+        
     var txIdString: String {
         "\(details.txid.prefix(4))...\(details.txid.suffix(4))"
     }
@@ -92,8 +92,8 @@ class TransactionDetailsViewModel: ObservableObject {
     
     private var currentBlockHeight = 0
     
-    private var url: URL?
-    private var urlSession: URLSession
+    private var url: URL? = URL(string: "https://api.blockcypher.com/v1/btc/test3")
+    private var urlSession: URLSession!
     private var subscriptions = Set<AnyCancellable>()
     
     init(coin: Coin, tx: BitcoinDevKit.Transaction) {
@@ -116,13 +116,7 @@ class TransactionDetailsViewModel: ObservableObject {
         if let tags = storage.object(forKey: details.txid + "labels") as? [String] {
             self.labels = tags.map{ TxLable(label: $0 )}
         }
-        
-        self.url = URL(string: "https://api.blockcypher.com/v1/btc/test3")
-        
-        let config = URLSessionConfiguration.default
-        config.waitsForConnectivity = true
-        
-        self.urlSession = URLSession(configuration: config)
+
         updateChainTip()
         
         if let confirmatinos = storage.object(forKey: details.txid + "confirmations") as? Int {
@@ -141,6 +135,11 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     private func updateChainTip() {
+        let config = URLSessionConfiguration.default
+        config.waitsForConnectivity = true
+        
+        self.urlSession = URLSession(configuration: config)
+        
         guard let url = self.url else { return }
         
         urlSession.dataTaskPublisher(for: url)
