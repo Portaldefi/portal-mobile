@@ -9,6 +9,7 @@ import SwiftUI
 import PortalUI
 
 struct CreateAccountView: View {
+    @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel = CreateAccountViewModel()
     
@@ -40,6 +41,7 @@ struct CreateAccountView: View {
             }
             
             TextField("Required", text: $viewModel.accountName)
+                .focused($isFocused)
                 .disableAutocorrection(true)
                 .textInputAutocapitalization(.never)
                 .font(Font.system(size: 16, weight: .bold, design: .monospaced))
@@ -55,11 +57,14 @@ struct CreateAccountView: View {
                 viewModel.createAccount()
             }
         }
-        .padding(.bottom, 157)
+        .padding(.bottom, 30)
         .padding([.top, .horizontal])
         .navigationBarHidden(true)
         .modifier(BackButtonModifier())
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
+        .onAppear {
+            isFocused = true
+        }
         
         //            VStack {
         ////                Form {
