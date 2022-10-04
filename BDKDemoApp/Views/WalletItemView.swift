@@ -12,7 +12,7 @@ struct WalletItemView: View {
     let item: WalletItem
     var body: some View {
         HStack {
-            VStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 12) {
                 VStack(spacing: 4.2) {
                     HStack(spacing: 6) {
                         CoinImageView(
@@ -24,7 +24,6 @@ struct WalletItemView: View {
                             .font(.Main.fixed(.monoBold, size: 16))
                             .foregroundColor(Palette.grayScaleCA)
                             .frame(height: 16)
-                        Spacer()
                     }
                     HStack(spacing: 4) {
                         Text("on")
@@ -38,7 +37,6 @@ struct WalletItemView: View {
                             .font(.Main.fixed(.monoMedium, size: 12))
                             .foregroundColor(Palette.grayScale6A)
                             .frame(height: 17)
-                        Spacer()
                     }
                 }
             }
