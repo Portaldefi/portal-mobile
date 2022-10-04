@@ -318,9 +318,7 @@ struct SendView: View {
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .navigationBarHidden(true)
-        .sheet(isPresented: $viewModel.qrScannerOpened, onDismiss: {
-            viewModel.qrScannerOpened = false
-        }) {
+        .sheet(isPresented: $viewModel.qrScannerOpened) {
             QRCodeReaderView(config: .send) { item in
                 viewModel.qrCodeItem = item
                 

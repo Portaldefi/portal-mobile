@@ -70,21 +70,15 @@ struct AccountView: View {
             .navigationBarHidden(true)
             .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         }
-        .sheet(isPresented: $viewState.showScanner, onDismiss: {
-            viewState.showScanner = false
-        }) {
+        .sheet(isPresented: $viewState.showScanner) {
             QRCodeReaderView(config: .universal)
         }
-        .sheet(isPresented: $goToReceive, onDismiss: {
-            
-        }) {
+        .sheet(isPresented: $goToReceive) {
             NavigationView {
                 ReceiveView(coin: .bitcoin())
             }
         }
-        .sheet(isPresented: $viewState.goToSend, onDismiss: {
-            
-        }) {
+        .sheet(isPresented: $viewState.goToSend) {
             NavigationView {
                 SelectAssetView(qrItem: $qrItem)
             }

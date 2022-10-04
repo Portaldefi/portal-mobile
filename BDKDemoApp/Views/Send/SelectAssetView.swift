@@ -56,9 +56,6 @@ struct SelectAssetView: View {
                             ForEach(viewModel.walletItems) { item in
                                 ZStack(alignment: .trailing) {
                                     WalletItemView(item: item)
-                                        .if(item.viewModel.balance == 0) { itemView in
-                                            itemView.opacity(0.4)
-                                        }
                                         .padding(.leading)
                                         .padding(.trailing, 6)
                                         .contentShape(Rectangle())

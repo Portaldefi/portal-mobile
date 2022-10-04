@@ -66,10 +66,8 @@ struct AssetDetailsView: View {
                             .padding(.horizontal, 8)
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                if case .confirmed = transaction {
-                                    selectedTx = transaction
-                                    showTxDetails = true
-                                }
+                                selectedTx = transaction
+                                showTxDetails = true
                             }
                         Divider()
                             .overlay(Palette.grayScale1A)
@@ -86,23 +84,17 @@ struct AssetDetailsView: View {
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         .navigationBarHidden(true)
-        .sheet(isPresented: $sendViewModel.goToReceive, onDismiss: {
-            sendViewModel.goToReceive = false
-        }) {
+        .sheet(isPresented: $sendViewModel.goToReceive) {
             NavigationView {
                 ReceiveView(coin: .bitcoin())
             }
         }
-        .sheet(isPresented: $sendViewModel.goToSend, onDismiss: {
-            sendViewModel.goToSend = false
-        }) {
+        .sheet(isPresented: $sendViewModel.goToSend) {
             NavigationView {
                 SendView()
             }
         }
-        .sheet(isPresented: $showTxDetails, onDismiss: {
-            showTxDetails = false
-        }) {
+        .sheet(isPresented: $showTxDetails) {
             if let tx = selectedTx {
                 TransactionDetailsView(coin: viewModel.coin, tx: tx)
             }

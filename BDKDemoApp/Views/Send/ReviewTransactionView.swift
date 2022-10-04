@@ -8,6 +8,7 @@
 import SwiftUI
 import PortalUI
 import Factory
+import BitcoinDevKit
 
 struct ReviewTransactionView: View {
     @State private var isAuthorizated = false
@@ -17,7 +18,7 @@ struct ReviewTransactionView: View {
     
     var body: some View {
         NavigationLink(
-            destination: ConfirmationView(),
+            destination: TransactionDetailsView(coin: .bitcoin(), tx: BitcoinDevKit.Transaction.mockedConfirmed),
             isActive: $viewModel.txSent
         ) {
             EmptyView()

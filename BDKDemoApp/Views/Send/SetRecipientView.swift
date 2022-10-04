@@ -66,9 +66,7 @@ struct SetRecipientView: View {
                 }
             }
         }
-        .sheet(isPresented: $viewModel.qrScannerOpened, onDismiss: {
-            viewModel.qrScannerOpened = false
-        }) {
+        .sheet(isPresented: $viewModel.qrScannerOpened) {
             QRCodeReaderView(config: .send) { item in
                 switch item.type {
                 case .bip21(let address, let amount, _):
