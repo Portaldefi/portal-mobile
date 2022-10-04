@@ -8,8 +8,11 @@
 import Foundation
 import Combine
 import BitcoinDevKit
+import Factory
 
 class TransactionDetailsViewModel: ObservableObject {
+    let storage: UserDefaults
+    
     struct TestNetDataResponse: Codable {
         let height: Int
     }
@@ -26,6 +29,8 @@ class TransactionDetailsViewModel: ObservableObject {
     @Published var editingLabels = false
     @Published var showAddLabelInterface = false
     @Published var newLabelTitle: String?
+    
+    @LazyInjected(Container.viewState) var viewState: ViewState
     
     var title: String {
         details.sent > 0 ? "Sent" : "Recieved"
@@ -65,12 +70,7 @@ class TransactionDetailsViewModel: ObservableObject {
         "\(details.txid.prefix(4))...\(details.txid.suffix(4))"
     }
     
-    var confirmations: Int {
-        guard let blockTime = blockTime, currentBlockHeight > 0 else {
-            return 0
-        }
-        return currentBlockHeight - Int(blockTime.height)
-    }
+    @Published var confirmations: Int = 0
     
     @Published var notes = String()
     @Published var labels: [TxLable] = []
@@ -98,7 +98,8 @@ class TransactionDetailsViewModel: ObservableObject {
     
     init(coin: Coin, tx: BitcoinDevKit.Transaction) {
         self.coin = coin
-        
+        self.storage = UserDefaults.standard
+                
         switch tx {
         case .confirmed(let details, let confirmations):
             self.details = details
@@ -108,6 +109,14 @@ class TransactionDetailsViewModel: ObservableObject {
             self.blockTime = nil
         }
         
+        if let notes = storage.string(forKey: details.txid + "notes") {
+            self.notes = notes
+        }
+        
+        if let tags = storage.object(forKey: details.txid + "labels") as? [String] {
+            self.labels = tags.map{ TxLable(label: $0 )}
+        }
+        
         self.url = URL(string: "https://api.blockcypher.com/v1/btc/test3")
         
         let config = URLSessionConfiguration.default
@@ -115,6 +124,20 @@ class TransactionDetailsViewModel: ObservableObject {
         
         self.urlSession = URLSession(configuration: config)
         updateChainTip()
+        
+        if let confirmatinos = storage.object(forKey: details.txid + "confirmations") as? Int {
+            self.confirmations = confirmatinos
+        }
+        
+        $labels.sink { labels in
+            self.storage.set(labels.map{ $0.label }, forKey: self.details.txid + "labels")
+        }
+        .store(in: &subscriptions)
+        
+        $notes.sink { notes in
+            self.storage.set(notes, forKey: self.details.txid + "notes")
+        }
+        .store(in: &subscriptions)
     }
     
     private func updateChainTip() {
@@ -130,9 +153,18 @@ class TransactionDetailsViewModel: ObservableObject {
                 }
             } receiveValue: { [weak self] response in
                 self?.currentBlockHeight = response.height
+                self?.updateConfirmations()
                 self?.objectWillChange.send()
             }
             .store(in: &subscriptions)
+    }
+    
+    private func updateConfirmations() {
+        guard let blockTime = blockTime, currentBlockHeight > 0 else {
+            return
+        }
+        self.confirmations = currentBlockHeight - Int(blockTime.height) + 1
+        storage.set(confirmations, forKey: details.txid + "confirmations")
     }
 }
 
