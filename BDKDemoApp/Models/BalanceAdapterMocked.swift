@@ -20,7 +20,7 @@ class BalanceAdapterMocked: IBalanceAdapter {
 }
 
 class SendAdapterMocked: ISendAdapter {
-    func send(to: String, amount: String, completion: @escaping (Error?) -> Void) {
+    func send(to: String, amount: String, completion: @escaping (String?, Error?) -> Void) {
         
     }
 }
