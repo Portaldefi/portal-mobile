@@ -40,20 +40,9 @@ class Exchanger: ObservableObject {
         }
     }
     
-    init(base: Coin, quote: AccountCurrency) {
+    init(base: Coin, quote: AccountCurrency, balanceAdapter: IBalanceAdapter) {
         self.base = base
         self.quote = quote
-        
-        let adapterManager: IAdapterManager = Container.adapterManager()
-        let walletManager: IWalletManager = Container.walletManager()
-                
-        guard
-            let wallet = walletManager.activeWallets.first(where: { $0.coin == base }),
-            let balanceAdapter = adapterManager.balanceAdapter(for: wallet)
-        else {
-            fatalError("coudn't fetch dependencies")
-        }
-        
         self.balanceAdapter = balanceAdapter
         
         subscribe()
