@@ -42,7 +42,7 @@ extension SharedContainer {
         return WalletManager(accountManager: accountManager, storage: walletStorage)
     }
     
-    static let sendViewModel = Factory<SendViewViewModel>(scope: .shared) {
+    static let sendViewModel = Factory<SendViewViewModel>(scope: .cached) {
         SendViewViewModel.config(coin: .bitcoin())
     }
     
