@@ -15,6 +15,7 @@ protocol IAdapterManager: AnyObject {
     func balanceAdapter(for wallet: Wallet) -> IBalanceAdapter?
     func transactionsAdapter(for wallet: Wallet) -> ITransactionsAdapter?
     func depositAdapter(for wallet: Wallet) -> IDepositAdapter?
+    func sendAdapter(for wallet: Wallet) -> ISendAdapter?
     func refresh()
     func refreshAdapters(wallets: [Wallet])
     func refresh(wallet: Wallet)

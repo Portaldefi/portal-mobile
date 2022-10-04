@@ -18,3 +18,9 @@ class BalanceAdapterMocked: IBalanceAdapter {
         Just(()).eraseToAnyPublisher()
     }
 }
+
+class SendAdapterMocked: ISendAdapter {
+    func send(to: String, amount: String, completion: @escaping (Error?) -> Void) {
+        
+    }
+}
