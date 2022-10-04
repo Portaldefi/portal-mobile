@@ -4,7 +4,5 @@
 <dict>
 	<key>LSMinimumSystemVersion</key>
 	<string>12.3</string>
-	<key>UIStatusBarStyle</key>
-	<string>UIStatusBarStyleDarkContent</string>
 </dict>
 </plist>
