@@ -94,8 +94,4 @@ class Exchanger: ObservableObject {
             }
             .store(in: &subscriptions)
     }
-    
-    func sendMax() {
-        
-    }
 }
