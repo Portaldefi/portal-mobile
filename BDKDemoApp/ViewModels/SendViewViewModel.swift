@@ -97,7 +97,7 @@ class SendViewViewModel: ObservableObject {
         case .recipient:
             return !to.isEmpty
         case .amount:
-            return exchanger.amountIsValid && Double(exchanger.cryptoAmount) ?? 0 > 0
+            return exchanger.amountIsValid && Double(exchanger.cryptoAmount.replacingOccurrences(of: ",", with: ".")) ?? 0 > 0
         case .review:
             return true
         case .signing, .sent:
