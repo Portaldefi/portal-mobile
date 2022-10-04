@@ -18,6 +18,8 @@ class SendViewViewModel: ObservableObject {
         case recipient, amount, review, signing, sent
     }
     private let balanceAdapter: IBalanceAdapter
+    private let sendAdapter: ISendAdapter
+
     var walletItems: [WalletItem] = []
     
     @Published var to = String()
@@ -50,7 +52,7 @@ class SendViewViewModel: ObservableObject {
     
     @ObservedObject private var account: AccountViewModel = Container.accountViewModel()
     @Injected(Container.marketData) private var marketData
-    @Injected(Container.viewState) private var viewState
+    @ObservedObject private var viewState = Container.viewState()
     @LazyInjected(Container.biometricAuthentification) private var biometrics
     
     var actionButtonEnabled: Bool {
@@ -90,8 +92,9 @@ class SendViewViewModel: ObservableObject {
         }
     }
     
-    init(balanceAdapter: IBalanceAdapter) {
+    init(balanceAdapter: IBalanceAdapter, sendAdapter: ISendAdapter) {
         self.balanceAdapter = balanceAdapter
+        self.sendAdapter = sendAdapter
         
         self.balanceString = balanceAdapter.balance.formatted()
         let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
@@ -162,15 +165,32 @@ class SendViewViewModel: ObservableObject {
             self?.objectWillChange.send()
         }
         .store(in: &subscriptions)
+        
+        $step
+            .filter{ $0 == .sent }
+            .flatMap{ _ in Just(true) }
+            .delay(for: .seconds(1), scheduler: RunLoop.main)
+            .eraseToAnyPublisher()
+            .assign(to: &$txSent)
     }
     
     func send() {
-//        account.send(to: to, amount: exchanger.cryptoAmount, completion: { [weak self] error in
-//            DispatchQueue.main.async {
-//                self?.sendError = error
-//                self?.txSent.toggle()
-//            }
-//        })
+        sendAdapter.send(to: to, amount: exchanger.cryptoAmount, completion: { [weak self] error in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                guard error == nil else {
+                    withAnimation {
+                        self.step = .review
+                        self.sendError = SendFlowError.error(error.debugDescription)
+                    }
+                    return
+                }
+                withAnimation {
+                    self.step = .sent
+                }
+            }
+        })
     }
     
     func authenticateUser(_ completion: @escaping (Bool) -> ()) {
@@ -253,6 +273,8 @@ class SendViewViewModel: ObservableObject {
     }
     
     func onActionButtonPressed() {
+        sendError = nil
+        
         switch step {
         case .recipient:
             if BitcoinAddressValidator.isValid(address: to) {
@@ -264,11 +286,28 @@ class SendViewViewModel: ObservableObject {
         case .amount:
             step = .review
         case .review:
-            step = .signing
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
-                self.step = .sent
-            })
+            biometrics.authenticateUser { success, error in
+                if let error = error {
+                    DispatchQueue.main.sync {
+                        withAnimation {
+                            self.sendError = SendFlowError.error(error.errorUserInfo.description)
+                        }
+                    }
+                }
+                guard success else { return }
+                    
+                DispatchQueue.main.sync {
+                    withAnimation {
+                        self.step = .signing
+                    }
+                }
+                
+                self.send()
+//
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
+//                    self.step = .sent
+//                })
+            }
         case .signing:
             break
         case .sent:
@@ -295,7 +334,7 @@ class SendViewViewModel: ObservableObject {
 
 extension SendViewViewModel {
     static var mocked: SendViewViewModel {
-        SendViewViewModel(balanceAdapter: BalanceAdapterMocked())
+        SendViewViewModel(balanceAdapter: BalanceAdapterMocked(), sendAdapter: SendAdapterMocked())
     }
     
     static func config(coin: Coin) -> SendViewViewModel {
@@ -304,11 +343,12 @@ extension SendViewViewModel {
 
         guard
             let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
-            let balanceAdapter = adapterManager.balanceAdapter(for: wallet)
+            let balanceAdapter = adapterManager.balanceAdapter(for: wallet),
+            let sendAdapter = adapterManager.sendAdapter(for: wallet)
         else {
             fatalError("coudn't fetch dependencies")
         }
 
-        return SendViewViewModel(balanceAdapter: balanceAdapter)
+        return SendViewViewModel(balanceAdapter: balanceAdapter, sendAdapter: sendAdapter)
     }
 }
