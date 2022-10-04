@@ -52,6 +52,8 @@ struct TxIDView: View {
 
 struct TxIDView_Previews: PreviewProvider {
     static var previews: some View {
-        TxIDView(txID: "239yeiuhsadkhasiudhy928ye", explorerURL: nil)
+        TxIDView(txID: "239y...928ye", explorerURL: nil)
+            .padding()
+            .previewLayout(.sizeThatFits)
     }
 }

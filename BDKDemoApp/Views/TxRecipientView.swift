@@ -28,5 +28,7 @@ struct TxRecipientView: View {
 struct TxRecipientView_Previews: PreviewProvider {
     static var previews: some View {
         TxRecipientView(recipient: "bc1saiUIFSksaoasdhVDPASDJNSAasdijsasdjkhasdkaso3njxks")
+            .padding()
+            .previewLayout(.sizeThatFits)
     }
 }

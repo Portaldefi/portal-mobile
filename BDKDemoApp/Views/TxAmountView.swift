@@ -41,5 +41,7 @@ struct TxAmountView: View {
 struct TxAmountView_Previews: PreviewProvider {
     static var previews: some View {
         TxAmountView(amount: "0.000055", value: "1.24")
+            .padding()
+            .previewLayout(.sizeThatFits)
     }
 }

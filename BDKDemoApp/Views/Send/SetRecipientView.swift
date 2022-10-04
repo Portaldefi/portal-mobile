@@ -72,5 +72,7 @@ struct SetRecipientView: View {
 struct RecipientView_Previews: PreviewProvider {
     static var previews: some View {
         SetRecipientView(viewModel: SendViewViewModel.mocked)
+            .padding()
+            .previewLayout(.sizeThatFits)
     }
 }

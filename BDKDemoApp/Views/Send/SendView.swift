@@ -349,6 +349,7 @@ struct SendView: View {
 
 struct SendView_Previews: PreviewProvider {
     static var previews: some View {
+        let _ = Container.sendViewModel.register { SendViewViewModel.mocked }
         SendView()
     }
 }

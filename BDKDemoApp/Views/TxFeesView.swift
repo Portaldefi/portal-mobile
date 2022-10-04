@@ -32,5 +32,7 @@ struct TxFeesView: View {
 struct TxFeesView_Previews: PreviewProvider {
     static var previews: some View {
         TxFeesView(fees: "0.000000134")
+            .padding()
+            .previewLayout(.sizeThatFits)
     }
 }

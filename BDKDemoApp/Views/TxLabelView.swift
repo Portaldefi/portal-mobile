@@ -25,5 +25,7 @@ struct TxLabelView: View {
 struct TxLabelView_Previews: PreviewProvider {
     static var previews: some View {
         TxLabelView(label: TxLable(label: "Preview"))
+            .padding()
+            .previewLayout(.sizeThatFits)
     }
 }

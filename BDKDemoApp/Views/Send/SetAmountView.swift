@@ -37,7 +37,7 @@ struct SetAmountView: View {
                             }
                     }
                     .buttonStyle(.plain)
-                    .frame(width: 125)
+                    .frame(width: 125, height: 33)
                     .disabled(!viewModel.useAllFundsEnabled)
                 }
                 
@@ -186,5 +186,6 @@ struct SetAmountView_Previews: PreviewProvider {
     static var previews: some View {
         SetAmountView(viewModel: SendViewViewModel.mocked)
             .padding()
+            .previewLayout(.sizeThatFits)
     }
 }

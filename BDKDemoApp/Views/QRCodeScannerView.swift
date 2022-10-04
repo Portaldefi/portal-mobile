@@ -242,7 +242,11 @@ struct QRCodeScannerView: View {
 
 struct QRCodeScannerView_Previews: PreviewProvider {
     static var previews: some View {
-        QRCodeScannerView(detected: {_ in })
-            .previewLayout(PreviewLayout.sizeThatFits)
+        Rectangle()
+            .foregroundColor(Color.black)
+            .edgesIgnoringSafeArea(.all)
+            .sheet(isPresented: .constant(true)) {
+                QRCodeScannerView(detected: {_ in })
+            }
     }
 }

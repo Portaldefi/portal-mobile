@@ -12,7 +12,6 @@ import Factory
 
 struct SelectAssetView: View {
     @Binding var item: QRCodeItem?
-//    @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel: SendViewViewModel = Container.sendViewModel()
     @State private var notEnoughFunds = false
     @State private var notEnoughFundsMessage = String()
@@ -68,7 +67,9 @@ struct SelectAssetView: View {
 
 struct SendFromView_Previews: PreviewProvider {
     static var previews: some View {
+        let _ = Container.sendViewModel.register { SendViewViewModel.mocked }
         SelectAssetView(qrItem: .constant(nil))
-            .environmentObject(AccountViewModel.mocked)
+            .padding()
+            .previewLayout(.sizeThatFits)
     }
 }

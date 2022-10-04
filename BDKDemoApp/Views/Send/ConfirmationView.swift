@@ -59,6 +59,7 @@ struct ConfirmationView: View {
 
 struct ConfirmationView_Previews: PreviewProvider {
     static var previews: some View {
+        let _ = Container.sendViewModel.register { SendViewViewModel.mocked }
         ConfirmationView()
     }
 }

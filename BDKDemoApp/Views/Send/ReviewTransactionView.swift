@@ -16,17 +16,6 @@ struct ReviewTransactionView: View {
     @ObservedObject private var viewModel: SendViewViewModel = Container.sendViewModel()
     
     var body: some View {
-        NavigationLink(
-            destination:
-                TransactionDetailsView(
-                    coin: .bitcoin(),
-                    tx: viewModel.unconfirmedTx != nil ? viewModel.unconfirmedTx! : BitcoinDevKit.Transaction.mockedConfirmed
-                ),
-            isActive: $viewModel.txSent
-        ) {
-            EmptyView()
-        }
-        
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 16) {
                 Text("Recipient")
@@ -111,6 +100,17 @@ struct ReviewTransactionView: View {
             Divider()
             
             Spacer()
+            
+            NavigationLink(
+                destination:
+                    TransactionDetailsView(
+                        coin: .bitcoin(),
+                        tx: viewModel.unconfirmedTx != nil ? viewModel.unconfirmedTx! : BitcoinDevKit.Transaction.mockedConfirmed
+                    ),
+                isActive: $viewModel.txSent
+            ) {
+                EmptyView()
+            }
         }
         .padding(.horizontal, 16)
         .navigationBarHidden(true)
@@ -119,6 +119,9 @@ struct ReviewTransactionView: View {
 
 struct ReviewTransactionView_Previews: PreviewProvider {
     static var previews: some View {
+        let _ = Container.sendViewModel.register { SendViewViewModel.mocked }
         ReviewTransactionView()
+            .padding()
+            .previewLayout(.sizeThatFits)
     }
 }
