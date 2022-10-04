@@ -12,34 +12,71 @@ import Combine
 import LocalAuthentication.LAError
 import SwiftUI
 import PortalUI
+import BitcoinDevKit
 
 class SendViewViewModel: ObservableObject {
-    enum SendStep {
-        case recipient, amount, review, signing, sent
+    
+    struct RecomendedFees: Codable {
+        let fastestFee: Int
+        let halfHourFee: Int
+        let hourFee: Int
+        
+        func fee(_ state: TxFees) -> Int {
+            switch state {
+            case .normal:
+                return halfHourFee
+            case .fast:
+                return fastestFee
+            case .slow:
+                return hourFee
+            case .custom:
+                fatalError("custom fees not implemented")
+            }
+        }
     }
+    
+    enum SendStep {
+        case selectAsset, recipient, amount, review, signing, sent
+    }
+    
+    enum TxFees {
+        case fast, normal, slow, custom
+        
+        var description: String {
+            switch self {
+            case .fast:
+                return "Fast ~ 10 min."
+            case .normal:
+                return "Normal ~ 30 min."
+            case .slow:
+                return "Slow ~ 60 min."
+            case .custom:
+                return "Not implemented"
+            }
+        }
+    }
+    
     private let balanceAdapter: IBalanceAdapter
     private let sendAdapter: ISendAdapter
 
     var walletItems: [WalletItem] = []
     
     @Published var to = String()
-    @Published var qrScannerOpened = false
     @Published var txSent = false
     @Published var selectedItem: WalletItem?
     @Published var qrCodeItem: QRCodeItem?
-    @Published var goToReceive = false
-    @Published var goToSend = false
-    @Published var goToReview = false
     
     @Published var balanceString = String()
     @Published var valueString = String()
-    @Published var fee: String?
     @Published var useAllFundsEnabled = true
 
     @Published private(set) var recipientAddressIsValid = true
     @Published private(set) var sendError: Error?
-    @Published private(set) var step: SendStep = .recipient
-    @Published var feesPickerSelection = 1
+    @Published private(set) var step: SendStep = .selectAsset
+    @Published var recomendedFees: RecomendedFees?
+    @Published var fee: TxFees = .normal
+    @Published var publishedTxId: String?
+    @Published var unconfirmedTx: BitcoinDevKit.Transaction?
     
     @Published var exchanger = Exchanger(
         base: .bitcoin(),
@@ -52,7 +89,7 @@ class SendViewViewModel: ObservableObject {
     
     @ObservedObject private var account: AccountViewModel = Container.accountViewModel()
     @Injected(Container.marketData) private var marketData
-    @ObservedObject private var viewState = Container.viewState()
+    @ObservedObject var viewState = Container.viewState()
     @LazyInjected(Container.biometricAuthentification) private var biometrics
     
     var actionButtonEnabled: Bool {
@@ -65,6 +102,8 @@ class SendViewViewModel: ObservableObject {
             return true
         case .signing, .sent:
             return false
+        case .selectAsset:
+            return false
         }
     }
     
@@ -75,6 +114,8 @@ class SendViewViewModel: ObservableObject {
         case .review:
             return "Send"
         case .signing, .sent:
+            return String()
+        case .selectAsset:
             return String()
         }
     }
@@ -89,8 +130,13 @@ class SendViewViewModel: ObservableObject {
             return "Singing..."
         case .sent:
             return "Signed!"
+        case .selectAsset:
+            return "Send"
         }
     }
+    
+    private var url: URL? = URL(string: "https://bitcoinfees.earn.com/api/v1/fees/recommended")
+    private var urlSession: URLSession!
     
     init(balanceAdapter: IBalanceAdapter, sendAdapter: ISendAdapter) {
         self.balanceAdapter = balanceAdapter
@@ -102,7 +148,14 @@ class SendViewViewModel: ObservableObject {
         
         self.walletItems = account.items
         
-        $selectedItem.map{ $0 != nil }.assign(to: &$goToSend)
+        $selectedItem.sink { item in
+            if item != nil {
+                withAnimation {
+                    self.step = .recipient
+                }
+            }
+        }
+        .store(in: &subscriptions)
         
         $qrCodeItem.sink { [unowned self] item in
             guard let item = item else { return }
@@ -110,8 +163,12 @@ class SendViewViewModel: ObservableObject {
             case .bip21(let address, let amount, _):
                 self.selectedItem = walletItems.first
                 self.to = address
-                guard let amount = amount else { return }
+                guard let amount = amount else {
+                    step = .amount
+                    return
+                }
                 self.exchanger.cryptoAmount = amount
+                self.step = .review
             default:
                 break
             }
@@ -148,14 +205,9 @@ class SendViewViewModel: ObservableObject {
                     doubleValue > 0,
                     self.exchanger.amountIsValid
                 else {
-                    self.fee = nil
                     self.useAllFundsEnabled = true
-                    if self.viewState.showFeesPicker {
-                        self.viewState.showFeesPicker = false
-                    }
                     return
                 }
-                self.fee = "3"
                 self.useAllFundsEnabled = !(self.exchanger.cryptoAmount == self.balanceString)
             }
         }
@@ -172,10 +224,34 @@ class SendViewViewModel: ObservableObject {
             .delay(for: .seconds(1), scheduler: RunLoop.main)
             .eraseToAnyPublisher()
             .assign(to: &$txSent)
+        
+        updateRecomendedFees()
+    }
+    
+    private func updateRecomendedFees() {
+        let config = URLSessionConfiguration.default
+        config.waitsForConnectivity = true
+        
+        self.urlSession = URLSession(configuration: config)
+        
+        guard let url = self.url else { return }
+        
+        urlSession.dataTaskPublisher(for: url)
+            .tryMap { $0.data }
+            .decode(type: RecomendedFees.self, decoder: JSONDecoder())
+            .receive(on: RunLoop.main)
+            .sink { completion in
+                if case let .failure(error) = completion {
+                    print(error.localizedDescription)
+                }
+            } receiveValue: { [weak self] response in
+                self?.recomendedFees = response
+            }
+            .store(in: &subscriptions)
     }
     
     func send() {
-        sendAdapter.send(to: to, amount: exchanger.cryptoAmount, completion: { [weak self] error in
+        sendAdapter.send(to: to, amount: exchanger.cryptoAmount, completion: { [weak self] txId, error in
             guard let self = self else { return }
             
             DispatchQueue.main.async {
@@ -186,8 +262,18 @@ class SendViewViewModel: ObservableObject {
                     }
                     return
                 }
-                withAnimation {
-                    self.step = .sent
+                if let id = txId {
+                    self.publishedTxId = id
+                    
+                    self.unconfirmedTx = BitcoinDevKit.Transaction.unconfirmedSentTransaction(
+                        recipient: self.to,
+                        amount: self.exchanger.cryptoAmount,
+                        id: id
+                    )
+                    
+                    withAnimation {
+                        self.step = .sent
+                    }
                 }
             }
         })
@@ -251,10 +337,12 @@ class SendViewViewModel: ObservableObject {
     
     func goBack() -> Bool {
         var shouldCloseSendFlow = false
+        sendError = nil
         
         switch step {
         case .recipient:
-            shouldCloseSendFlow = true
+            selectedItem = nil
+            step = .selectAsset
         case .amount:
             step = .recipient
         case .review:
@@ -263,6 +351,8 @@ class SendViewViewModel: ObservableObject {
             step = .review
         case .sent:
             step = .recipient
+        case .selectAsset:
+            shouldCloseSendFlow = true
         }
         
         return shouldCloseSendFlow
@@ -303,14 +393,12 @@ class SendViewViewModel: ObservableObject {
                 }
                 
                 self.send()
-//
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
-//                    self.step = .sent
-//                })
             }
         case .signing:
             break
         case .sent:
+            break
+        case .selectAsset:
             break
         }
     }
@@ -323,7 +411,7 @@ class SendViewViewModel: ObservableObject {
     }
     
     func openScanner() {
-        qrScannerOpened = true
+        viewState.showQRCodeScannerFromRecipientView = true
     }
     
     func useAllFunds() {
