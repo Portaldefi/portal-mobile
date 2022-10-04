@@ -24,3 +24,9 @@ class SendAdapterMocked: ISendAdapter {
         
     }
 }
+
+class DepositAdapterMocked: IDepositAdapter {
+    var receiveAddress: String {
+        "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3"
+    }
+}
