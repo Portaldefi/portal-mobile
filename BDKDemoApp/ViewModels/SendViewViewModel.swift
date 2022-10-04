@@ -78,12 +78,7 @@ class SendViewViewModel: ObservableObject {
     @Published var publishedTxId: String?
     @Published var unconfirmedTx: BitcoinDevKit.Transaction?
     
-    @Published var exchanger = Exchanger(
-        base: .bitcoin(),
-        quote: .fiat(
-            FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)
-        )
-    )
+    @Published var exchanger: Exchanger!
     
     private var subscriptions = Set<AnyCancellable>()
     
@@ -141,6 +136,12 @@ class SendViewViewModel: ObservableObject {
     init(balanceAdapter: IBalanceAdapter, sendAdapter: ISendAdapter) {
         self.balanceAdapter = balanceAdapter
         self.sendAdapter = sendAdapter
+        
+        self.exchanger = Exchanger(
+            base: .bitcoin(),
+            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)),
+            balanceAdapter: balanceAdapter
+        )
         
         self.balanceString = balanceAdapter.balance.formatted()
         let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
@@ -422,7 +423,14 @@ class SendViewViewModel: ObservableObject {
 
 extension SendViewViewModel {
     static var mocked: SendViewViewModel {
-        SendViewViewModel(balanceAdapter: BalanceAdapterMocked(), sendAdapter: SendAdapterMocked())
+        let vm = SendViewViewModel(balanceAdapter: BalanceAdapterMocked(), sendAdapter: SendAdapterMocked())
+        vm.walletItems = [WalletItem.mockedBtc]
+        vm.unconfirmedTx = BitcoinDevKit.Transaction.unconfirmedSentTransaction(recipient: "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3", amount: "0.000123", id: "9dbc955b20b0ad5ff5dced70875c9148769ef78481a0c299131034f33c04e2f6")
+        vm.to = "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3"
+        vm.balanceString = "0.000124"
+        vm.valueString = "12.93"
+        vm.exchanger.cryptoAmount = "0.0000432"
+        return vm
     }
     
     static func config(coin: Coin) -> SendViewViewModel {
