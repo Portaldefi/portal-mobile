@@ -151,27 +151,34 @@ final class BitcoinAdapter {
     }
     
     private func update(txs: [BitcoinDevKit.Transaction]) {
-        transactionsSubject.send(txs)
+        DispatchQueue.main.async {
+            self.transactionsSubject.send(txs)
+        }
     }
 }
 
-extension BitcoinAdapter {
-    func send(to: String, amount: String, completion: @escaping (Error?) -> Void) {
+extension BitcoinAdapter: ISendAdapter {
+    func send(to: String, amount: String, completion: @escaping (String?, Error?) -> Void) {
         do {
             let walletBalance = try wallet.getBalance()
-            if let amountToSend = UInt64(amount), walletBalance > amountToSend {
-                let psbt = try TxBuilder().addRecipient(address: to, amount: amountToSend).enableRbf().finish(wallet: wallet)
+            let satAmountDouble = (Double(amount) ?? 0) * 100_000_000
+            let satAmountInt = UInt64(satAmountDouble)
+            if walletBalance >= satAmountInt {
+                let psbt = try TxBuilder().addRecipient(address: to, amount: satAmountInt).enableRbf().finish(wallet: wallet)
                 let finalized = try wallet.sign(psbt: psbt)
+                print("Tx id: \(psbt.txid())")
+
                 if finalized {
                     print("Tx id: \(psbt.txid())")
                     try blockchain.broadcast(psbt: psbt)
-                    completion(nil)
+                    sync()
+                    completion(psbt.txid(), nil)
                 }
             } else {
-                completion(SendFlowError.insufficientAmount)
+                completion(nil, SendFlowError.insufficientAmount)
             }
         } catch {
-            completion(error)
+            completion(nil, error)
         }
     }
 }
