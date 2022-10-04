@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Foundation
 
 class LabelsManagerViewModel: ObservableObject {
     let title = "Select labels"
@@ -21,21 +22,18 @@ class LabelsManagerViewModel: ObservableObject {
 
     @Published var newLabelTitle: String?
     @Published var editItem: TxLable?
-
+    
+    let storage: UserDefaults
+    let storageKey = "TxLabelsStorage"
     
     init(selectedLabels: [TxLable]) {
-        let tags = [
-            TxLable(label: "Taxes"),
-            TxLable(label: "Buisness"),
-            TxLable(label: "Friend"),
-            TxLable(label: "Do Not Spend"),
-            TxLable(label: "Savings"),
-            TxLable(label: "Food")
-        ]
-        self.labels = tags
+        self.storage = UserDefaults.standard
+        
+        let allLabels = storage.object(forKey: storageKey) as? [String] ?? []
+        self.labels = allLabels.map{ TxLable(label: $0) }
         self.selectedLabels = selectedLabels
         
-        self.initialStateHash = tags.hashValue
+        self.initialStateHash = allLabels.hashValue
         self.selectionStateHash = selectedLabels.hashValue
         
         Publishers
@@ -72,6 +70,7 @@ class LabelsManagerViewModel: ObservableObject {
         if let index = selectedLabels.firstIndex(where: { $0.label == item.label }) {
             selectedLabels.remove(at: index)
         }
+        storage.set(labels.map{ $0.label }, forKey: storageKey)
     }
     
     func isSelected(item: TxLable) -> Bool {
@@ -87,6 +86,7 @@ class LabelsManagerViewModel: ObservableObject {
         labels.append(label)
         
         self.newLabelTitle = nil
+        storage.set(labels.map{ $0.label }, forKey: storageKey)
     }
     
     func edit(item: TxLable) {
@@ -110,5 +110,6 @@ class LabelsManagerViewModel: ObservableObject {
         
         self.editItem = nil
         self.newLabelTitle = nil
+        storage.set(labels, forKey: storageKey)
     }
 }
