@@ -61,4 +61,8 @@ extension ReceiveViewModel {
         
         return ReceiveViewModel(depositAdapter: depositAdapter)
     }
+    
+    static var mocked: ReceiveViewModel {
+        ReceiveViewModel(depositAdapter: DepositAdapterMocked())
+    }
 }
