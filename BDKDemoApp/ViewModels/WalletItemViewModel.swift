@@ -14,8 +14,9 @@ class WalletItemViewModel: ObservableObject {
     let coin: Coin
     private let balanceAdapter: IBalanceAdapter
     private var subscriptions = Set<AnyCancellable>()
-    @Injected(Container.marketData) private var marketData
-    @ObservedObject private var viewState = Container.viewState()
+    private var marketData: IMarketDataRepository
+    
+    @ObservedObject private var viewState: ViewState
     
     @Published var balance: Decimal
     @Published var balanceString: String
@@ -33,20 +34,16 @@ class WalletItemViewModel: ObservableObject {
         }
     }
     
-    init(coin: Coin, balanceAdapter: IBalanceAdapter) {
+    init(coin: Coin, balanceAdapter: IBalanceAdapter, marketData: IMarketDataRepository, viewState: ViewState) {
         self.coin = coin
         self.balanceAdapter = balanceAdapter
+        self.marketData = marketData
+        self.viewState = viewState
         
         self.balance = balanceAdapter.balance
         self.balanceString = "\(balanceAdapter.balance)"
         
         subscribeForUpdates()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            self.balance = 0.0004543223
-            self.balanceString = "\(self.balance)"
-            self.viewState.onAssetBalancesUpdate.send()
-        }
     }
     
     private func subscribeForUpdates() {
@@ -62,13 +59,25 @@ class WalletItemViewModel: ObservableObject {
 extension WalletItemViewModel {
     static func config(coin: Coin) -> WalletItemViewModel {
         let adapterManager = Container.adapterManager()
-        guard let balanceAdapter = adapterManager.balanceAdapter(for: Wallet(coin: coin, account: Account.mocked)) else {
+        let marketData = Container.marketData()
+        let viewState = Container.viewState()
+        let walletManager = Container.walletManager()
+        
+        guard
+            let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
+            let balanceAdapter = adapterManager.balanceAdapter(for: wallet)
+        else {
             fatalError("Balance adapter for \(coin) is nil")
         }
-        return WalletItemViewModel(coin: coin, balanceAdapter: balanceAdapter)
+        return WalletItemViewModel(coin: coin, balanceAdapter: balanceAdapter, marketData: marketData, viewState: viewState)
     }
     
     static var mocked: WalletItemViewModel {
-        WalletItemViewModel(coin: .bitcoin(), balanceAdapter: BalanceAdapterMocked())
+        WalletItemViewModel(
+            coin: .bitcoin(),
+            balanceAdapter: BalanceAdapterMocked(),
+            marketData: MarketData.mocked,
+            viewState: ViewState()
+        )
     }
 }
