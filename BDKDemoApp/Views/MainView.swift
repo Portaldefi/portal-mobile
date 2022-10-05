@@ -101,6 +101,7 @@ struct Mainview: View {
             
             if !viewState.hideTabBar {
                 TabBar
+                    .transition(.move(edge: .bottom))
             }
         }
     }

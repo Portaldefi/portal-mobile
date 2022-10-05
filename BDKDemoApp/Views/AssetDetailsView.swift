@@ -13,7 +13,7 @@ import Factory
 struct AssetDetailsView: View {
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewState: ViewState = Container.viewState()
-    @StateObject private var viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
+    @ObservedObject private var viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
     @State private var showTxDetails = false
     @State private var selectedTx: BitcoinDevKit.Transaction?
     
@@ -25,7 +25,9 @@ struct AssetDetailsView: View {
                 HStack {
                     HStack(spacing: 14) {
                         PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
-                            viewState.hideTabBar = false
+                            withAnimation {
+                                viewState.hideTabBar = false
+                            }
                             presentationMode.wrappedValue.dismiss()
                         }
                         .frame(width: 20)

@@ -16,7 +16,7 @@ struct RootView: View {
             NoAccountView()
         case .account:
             Mainview()
-                .animation(nil)
+                .animation(nil, value: false)
         }
     }
 }

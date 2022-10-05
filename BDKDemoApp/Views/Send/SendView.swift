@@ -39,7 +39,7 @@ struct SendView: View {
                             .frame(width: 300, height: 62)
                             .font(.Main.fixed(.monoBold, size: 16))
                     }
-                    .animation(nil)
+                    .animation(nil, value: false)
                     
                     switch viewModel.step {
                     case .recipient:

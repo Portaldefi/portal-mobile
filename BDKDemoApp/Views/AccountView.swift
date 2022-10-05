@@ -45,8 +45,8 @@ struct AccountView: View {
                                     .padding(.trailing, 8)
                                     .contentShape(Rectangle())
                                     .onTapGesture {
-                                        selectedItem = item
                                         viewState.hideTabBar = true
+                                        selectedItem = item
                                         goToDetails = true
                                     }
                                 Asset.chevronRightIcon
