@@ -38,10 +38,13 @@ class ViewState: ObservableObject {
     }
     @Published var showFeesPicker: Bool = false
     
-    @Published var showQRCodeScannerFromRecipientView = false     
+    @Published var showQRCodeScannerFromRecipientView = false
     @Published var goToReceive = false
     
     @Published private(set) var selectedTab: Tab = .wallet
+    
+    var onAssetBalancesUpdate = PassthroughSubject<Void, Never>()
+    
     private var subscriptions = Set<AnyCancellable>()
     
     init() {}

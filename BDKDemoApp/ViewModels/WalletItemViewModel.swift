@@ -8,20 +8,17 @@
 import Foundation
 import Combine
 import Factory
+import SwiftUI
 
 class WalletItemViewModel: ObservableObject {
     let coin: Coin
     private let balanceAdapter: IBalanceAdapter
     private var subscriptions = Set<AnyCancellable>()
     @Injected(Container.marketData) private var marketData
+    @ObservedObject private var viewState = Container.viewState()
     
-    var balance: Decimal {
-        balanceAdapter.balance
-    }
-    
-    var balanceString: String {
-        "\(balance)"
-    }
+    @Published var balance: Decimal
+    @Published var balanceString: String
     
     var valueString: String {
         switch coin.type {
@@ -39,14 +36,26 @@ class WalletItemViewModel: ObservableObject {
     init(coin: Coin, balanceAdapter: IBalanceAdapter) {
         self.coin = coin
         self.balanceAdapter = balanceAdapter
+        
+        self.balance = balanceAdapter.balance
+        self.balanceString = "\(balanceAdapter.balance)"
+        
         subscribeForUpdates()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            self.balance = 0.0004543223
+            self.balanceString = "\(self.balance)"
+            self.viewState.onAssetBalancesUpdate.send()
+        }
     }
     
     private func subscribeForUpdates() {
-        balanceAdapter.balanceUpdated.sink { [weak self] in
-            self?.objectWillChange.send()
-        }
-        .store(in: &subscriptions)
+        balanceAdapter.balanceUpdated
+            .receive(on: RunLoop.main)
+            .sink { [weak self] in
+                self?.viewState.onAssetBalancesUpdate.send()
+            }
+            .store(in: &subscriptions)
     }
 }
 

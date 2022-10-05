@@ -9,7 +9,8 @@ import SwiftUI
 import PortalUI
 
 struct WalletItemView: View {
-    let item: WalletItem
+    @ObservedObject var viewModel: WalletItemViewModel
+    
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 12) {
@@ -17,10 +18,10 @@ struct WalletItemView: View {
                     HStack(spacing: 6) {
                         CoinImageView(
                             size: 24,
-                            url: item.viewModel.coin.icon,
+                            url: viewModel.coin.icon,
                             placeholderForegroundColor: Color.gray
                         )
-                        Text(item.viewModel.coin.name)
+                        Text(viewModel.coin.name)
                             .font(.Main.fixed(.monoBold, size: 16))
                             .foregroundColor(Palette.grayScaleCA)
                             .frame(height: 16)
@@ -30,10 +31,10 @@ struct WalletItemView: View {
                             .font(.Main.fixed(.monoMedium, size: 12))
                             .foregroundColor(Palette.grayScale6A)
                             .frame(height: 17)
-                        item.viewModel.coin.chainIcon.resizable()
+                        viewModel.coin.chainIcon.resizable()
                             .frame(width: 12, height: 12)
                             .foregroundColor(Palette.grayScale8A)
-                        Text(item.viewModel.coin.description)
+                        Text(viewModel.coin.description)
                             .font(.Main.fixed(.monoMedium, size: 12))
                             .foregroundColor(Palette.grayScale6A)
                             .frame(height: 17)
@@ -43,16 +44,16 @@ struct WalletItemView: View {
             Spacer()
             HStack(spacing: 6) {
                 VStack(alignment: .trailing, spacing: 0) {
-                    Text(item.viewModel.balanceString)
+                    Text(viewModel.balanceString)
                         .font(.Main.fixed(.monoBold, size: 20))
                         .foregroundColor(Palette.grayScaleEA)
-                    Text(item.viewModel.valueString)
+                    Text(viewModel.valueString)
                         .font(.Main.fixed(.monoMedium, size: 16))
                         .foregroundColor(Palette.grayScale6A)
                 }
                 VStack(alignment: .leading, spacing: 0) {
                     HStack {
-                        Text(item.viewModel.coin.unit.lowercased())
+                        Text(viewModel.coin.unit.lowercased())
                             .font(.Main.fixed(.monoMedium, size: 12))
                             .foregroundColor(Palette.grayScaleAA)
                         Spacer()
@@ -71,7 +72,7 @@ struct WalletItemView: View {
 
 struct WalletItemView_Previews: PreviewProvider {
     static var previews: some View {
-        WalletItemView(item: WalletItem.mockedBtc)
+        WalletItemView(viewModel: WalletItem.mockedBtc.viewModel)
             .previewLayout(PreviewLayout.sizeThatFits)
             .padding()
     }

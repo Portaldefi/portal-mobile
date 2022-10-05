@@ -32,7 +32,7 @@ struct SelectAssetView: View {
                         Divider()
                         ForEach(viewModel.walletItems) { item in
                             ZStack(alignment: .trailing) {
-                                WalletItemView(item: item)
+                                WalletItemView(viewModel: item.viewModel)
                                     .padding(.leading)
                                     .padding(.trailing, 6)
                                     .contentShape(Rectangle())

@@ -40,7 +40,7 @@ struct AccountView: View {
                     VStack(spacing: 0) {
                         ForEach(viewModel.items) { item in
                             ZStack(alignment: .trailing) {
-                                WalletItemView(item: item)
+                                WalletItemView(viewModel: item.viewModel)
                                     .padding(.leading, 16)
                                     .padding(.trailing, 8)
                                     .contentShape(Rectangle())

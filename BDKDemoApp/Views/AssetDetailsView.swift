@@ -47,7 +47,7 @@ struct AssetDetailsView: View {
                     .overlay(Palette.grayScale2A)
                 
                 if let walletItem = item {
-                    WalletItemView(item: walletItem)
+                    WalletItemView(viewModel: walletItem.viewModel)
                         .padding(.leading, 16)
                         .padding(.vertical, 8)
                 }

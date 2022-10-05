@@ -51,12 +51,14 @@ extension SharedContainer {
         let walletManager = Container.walletManager()
         let adapterManager = Container.adapterManager()
         let marketData = Container.marketData()
+        let viewState = Container.viewState()
         
         return AccountViewModel(
             accountManager: accountManager,
             walletManager: walletManager,
             adapterManager: adapterManager,
-            marketData: marketData
+            marketData: marketData,
+            viewState: viewState
         )
     }
     

@@ -24,17 +24,21 @@ class AccountViewModel: ObservableObject {
     private let marketData: IMarketDataRepository
     
     private var subscriptions = Set<AnyCancellable>()
+    
+    @ObservedObject private var viewState: ViewState
             
     init(
         accountManager: IAccountManager,
         walletManager: IWalletManager,
         adapterManager: IAdapterManager,
-        marketData: IMarketDataRepository
+        marketData: IMarketDataRepository,
+        viewState: ViewState
     ) {
         self.accountManager = accountManager
         self.walletManager = walletManager
         self.adapterManager = adapterManager
         self.marketData = marketData
+        self.viewState = viewState
         
         subscribeForUpdates()
     }
@@ -47,8 +51,6 @@ class AccountViewModel: ObservableObject {
                 let configuredItems = self.configuredItems()
                 DispatchQueue.main.async {
                     self.items = configuredItems
-                    self.updateBalance()
-                    self.updateValue()
                 }
             }
             .store(in: &subscriptions)
@@ -70,6 +72,22 @@ class AccountViewModel: ObservableObject {
             self?.accountName = account.name
         }
         .store(in: &subscriptions)
+        
+        $items
+            .delay(for: .seconds(0.1), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.updateBalance()
+                self?.updateValue()
+            }
+            .store(in: &subscriptions)
+        
+        viewState.onAssetBalancesUpdate
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.updateBalance()
+                self?.updateValue()
+            }
+            .store(in: &subscriptions)
     }
     
     private func updateBalance() {
@@ -97,7 +115,8 @@ extension AccountViewModel {
             accountManager: AccountManager.mocked,
             walletManager: WalletManager.mocked,
             adapterManager: AdapterManager.mocked,
-            marketData: MarketData.mocked
+            marketData: MarketData.mocked,
+            viewState: ViewState()
         )
         viewModel.accountName = "Mocked"
         viewModel.totalBalance = "0.00055"
