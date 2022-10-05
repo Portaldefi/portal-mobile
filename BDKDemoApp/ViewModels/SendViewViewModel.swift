@@ -73,6 +73,7 @@ class SendViewViewModel: ObservableObject {
     @Published private(set) var recipientAddressIsValid = true
     @Published private(set) var sendError: Error?
     @Published private(set) var step: SendStep = .selectAsset
+    
     @Published var recomendedFees: RecomendedFees?
     @Published var fee: TxFees = .normal
     @Published var publishedTxId: String?
@@ -251,33 +252,62 @@ class SendViewViewModel: ObservableObject {
             .store(in: &subscriptions)
     }
     
-    func send() {
-        sendAdapter.send(to: to, amount: exchanger.cryptoAmount, completion: { [weak self] txId, error in
-            guard let self = self else { return }
-            
-            DispatchQueue.main.async {
-                guard error == nil else {
-                    withAnimation {
-                        self.step = .review
-                        self.sendError = SendFlowError.error(error.debugDescription)
+    func send(max: Bool) {
+        if max {
+            sendAdapter.sendMax(to: to, fee: recomendedFees?.fee(fee)) { [weak self] txId, error in
+                guard let self = self else { return }
+                
+                DispatchQueue.main.async {
+                    guard error == nil else {
+                        withAnimation {
+                            self.step = .review
+                            self.sendError = SendFlowError.error(error.debugDescription)
+                        }
+                        return
                     }
-                    return
-                }
-                if let id = txId {
-                    self.publishedTxId = id
-                    
-                    self.unconfirmedTx = BitcoinDevKit.Transaction.unconfirmedSentTransaction(
-                        recipient: self.to,
-                        amount: self.exchanger.cryptoAmount,
-                        id: id
-                    )
-                    
-                    withAnimation {
-                        self.step = .sent
+                    if let id = txId {
+                        self.publishedTxId = id
+                        
+                        self.unconfirmedTx = BitcoinDevKit.Transaction.unconfirmedSentTransaction(
+                            recipient: self.to,
+                            amount: self.exchanger.cryptoAmount,
+                            id: id
+                        )
+                        
+                        withAnimation {
+                            self.step = .sent
+                        }
                     }
                 }
             }
-        })
+        } else {
+            sendAdapter.send(to: to, amount: exchanger.cryptoAmount, fee: recomendedFees?.fee(fee), completion: { [weak self] txId, error in
+                guard let self = self else { return }
+                
+                DispatchQueue.main.async {
+                    guard error == nil else {
+                        withAnimation {
+                            self.step = .review
+                            self.sendError = SendFlowError.error(error.debugDescription)
+                        }
+                        return
+                    }
+                    if let id = txId {
+                        self.publishedTxId = id
+                        
+                        self.unconfirmedTx = BitcoinDevKit.Transaction.unconfirmedSentTransaction(
+                            recipient: self.to,
+                            amount: self.exchanger.cryptoAmount,
+                            id: id
+                        )
+                        
+                        withAnimation {
+                            self.step = .sent
+                        }
+                    }
+                }
+            })
+        }
     }
     
     func authenticateUser(_ completion: @escaping (Bool) -> ()) {
@@ -377,7 +407,9 @@ class SendViewViewModel: ObservableObject {
         case .amount:
             step = .review
         case .review:
-            biometrics.authenticateUser { success, error in
+            biometrics.authenticateUser { [weak self] success, error in
+                guard let self = self else { return }
+                
                 if let error = error {
                     DispatchQueue.main.sync {
                         withAnimation {
@@ -385,6 +417,7 @@ class SendViewViewModel: ObservableObject {
                         }
                     }
                 }
+                
                 guard success else { return }
                     
                 DispatchQueue.main.sync {
@@ -393,7 +426,7 @@ class SendViewViewModel: ObservableObject {
                     }
                 }
                 
-                self.send()
+                self.send(max: !self.useAllFundsEnabled)
             }
         case .signing:
             break

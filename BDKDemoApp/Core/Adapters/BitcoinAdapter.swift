@@ -158,21 +158,69 @@ final class BitcoinAdapter {
 }
 
 extension BitcoinAdapter: ISendAdapter {
-    func send(to: String, amount: String, completion: @escaping (String?, Error?) -> Void) {
+    func sendMax(to: String, fee: Int?, completion: @escaping (String?, Error?) -> Void) {
+        do {
+            let psbt = try TxBuilder()
+                .drainWallet()
+                .drainTo(address: to)
+                .enableRbf()
+                .finish(wallet: wallet)
+            
+            let finalized = try wallet.sign(psbt: psbt)
+            print("Tx id: \(psbt.txid())")
+
+            if finalized {
+                try blockchain.broadcast(psbt: psbt)
+                sync()
+                completion(psbt.txid(), nil)
+            } else {
+                completion(nil, SendFlowError.error("Tx not finalized"))
+            }
+        } catch {
+            completion(nil, error)
+        }
+    }
+    
+    func send(to: String, amount: String, fee: Int?, completion: @escaping (String?, Error?) -> Void) {
         do {
             let walletBalance = try wallet.getBalance()
             let satAmountDouble = (Double(amount) ?? 0) * 100_000_000
             let satAmountInt = UInt64(satAmountDouble)
+            
             if walletBalance >= satAmountInt {
-                let psbt = try TxBuilder().addRecipient(address: to, amount: satAmountInt).enableRbf().finish(wallet: wallet)
-                let finalized = try wallet.sign(psbt: psbt)
-                print("Tx id: \(psbt.txid())")
-
-                if finalized {
+                if let fee = fee {
+                    let psbt = try TxBuilder()
+                        .addRecipient(address: to, amount: satAmountInt)
+                        .feeRate(satPerVbyte: Float(fee))
+                        .enableRbf()
+                        .finish(wallet: wallet)
+                    
+                    let finalized = try wallet.sign(psbt: psbt)
                     print("Tx id: \(psbt.txid())")
-                    try blockchain.broadcast(psbt: psbt)
-                    sync()
-                    completion(psbt.txid(), nil)
+
+                    if finalized {
+                        try blockchain.broadcast(psbt: psbt)
+                        sync()
+                        completion(psbt.txid(), nil)
+                    } else {
+                        completion(nil, SendFlowError.error("Tx not finalized"))
+                    }
+                } else {
+                    let psbt = try TxBuilder()
+                        .addRecipient(address: to, amount: satAmountInt)
+                        .enableRbf()
+                        .finish(wallet: wallet)
+                    
+                    let finalized = try wallet.sign(psbt: psbt)
+                    print("Tx id: \(psbt.txid())")
+
+                    if finalized {
+                        try blockchain.broadcast(psbt: psbt)
+                        sync()
+                        completion(psbt.txid(), nil)
+                    } else {
+                        completion(nil, SendFlowError.error("Tx not finalized"))
+                    }
                 }
             } else {
                 completion(nil, SendFlowError.insufficientAmount)
