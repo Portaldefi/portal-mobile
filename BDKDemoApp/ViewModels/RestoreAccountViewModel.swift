@@ -31,9 +31,9 @@ class RestoreAccountViewModel: ObservableObject {
     func restoreAccount() {
         let words = seed.components(separatedBy: " ").filter{ !$0.isEmpty && $0.count >= 3 }
         do {
-            let restoredKey = try restoreExtendedKey(network: Network.testnet, mnemonic: words.joined(separator:" "), password: nil)
+            let restoredKey = try DescriptorSecretKey(network: .testnet, mnemonic: words.joined(separator:" "), password: nil)
             let account = Account(id: UUID().uuidString, index: 0, name: accountName, key: restoredKey)
-            manager.save(account: account)
+            manager.save(account: account, mnemonic: words.joined(separator:" "), salt: nil)
         } catch {
             print("restore error: \(error)")
         }

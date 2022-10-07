@@ -30,15 +30,15 @@ class AccountStorage {
             return nil
         }
         
-        let key = try! restoreExtendedKey(network: Network.testnet, mnemonic: words.joined(separator: " "), password: salt)
+        let key = try! DescriptorSecretKey(network: .testnet, mnemonic: words.joined(separator: " "), password: salt)
         
         return Account(record: record, key: key)
     }
 
-    private func createRecord(account: Account) throws -> AccountRecord {
+    private func createRecord(account: Account, mnemonic: String, salt: String?) throws -> AccountRecord {
         let typeName: TypeName = .mnemonic
-        _ = try store(stringArray: account.extendedKey.mnemonic.components(separatedBy: " "), id: account.id, typeName: typeName, keyName: .words)
-        _ = try store(String(), id: account.id, typeName: typeName, keyName: .salt)
+        _ = try store(stringArray: mnemonic.components(separatedBy: " "), id: account.id, typeName: typeName, keyName: .words)
+        _ = try store(salt != nil ? salt! : String(), id: account.id, typeName: typeName, keyName: .salt)
         return AccountRecord(id: account.id, index: account.index, name: account.name, context: accountStorage.context)
     }
 
@@ -98,8 +98,8 @@ extension AccountStorage: IAccountStorage {
         accountStorage.accountRecords.compactMap { createAccount(record: $0) }
     }
 
-    func save(account: Account) {
-        if let record = try? createRecord(account: account) {
+    func save(account: Account, mnemonic: String, salt: String?) {
+        if let record = try? createRecord(account: account, mnemonic: mnemonic, salt: salt) {
             accountStorage.save(accountRecord: record)
             localStorage.setCurrentAccountID(record.id)
         }

@@ -26,7 +26,7 @@ struct ConfirmationsCounterViewStyle: ProgressViewStyle {
 }
 
 struct ConfirmationCounterView: View {
-    let confirmations: Int
+    let confirmations: Int32
     
     private let maxConfirmations: Int = 6
     
@@ -52,7 +52,7 @@ struct ConfirmationCounterView: View {
         }
     }
     
-    init(confirmations: Int) {
+    init(confirmations: Int32) {
         self.confirmations = confirmations
     }
     

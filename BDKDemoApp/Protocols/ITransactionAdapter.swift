@@ -10,5 +10,5 @@ import Combine
 import BitcoinDevKit
 
 protocol ITransactionsAdapter {
-    var transactionRecords: AnyPublisher<[BitcoinDevKit.Transaction], Never> { get }
+    var transactionRecords: AnyPublisher<[BitcoinDevKit.TransactionDetails], Never> { get }
 }

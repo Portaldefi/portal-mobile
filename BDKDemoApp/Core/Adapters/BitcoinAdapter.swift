@@ -29,7 +29,7 @@ final class BitcoinAdapter {
         
     private let stateUpdatedSubject = PassthroughSubject<Void, Never>()
     private let balanceUpdatedSubject = PassthroughSubject<Void, Never>()
-    private let transactionsSubject = CurrentValueSubject<[BitcoinDevKit.Transaction], Never>([])
+    private let transactionsSubject = CurrentValueSubject<[BitcoinDevKit.TransactionDetails], Never>([])
     
     private let wallet: BitcoinDevKit.Wallet
     private let blockchain: BitcoinDevKit.Blockchain
@@ -42,11 +42,10 @@ final class BitcoinAdapter {
     
     init(wallet: Wallet) throws {
         let account = wallet.account
-        let fingerprint = account.extendedKey.fingerprint
-        let xprv = account.extendedKey.xprv
-                
-        let descriptor = "wpkh([\(fingerprint)/84'/0'/0']\(xprv)/*)"
-        let changeDescriptor = "wpkh([\(fingerprint)/84'/0'/1']\(xprv)/*)"
+        let bip32RootKey = wallet.account.rootKey
+        let deriviationPath = try DerivationPath(path: "m/84h/0h/\(account.index)h/0")
+        let fullDescriptor = try bip32RootKey.derive(path: deriviationPath)
+        let descriptor = "wpkh(\(fullDescriptor.asString()))"
         
         if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
             let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite" + "\(account.id)")
@@ -58,7 +57,7 @@ final class BitcoinAdapter {
             
             self.wallet = try BitcoinDevKit.Wallet(
                 descriptor: descriptor,
-                changeDescriptor: changeDescriptor,
+                changeDescriptor: nil,
                 network: Network.testnet,
                 databaseConfig: dbConfig
             )
@@ -119,30 +118,12 @@ final class BitcoinAdapter {
     }
     
     private func fetchBalance() throws {
-        balanceSats = try wallet.getBalance()
+        balanceSats = try wallet.getBalance().total
         balanceUpdatedSubject.send()
     }
     
     private func fetchTransactions() throws {
-        update(txs:
-            try wallet.getTransactions().sorted(by: {
-                switch $0 {
-                case .confirmed(_, let confirmation_a):
-                    switch $1 {
-                    case .confirmed(_, let confirmation_b):
-                        return confirmation_a.timestamp > confirmation_b.timestamp
-                    default:
-                        return false
-                    }
-                default:
-                    switch $1 {
-                    case .unconfirmed(_):
-                        return true
-                    default:
-                        return false
-                    }
-                } })
-        )
+        update(txs: try wallet.listTransactions())
     }
     
     private func update(state: AdapterState) {
@@ -150,7 +131,7 @@ final class BitcoinAdapter {
         stateUpdatedSubject.send()
     }
     
-    private func update(txs: [BitcoinDevKit.Transaction]) {
+    private func update(txs: [BitcoinDevKit.TransactionDetails]) {
         DispatchQueue.main.async {
             self.transactionsSubject.send(txs)
         }
@@ -183,7 +164,7 @@ extension BitcoinAdapter: ISendAdapter {
     
     func send(to: String, amount: String, fee: Int?, completion: @escaping (String?, Error?) -> Void) {
         do {
-            let walletBalance = try wallet.getBalance()
+            let walletBalance = try wallet.getBalance().total
             let satAmountDouble = (Double(amount) ?? 0) * 100_000_000
             let satAmountInt = UInt64(satAmountDouble)
             
@@ -244,8 +225,11 @@ extension BitcoinAdapter: IAdapter {
         sync()
     }
     
-    var debugInfo: String {
-        "Btc adapter debug"
+    var blockchainHeight: Int32 {
+        if let height = try? blockchain.getHeight() {
+            return Int32(height)
+        }
+        return 0
     }
 }
 
@@ -282,7 +266,7 @@ extension BitcoinAdapter: IDepositAdapter {
 }
 
 extension BitcoinAdapter: ITransactionsAdapter {
-    var transactionRecords: AnyPublisher<[Transaction], Never> {
+    var transactionRecords: AnyPublisher<[TransactionDetails], Never> {
         transactionsSubject.eraseToAnyPublisher()
     }
 }

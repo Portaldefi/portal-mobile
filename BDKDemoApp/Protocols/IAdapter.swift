@@ -11,5 +11,5 @@ protocol IAdapter: AnyObject {
     func start()
     func stop()
     func refresh()
-    var debugInfo: String { get }
+    var blockchainHeight: Int32 { get }
 }

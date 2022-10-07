@@ -22,8 +22,8 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     let coin: Coin
-    let details: TransactionDetails
-    let blockTime: BlockTime?
+    let transaction: TransactionDetails
+    let blockChainHeight: Int32
     
     @Published var editingNotes = false
     @Published var editingLabels = false
@@ -33,15 +33,15 @@ class TransactionDetailsViewModel: ObservableObject {
     @LazyInjected(Container.viewState) var viewState: ViewState
     
     var title: String {
-        details.sent > 0 ? "Sent" : "Recieved"
+        transaction.sent > 0 ? "Sent" : "Recieved"
     }
     
     var amountString: String {
         switch txSide {
         case .sent:
-            return (Double(details.sent)/100_000_000).toString(decimal: 8)
+            return (Double(transaction.sent)/100_000_000).toString(decimal: 8)
         case .recieved:
-            return (Double(details.received)/100_000_000).toString(decimal: 8)
+            return (Double(transaction.received)/100_000_000).toString(decimal: 8)
         }
     }
     
@@ -50,11 +50,11 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     var recipientString: String? {
-        storage.object(forKey: details.txid + "recipient") as? String
+        storage.object(forKey: transaction.txid + "recipient") as? String
     }
     
     var dateString: String {
-        guard let blockTime = blockTime else {
+        guard let blockTime = transaction.confirmationTime else {
             return Date().extendedDate()
         }
         
@@ -62,15 +62,15 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     var feeString: String {
-        guard let fee = details.fee else { return "0.000000141" }
+        guard let fee = transaction.fee else { return "0.000000141" }
         return String(format: "%.8f", Double(fee)/100_000_000)
     }
         
     var txIdString: String {
-        "\(details.txid.prefix(4))...\(details.txid.suffix(4))"
+        "\(transaction.txid.prefix(4))...\(transaction.txid.suffix(4))"
     }
     
-    @Published var confirmations: Int = 0
+    @Published var confirmations: Int32 = 0
     
     @Published var notes = String()
     @Published var labels: [TxLable] = []
@@ -78,98 +78,65 @@ class TransactionDetailsViewModel: ObservableObject {
     var explorerUrl: URL? {
         switch coin.type {
         case .bitcoin:
-            return URL(string: "https://blockstream.info/testnet/tx/\(details.txid)")
+            return URL(string: "https://blockstream.info/testnet/tx/\(transaction.txid)")
         case .ethereum:
-            return URL(string: "https://ropsten.etherscan.io/tx/\(details.txid)")
+            return URL(string: "https://ropsten.etherscan.io/tx/\(transaction.txid)")
         default:
             return nil
         }
     }
     
     private var txSide: TxSide {
-        details.sent > 0 ? .sent : .recieved
+        transaction.sent > 0 ? .sent : .recieved
     }
-    
-    private var currentBlockHeight = 0
-    
-    private var url: URL? = URL(string: "https://api.blockcypher.com/v1/btc/test3")
-    private var urlSession: URLSession!
+        
     private var subscriptions = Set<AnyCancellable>()
     
-    init(coin: Coin, tx: BitcoinDevKit.Transaction) {
+    init(coin: Coin, tx: BitcoinDevKit.TransactionDetails, blockChainHeight: Int32) {
         self.coin = coin
         self.storage = UserDefaults.standard
-                
-        switch tx {
-        case .confirmed(let details, let confirmations):
-            self.details = details
-            self.blockTime = confirmations
-        case .unconfirmed(let details):
-            self.details = details
-            self.blockTime = nil
-        }
+        self.transaction = tx
+        self.blockChainHeight = blockChainHeight
         
-        if let notes = storage.string(forKey: details.txid + "notes") {
+        if let notes = storage.string(forKey: transaction.txid + "notes") {
             self.notes = notes
         }
         
-        if let tags = storage.object(forKey: details.txid + "labels") as? [String] {
+        if let tags = storage.object(forKey: transaction.txid + "labels") as? [String] {
             self.labels = tags.map{ TxLable(label: $0 )}
         }
-
-        updateChainTip()
         
-        if let confirmatinos = storage.object(forKey: details.txid + "confirmations") as? Int {
-            self.confirmations = confirmatinos
+        if let blockTime = tx.confirmationTime {
+            confirmations = blockChainHeight - Int32(blockTime.height) + 1
+        } else {
+            confirmations = 0
         }
         
-        $labels.sink { labels in
-            self.storage.set(labels.map{ $0.label }, forKey: self.details.txid + "labels")
-        }
-        .store(in: &subscriptions)
-        
-        $notes.sink { notes in
-            self.storage.set(notes, forKey: self.details.txid + "notes")
+        $labels.sink { [unowned self] labels in
+            self.storage.set(labels.map{ $0.label }, forKey: self.transaction.txid + "labels")
         }
         .store(in: &subscriptions)
-    }
-    
-    private func updateChainTip() {
-        let config = URLSessionConfiguration.default
-        config.waitsForConnectivity = true
         
-        self.urlSession = URLSession(configuration: config)
-        
-        guard let url = self.url else { return }
-        
-        urlSession.dataTaskPublisher(for: url)
-            .tryMap { $0.data }
-            .decode(type: TestNetDataResponse.self, decoder: JSONDecoder())
-            .receive(on: RunLoop.main)
-            .sink { completion in
-                if case let .failure(error) = completion {
-                    print(error.localizedDescription)
-                }
-            } receiveValue: { [weak self] response in
-                self?.currentBlockHeight = response.height
-                self?.updateConfirmations()
-                self?.objectWillChange.send()
-            }
-            .store(in: &subscriptions)
-    }
-    
-    private func updateConfirmations() {
-        guard let blockTime = blockTime, currentBlockHeight > 0 else {
-            return
+        $notes.sink { [unowned self] notes in
+            self.storage.set(notes, forKey: self.transaction.txid + "notes")
         }
-        self.confirmations = currentBlockHeight - Int(blockTime.height) + 1
-        storage.set(confirmations, forKey: details.txid + "confirmations")
+        .store(in: &subscriptions)
     }
 }
 
 extension TransactionDetailsViewModel {
-    static func config(coin: Coin, tx: BitcoinDevKit.Transaction) -> TransactionDetailsViewModel {
-        TransactionDetailsViewModel(coin: coin, tx: tx)
+    static func config(coin: Coin, tx: BitcoinDevKit.TransactionDetails) -> TransactionDetailsViewModel {
+        let adapterManager: IAdapterManager = Container.adapterManager()
+        let walletManager: IWalletManager = Container.walletManager()
+                
+        guard
+            let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
+            let adapter = adapterManager.adapter(for: wallet)
+        else {
+            fatalError("coudn't fetch dependencies")
+        }
+        
+        return TransactionDetailsViewModel(coin: coin, tx: tx, blockChainHeight: adapter.blockchainHeight)
     }
 }
 

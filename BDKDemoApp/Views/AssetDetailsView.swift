@@ -15,7 +15,7 @@ struct AssetDetailsView: View {
     @ObservedObject private var viewState: ViewState = Container.viewState()
     @ObservedObject private var viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
     @State private var showTxDetails = false
-    @State private var selectedTx: BitcoinDevKit.Transaction?
+    @State private var selectedTx: BitcoinDevKit.TransactionDetails?
     
     let item: WalletItem?
     

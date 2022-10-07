@@ -11,7 +11,12 @@ class AdapterFactory: IAdapterFactory {
     func adapter(wallet: Wallet) -> IAdapter? {
         switch wallet.coin.type {
         case .bitcoin:
-            return try? BitcoinAdapter(wallet: wallet)
+            do {
+                return try BitcoinAdapter(wallet: wallet)
+            } catch {
+                print(error.localizedDescription)
+                fatalError(error.localizedDescription)
+            }
         default:
             return nil
         }

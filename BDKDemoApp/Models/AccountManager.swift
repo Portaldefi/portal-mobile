@@ -46,8 +46,8 @@ extension AccountManager: IAccountManager {
         onActiveAccountUpdate.send(accountStorage.activeAccount)
     }
     
-    func save(account: Account) {
-        accountStorage.save(account: account)
+    func save(account: Account, mnemonic: String, salt: String?) {
+        accountStorage.save(account: account, mnemonic: mnemonic, salt: salt)
         onActiveAccountUpdate.send(account)
     }
     
@@ -98,7 +98,7 @@ extension AccountManager {
             
         }
         
-        func save(account: Account) {
+        func save(account: Account, mnemonic: String, salt: String?) {
             
         }
         

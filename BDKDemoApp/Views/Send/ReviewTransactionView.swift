@@ -105,7 +105,7 @@ struct ReviewTransactionView: View {
                 destination:
                     TransactionDetailsView(
                         coin: .bitcoin(),
-                        tx: viewModel.unconfirmedTx != nil ? viewModel.unconfirmedTx! : BitcoinDevKit.Transaction.mockedConfirmed
+                        tx: viewModel.unconfirmedTx != nil ? viewModel.unconfirmedTx! : BitcoinDevKit.TransactionDetails.mockedConfirmed
                     ),
                 isActive: $viewModel.txSent
             ) {

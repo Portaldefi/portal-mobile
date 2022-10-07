@@ -13,7 +13,7 @@ struct TransactionDetailsView: View {
     @StateObject private var viewModel: TransactionDetailsViewModel
     @Environment(\.presentationMode) private var presentationMode
     
-    init(coin: Coin, tx: BitcoinDevKit.Transaction) {
+    init(coin: Coin, tx: BitcoinDevKit.TransactionDetails) {
         _viewModel = StateObject(wrappedValue: TransactionDetailsViewModel.config(coin: coin, tx: tx))
     }
     
@@ -213,6 +213,6 @@ struct TransactionDetailsView: View {
 
 struct TransactionDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        TransactionDetailsView(coin: .bitcoin(), tx: BitcoinDevKit.Transaction.mockedConfirmed)
+        TransactionDetailsView(coin: .bitcoin(), tx: BitcoinDevKit.TransactionDetails.mockedConfirmed)
     }
 }

@@ -77,7 +77,7 @@ class SendViewViewModel: ObservableObject {
     @Published var recomendedFees: RecomendedFees?
     @Published var fee: TxFees = .normal
     @Published var publishedTxId: String?
-    @Published var unconfirmedTx: BitcoinDevKit.Transaction?
+    @Published var unconfirmedTx: BitcoinDevKit.TransactionDetails?
     
     @Published var exchanger: Exchanger!
     
@@ -268,7 +268,7 @@ class SendViewViewModel: ObservableObject {
                     if let id = txId {
                         self.publishedTxId = id
                         
-                        self.unconfirmedTx = BitcoinDevKit.Transaction.unconfirmedSentTransaction(
+                        self.unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
                             recipient: self.to,
                             amount: self.exchanger.cryptoAmount,
                             id: id
@@ -295,7 +295,7 @@ class SendViewViewModel: ObservableObject {
                     if let id = txId {
                         self.publishedTxId = id
                         
-                        self.unconfirmedTx = BitcoinDevKit.Transaction.unconfirmedSentTransaction(
+                        self.unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
                             recipient: self.to,
                             amount: self.exchanger.cryptoAmount,
                             id: id
@@ -458,7 +458,7 @@ extension SendViewViewModel {
     static var mocked: SendViewViewModel {
         let vm = SendViewViewModel(balanceAdapter: BalanceAdapterMocked(), sendAdapter: SendAdapterMocked())
         vm.walletItems = [WalletItem.mockedBtc]
-        vm.unconfirmedTx = BitcoinDevKit.Transaction.unconfirmedSentTransaction(recipient: "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3", amount: "0.000123", id: "9dbc955b20b0ad5ff5dced70875c9148769ef78481a0c299131034f33c04e2f6")
+        vm.unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(recipient: "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3", amount: "0.000123", id: "9dbc955b20b0ad5ff5dced70875c9148769ef78481a0c299131034f33c04e2f6")
         vm.to = "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3"
         vm.balanceString = "0.000124"
         vm.valueString = "12.93"
