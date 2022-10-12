@@ -11,6 +11,7 @@ import PortalUI
 import Factory
 
 struct QRCodeScannerView: View {
+    private let selectionFeedbackGenerator = UISelectionFeedbackGenerator()
     private let qrCodeSimulatedData = "bitcoin:BC1QYLH3U67J673H6Y6ALV70M0PL2YZ53TZHVXGG7U?amount=0.00001&label=sbddesign%3A%20For%20lunch%20Tuesday&message=For%20lunch%20Tuesday&lightning=LNO1PG257ENXV4EZQCNEYPE82UM50YNHXGRWDAJX283QFWDPL28QQMC78YMLVHMXCSYWDK5WRJNJ36JRYG488QWLRNZYJCZS"
     @State private var importFromLibrary = false
     @State private var torchOn  = false
@@ -129,6 +130,7 @@ struct QRCodeScannerView: View {
             
             HStack {
                 PButton(config: .onlyIcon(Asset.galeryIcon), style: .free, size: .big, enabled: true) {
+                    selectionFeedbackGenerator.selectionChanged()
                     importFromLibrary.toggle()
                 }
                 .frame(width: 60, height: 60)
@@ -136,6 +138,7 @@ struct QRCodeScannerView: View {
                 Spacer()
                 
                 PButton(config: .onlyIcon(Asset.lightningIcon), style: .free, size: .big, enabled: true) {
+                    selectionFeedbackGenerator.selectionChanged()
                     torchOn.toggle()
                 }
                 .frame(width: 60, height: 60)
@@ -143,6 +146,7 @@ struct QRCodeScannerView: View {
                 Spacer()
                 
                 PButton(config: .onlyIcon(Asset.xIcon), style: .outline, size: .big, enabled: true) {
+                    selectionFeedbackGenerator.selectionChanged()
                     onClose()
                 }
                 .frame(width: 60, height: 60)
@@ -163,6 +167,9 @@ struct QRCodeScannerView: View {
                   message: Text("\nThe QR Code doesn’t contain a supported address type.\n\nSuppported Addresses:\n• Bitcoin Legacy\n• Bitcoin Segwit\n• Bitcoin Taproot\n• Lightning Invoice\n• Lightning Offer\n• Lightning Node ID\n• Lightning Address\n\nSuppported Wallet Keys:\nBitcoin Wallet Public Key\nBitcoin Wallet Private Key"),
                   dismissButton: .default(Text("OK"))
             )
+        }
+        .onAppear {
+            selectionFeedbackGenerator.prepare()
         }
     }
     
