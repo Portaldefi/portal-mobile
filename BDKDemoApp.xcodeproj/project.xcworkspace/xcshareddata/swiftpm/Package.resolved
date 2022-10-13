@@ -21,10 +21,10 @@
     {
       "identity" : "codescanner",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/twostraws/CodeScanner",
+      "location" : "https://github.com/cuhte3/CodeScanner",
       "state" : {
         "branch" : "main",
-        "revision" : "9aef09bf5c0274689a89c2fd71794011bebdc43f"
+        "revision" : "63657b5ada395bfd032be4e9eabcb959f57575eb"
       }
     },
     {
@@ -87,7 +87,7 @@
       "location" : "https://github.com/FabricLabs/portal-ui-swift",
       "state" : {
         "branch" : "main",
-        "revision" : "71cea85d1aa21c693648af562afa473f81ae9d11"
+        "revision" : "8e20830d0a507aec4d7f7c941866edd19c27b202"
       }
     }
   ],
