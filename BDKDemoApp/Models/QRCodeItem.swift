@@ -8,7 +8,7 @@
 import Foundation
 
 struct QRCodeItem: Identifiable {
-    enum ItemType {
+    enum ItemType: Equatable {
         case bip21(address: String, amount: String?, message: String?),
              bolt11(invoice: String),
              bolt12(offer: String),
