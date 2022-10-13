@@ -25,7 +25,6 @@
 		479A7AD428B8F30B0057E100 /* ReviewTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479A7AD328B8F30B0057E100 /* ReviewTransactionView.swift */; };
 		7502D68B289BD8EF00613323 /* PortalUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7502D68A289BD8EF00613323 /* PortalUI */; };
 		752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */; };
-		752A2D5328A507B900BC6BE2 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 752A2D5228A507B900BC6BE2 /* CodeScanner */; };
 		7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */; };
 		7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0828C211DA00ED92C3 /* View+Extension.swift */; };
 		7545BC0B28C2339900ED92C3 /* ConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0A28C2339900ED92C3 /* ConfirmationView.swift */; };
@@ -105,6 +104,7 @@
 		756DDD9728A28F8F002EDC60 /* IAccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD9528A28F8F002EDC60 /* IAccountManager.swift */; };
 		756DDD9928A28FC6002EDC60 /* AccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD9828A28FC6002EDC60 /* AccountManager.swift */; };
 		756DDD9D28A292D4002EDC60 /* RootViewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD9C28A292D4002EDC60 /* RootViewViewModel.swift */; };
+		75772A5D28F8192F00BE80B7 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 75772A5C28F8192F00BE80B7 /* CodeScanner */; };
 		75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */ = {isa = PBXBuildFile; productRef = 75AA211028A668A400DD2E89 /* BitcoinAddressValidator */; };
 		75D8C59228D8867600228298 /* IAccountStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59128D8867600228298 /* IAccountStorage.swift */; };
 		75D8C59628D88A1100228298 /* IAppConfigProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59528D88A1100228298 /* IAppConfigProvider.swift */; };
@@ -260,7 +260,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				752A2D5328A507B900BC6BE2 /* CodeScanner in Frameworks */,
 				7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */,
 				7502D68B289BD8EF00613323 /* PortalUI in Frameworks */,
 				75D8C5CA28E1B00800228298 /* Kingfisher in Frameworks */,
@@ -269,6 +268,7 @@
 				756DDD8C28A28858002EDC60 /* KeychainAccess in Frameworks */,
 				75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */,
 				7564C65E28D1F89E00ABA8CF /* DataField in Frameworks */,
+				75772A5D28F8192F00BE80B7 /* CodeScanner in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -539,12 +539,12 @@
 				756A31292888252D004978E2 /* BitcoinDevKit */,
 				7502D68A289BD8EF00613323 /* PortalUI */,
 				756DDD8B28A28858002EDC60 /* KeychainAccess */,
-				752A2D5228A507B900BC6BE2 /* CodeScanner */,
 				75AA211028A668A400DD2E89 /* BitcoinAddressValidator */,
 				479A7AC828B756DF0057E100 /* Factory */,
 				7545BC4028CA107100ED92C3 /* Coinpaprika */,
 				7564C65D28D1F89E00ABA8CF /* DataField */,
 				75D8C5C928E1B00800228298 /* Kingfisher */,
+				75772A5C28F8192F00BE80B7 /* CodeScanner */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* BDKDemoApp.app */;
@@ -578,12 +578,12 @@
 				756A31282888252D004978E2 /* XCRemoteSwiftPackageReference "bdk-swift" */,
 				7502D689289BD8EF00613323 /* XCRemoteSwiftPackageReference "portal-ui-swift" */,
 				756DDD8A28A28858002EDC60 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
-				752A2D5128A507B900BC6BE2 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 				75AA210F28A668A400DD2E89 /* XCRemoteSwiftPackageReference "bitcoin-address-validator-swift" */,
 				479A7AC728B756DF0057E100 /* XCRemoteSwiftPackageReference "Factory" */,
 				7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */,
 				7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field" */,
 				75D8C5C828E1B00800228298 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				75772A5B28F8192F00BE80B7 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -961,14 +961,6 @@
 				kind = branch;
 			};
 		};
-		752A2D5128A507B900BC6BE2 /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/twostraws/CodeScanner";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 		7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/coinpaprika/coinpaprika-api-swift-client";
@@ -1001,6 +993,14 @@
 				kind = branch;
 			};
 		};
+		75772A5B28F8192F00BE80B7 /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/cuhte3/CodeScanner";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		75AA210F28A668A400DD2E89 /* XCRemoteSwiftPackageReference "bitcoin-address-validator-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cuhte3/bitcoin-address-validator-swift";
@@ -1030,11 +1030,6 @@
 			package = 7502D689289BD8EF00613323 /* XCRemoteSwiftPackageReference "portal-ui-swift" */;
 			productName = PortalUI;
 		};
-		752A2D5228A507B900BC6BE2 /* CodeScanner */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 752A2D5128A507B900BC6BE2 /* XCRemoteSwiftPackageReference "CodeScanner" */;
-			productName = CodeScanner;
-		};
 		7545BC4028CA107100ED92C3 /* Coinpaprika */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */;
@@ -1054,6 +1049,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 756DDD8A28A28858002EDC60 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
+		};
+		75772A5C28F8192F00BE80B7 /* CodeScanner */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 75772A5B28F8192F00BE80B7 /* XCRemoteSwiftPackageReference "CodeScanner" */;
+			productName = CodeScanner;
 		};
 		75AA211028A668A400DD2E89 /* BitcoinAddressValidator */ = {
 			isa = XCSwiftPackageProductDependency;
