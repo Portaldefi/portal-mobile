@@ -17,12 +17,11 @@ struct QRCodeScannerView: View {
     @State private var torchOn  = false
     @State private var scanState: ScanState = .detecting
     @State private var detectedItems: [QRCodeItem] = []
-    @State private var showingNoQRAlert = false
-    @State private var showingNotSupportedQRAlert = false
+    @State private var showAlertView = false
     @State private var qrItem: QRCodeItem?
         
     enum ScanState {
-        case detecting, detected
+        case detecting, detected, unsupported, notFound
     }
     
     @Environment(\.presentationMode) var presentation
@@ -42,22 +41,30 @@ struct QRCodeScannerView: View {
                     ZStack {
                         CodeScannerView(
                             codeTypes: [.qr],
-                            scanMode: .continuous,
+                            scanMode: .oncePerCode,
                             simulatedData: qrCodeSimulatedData,
                             isTorchOn: torchOn,
                             isGalleryPresented: $importFromLibrary
                         ) { response in
                             if case let .success(result) = response {
-                                withAnimation(.easeInOut(duration: 0.25)) {
-                                    detectedItems = QRCodeParser.current.parse(result.string)
-                                    scanState = .detected
+                                let items = QRCodeParser.current.parse(result.string)
+                                let supportedItems = items.filter{ $0.type != .unsupported }
+                                if let item = supportedItems.first {
+                                    withAnimation(.easeInOut(duration: 0.25)) {
+                                        detectedItems = items
+                                        scanState = .detected
+                                    }
+                                } else {
+                                    scanState = .unsupported
+                                    showAlertView.toggle()
                                 }
                             } else if case let .failure(error) = response {
                                 switch error {
                                 case .badInput:
                                     break
                                 case .badOutput:
-                                    showingNoQRAlert.toggle()
+                                    showAlertView.toggle()
+                                    scanState = .notFound
                                 case .permissionDenied:
                                     break
                                 case .initError(_):
@@ -122,6 +129,23 @@ struct QRCodeScannerView: View {
                                 .stroke(Palette.grayScale2A, lineWidth: 1)
                         )
                         .padding([.bottom, .horizontal], 8)
+                    case .unsupported:
+                        Text("No Supported Address Detected in QR")
+                            .font(.Main.fixed(.monoMedium, size: 12))
+                            .padding(8)
+                            .frame(height: 33)
+                            .frame(maxWidth: .infinity)
+                            .background(Palette.grayScale0A)
+                            .foregroundColor(Color(red: 0.938, green: 0.715, blue: 0.145))
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Palette.grayScale2A, lineWidth: 1)
+                            )
+                            .padding([.bottom, .horizontal], 8)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    case .notFound:
+                        EmptyView()
                     }
                 }
             }
@@ -131,17 +155,24 @@ struct QRCodeScannerView: View {
             HStack {
                 PButton(config: .onlyIcon(Asset.galeryIcon), style: .free, size: .big, enabled: true) {
                     selectionFeedbackGenerator.selectionChanged()
-                    importFromLibrary.toggle()
+                    importFromLibrary = true
                 }
                 .frame(width: 60, height: 60)
                 
                 Spacer()
                 
-                PButton(config: .onlyIcon(Asset.lightningIcon), style: .free, size: .big, enabled: true) {
+                PButton(
+                    config: torchOn ? .onlyIcon(Asset.flashSlashIcon) : .onlyIcon(Asset.flashIcon),
+                    style: .free,
+                    size: .big,
+                    color: torchOn ? Color.yellow : Color.white,
+                    enabled: true
+                ) {
                     selectionFeedbackGenerator.selectionChanged()
                     torchOn.toggle()
                 }
                 .frame(width: 60, height: 60)
+                .offset(x: torchOn ? -1.5 : 0)
                 
                 Spacer()
                 
@@ -156,17 +187,23 @@ struct QRCodeScannerView: View {
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .navigationBarHidden(true)
-        .alert(isPresented: $showingNoQRAlert) {
-            Alert(title: Text("No QR Code Found"),
-                  message: Text("Make sure the image contains a valid QR Code clearly visible."),
-                  dismissButton: .default(Text("OK"))
-            )
-        }
-        .alert(isPresented: $showingNotSupportedQRAlert) {
-            Alert(title: Text("Not Supported Address or Wallet Detected"),
-                  message: Text("\nThe QR Code doesn’t contain a supported address type.\n\nSuppported Addresses:\n• Bitcoin Legacy\n• Bitcoin Segwit\n• Bitcoin Taproot\n• Lightning Invoice\n• Lightning Offer\n• Lightning Node ID\n• Lightning Address\n\nSuppported Wallet Keys:\nBitcoin Wallet Public Key\nBitcoin Wallet Private Key"),
-                  dismissButton: .default(Text("OK"))
-            )
+        .alert(isPresented: $showAlertView) {
+            switch scanState {
+            case .detected, .detecting:
+                fatalError("Should not happen")
+            case .notFound:
+                return Alert(
+                    title: Text("No QR Code Found"),
+                    message: Text("Make sure the image contains a valid QR Code clearly visible."),
+                    dismissButton: .default(Text("OK"))
+                )
+            case .unsupported:
+                return Alert(
+                    title: Text("No Supported Address Detected"),
+                    message: Text("\nThe QR Code doesn’t contain a supported address type.\n\nSuppported Addresses:\n• Bitcoin Legacy\n• Bitcoin Segwit\n• Bitcoin Taproot\n"),
+                    dismissButton: .default(Text("OK"))
+                )
+            }
         }
         .onAppear {
             selectionFeedbackGenerator.prepare()
