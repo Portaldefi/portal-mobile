@@ -59,11 +59,19 @@ struct ConfirmationCounterView: View {
     var body: some View {
         HStack(spacing: 4) {
             ZStack {
-                ProgressView(String(), value: CGFloat(maxConfirmations), total: CGFloat(maxConfirmations))
+                ProgressView(
+                    String(),
+                    value: CGFloat(maxConfirmations),
+                    total: CGFloat(maxConfirmations)
+                )
                     .progressViewStyle(ConfirmationsCounterViewStyle(lineWidth: 1))
                     .foregroundColor(progressColor)
 
-                ProgressView(String(), value: CGFloat(confirmations), total: CGFloat(maxConfirmations))
+                ProgressView(
+                    String(),
+                    value: confirmations > maxConfirmations ? CGFloat(maxConfirmations) : CGFloat(confirmations),
+                    total: CGFloat(maxConfirmations)
+                )
                     .progressViewStyle(ConfirmationsCounterViewStyle(lineWidth: 2))
                     .foregroundColor(progressColor)
             }
