@@ -16,17 +16,24 @@ class ReceiveViewModel: ObservableObject {
     private let context = CIContext()
     private let filter = CIFilter.qrCodeGenerator()
     
+    @Published var amount = String()
+    @Published var editingAmount = false
+    
+    @Published var description = String()
+    @Published var editingDescription = false
+    
+    @Published private(set) var qrCode = UIImage()
+    
     var receiveAddress: String {
         adapter.receiveAddress
     }
     
-    @Published private(set) var qrCode: UIImage = UIImage()
-    
     init(depositAdapter: IDepositAdapter) {
         adapter = depositAdapter
+        generateQRCode()
     }
     
-    func generateQRCode() {
+    private func generateQRCode() {
         let qrCodeString = "bitcoin:\(adapter.receiveAddress)"
         let data = Data(qrCodeString.utf8)
         filter.setValue(data, forKey: "inputMessage")
