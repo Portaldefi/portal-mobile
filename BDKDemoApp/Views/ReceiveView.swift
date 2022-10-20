@@ -10,105 +10,266 @@ import PortalUI
 
 struct ReceiveView: View {
     @Environment(\.presentationMode) private var presentationMode
-    @ObservedObject var viewModel: ReceiveViewModel
+    @StateObject var viewModel: ReceiveViewModel
     
-    init(coin: Coin) {
-        viewModel = ReceiveViewModel.config(coin: coin)
+    init(viewModel: ReceiveViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                HStack {
-                    PButton(config: .onlyIcon(Asset.xIcon), style: .free, size: .medium, enabled: true) {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                    .frame(width: 20)
-                    
-                    Spacer()
-                }
-                
-                Text("Receive")
-                    .font(.Main.fixed(.monoBold, size: 16))
-                    .foregroundColor(Color(red: 1, green: 1, blue: 1))
-                    .frame(height: 62)
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Account/Asset")
-                    .font(.Main.fixed(.monoBold, size: 16))
-                HStack(spacing: 6) {
-                    Asset.btcIcon
-                        .resizable()
-                        .frame(width: 16, height: 16)
-                    Text("Bitcoin")
-                        .font(.Main.fixed(.monoBold, size: 14))
-                        .foregroundColor(Color(red: 1, green: 1, blue: 1))
-                    
-                    HStack(spacing: 6) {
-                        Text("on")
-                            .font(.Main.fixed(.monoMedium, size: 14))
-                        Asset.chainIcon
-                        Text("Chain")
-                            .font(.Main.fixed(.monoMedium, size: 14))
-                        Spacer()
-                    }
-                    .foregroundColor(Palette.grayScale6A)
-                }
-                .padding(15)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Palette.grayScale1A)
-                )
-                
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.white)
-                        .overlay {
-                            Image(uiImage: viewModel.qrCode)
-                                .interpolation(.none)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 250, height: 250)
+        GeometryReader { geo in
+            ZStack(alignment: .bottom) {
+                VStack(spacing: 0) {
+                    ZStack {
+                        HStack {
+                            PButton(config: viewModel.step == .generateQR ? .onlyIcon(Asset.caretLeftIcon) : .onlyIcon(Asset.xIcon), style: .free, size: .medium, enabled: true) {
+                                switch viewModel.step {
+                                case .selectAsset:
+                                    presentationMode.wrappedValue.dismiss()
+                                case .generateQR:
+                                    viewModel.selectedItem = nil
+                                }
+                            }
+                            .frame(width: 20)
+                            
+                            Spacer()
                         }
-                        .frame(width: 260, height: 260)
-                        .padding(.top, 24)
-                        .padding(.horizontal, 55)
-                        .padding(.bottom, 16)
+                        .padding(.horizontal, 25)
+                        
+                        Text("Recieve")
+                            .frame(width: 300, height: 62)
+                            .font(.Main.fixed(.monoBold, size: 16))
+                    }
+                    .animation(nil, value: false)
                     
-                    Asset.portalQrIcon
-                        .resizable()
-                        .frame(width: 65, height: 65)
+                    switch viewModel.step {
+                    case .selectAsset:
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Select Asset")
+                                .font(.Main.fixed(.bold, size: 24))
+                                .foregroundColor(Palette.grayScaleCA)
+                            
+                            ScrollView {
+                                VStack {
+                                    VStack(spacing: 0) {
+                                        Divider()
+                                        ForEach(viewModel.walletItems) { item in
+                                            ZStack(alignment: .trailing) {
+                                                WalletItemView(viewModel: item.viewModel, showBalance: false)
+                                                    .padding(.leading)
+                                                    .padding(.trailing, 6)
+                                                    .contentShape(Rectangle())
+                                                    .onTapGesture {
+                                                        viewModel.selectedItem = item
+                                                    }
+                                                Asset.chevronRightIcon
+                                                    .foregroundColor(Palette.grayScale4A)
+                                            }
+                                            
+                                            Divider()
+                                                .overlay(Palette.grayScale2A)
+                                        }
+                                    }
+                                }
+                            }
+                            .frame(height: CGFloat(viewModel.walletItems.count) * 72)
+                        }
+                        .padding(.horizontal, 16)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    case .generateQR:
+                        ScrollView {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 0) {
+                                    HStack(spacing: 8) {
+                                        Asset.btcIcon
+                                        Text("Bitcoin")
+                                            .font(.Main.fixed(.monoBold, size: 22))
+                                            .foregroundColor(Palette.grayScaleF4)
+                                    }
+                                    HStack {
+                                        Text("on")
+                                            .font(.Main.fixed(.monoMedium, size: 16))
+                                            .foregroundColor(Palette.grayScale8A)
+                                        HStack(spacing: 4) {
+                                            Asset.chainIcon
+                                            Text("Chain")
+                                                .font(.Main.fixed(.monoMedium, size: 16))
+                                                .foregroundColor(Palette.grayScale8A)
+                                        }
+                                    }
+                                }
+                                
+                                Spacer()
+                                
+                                VStack {
+                                    Text("Address type")
+                                        .font(.Main.fixed(.monoRegular, size: 14))
+                                        .foregroundColor(Palette.grayScale6A)
+                                    Text("Segwit")
+                                        .font(.Main.fixed(.monoBold, size: 16))
+                                        .foregroundColor(Palette.grayScaleCA)
+                                }
+                            }
+                            .padding(.horizontal, 40)
+                            .padding(.bottom, 16)
+                            
+                            ZStack {
+                                Image(uiImage: viewModel.qrCode)
+                                    .interpolation(.none)
+                                    .resizable()
+                                    .cornerRadius(12)
+                                
+                                Asset.portalQrIcon
+                                    .resizable()
+                                    .frame(width: 72, height: 72)
+                            }
+                            .frame(width: geo.size.width - 80)
+                            .frame(height: geo.size.width - 80)
+                            
+                            VStack(spacing: 10) {
+                                Text(viewModel.receiveAddress)
+                                    .font(.Main.fixed(.monoRegular, size: 14))
+                                
+                                HStack(spacing: 10) {
+                                    PButton(config: .labelAndIconLeft(label: "Copy", icon: Asset.copyIcon), style: .outline, size: .medium, color: Palette.grayScaleEA, enabled: true) {
+                                        viewModel.copyToClipboard()
+                                    }
+                                    
+                                    PButton(config: .labelAndIconLeft(label: "Share", icon: Asset.arrowUprightIcon), style: .outline, size: .medium, color: Palette.grayScaleEA, enabled: true) {
+                                        viewModel.share()
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 40)
+                            .padding(.vertical, 16)
+                            
+                            VStack {
+                                Divider()
+                                AmountView()
+                                Divider()
+                                DescriptionView()
+                                Divider()
+                            }
+                            .padding(.horizontal, 24)
+                        }
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
                 }
                 
-                Text(viewModel.receiveAddress.groupedByThreeFromLeft.uppercased())
-                    .font(.Main.fixed(.monoRegular, size: 16))
-                    .padding(.horizontal, 55)
-                
-                Spacer()
-                
-                HStack(spacing: 8) {
-                    PButton(config: .onlyLabel("Share"), style: .filled, size: .big, enabled: true) {
-                        
+                if viewModel.editingAmount {
+                    AmountEditorView(initialAmount: viewModel.amount) {
+                        withAnimation {
+                            viewModel.editingAmount.toggle()
+                        }
+                    } onSaveAction: { amount in
+                        withAnimation {
+                            viewModel.amount = amount
+                            viewModel.editingAmount.toggle()
+                        }
                     }
-                    PButton(config: .onlyLabel("Copy"), style: .filled, size: .big, enabled: true) {
-                        viewModel.copyToClipboard()
-                        presentationMode.wrappedValue.dismiss()
-                    }
+                    .cornerRadius(8)
+                    .offset(y: 5)
+                    .transition(.move(edge: .bottom))
+                    .zIndex(1)
+                } else if viewModel.editingDescription {
+                    TextEditorView(
+                        title: "Description",
+                        placeholder: "Write a payment description",
+                        initialText: viewModel.description,
+                        onCancelAction: {
+                            withAnimation {
+                                viewModel.editingDescription.toggle()
+                            }
+                        }, onSaveAction: { description in
+                            withAnimation {
+                                viewModel.description = description
+                                viewModel.editingDescription.toggle()
+                            }
+                        }
+                    )
+                    .cornerRadius(8)
+                    .offset(y: 5)
+                    .transition(.move(edge: .bottom))
+                    .zIndex(1)
                 }
             }
         }
-        .padding(.horizontal, 24)
         .navigationBarHidden(true)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
-        .onAppear(perform: {
-            viewModel.generateQRCode()
-        })
+        .sheet(item: $viewModel.sharedAddress) { address in
+            ActivityShareView(text: address.text)
+        }
+    }
+    
+    private func AmountView() -> some View {
+        Group {
+            if viewModel.amount.isEmpty {
+                Button {
+                    withAnimation {
+                        viewModel.editingAmount.toggle()
+                    }
+                } label: {
+                    HStack {
+                        PButton(config: .labelAndIconLeft(label: "Add Amount", icon: Asset.pencilIcon), style: .free, size: .small, applyGradient: true, enabled: true) {
+                            withAnimation {
+                                viewModel.editingAmount.toggle()
+                            }
+                        }
+                        .frame(width: 125)
+                        
+                        Spacer()
+                    }
+                    .frame(height: 62)
+                    .padding(.horizontal, 24)
+                }
+            } else {
+                Button {
+                    withAnimation {
+                        viewModel.editingAmount.toggle()
+                    }
+                } label: {
+                    EditableTextFieldView(description: "Amount", text: viewModel.amount)
+                }
+            }
+        }
+    }
+    
+    private func DescriptionView() -> some View {
+        Group {
+            if viewModel.description.isEmpty {
+                Button {
+                    withAnimation {
+                        viewModel.editingDescription.toggle()
+                    }
+                } label: {
+                    HStack {
+                        PButton(config: .labelAndIconLeft(label: "Add Description", icon: Asset.pencilIcon), style: .free, size: .small, applyGradient: true, enabled: true) {
+                            withAnimation {
+                                viewModel.editingDescription.toggle()
+                            }
+                        }
+                        .frame(width: 170)
+                        
+                        Spacer()
+                    }
+                    .frame(height: 62)
+                    .padding(.horizontal, 24)
+                }
+            } else {
+                Button {
+                    withAnimation {
+                        viewModel.editingDescription.toggle()
+                    }
+                } label: {
+                    EditableTextFieldView(description: "Description", text: viewModel.description)
+                }
+            }
+        }
     }
 }
 
 struct ReceiveView_Previews: PreviewProvider {
     static var previews: some View {
-        ReceiveView(coin: .bitcoin())
+        ReceiveView(viewModel: ReceiveViewModel.mocked)
     }
 }
