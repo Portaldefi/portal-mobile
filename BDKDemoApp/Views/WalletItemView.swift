@@ -9,7 +9,13 @@ import SwiftUI
 import PortalUI
 
 struct WalletItemView: View {
-    @ObservedObject var viewModel: WalletItemViewModel
+    private let showBalance: Bool
+    @ObservedObject private var viewModel: WalletItemViewModel
+    
+    init(viewModel: WalletItemViewModel, showBalance: Bool = true) {
+        self.viewModel = viewModel
+        self.showBalance = showBalance
+    }
     
     var body: some View {
         HStack {
@@ -42,27 +48,30 @@ struct WalletItemView: View {
                 }
             }
             Spacer()
-            HStack(spacing: 6) {
-                VStack(alignment: .trailing, spacing: 0) {
-                    Text(viewModel.balanceString)
-                        .font(.Main.fixed(.monoBold, size: 20))
-                        .foregroundColor(Palette.grayScaleEA)
-                    Text(viewModel.valueString)
-                        .font(.Main.fixed(.monoMedium, size: 16))
-                        .foregroundColor(Palette.grayScale6A)
-                }
-                VStack(alignment: .leading, spacing: 0) {
-                    HStack {
-                        Text(viewModel.coin.unit.lowercased())
-                            .font(.Main.fixed(.monoMedium, size: 12))
-                            .foregroundColor(Palette.grayScaleAA)
-                        Spacer()
+            
+            if showBalance {
+                HStack(spacing: 6) {
+                    VStack(alignment: .trailing, spacing: 0) {
+                        Text(viewModel.balanceString)
+                            .font(.Main.fixed(.monoBold, size: 20))
+                            .foregroundColor(Palette.grayScaleEA)
+                        Text(viewModel.valueString)
+                            .font(.Main.fixed(.monoMedium, size: 16))
+                            .foregroundColor(Palette.grayScale6A)
                     }
-                    .frame(width: 40)
-                    Text("usd")
-                        .font(.Main.fixed(.monoMedium, size: 12))
-                        .foregroundColor(Palette.grayScale6A)
-                        .offset(y: 7)
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack {
+                            Text(viewModel.coin.unit.lowercased())
+                                .font(.Main.fixed(.monoMedium, size: 12))
+                                .foregroundColor(Palette.grayScaleAA)
+                            Spacer()
+                        }
+                        .frame(width: 40)
+                        Text("usd")
+                            .font(.Main.fixed(.monoMedium, size: 12))
+                            .foregroundColor(Palette.grayScale6A)
+                            .offset(y: 7)
+                    }
                 }
             }
         }
