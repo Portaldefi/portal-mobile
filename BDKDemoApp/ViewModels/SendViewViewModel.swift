@@ -224,7 +224,6 @@ class SendViewViewModel: ObservableObject {
             .filter{ $0 == .sent }
             .flatMap{ _ in Just(true) }
             .delay(for: .seconds(1), scheduler: RunLoop.main)
-            .eraseToAnyPublisher()
             .assign(to: &$txSent)
         
         updateRecomendedFees()

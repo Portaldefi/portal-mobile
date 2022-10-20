@@ -75,7 +75,7 @@ struct AccountView: View {
         }
         .sheet(isPresented: $goToReceive) {
             NavigationView {
-                ReceiveView(coin: .bitcoin())
+                ReceiveView(viewModel: ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: nil))
             }
         }
         .sheet(isPresented: $viewState.goToSend) {

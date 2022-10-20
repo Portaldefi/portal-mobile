@@ -34,7 +34,7 @@ class TextEditorViewModel: ObservableObject {
         text = initialText
         
         $text.flatMap {
-            Just($0 != initialText).eraseToAnyPublisher()
+            Just($0 != initialText)
         }
         .assign(to: &$saveButtonEnabled)
     }

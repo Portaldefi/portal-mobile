@@ -172,7 +172,7 @@ struct TransactionDetailsView: View {
                         viewModel.editingNotes.toggle()
                     }
                 } label: {
-                    TxNotesView(notes: viewModel.notes)
+                    EditableTextFieldView(description: "Notes", text: viewModel.notes)
                 }
             }
         }
