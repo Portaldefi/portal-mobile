@@ -12,12 +12,14 @@ import Combine
 
 struct AmountView: View {
     private let warningColor = Color(red: 1, green: 0.321, blue: 0.321)
+    private let validate: Bool
     @ObservedObject private var exchanger: Exchanger
     @FocusState private var focusedField: Exchanger.Side?
     @ObservedObject private var viewState = Container.viewState()
     
-    init(exchanger: Exchanger) {
+    init(exchanger: Exchanger, validate: Bool = true) {
         self.exchanger = exchanger
+        self.validate = validate
     }
     
     func limitText(_ upper: Int) {
@@ -48,7 +50,9 @@ struct AmountView: View {
                             .disableAutocorrection(true)
                             .textInputAutocapitalization(.never)
                             .font(.Main.fixed(.monoBold, size: 32))
-                            .foregroundColor(exchanger.amountIsValid ? Palette.grayScaleEA : warningColor)
+                            .foregroundColor(
+                                validate ? exchanger.amountIsValid ? Palette.grayScaleEA : warningColor : Palette.grayScaleEA
+                            )
                         Text("btc")
                             .font(.Main.fixed(.monoRegular, size: 18))
                             .foregroundColor(Palette.grayScale6A)
@@ -80,7 +84,9 @@ struct AmountView: View {
                             .disableAutocorrection(true)
                             .textInputAutocapitalization(.never)
                             .font(.Main.fixed(.monoBold, size: 32))
-                            .foregroundColor(exchanger.amountIsValid ? Palette.grayScaleEA : warningColor)
+                            .foregroundColor(
+                                validate ? exchanger.amountIsValid ? Palette.grayScaleEA : warningColor : Palette.grayScaleEA
+                            )
                         Text("usd")
                             .font(.Main.fixed(.monoRegular, size: 18))
                             .foregroundColor(Palette.grayScale6A)
