@@ -27,7 +27,7 @@ struct ReceiveView: View {
                                 case .selectAsset:
                                     presentationMode.wrappedValue.dismiss()
                                 case .generateQR:
-                                    viewModel.selectedItem = nil
+                                    viewModel.clear()
                                 }
                             }
                             .frame(width: 20)

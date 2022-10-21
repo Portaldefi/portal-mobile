@@ -122,6 +122,14 @@ class ReceiveViewModel: ObservableObject {
         qrCode = UIImage(cgImage: cgimg)
     }
     
+    func clear() {
+        selectedItem = nil
+        qrCode = UIImage()
+        adapter = nil
+        amount = String()
+        description = String()
+    }
+    
     func copyToClipboard() {
         guard let adapter = adapter else { return }
 
