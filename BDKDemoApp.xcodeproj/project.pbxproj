@@ -108,6 +108,9 @@
 		75772A6228FEC0AD00BE80B7 /* AmountEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A6128FEC0AD00BE80B7 /* AmountEditorView.swift */; };
 		75772A642901793300BE80B7 /* IdentifiableString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A632901793300BE80B7 /* IdentifiableString.swift */; };
 		75772A662901795C00BE80B7 /* ActivityShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A652901795C00BE80B7 /* ActivityShareView.swift */; };
+		75772A682902D73E00BE80B7 /* TextLimitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A672902D73E00BE80B7 /* TextLimitter.swift */; };
+		75772A6A290681C500BE80B7 /* NotifiableViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A69290681C500BE80B7 /* NotifiableViewModifier.swift */; };
+		75772A6C2906B57200BE80B7 /* AmountValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A6B2906B57200BE80B7 /* AmountValueView.swift */; };
 		75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */ = {isa = PBXBuildFile; productRef = 75AA211028A668A400DD2E89 /* BitcoinAddressValidator */; };
 		75D8C59228D8867600228298 /* IAccountStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59128D8867600228298 /* IAccountStorage.swift */; };
 		75D8C59628D88A1100228298 /* IAppConfigProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59528D88A1100228298 /* IAppConfigProvider.swift */; };
@@ -234,6 +237,9 @@
 		75772A6128FEC0AD00BE80B7 /* AmountEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountEditorView.swift; sourceTree = "<group>"; };
 		75772A632901793300BE80B7 /* IdentifiableString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentifiableString.swift; sourceTree = "<group>"; };
 		75772A652901795C00BE80B7 /* ActivityShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityShareView.swift; sourceTree = "<group>"; };
+		75772A672902D73E00BE80B7 /* TextLimitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLimitter.swift; sourceTree = "<group>"; };
+		75772A69290681C500BE80B7 /* NotifiableViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifiableViewModifier.swift; sourceTree = "<group>"; };
+		75772A6B2906B57200BE80B7 /* AmountValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountValueView.swift; sourceTree = "<group>"; };
 		75D8C59128D8867600228298 /* IAccountStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAccountStorage.swift; sourceTree = "<group>"; };
 		75D8C59528D88A1100228298 /* IAppConfigProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAppConfigProvider.swift; sourceTree = "<group>"; };
 		75D8C59728D88A5600228298 /* AppConfigProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConfigProvider.swift; sourceTree = "<group>"; };
@@ -333,6 +339,7 @@
 				479A7ACA28B759510057E100 /* Portal+Injection.swift */,
 				756A3115288821F3004978E2 /* BDKDemoAppApp.swift */,
 				756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */,
+				75772A69290681C500BE80B7 /* NotifiableViewModifier.swift */,
 				756A3138288AEAD2004978E2 /* BackButtonModifier.swift */,
 				4774D73028B4FD1800B7988B /* Extensions */,
 				756DDD8528A287A7002EDC60 /* Protocols */,
@@ -383,6 +390,7 @@
 				755C56DB28EB096E00A4B57B /* TextFieldAlert.swift */,
 				755C56DD28EB09B000A4B57B /* TextFieldAlertController.swift */,
 				75772A632901793300BE80B7 /* IdentifiableString.swift */,
+				75772A672902D73E00BE80B7 /* TextLimitter.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -418,6 +426,7 @@
 				756DDD6F28A275AD002EDC60 /* CreateAccountView.swift */,
 				756DDD7328A27C86002EDC60 /* RestoreAccountView.swift */,
 				756A313A288AEFA2004978E2 /* ReceiveView.swift */,
+				75772A6B2906B57200BE80B7 /* AmountValueView.swift */,
 				756A313228898C73004978E2 /* SingleTxView.swift */,
 				752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */,
 				75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */,
@@ -646,6 +655,7 @@
 				75D8C59B28D88BE500228298 /* IAdapterFactory.swift in Sources */,
 				75D8C5B128DADE7500228298 /* IWalletManager.swift in Sources */,
 				755C56E228EB0A1900A4B57B /* SelectableTxLabelView.swift in Sources */,
+				75772A6C2906B57200BE80B7 /* AmountValueView.swift in Sources */,
 				4774D72928B4FC7500B7988B /* UInt64+Extension.swift in Sources */,
 				75772A6228FEC0AD00BE80B7 /* AmountEditorView.swift in Sources */,
 				75D8C5BB28DAF46800228298 /* WalletStorage.swift in Sources */,
@@ -676,7 +686,9 @@
 				4774D71A28AF916600B7988B /* QRCodeItem.swift in Sources */,
 				756DDD9328A28DE7002EDC60 /* RootView.swift in Sources */,
 				4774D72528B4FC2000B7988B /* StringFormatter.swift in Sources */,
+				75772A682902D73E00BE80B7 /* TextLimitter.swift in Sources */,
 				756DDD6E28A272AB002EDC60 /* NoAccountView.swift in Sources */,
+				75772A6A290681C500BE80B7 /* NotifiableViewModifier.swift in Sources */,
 				756A3118288821F3004978E2 /* AccountView.swift in Sources */,
 				755C56C928EAC99700A4B57B /* TextEditorViewModel.swift in Sources */,
 				75D8C5AE28D8939A00228298 /* BitcoinAdapter.swift in Sources */,
@@ -879,6 +891,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -917,6 +930,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
