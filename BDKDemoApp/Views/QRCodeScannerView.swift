@@ -112,7 +112,7 @@ struct QRCodeScannerView: View {
                                     .foregroundColor(Palette.grayScale8A)
                                 Spacer()
                             }
-                            .padding(.horizontal, 16)
+                            .padding(.horizontal, 8)
                             .background(Palette.grayScale0A)
                             
                             Divider()
@@ -221,11 +221,11 @@ struct QRCodeScannerView: View {
                     VStack(spacing: 12) {
                         VStack(spacing: 4.2) {
                             HStack(spacing: 6) {
-                                RoundedRectangle(cornerRadius: 8)
+                                Asset.btcIcon
+                                    .resizable()
                                     .frame(width: 16, height: 16)
-                                    .foregroundColor(Color.green)
                                 Text(item.title)
-                                    .font(.Main.fixed(.monoMedium, size: 14))
+                                    .font(.Main.fixed(.monoBold, size: 14))
                                     .foregroundColor(Palette.grayScaleCA)
                                     .frame(height: 16)
                                 Spacer()
@@ -243,6 +243,7 @@ struct QRCodeScannerView: View {
                                         .frame(height: 17)
                                     Asset.chainIcon
                                         .resizable()
+                                        .foregroundColor(Palette.grayScale6A)
                                         .frame(width: 12, height: 12)
                                 case .bolt11, .bolt12:
                                     Text("on")
@@ -252,6 +253,7 @@ struct QRCodeScannerView: View {
                                         .frame(height: 17)
                                     Asset.lightningIcon
                                         .resizable()
+                                        .foregroundColor(Palette.grayScale6A)
                                         .frame(width: 12, height: 12)
                                 case .unsupported:
                                     EmptyView()
