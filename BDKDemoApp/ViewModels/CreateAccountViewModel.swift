@@ -7,17 +7,22 @@
 
 import Foundation
 import BitcoinDevKit
+import Factory
 
 class CreateAccountViewModel: ObservableObject {
     @Published var accountName = String()
-    @Published var extendedKey: ExtendedKeyInfo
+    @Published var extendedKey: DescriptorSecretKey
+    private let mnemonic: String
+    
+    @Injected(Container.accountManager) private var manager
     
     init() {
-        extendedKey = try! generateExtendedKey(network: Network.testnet, wordCount: WordCount.words12, password: nil)
+        mnemonic = try! generateMnemonic(wordCount: .words12)
+        extendedKey = try! DescriptorSecretKey(network: .testnet, mnemonic: mnemonic, password: nil)
     }
     
     func createAccount() {
         let account = Account(id: UUID().uuidString, index: 0, name: accountName, key: extendedKey)
-        Portal.shared.accountManager.save(account: account)
+        manager.save(account: account, mnemonic: mnemonic, salt: nil)
     }
 }

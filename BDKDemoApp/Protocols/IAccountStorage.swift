@@ -1,19 +1,18 @@
 //
 //  IAccountStorage.swift
-//  Portal
+//  BDKDemoApp
 //
-//  Created by Farid on 22.07.2021.
+//  Created by farid on 9/19/22.
 //
 
 import Foundation
-import CoreData
 
 protocol IAccountStorage {
-    var context: NSManagedObjectContext { get }
-    var accountRecords: [AccountRecord] { get }
-    func save(accountRecord: AccountRecord)
-    func update(account: Account)
-    func deleteAccount(_ account: Account) throws
-    func deleteAllAccountRecords()
+    var activeAccount: Account? { get }
+    var allAccounts: [Account] { get }
+    func save(account: Account, mnemonic: String, salt: String?)
+    func delete(account: Account)
     func clear()
+    func setCurrentAccount(id: String)
+    func update(account: Account)
 }

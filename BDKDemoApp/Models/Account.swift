@@ -8,32 +8,32 @@
 import Foundation
 import BitcoinDevKit
 
-class Account: IAccount {
+class Account {
     let id: String
     let index: Int
-    let extendedKey: ExtendedKeyInfo
+    let rootKey: DescriptorSecretKey
 
     private(set) var name: String
     
     private let btcNetwork: Int
     private let ethNetwork: Int
 
-    init(id: String, index: Int, name: String, key: ExtendedKeyInfo) {
+    init(id: String, index: Int, name: String, key: DescriptorSecretKey) {
         self.id = id
         self.index = index
         self.name = name
         self.btcNetwork = 1 //testNet
         self.ethNetwork = 1 //ropsten
-        self.extendedKey = key
+        self.rootKey = key
     }
     
-    init(record: AccountRecord, key: ExtendedKeyInfo) {
+    init(record: AccountRecord, key: DescriptorSecretKey) {
         self.id = record.id
         self.index = Int(record.index)
         self.name = record.name
         self.btcNetwork = 1 //testNet
         self.ethNetwork = 1 //ropsten
-        self.extendedKey = key
+        self.rootKey = key
     }
 }
 
@@ -47,14 +47,19 @@ extension Account: Hashable {
     }
 }
 
-class MockedAccount: IAccount {
-    var index: Int = 0
-    
-    var id: String {
-        UUID().uuidString
-    }
-    
-    var name: String {
-        "Mocked"
+extension Account {
+    static var mocked: Account {
+        let id = UUID().uuidString
+        let index = 0
+        let name = "Mocked"
+        let mnemonic = try! generateMnemonic(wordCount: .words12)
+        let key = try! DescriptorSecretKey(network: .testnet, mnemonic: mnemonic, password: nil)
+        
+        return Account(
+            id: id,
+            index: index,
+            name: name,
+            key: key
+        )
     }
 }

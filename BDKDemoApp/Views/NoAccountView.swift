@@ -14,27 +14,30 @@ struct NoAccountView: View {
     
     var body: some View {
         NavigationView {
-            ZStack {
-                Color(red: 26/255, green: 26/255, blue: 26/255, opacity: 1).ignoresSafeArea()
-                
-                VStack {
-                    Text("Welcome to Portal")
-                        .foregroundColor(.white)
-                        .font(.system(size: 16, design: .monospaced))
+            VStack {
+                VStack(spacing: 51) {
+                    Asset.portalIcon
+                    Text("Your Gateway To\nUncensorable Finance")
+                        .foregroundColor(Palette.grayScaleCA)
+                        .font(.Main.fixed(.monoBold, size: 21))
                         .fontWeight(.bold)
-                    Spacer()
-                    PButton(config: .onlyLabel("Create account"), style: .filled, size: .medium, enabled: true) {
-                        createAccount.toggle()
-                    }
-                    PButton(config: .onlyLabel("Restore account"), style: .filled, size: .medium, enabled: true) {
-                        restoreAccount.toggle()
-                    }
-                    NavigationLink(destination: CreateAccountView(), isActive: $createAccount) { EmptyView() }
-                    NavigationLink(destination: RestoreAccountView(), isActive: $restoreAccount) { EmptyView() }
+                        .multilineTextAlignment(.center)
                 }
-                .padding()
-                .navigationBarHidden(true)
+                .padding(.top, 144)
+                Spacer()
+                PButton(config: .onlyLabel("Create new wallet"), style: .filled, size: .big, enabled: true) {
+                    createAccount.toggle()
+                }
+                PButton(config: .onlyLabel("Import wallet"), style: .outline, size: .big, enabled: true) {
+                    restoreAccount.toggle()
+                }
+                NavigationLink(destination: CreateAccountView(), isActive: $createAccount) { EmptyView() }
+                NavigationLink(destination: RestoreAccountView(), isActive: $restoreAccount) { EmptyView() }
             }
+            .padding(.bottom, 87)
+            .padding(.horizontal)
+            .navigationBarHidden(true)
+            .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         }
     }
 }

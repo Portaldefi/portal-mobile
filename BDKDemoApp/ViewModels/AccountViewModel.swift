@@ -6,241 +6,121 @@
 //
 
 import Foundation
-import BitcoinDevKit
+import Combine
 import SwiftUI
+import PortalUI
+import Factory
 
 class AccountViewModel: ObservableObject {
-    class ProgressHandler: BitcoinDevKit.Progress {
-        func update(progress: Float, message: String?) {
-            print("progress: \(progress), message: \(message ?? "-")")
-        }
-    }
-    
-    enum State {
-        case dbNotFound
-        case empty
-        case loading
-        case failed(Error)
-        case loaded(Wallet, Blockchain)
-    }
-    
-    enum SyncState: Equatable {
-        case empty
-        case syncing
-        case synced
-        case failed(Error)
-        
-        static func ==(lhs: SyncState, rhs: SyncState) -> Bool {
-            switch (lhs, rhs) {
-            case (.empty, .empty),(.syncing, .syncing), (.synced, .synced), (.failed, .failed) : return true
-            default: return false
-            }
-        }
-    }
-    
-    enum SendError: Error {
-        case insufficientAmount
-        case error(String)
-    }
-    
-    private(set) var key = "private_key"
-    
-    @Published private(set) var state = State.empty
-    @Published private(set) var syncState = SyncState.empty
-    @Published private(set) var balance: UInt64 = 0
-    @Published private(set) var transactions: [BitcoinDevKit.Transaction] = []
-    @Published private(set) var items: [WalletItem] = []
     @Published private(set) var accountName = String()
+    @Published private(set) var totalBalance: String = "0"
+    @Published private(set) var totalValue: String = "0"
+    @Published private(set) var items: [WalletItem] = []
+    @Published var selectedItem: WalletItem?
     
-    private(set) var progressHandler = ProgressHandler()
+    private let accountManager: IAccountManager
+    private let walletManager: IWalletManager
+    private let adapterManager: IAdapterManager
+    private let marketData: IMarketDataRepository
     
-    init() {
-        setup()
-        loadCache()
-    }
+    private var subscriptions = Set<AnyCancellable>()
     
-    private func setup() {
-        state = .loading
-        
-        guard let account = Portal.shared.accountManager.activeAccount else {
-            fatalError("\(#function): There is no account")
-        }
-        
-        accountName = account.name
-        
-        let fingerprint = account.extendedKey.fingerprint
-        let xprv = account.extendedKey.xprv
-        
-        let descriptor = "wpkh([\(fingerprint)/84'/0'/0']\(xprv)/*)"
-        let changeDescriptor = "wpkh([\(fingerprint)/84'/0'/1']\(xprv)/*)"
-        
-        if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
-            let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite" + "\(account.id)")
-            let db = DatabaseConfig.sqlite(config: sqliteConfig)
-            let electrum = ElectrumConfig(url: "ssl://electrum.blockstream.info:60002", socks5: nil, retry: 5, timeout: nil, stopGap: 10)
-            let blockchainConfig = BlockchainConfig.electrum(config: electrum)
-            do {
-                let blockchain = try Blockchain(config: blockchainConfig)
-                let wallet = try Wallet(descriptor: descriptor, changeDescriptor: changeDescriptor, network: Network.testnet, databaseConfig: db)
-                state = State.loaded(wallet, blockchain)
-            } catch let error {
-                state = State.failed(error)
-            }
-        } else {
-            state = State.dbNotFound
-        }
-    }
-    
-    private func loadCache() {
-        guard case .loaded(let wallet, _) = state else { return }
-        
-        do {
-            balance = try wallet.getBalance()
+    @ObservedObject private var viewState: ViewState
             
-            let txs = try wallet.getTransactions().sorted(by: {
-                switch $0 {
-                case .confirmed(_, let confirmation_a):
-                    switch $1 {
-                    case .confirmed(_, let confirmation_b):
-                        return confirmation_a.timestamp > confirmation_b.timestamp
-                    default:
-                        return false
-                    }
-                default:
-                    switch $1 {
-                    case .unconfirmed(_):
-                        return true
-                    default:
-                        return false
-                    }
-                } })
-            
-            transactions = txs
-        } catch {
-            state = State.failed(error)
-        }
+    init(
+        accountManager: IAccountManager,
+        walletManager: IWalletManager,
+        adapterManager: IAdapterManager,
+        marketData: IMarketDataRepository,
+        viewState: ViewState
+    ) {
+        self.accountManager = accountManager
+        self.walletManager = walletManager
+        self.adapterManager = adapterManager
+        self.marketData = marketData
+        self.viewState = viewState
         
-        items = [WalletItem(description: "on Chain", balance: balance)]
+        subscribeForUpdates()
     }
     
-    func sync() {
-        guard case .loaded(let wallet, let blockchain) = state else { return }
-        
-        syncState = .syncing
-        
-        DispatchQueue.global(qos: .userInitiated).async {
-            do {
-                try wallet.sync(blockchain: blockchain, progress: self.progressHandler)
-            } catch {
+    private func subscribeForUpdates() {
+        adapterManager.adapterReady
+            .receive(on: DispatchQueue.global())
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                let configuredItems = self.configuredItems()
                 DispatchQueue.main.async {
-                    self.syncState = .failed(error)
+                    self.items = configuredItems
                 }
             }
-            
-            do {
-                let txs = try wallet.getTransactions()
-
-                let _balance = try wallet.getBalance()
-                let _items = [WalletItem(description: "on Chain", balance: _balance)]
-
-                let _transactions = txs.sorted(by: {
-                    switch $0 {
-                    case .confirmed(_, let confirmation_a):
-                        switch $1 {
-                        case .confirmed(_, let confirmation_b):
-                            return confirmation_a.timestamp > confirmation_b.timestamp
-                        default:
-                            return false
-                        }
-                    default:
-                        switch $1 {
-                        case .unconfirmed(_):
-                            return true
-                        default:
-                            return false
-                        }
-                    } })
-
-                DispatchQueue.main.async {
-                    self.syncState = .synced
-                    self.balance = _balance
-                    self.items = _items
-                    self.transactions = _transactions
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    self.state = .failed(error)
-                }
+            .store(in: &subscriptions)
+        
+        marketData
+            .onMarketDataUpdate
+            .receive(on: RunLoop.main)
+            .sink { _ in
+                self.updateValue()
             }
+            .store(in: &subscriptions)
+        
+        if let account = accountManager.activeAccount {
+            accountName = account.name
         }
+        
+        accountManager.onActiveAccountUpdate.sink { [weak self] account in
+            guard let account = account else { return }
+            self?.accountName = account.name
+        }
+        .store(in: &subscriptions)
+        
+        $items
+            .delay(for: .seconds(0.1), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.updateBalance()
+                self?.updateValue()
+            }
+            .store(in: &subscriptions)
+        
+        viewState.onAssetBalancesUpdate
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.updateBalance()
+                self?.updateValue()
+            }
+            .store(in: &subscriptions)
     }
     
-    func send(to: String, amount: String) throws {
-        switch state {
-        case .loaded(let wallet, let blockchain):
-            do {
-                let walletBalance = try wallet.getBalance()
-                if let amountToSend = UInt64(amount), walletBalance > amountToSend {
-                    let psbt = try TxBuilder().addRecipient(address: to, amount: amountToSend).enableRbf().finish(wallet: wallet)
-                    let finalized = try wallet.sign(psbt: psbt)
-                    if finalized {
-                        print("Tx id: \(psbt.txid())")
-                        try blockchain.broadcast(psbt: psbt)
-                        sync()
-                    }
-                } else {
-                    throw SendError.insufficientAmount
-                }
-            } catch {
-                throw error
-            }
-        default:
-            throw SendError.error("Send error: wallet isn't loaded")
-        }
-    }
-        
-    func getAddress(new: Bool = false) -> String {
-        switch state {
-        case .loaded(let wallet, _):
-            do {
-                let addressInfo = try wallet.getAddress(addressIndex: new ? AddressIndex.new : AddressIndex.lastUnused)
-                return addressInfo.address
-            } catch {
-                return "ERROR"
-            }
-        default:
-            return "ERROR"
-        }
+    private func updateBalance() {
+        let balance = items.map{ $0.viewModel.balance }.reduce(0){ $0 + $1 }
+        totalBalance = "\(balance)"
     }
     
-    func generateQRCode(from string: String) -> UIImage {
-        let data = Data(string.utf8)
-        filter.setValue(data, forKey: "inputMessage")
-        
-        if let outputImage = filter.outputImage {
-            if let cgimg = context.createCGImage(outputImage, from: outputImage.extent) {
-                return UIImage(cgImage: cgimg)
-            }
-        }
-        
-        return UIImage(systemName: "xmark.circle") ?? UIImage()
+    private func updateValue() {
+        totalValue = items.first?.viewModel.valueString ?? "0"
+    }
+    
+    private func configuredItems() -> [WalletItem] {
+        walletManager.activeWallets.compactMap({ wallet in
+            let viewModel = WalletItemViewModel.config(coin: wallet.coin)
+            return WalletItem(viewModel: viewModel)
+        })
     }
 }
 
 extension AccountViewModel {
-    static func mocked() -> AccountViewModel {
-        let viewModel = AccountViewModel()
-        viewModel.balance = 23587
-        viewModel.items = [WalletItem(description: "on Chain", balance: 23587), WalletItem(description: "in Lightning", balance: 143255)]
+    static var mocked: AccountViewModel {
+        let viewModel = AccountViewModel(
+            accountManager: AccountManager.mocked,
+            walletManager: WalletManager.mocked,
+            adapterManager: AdapterManager.mocked,
+            marketData: MarketData.mocked,
+            viewState: ViewState()
+        )
+        viewModel.accountName = "Mocked"
+        viewModel.totalBalance = "0.00055"
+        viewModel.totalValue = "2.15"
+        viewModel.items = [WalletItem.mockedBtc]
+        viewModel.objectWillChange.send()
         return viewModel
     }
 }
-
-extension Date {
-    func getFormattedDate(format: String) -> String {
-        let dateformat = DateFormatter()
-        dateformat.dateFormat = format
-        return dateformat.string(from: self)
-    }
-}
-

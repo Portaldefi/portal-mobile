@@ -8,14 +8,15 @@
 import SwiftUI
 
 struct RootView: View {
-    @StateObject private var viewModel = RootViewViewModel.config()
+    @StateObject private var viewModel = RootViewViewModel()
     
     var body: some View {
         switch viewModel.state {
         case .empty:
             NoAccountView()
         case .account:
-            HostingTabBarView()
+            Mainview()
+                .animation(nil, value: false)
         }
     }
 }

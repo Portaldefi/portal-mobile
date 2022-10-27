@@ -5,8 +5,62 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/bitcoindevkit/bdk-swift",
       "state" : {
-        "revision" : "320f95e4fa37ae4ce70d1fd6d57c1d431ab0a194",
-        "version" : "0.4.0"
+        "revision" : "5ccf19d4587ad9431d6e8285f2f11e13f7f4cc4d",
+        "version" : "0.5.1"
+      }
+    },
+    {
+      "identity" : "bitcoin-address-validator-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cuhte3/bitcoin-address-validator-swift",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c8738fea95bb403b49ff3e1457265d4b5b64838f"
+      }
+    },
+    {
+      "identity" : "codescanner",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cuhte3/CodeScanner",
+      "state" : {
+        "branch" : "main",
+        "revision" : "63657b5ada395bfd032be4e9eabcb959f57575eb"
+      }
+    },
+    {
+      "identity" : "coinpaprika-api-swift-client",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/coinpaprika/coinpaprika-api-swift-client",
+      "state" : {
+        "branch" : "master",
+        "revision" : "22daaef73cfd79360483cbc51632dc372f23206d"
+      }
+    },
+    {
+      "identity" : "cryptoswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzyzanowskim/CryptoSwift.git",
+      "state" : {
+        "revision" : "19b3c3ceed117c5cc883517c4e658548315ba70b",
+        "version" : "1.6.0"
+      }
+    },
+    {
+      "identity" : "data-field",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/marcusrossel/data-field.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "81f3cefcf320d9ca203f6e8754179a5b2d85d62f"
+      }
+    },
+    {
+      "identity" : "factory",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hmlongco/Factory",
+      "state" : {
+        "revision" : "8557426f3286e20b631ecdac8115242f888656e0",
+        "version" : "1.2.8"
       }
     },
     {
@@ -19,12 +73,21 @@
       }
     },
     {
+      "identity" : "kingfisher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/onevcat/Kingfisher",
+      "state" : {
+        "revision" : "017f94ccfdacabb1ae7f45b75b4217b24c06e6ac",
+        "version" : "7.4.0"
+      }
+    },
+    {
       "identity" : "portal-ui-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/FabricLabs/portal-ui-swift",
       "state" : {
         "branch" : "main",
-        "revision" : "23a3bd607fb91f8d2ea53bc3a28b72dc1714c6f0"
+        "revision" : "85b62e16509baa8e3ea4a3a2abed90494440eee6"
       }
     }
   ],

@@ -6,17 +6,17 @@
 //
 
 import Foundation
+import SwiftUI
+import PortalUI
+import Factory
 
 struct WalletItem: Identifiable {
     let id: UUID = UUID()
-    let description: String
-    let balance: UInt64
-    
-    var fiatValue: UInt64 {
-        balance/1000
-    }
-    
-    var balanceString: String {
-        String(format: "%.8f", Double(balance) / Double(100000000))
+    let viewModel: WalletItemViewModel
+}
+
+extension WalletItem {
+    static var mockedBtc: WalletItem {
+        WalletItem(viewModel: WalletItemViewModel.mocked)
     }
 }

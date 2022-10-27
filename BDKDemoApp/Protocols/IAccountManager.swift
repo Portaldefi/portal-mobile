@@ -16,7 +16,7 @@ protocol IAccountManager {
     func updateWalletCurrency(code: String)
     func addCoin(coin: String)
     func setActiveAccount(id: String)
-    func save(account: Account)
+    func save(account: Account, mnemonic: String, salt: String?)
     func update(account: Account)
     func delete(account: Account)
     func clear()

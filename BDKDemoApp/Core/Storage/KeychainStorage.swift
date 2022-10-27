@@ -9,13 +9,15 @@
 import Foundation
 import KeychainAccess
 
-final class KeychainStorage: IKeychainStorage {
+final class KeychainStorage {
     private let keychain: Keychain
         
     init(keychain: Keychain) {
         self.keychain = keychain.accessibility(.whenPasscodeSetThisDeviceOnly)
     }
-    
+}
+
+extension KeychainStorage: IKeychainStorage {
     func string(for key: String) -> String? {
         keychain[key]
     }
@@ -74,6 +76,62 @@ final class KeychainStorage: IKeychainStorage {
 
     func removeValue(for key: String) throws {
         try keychain.remove(key)
+    }
+}
+
+extension KeychainStorage {
+    fileprivate class KeychainStorageMock: IKeychainStorage {
+        func save(data: Data, key: String) {
+            
+        }
+        
+        func save(string: String, key: String) {
+            
+        }
+        
+        func string(for key: String) -> String? {
+            nil
+        }
+        
+        func data(for key: String) -> Data? {
+            nil
+        }
+        
+        func recoverStringArray(for key: String) -> [String]? {
+            nil
+        }
+        
+        func remove(key: String) throws {
+            
+        }
+        
+        func clear() throws {
+            
+        }
+        
+        func value<T>(for key: String) -> T? where T : LosslessStringConvertible {
+            nil
+        }
+        
+        func set<T>(value: T?, for key: String) throws where T : LosslessStringConvertible {
+            
+        }
+        
+        func value(for key: String) -> Data? {
+            nil
+        }
+        
+        func set(value: Data?, for key: String) throws {
+            
+        }
+        
+        func removeValue(for key: String) throws {
+            
+        }
+    }
+    
+    static var mocked: IKeychainStorage {
+        KeychainStorageMock()
     }
 }
 

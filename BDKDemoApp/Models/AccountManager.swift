@@ -11,9 +11,9 @@ import Combine
 final class AccountManager {
     var onActiveAccountUpdate = PassthroughSubject<Account?, Never>()
 
-    private let accountStorage: AccountStorage
+    private let accountStorage: IAccountStorage
     
-    init(accountStorage: AccountStorage) {
+    init(accountStorage: IAccountStorage) {
         self.accountStorage = accountStorage
     }
         
@@ -46,8 +46,8 @@ extension AccountManager: IAccountManager {
         onActiveAccountUpdate.send(accountStorage.activeAccount)
     }
     
-    func save(account: Account) {
-        accountStorage.save(account: account)
+    func save(account: Account, mnemonic: String, salt: String?) {
+        accountStorage.save(account: account, mnemonic: mnemonic, salt: salt)
         onActiveAccountUpdate.send(account)
     }
     
@@ -71,5 +71,51 @@ extension AccountManager: IAccountManager {
     
     func addCoin(coin: String) {
         
+    }
+}
+
+extension AccountManager {
+    private class AccountManagerMock: IAccountManager {
+        var onActiveAccountUpdate = PassthroughSubject<Account?, Never>()
+        
+        var accounts: [Account] = []
+        
+        var activeAccount: Account? = Account.mocked
+        
+        func account(id: String) -> Account? {
+            nil
+        }
+        
+        func updateWalletCurrency(code: String) {
+            
+        }
+        
+        func addCoin(coin: String) {
+            
+        }
+        
+        func setActiveAccount(id: String) {
+            
+        }
+        
+        func save(account: Account, mnemonic: String, salt: String?) {
+            
+        }
+        
+        func update(account: Account) {
+            
+        }
+        
+        func delete(account: Account) {
+            
+        }
+        
+        func clear() {
+            
+        }
+    }
+    
+    static var mocked: IAccountManager {
+        AccountManagerMock()
     }
 }

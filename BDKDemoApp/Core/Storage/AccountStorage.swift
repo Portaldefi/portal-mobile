@@ -11,9 +11,9 @@ import BitcoinDevKit
 class AccountStorage {
     private let localStorage: ILocalStorage
     private let secureStorage: IKeychainStorage
-    private let accountStorage: IAccountStorage
+    private let accountStorage: IAccountRecordStorage
 
-    init(localStorage: ILocalStorage, secureStorage: IKeychainStorage, accountStorage: IAccountStorage) {
+    init(localStorage: ILocalStorage, secureStorage: IKeychainStorage, accountStorage: IAccountRecordStorage) {
         self.localStorage = localStorage
         self.secureStorage = secureStorage
         self.accountStorage = accountStorage
@@ -25,19 +25,20 @@ class AccountStorage {
         guard let words = recoverStringArray(id: id, typeName: .mnemonic, keyName: .words) else {
             return nil
         }
+                
         guard let salt: String = recover(id: id, typeName: .mnemonic, keyName: .salt) else {
             return nil
         }
         
-        let key = try! restoreExtendedKey(network: Network.testnet, mnemonic: words.joined(separator:" "), password: salt)
+        let key = try! DescriptorSecretKey(network: .testnet, mnemonic: words.joined(separator: " "), password: salt)
         
         return Account(record: record, key: key)
     }
 
-    private func createRecord(account: Account) throws -> AccountRecord {
+    private func createRecord(account: Account, mnemonic: String, salt: String?) throws -> AccountRecord {
         let typeName: TypeName = .mnemonic
-        _ = try store(stringArray: account.extendedKey.mnemonic.components(separatedBy: " "), id: account.id, typeName: typeName, keyName: .words)
-        _ = try store(String(), id: account.id, typeName: typeName, keyName: .salt)
+        _ = try store(stringArray: mnemonic.components(separatedBy: " "), id: account.id, typeName: typeName, keyName: .words)
+        _ = try store(salt != nil ? salt! : String(), id: account.id, typeName: typeName, keyName: .salt)
         return AccountRecord(id: account.id, index: account.index, name: account.name, context: accountStorage.context)
     }
 
@@ -83,7 +84,7 @@ class AccountStorage {
     }
 }
 
-extension AccountStorage {
+extension AccountStorage: IAccountStorage {
     var activeAccount: Account? {
         guard
             let currentAccountID = localStorage.getCurrentAccountID(),
@@ -97,8 +98,8 @@ extension AccountStorage {
         accountStorage.accountRecords.compactMap { createAccount(record: $0) }
     }
 
-    func save(account: Account) {
-        if let record = try? createRecord(account: account) {
+    func save(account: Account, mnemonic: String, salt: String?) {
+        if let record = try? createRecord(account: account, mnemonic: mnemonic, salt: salt) {
             accountStorage.save(accountRecord: record)
             localStorage.setCurrentAccountID(record.id)
         }
@@ -133,5 +134,15 @@ extension AccountStorage {
         case salt
         case data
         case privateKey
+    }
+}
+
+extension AccountStorage {
+    static var mocked: IAccountStorage {
+        AccountStorage(
+            localStorage: LocalStorage.mocked,
+            secureStorage: KeychainStorage.mocked,
+            accountStorage: DBlocalStorage.mocked
+        )
     }
 }

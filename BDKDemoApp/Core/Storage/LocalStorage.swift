@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class LocalStorage: ILocalStorage {
+final class LocalStorage {
     private let storage: UserDefaults
     
     static let appLaunchesCountKey = "APP_LAUNCHES_COUNTER"
@@ -19,15 +19,18 @@ final class LocalStorage: ILocalStorage {
     }
 
     var currentAccountID: String?
+        
+    init(storage: UserDefaults) {
+        self.storage = storage
+    }
+}
+
+extension LocalStorage: ILocalStorage {
     var isFirstLaunch: Bool {
         storage.integer(forKey: Self.appLaunchesCountKey) == 0
     }
     var syncedExchangesIds: [String] {
         storage.object(forKey: Self.syncedExchangesIDsKey) as? [String] ?? []
-    }
-        
-    init(storage: UserDefaults) {
-        self.storage = storage
     }
     
     func incrementAppLaunchesCouner() {
@@ -66,5 +69,42 @@ final class LocalStorage: ILocalStorage {
             exchangesIds.remove(at: index)
             storage.set(exchangesIds, forKey: Self.syncedExchangesIDsKey)
         }
+    }
+}
+
+extension LocalStorage {
+    fileprivate class LocalStorageMock: ILocalStorage {
+        var syncedExchangesIds: [String] = []
+        
+        var isFirstLaunch: Bool = false
+        
+        var currentAccountID: String? = nil
+        
+        func incrementAppLaunchesCouner() {
+            
+        }
+        
+        func getCurrentAccountID() -> String? {
+            nil
+        }
+        
+        func setCurrentAccountID(_ id: String) {
+            
+        }
+        
+        func removeCurrentAccountID() {
+            
+        }
+        
+        func addSyncedExchange(id: String) {
+            
+        }
+        
+        func removeSyncedExchange(id: String) {
+            
+        }
+    }
+    static var mocked: ILocalStorage {
+        LocalStorageMock()
     }
 }

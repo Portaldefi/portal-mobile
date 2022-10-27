@@ -8,11 +8,14 @@
 import Foundation
 import Combine
 import BitcoinDevKit
+import Factory
 
 class RestoreAccountViewModel: ObservableObject {
     @Published var accountName = String()
     @Published var seed = String()
     @Published var restorable = false
+    
+    @Injected(Container.accountManager) private var manager
     
     private var subscriptions = Set<AnyCancellable>()
     
@@ -27,8 +30,12 @@ class RestoreAccountViewModel: ObservableObject {
     
     func restoreAccount() {
         let words = seed.components(separatedBy: " ").filter{ !$0.isEmpty && $0.count >= 3 }
-        let restoredKey = try! restoreExtendedKey(network: Network.testnet, mnemonic: words.joined(separator:" "), password: nil)
-        let account = Account(id: UUID().uuidString, index: 0, name: accountName, key: restoredKey)
-        Portal.shared.accountManager.save(account: account)
+        do {
+            let restoredKey = try DescriptorSecretKey(network: .testnet, mnemonic: words.joined(separator:" "), password: nil)
+            let account = Account(id: UUID().uuidString, index: 0, name: accountName, key: restoredKey)
+            manager.save(account: account, mnemonic: words.joined(separator:" "), salt: nil)
+        } catch {
+            print("restore error: \(error)")
+        }
     }
 }
