@@ -20,7 +20,6 @@ class ReceiveViewModel: ObservableObject {
     private let context = CIContext()
     private let filter = CIFilter.qrCodeGenerator()
     
-    @Published var amount = String()
     @Published var editingAmount = false
     
     @Published var description = String()
@@ -32,6 +31,7 @@ class ReceiveViewModel: ObservableObject {
     
     @Published var sharedAddress: IdentifiableString?
     @Published var selectedItem: WalletItem?
+    @Published var exchanger: Exchanger
     
     private var subscriptions = Set<AnyCancellable>()
     
@@ -43,7 +43,13 @@ class ReceiveViewModel: ObservableObject {
         self.walletItems = items
         self.selectedItem = selectedItem
         
-        Publishers.CombineLatest($amount, $description)
+        self.exchanger = Exchanger(
+            base: .bitcoin(),
+            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)),
+            balanceAdapter: BalanceAdapterMocked()
+        )
+        
+        Publishers.CombineLatest(exchanger.baseAmount.$value, $description)
             .flatMap { _ in Just(()) }
             .receive(on: RunLoop.main)
             .sink { [unowned self] _ in
@@ -94,8 +100,8 @@ class ReceiveViewModel: ObservableObject {
         var components = URLComponents()
         components.queryItems = []
         
-        if !amount.isEmpty {
-            components.queryItems?.append(URLQueryItem(name: "amount", value: amount))
+        if !exchanger.baseAmount.value.isEmpty {
+            components.queryItems?.append(URLQueryItem(name: "amount", value: exchanger.baseAmount.value))
         }
 
         if !description.isEmpty {
@@ -126,7 +132,7 @@ class ReceiveViewModel: ObservableObject {
         selectedItem = nil
         qrCode = UIImage()
         adapter = nil
-        amount = String()
+        exchanger.baseAmount.value = String()
         description = String()
     }
     
@@ -148,6 +154,6 @@ extension ReceiveViewModel {
     }
     
     static var mocked: ReceiveViewModel {
-        ReceiveViewModel(items: [WalletItem.mockedBtc], selectedItem: nil)
+        ReceiveViewModel(items: [WalletItem.mockedBtc], selectedItem: WalletItem.mockedBtc)
     }
 }

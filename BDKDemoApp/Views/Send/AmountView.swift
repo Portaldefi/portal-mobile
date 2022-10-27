@@ -21,31 +21,17 @@ struct AmountView: View {
         self.exchanger = exchanger
         self.validate = validate
     }
-    
-    func limitText(_ upper: Int) {
-        switch exchanger.side {
-        case .crypto:
-            if exchanger.cryptoAmount.count > upper {
-                exchanger.cryptoAmount = String(exchanger.cryptoAmount.prefix(upper))
-            }
-        case .currency:
-            if exchanger.currencyAmount.count > upper {
-                exchanger.currencyAmount = String(exchanger.currencyAmount.prefix(upper))
-            }
-        }
-    }
         
     var body: some View {
         HStack(spacing: 16) {
             VStack(spacing: 2) {
                 switch exchanger.side {
-                case .crypto:
+                case .base:
                     HStack(spacing: 8.5) {
                         Spacer()
-                        TextField("0", text: $exchanger.cryptoAmount)
+                        TextField("0", text: $exchanger.baseAmount.value)
                             .keyboardType(.decimalPad)
-                            .focused($focusedField, equals: .crypto)
-                            .onReceive(Just(exchanger.cryptoAmount)) { _ in limitText(10) }
+                            .focused($focusedField, equals: .base)
                             .fixedSize(horizontal: true, vertical: true)
                             .disableAutocorrection(true)
                             .textInputAutocapitalization(.never)
@@ -63,7 +49,7 @@ struct AmountView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
 
                     HStack(spacing: 4) {
-                        Text(exchanger.currencyAmount.isEmpty ? "0" : exchanger.currencyAmount)
+                        Text(exchanger.quoteAmount.value.isEmpty ? "0" : exchanger.quoteAmount.value)
                             .animation(nil)
                             .font(.Main.fixed(.monoMedium, size: 16))
                             .foregroundColor(Palette.grayScale6A)
@@ -74,12 +60,11 @@ struct AmountView: View {
                             .offset(y: 2)
                     }
                     .transition(.move(edge: .top).combined(with: .opacity))
-                case .currency:
+                case .quote:
                     HStack(spacing: 8.5) {
-                        TextField("0", text: $exchanger.currencyAmount)
+                        TextField("0", text: $exchanger.quoteAmount.value)
                             .keyboardType(.decimalPad)
-                            .focused($focusedField, equals: .currency)
-                            .onReceive(Just(exchanger.currencyAmount)) { _ in limitText(10) }
+                            .focused($focusedField, equals: .quote)
                             .fixedSize(horizontal: true, vertical: true)
                             .disableAutocorrection(true)
                             .textInputAutocapitalization(.never)
@@ -96,7 +81,7 @@ struct AmountView: View {
 
                     HStack(spacing: 4) {
                         Spacer()
-                        Text(exchanger.cryptoAmount.isEmpty ? "0" : exchanger.cryptoAmount)
+                        Text(exchanger.baseAmount.value.isEmpty ? "0" : exchanger.baseAmount.value)
                             .font(.Main.fixed(.monoMedium, size: 16))
                             .foregroundColor(Palette.grayScale6A)
                         Text("btc")
@@ -113,10 +98,10 @@ struct AmountView: View {
             Button {
                 withAnimation(.spring(response: 0.45, dampingFraction: 0.65, blendDuration: 0)) {
                     switch exchanger.side {
-                    case .crypto:
-                        exchanger.side = .currency
-                    case .currency:
-                        exchanger.side = .crypto
+                    case .base:
+                        exchanger.side = .quote
+                    case .quote:
+                        exchanger.side = .base
                     }
                 }
             } label: {
@@ -138,10 +123,10 @@ struct AmountView: View {
         )
         .onChange(of: exchanger.side, perform: { newValue in
             switch newValue {
-            case .crypto:
-                focusedField = .crypto
-            case .currency:
-                focusedField = .currency
+            case .base:
+                focusedField = .base
+            case .quote:
+                focusedField = .quote
             }
         })
         .onChange(of: viewState.showFeesPicker, perform: { newValue in
@@ -149,15 +134,15 @@ struct AmountView: View {
                 focusedField = nil
             } else {
                 switch exchanger.side {
-                case .crypto:
-                    focusedField = .crypto
-                case .currency:
-                    focusedField = .currency
+                case .base:
+                    focusedField = .base
+                case .quote:
+                    focusedField = .quote
                 }
             }
         })
         .onAppear {
-            focusedField = .crypto
+            focusedField = .base
         }
     }
 }

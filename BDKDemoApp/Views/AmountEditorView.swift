@@ -17,25 +17,21 @@ class AmontEditorViewModel: ObservableObject {
     
     @Published var saveButtonEnabled = false
     @Published var exchanger: Exchanger
+    let initialAmount: String
     
     init(
-        initialAmount: String,
+        exchanger: Exchanger,
         onCancelAction: @escaping () -> (),
         onSaveAction: @escaping (String) -> ()
     ) {
         self.onCancelAcion = onCancelAction
         self.onSaveAcion = onSaveAction
-                
-        self.exchanger = Exchanger(
-            base: .bitcoin(),
-            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)),
-            balanceAdapter: BalanceAdapterMocked()
-        )
+        self.exchanger = exchanger
         
-        self.exchanger.cryptoAmount = initialAmount
+        self.initialAmount = exchanger.baseAmount.value
         
-        self.exchanger.$cryptoAmount.flatMap {
-            Just($0 != initialAmount)
+        self.exchanger.baseAmount.$value.flatMap {
+            Just($0 != self.initialAmount)
         }
         .assign(to: &$saveButtonEnabled)
     }
@@ -46,13 +42,13 @@ struct AmountEditorView: View {
     @StateObject private var viewModel: AmontEditorViewModel
     
     init(
-        initialAmount: String,
+        exchanger: Exchanger,
         onCancelAction: @escaping () -> (),
         onSaveAction: @escaping (String) -> ()
     ) {
         _viewModel = StateObject(
             wrappedValue: AmontEditorViewModel(
-                initialAmount: initialAmount,
+                exchanger: exchanger,
                 onCancelAction: onCancelAction,
                 onSaveAction: onSaveAction
             )
@@ -75,7 +71,7 @@ struct AmountEditorView: View {
                     Spacer()
                     
                     PButton(config: .onlyLabel("Save"), style: .free, size: .small, applyGradient: true, enabled: viewModel.saveButtonEnabled) {
-                        viewModel.onSaveAcion(viewModel.exchanger.cryptoAmount)
+                        viewModel.onSaveAcion(viewModel.exchanger.baseAmount.value)
                     }
                     .frame(width: 39)
                 }
@@ -100,7 +96,7 @@ struct AmountEditorView: View {
 struct AmountEditorView_Previews: PreviewProvider {
     static var previews: some View {
         AmountEditorView(
-            initialAmount: String(),
+            exchanger: Exchanger.mocked(),
             onCancelAction: {
                 
             }, onSaveAction: { amount in

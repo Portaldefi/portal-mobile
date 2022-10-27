@@ -143,7 +143,7 @@ struct ReceiveView: View {
                             .padding(.horizontal, 40)
                             .padding(.vertical, 16)
                             
-                            VStack {
+                            VStack(spacing: 0) {
                                 Divider()
                                 AmountView()
                                 Divider()
@@ -157,13 +157,12 @@ struct ReceiveView: View {
                 }
                 
                 if viewModel.editingAmount {
-                    AmountEditorView(initialAmount: viewModel.amount) {
+                    AmountEditorView(exchanger: viewModel.exchanger) {
                         withAnimation {
                             viewModel.editingAmount.toggle()
                         }
                     } onSaveAction: { amount in
                         withAnimation {
-                            viewModel.amount = amount
                             viewModel.editingAmount.toggle()
                         }
                     }
@@ -203,7 +202,7 @@ struct ReceiveView: View {
     
     private func AmountView() -> some View {
         Group {
-            if viewModel.amount.isEmpty {
+            if viewModel.exchanger.baseAmount.value.isEmpty {
                 Button {
                     withAnimation {
                         viewModel.editingAmount.toggle()
@@ -228,7 +227,7 @@ struct ReceiveView: View {
                         viewModel.editingAmount.toggle()
                     }
                 } label: {
-                    EditableTextFieldView(description: "Amount", text: viewModel.amount)
+                    AmountValueView(exchanger: viewModel.exchanger)
                 }
             }
         }

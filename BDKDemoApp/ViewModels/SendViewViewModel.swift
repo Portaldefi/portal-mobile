@@ -93,7 +93,7 @@ class SendViewViewModel: ObservableObject {
         case .recipient:
             return !to.isEmpty
         case .amount:
-            return exchanger.amountIsValid && Double(exchanger.cryptoAmount.replacingOccurrences(of: ",", with: ".")) ?? 0 > 0
+            return exchanger.amountIsValid && Double(exchanger.baseAmount.value.replacingOccurrences(of: ",", with: ".")) ?? 0 > 0
         case .review:
             return true
         case .signing, .sent:
@@ -169,7 +169,7 @@ class SendViewViewModel: ObservableObject {
                     step = .amount
                     return
                 }
-                self.exchanger.cryptoAmount = amount
+                self.exchanger.baseAmount.value = amount
                 self.step = .review
             default:
                 break
@@ -199,18 +199,18 @@ class SendViewViewModel: ObservableObject {
         }
         .store(in: &subscriptions)
         
-        exchanger.$cryptoAmount.sink { [weak self] _ in
+        exchanger.$baseAmount.sink { [weak self] _ in
             guard let self = self else { return }
             withAnimation {
                 guard
-                    let doubleValue = Double(self.exchanger.cryptoAmount),
+                    let doubleValue = Double(self.exchanger.baseAmount.value),
                     doubleValue > 0,
                     self.exchanger.amountIsValid
                 else {
                     self.useAllFundsEnabled = true
                     return
                 }
-                self.useAllFundsEnabled = !(self.exchanger.cryptoAmount == self.balanceString)
+                self.useAllFundsEnabled = !(self.exchanger.baseAmount.value == self.balanceString)
             }
         }
         .store(in: &subscriptions)
@@ -269,7 +269,7 @@ class SendViewViewModel: ObservableObject {
                         
                         self.unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
                             recipient: self.to,
-                            amount: self.exchanger.cryptoAmount,
+                            amount: self.exchanger.baseAmount.value,
                             id: id
                         )
                         
@@ -280,7 +280,7 @@ class SendViewViewModel: ObservableObject {
                 }
             }
         } else {
-            sendAdapter.send(to: to, amount: exchanger.cryptoAmount, fee: recomendedFees?.fee(fee), completion: { [weak self] txId, error in
+            sendAdapter.send(to: to, amount: exchanger.baseAmount.value, fee: recomendedFees?.fee(fee), completion: { [weak self] txId, error in
                 guard let self = self else { return }
                 
                 DispatchQueue.main.async {
@@ -296,7 +296,7 @@ class SendViewViewModel: ObservableObject {
                         
                         self.unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
                             recipient: self.to,
-                            amount: self.exchanger.cryptoAmount,
+                            amount: self.exchanger.baseAmount.value,
                             id: id
                         )
                         
@@ -448,8 +448,8 @@ class SendViewViewModel: ObservableObject {
     }
     
     func useAllFunds() {
-        exchanger.cryptoAmount = balanceString
-        exchanger.cryptoAmount = balanceString
+        exchanger.baseAmount.value = balanceString
+        exchanger.baseAmount.value = balanceString
     }
 }
 
@@ -461,7 +461,7 @@ extension SendViewViewModel {
         vm.to = "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3"
         vm.balanceString = "0.000124"
         vm.valueString = "12.93"
-        vm.exchanger.cryptoAmount = "0.0000432"
+        vm.exchanger.baseAmount.value = "0.0000432"
         return vm
     }
     

@@ -39,7 +39,7 @@ struct ReviewTransactionView: View {
 
                 VStack(alignment: .trailing, spacing: 0) {
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Text(viewModel.exchanger.cryptoAmount)
+                        Text(viewModel.exchanger.baseAmount.value)
                             .font(.Main.fixed(.monoBold, size: 32))
                             .foregroundColor(Palette.grayScaleEA)
                             .frame(height: 26)
@@ -50,7 +50,7 @@ struct ReviewTransactionView: View {
                     }
                     
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text(viewModel.exchanger.currencyAmount)
+                        Text(viewModel.exchanger.quoteAmount.value)
                             .font(.Main.fixed(.monoMedium, size: 16))
                             .foregroundColor(Palette.grayScale6A)
                         

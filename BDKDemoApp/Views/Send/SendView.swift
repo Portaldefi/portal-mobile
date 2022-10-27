@@ -277,7 +277,7 @@ struct SendView: View {
                                     .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
                                     .transition(.move(edge: .bottom).combined(with: .opacity))
                             } else if !viewModel.exchanger.amountIsValid {
-                                Text("Invalid Amount")
+                                Text("Not enough funds")
                                     .font(.Main.fixed(.monoRegular, size: 16))
                                     .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
                                     .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -335,7 +335,7 @@ struct SendView: View {
                 case .bip21(let address, let amount, _):
                     viewModel.to = address
                     guard let _amount = amount else { return }
-                    viewModel.exchanger.cryptoAmount = _amount
+                    viewModel.exchanger.baseAmount.value = _amount
                     withAnimation {
                         viewModel.toReview()
                     }

@@ -53,11 +53,11 @@ struct SetAmountView: View {
                 
                 VStack(alignment: .trailing) {
                     switch viewModel.exchanger.side {
-                    case .crypto:
+                    case .base:
                         HStack(spacing: 0) {
                             Text(viewModel.balanceString)
                                 .font(.Main.fixed(.monoMedium, size: 16))
-                                .if(viewModel.exchanger.side == .crypto, then: { text in
+                                .if(viewModel.exchanger.side == .base, then: { text in
                                     text.foregroundColor(viewModel.exchanger.amountIsValid ?  Palette.grayScaleCA : warningColor)
                                 }, else: { text in
                                     text.foregroundColor(Palette.grayScaleCA)
@@ -74,7 +74,7 @@ struct SetAmountView: View {
                         HStack(spacing: 0) {
                             Text(viewModel.valueString)
                                 .font(.Main.fixed(.monoMedium, size: 16))
-                                .if(viewModel.exchanger.side == .currency, then: { text in
+                                .if(viewModel.exchanger.side == .quote, then: { text in
                                     text.foregroundColor(viewModel.exchanger.amountIsValid ?  Palette.grayScaleCA : warningColor)
                                 }, else: { text in
                                     text.foregroundColor(Palette.grayScale6A)
@@ -88,11 +88,11 @@ struct SetAmountView: View {
                         }
                         .transition(.move(edge: .top).combined(with: .opacity))
 
-                    case .currency:
+                    case .quote:
                         HStack(spacing: 0) {
                             Text(viewModel.valueString)
                                 .font(.Main.fixed(.monoMedium, size: 16))
-                                .if(viewModel.exchanger.side == .currency, then: { text in
+                                .if(viewModel.exchanger.side == .quote, then: { text in
                                     text.foregroundColor(viewModel.exchanger.amountIsValid ?  Palette.grayScaleCA : warningColor)
                                 }, else: { text in
                                     text.foregroundColor(Palette.grayScaleCA)
@@ -109,7 +109,7 @@ struct SetAmountView: View {
                         HStack(spacing: 0) {
                             Text(viewModel.balanceString)
                                 .font(.Main.fixed(.monoMedium, size: 16))
-                                .if(viewModel.exchanger.side == .crypto, then: { text in
+                                .if(viewModel.exchanger.side == .base, then: { text in
                                     text.foregroundColor(viewModel.exchanger.amountIsValid ?  Palette.grayScaleCA : warningColor)
                                 }, else: { text in
                                     text.foregroundColor(Palette.grayScale6A)

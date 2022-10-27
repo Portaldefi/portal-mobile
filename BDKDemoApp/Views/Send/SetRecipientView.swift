@@ -22,28 +22,28 @@ struct SetRecipientView: View {
                     .font(.Main.fixed(.bold, size: 24))
                     .foregroundColor(Palette.grayScaleCA)
                 
-                TextField("Enter address", text: $viewModel.to)
-                    .disableAutocorrection(true)
-                    .textInputAutocapitalization(.never)
-                    .font(.Main.fixed(.monoRegular, size: 16))
-                    .foregroundColor(
-                        viewModel.recipientAddressIsValid ? Palette.grayScaleAA : Color(red: 255/255, green: 82/255, blue: 82/255)
-                    )
-                    .padding()
-                    .cornerRadius(12)
-                    .if(!viewModel.recipientAddressIsValid, then: {
-                        $0.overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color(red: 255/255, green: 82/255, blue: 82/255), lineWidth: 1)
-                                .foregroundColor(Color.clear)
+                ZStack {
+                    if viewModel.recipientAddressIsValid {
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color(red: 58/255, green: 58/255, blue: 58/255), lineWidth: 1)
+                            .foregroundColor(Color.clear)
+
+                    } else {
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color(red: 255/255, green: 82/255, blue: 82/255), lineWidth: 1)
+                            .foregroundColor(Color.clear)
+                    }
+                    
+                    TextField("Enter address", text: $viewModel.to)
+                        .disableAutocorrection(true)
+                        .textInputAutocapitalization(.never)
+                        .font(.Main.fixed(.monoRegular, size: 16))
+                        .foregroundColor(
+                            viewModel.recipientAddressIsValid ? Palette.grayScaleAA : Color(red: 255/255, green: 82/255, blue: 82/255)
                         )
-                    }, else: {
-                        $0.overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color(red: 58/255, green: 58/255, blue: 58/255), lineWidth: 1)
-                                .foregroundColor(Color.clear)
-                        )
-                    })
+                        .padding()
+                        .cornerRadius(12)
+                }
             }
             
             HStack(spacing: 16) {

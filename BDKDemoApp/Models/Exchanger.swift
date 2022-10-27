@@ -11,19 +11,18 @@ import Factory
 
 class Exchanger: ObservableObject {
     private let balanceAdapter: IBalanceAdapter
-    private let base: Coin
-    private let quote: AccountCurrency
+    let base: Coin
+    let quote: AccountCurrency
     private var subscriptions = Set<AnyCancellable>()
     
     enum Side: Int, Hashable {
-        case crypto, currency
+        case base, quote
     }
         
-    @Published var cryptoAmount: String = "0"
-    @Published var currencyAmount: String = "0"
+    @Published var baseAmount = TextLimiter(limit: 10)
+    @Published var quoteAmount = TextLimiter(limit: 10)
     @Published var amountIsValid: Bool = true
-
-    @Published var side: Side = .crypto
+    @Published var side: Side = .base
     
     @Injected(Container.marketData) private var marketData
     
@@ -49,7 +48,7 @@ class Exchanger: ObservableObject {
     }
     
     private func subscribe() {
-        $cryptoAmount
+        baseAmount.$value
             .removeDuplicates()
             .map { Double($0.replacingOccurrences(of: ",", with: ".")) ?? 0 }
             .map { [unowned self] doubleValue -> String in
@@ -60,15 +59,15 @@ class Exchanger: ObservableObject {
             }
             .sink { [weak self] value in
                 if value == "0.0" {
-                    self?.currencyAmount = String()
+                    self?.quoteAmount.value = String()
                 } else {
-                    self?.currencyAmount = value
+                    self?.quoteAmount.value = value
                 }
                 
             }
             .store(in: &subscriptions)
         
-        $currencyAmount
+        quoteAmount.$value
             .removeDuplicates()
             .map { Double($0.replacingOccurrences(of: ",", with: ".")) ?? 0 }
             .map { [unowned self] in
@@ -76,11 +75,19 @@ class Exchanger: ObservableObject {
             }
             .sink { [unowned self] value in
                 if value == "0.00" {
-                    self.cryptoAmount = String()
+                    self.baseAmount.value = String()
                 } else {
-                    self.cryptoAmount = value
+                    self.baseAmount.value = value
                 }
             }
             .store(in: &subscriptions)
+    }
+}
+
+extension Exchanger {
+    static func mocked() -> Exchanger {
+        let exchanger = Exchanger(base: .bitcoin(), quote: .fiat(FiatCurrency(code: "USD", name: "Dollar")), balanceAdapter: BalanceAdapterMocked())
+        exchanger.baseAmount.value = "0.00001"
+        return exchanger
     }
 }
