@@ -116,11 +116,15 @@ struct QRCodeScannerView: View {
                             .background(Palette.grayScale0A)
                             
                             Divider()
+                                .frame(height: 1)
+                                .overlay(Palette.grayScale2A)
                             
                             ForEach(detectedItems) {
                                 QRCodeItemView(item: $0)
                                     .transition(.asymmetric(insertion: .move(edge: .bottom), removal: .move(edge: .top)))
                                 Divider()
+                                    .frame(height: 1)
+                                    .overlay(Palette.grayScale2A)
                             }
                         }
                         .cornerRadius(12)
@@ -277,9 +281,6 @@ struct QRCodeScannerView: View {
                 }
                 .padding(.horizontal)
                 .frame(height: 59)
-                
-                Divider()
-                    .frame(maxWidth: .infinity, maxHeight: 1)
             }
             .background(Palette.grayScale1A)
         }
