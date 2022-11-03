@@ -110,6 +110,6 @@ class LabelsManagerViewModel: ObservableObject {
         
         self.editItem = nil
         self.newLabelTitle = nil
-        storage.set(labels, forKey: storageKey)
+        storage.set(labels.map{ $0.label }, forKey: storageKey)
     }
 }
