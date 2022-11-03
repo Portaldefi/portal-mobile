@@ -28,8 +28,9 @@ class AssetDetailsViewModel: ObservableObject {
     private func subscribe() {
         transactionAdapter
             .transactionRecords
+            .receive(on: RunLoop.main)
             .assign(to: &$transactions)
-    }
+    }    
 }
 
 extension AssetDetailsViewModel {
