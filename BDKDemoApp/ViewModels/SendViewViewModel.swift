@@ -80,6 +80,7 @@ class SendViewViewModel: ObservableObject {
     @Published var unconfirmedTx: BitcoinDevKit.TransactionDetails?
     
     @Published var exchanger: Exchanger!
+    @Published var clipboardIsEmpty = false
     
     private var subscriptions = Set<AnyCancellable>()
     
@@ -440,6 +441,8 @@ class SendViewViewModel: ObservableObject {
         let pasteboard = UIPasteboard.general
         if let pastboardString = pasteboard.string {
             to = pastboardString
+        } else {
+            clipboardIsEmpty.toggle()
         }
     }
     

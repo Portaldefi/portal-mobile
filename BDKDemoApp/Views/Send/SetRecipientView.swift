@@ -66,6 +66,9 @@ struct SetRecipientView: View {
                 }
             }
         }
+        .alert(isPresented: $viewModel.clipboardIsEmpty) {
+            Alert(title: Text("Empty Clipboard"), message: Text("You don't have anything in your device clipboard."), dismissButton: .default(Text("OK")))
+        }
     }
 }
 
