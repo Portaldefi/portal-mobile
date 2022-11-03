@@ -112,6 +112,7 @@
 		75772A6A290681C500BE80B7 /* NotifiableViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A69290681C500BE80B7 /* NotifiableViewModifier.swift */; };
 		75772A6C2906B57200BE80B7 /* AmountValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A6B2906B57200BE80B7 /* AmountValueView.swift */; };
 		75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */ = {isa = PBXBuildFile; productRef = 75AA211028A668A400DD2E89 /* BitcoinAddressValidator */; };
+		75CC43AF2913CBC300B15008 /* SingleTxViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CC43AE2913CBC300B15008 /* SingleTxViewModel.swift */; };
 		75D8C59228D8867600228298 /* IAccountStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59128D8867600228298 /* IAccountStorage.swift */; };
 		75D8C59628D88A1100228298 /* IAppConfigProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59528D88A1100228298 /* IAppConfigProvider.swift */; };
 		75D8C59828D88A5600228298 /* AppConfigProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59728D88A5600228298 /* AppConfigProvider.swift */; };
@@ -240,6 +241,7 @@
 		75772A672902D73E00BE80B7 /* TextLimitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLimitter.swift; sourceTree = "<group>"; };
 		75772A69290681C500BE80B7 /* NotifiableViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifiableViewModifier.swift; sourceTree = "<group>"; };
 		75772A6B2906B57200BE80B7 /* AmountValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountValueView.swift; sourceTree = "<group>"; };
+		75CC43AE2913CBC300B15008 /* SingleTxViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleTxViewModel.swift; sourceTree = "<group>"; };
 		75D8C59128D8867600228298 /* IAccountStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAccountStorage.swift; sourceTree = "<group>"; };
 		75D8C59528D88A1100228298 /* IAppConfigProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAppConfigProvider.swift; sourceTree = "<group>"; };
 		75D8C59728D88A5600228298 /* AppConfigProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConfigProvider.swift; sourceTree = "<group>"; };
@@ -409,6 +411,7 @@
 				755C56C328E9B2CC00A4B57B /* AssetDetailsViewModel.swift */,
 				755C56C828EAC99700A4B57B /* TextEditorViewModel.swift */,
 				755C56DF28EB09EC00A4B57B /* LabelManagerViewModel.swift */,
+				75CC43AE2913CBC300B15008 /* SingleTxViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -645,6 +648,7 @@
 				755C56E028EB09EC00A4B57B /* LabelManagerViewModel.swift in Sources */,
 				7564C65228CF3CF600ABA8CF /* SetRecipientView.swift in Sources */,
 				755C56DE28EB09B000A4B57B /* TextFieldAlertController.swift in Sources */,
+				75CC43AF2913CBC300B15008 /* SingleTxViewModel.swift in Sources */,
 				756DDD7428A27C86002EDC60 /* RestoreAccountView.swift in Sources */,
 				756DDD9028A28C06002EDC60 /* AccountRecord+CoreDataClass.swift in Sources */,
 				75772A642901793300BE80B7 /* IdentifiableString.swift in Sources */,
