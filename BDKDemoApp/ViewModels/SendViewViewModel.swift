@@ -45,11 +45,11 @@ class SendViewViewModel: ObservableObject {
         var description: String {
             switch self {
             case .fast:
-                return "Fast ~ 10 min."
+                return "Fast ~ 10 mins"
             case .normal:
-                return "Normal ~ 30 min."
+                return "Normal ~ 30 mins"
             case .slow:
-                return "Slow ~ 60 min."
+                return "Slow ~ 60 mins"
             case .custom:
                 return "Not implemented"
             }

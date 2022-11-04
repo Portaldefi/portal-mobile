@@ -68,10 +68,22 @@ struct SendView: View {
                             .frame(height: 1)
                             .overlay(Palette.grayScale4A)
                         
-                        HStack {
+                        ZStack {
                             Text("Change Fee")
                                 .font(.Main.fixed(.monoBold, size: 16))
                                 .foregroundColor(Palette.grayScaleF4)
+                            
+                            HStack {
+                                PButton(config: .onlyLabel("Cancel"), style: .free, size: .small, applyGradient: true, enabled: true) {
+                                    withAnimation {
+                                        viewModel.viewState.showFeesPicker = false
+                                    }
+                                }
+                                .frame(width: 58)
+                                
+                                Spacer()
+                            }
+                            .padding(.horizontal, 16)
                         }
                         .frame(height: 62)
 
@@ -93,6 +105,11 @@ struct SendView: View {
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .stroke(Palette.grayScale2A, lineWidth: 2)
                                                     .frame(width: 24, height: 24)
+                                                
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .foregroundColor(Palette.grayScale10)
+                                                    .frame(width: 22, height: 22)
+                                                
                                                 if viewModel.fee == .fast {
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(
@@ -113,7 +130,7 @@ struct SendView: View {
                                             Text("~10 mins")
                                                 .font(.Main.fixed(.monoRegular, size: 16))
                                                 .foregroundColor(Palette.grayScaleF4)
-                                            Text("\(fees.fastestFee) sat/vByte")
+                                            Text("\((Double(fees.fastestFee)/100_000_000).formattedString(.btc, decimals: 8)) btc/vByte")
                                                 .font(.Main.fixed(.monoRegular, size: 14))
                                                 .foregroundColor(Palette.grayScale8A)
                                         }
@@ -138,6 +155,11 @@ struct SendView: View {
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .stroke(Palette.grayScale2A, lineWidth: 2)
                                                     .frame(width: 24, height: 24)
+                                                
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .foregroundColor(Palette.grayScale10)
+                                                    .frame(width: 22, height: 22)
+                                                
                                                 if viewModel.fee == .normal {
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(
@@ -155,10 +177,10 @@ struct SendView: View {
                                         Spacer()
                                         
                                         VStack(alignment: .trailing, spacing: 4) {
-                                            Text("~30 min")
+                                            Text("~30 mins")
                                                 .font(.Main.fixed(.monoRegular, size: 16))
                                                 .foregroundColor(Palette.grayScaleF4)
-                                            Text("\(fees.halfHourFee) sat/vByte")
+                                            Text("\((Double(fees.halfHourFee)/100_000_000).formattedString(.btc, decimals: 8)) btc/vByte")
                                                 .font(.Main.fixed(.monoRegular, size: 14))
                                                 .foregroundColor(Palette.grayScale8A)
                                         }
@@ -183,6 +205,11 @@ struct SendView: View {
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .stroke(Palette.grayScale2A, lineWidth: 2)
                                                     .frame(width: 24, height: 24)
+                                                
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .foregroundColor(Palette.grayScale10)
+                                                    .frame(width: 22, height: 22)
+                                                
                                                 if viewModel.fee == .slow {
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(
@@ -200,10 +227,10 @@ struct SendView: View {
                                         Spacer()
                                         
                                         VStack(alignment: .trailing, spacing: 4) {
-                                            Text("~60 min")
+                                            Text("~60 mins")
                                                 .font(.Main.fixed(.monoRegular, size: 16))
                                                 .foregroundColor(Palette.grayScaleF4)
-                                            Text("\(fees.hourFee) sat/vByte")
+                                            Text("\((Double(fees.hourFee)/100_000_000).formattedString(.btc, decimals: 8)) btc/vByte")
                                                 .font(.Main.fixed(.monoRegular, size: 14))
                                                 .foregroundColor(Palette.grayScale8A)
                                         }
@@ -228,6 +255,11 @@ struct SendView: View {
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .stroke(Palette.grayScale2A, lineWidth: 2)
                                                     .frame(width: 24, height: 24)
+                                                
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .foregroundColor(Palette.grayScale10)
+                                                    .frame(width: 22, height: 22)
+                                                
                                                 if viewModel.fee == .custom {
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(

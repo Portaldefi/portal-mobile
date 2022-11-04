@@ -70,7 +70,7 @@ struct ReviewTransactionView: View {
                         .font(.Main.fixed(.monoBold, size: 14))
                         .foregroundColor(Palette.grayScaleAA)
                     Text(viewModel.fee.description)
-                        .font(.Main.fixed(.monoBold, size: 14))
+                        .font(.Main.fixed(.monoRegular, size: 14))
                         .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
                 }
                 
@@ -79,11 +79,11 @@ struct ReviewTransactionView: View {
                 if let fees = viewModel.recomendedFees {
                     VStack {
                         HStack(spacing: 4) {
-                            Text("\(fees.fee(viewModel.fee))")
+                            Text((Double(fees.fee(viewModel.fee))/100_000_000).formattedString(.btc, decimals: 8))
                                 .font(.Main.fixed(.monoBold, size: 16))
                                 .foregroundColor(Palette.grayScaleEA)
 
-                            Text("sat/vByte")
+                            Text("btc/vByte")
                                 .font(.Main.fixed(.monoMedium, size: 11))
                                 .foregroundColor(Palette.grayScale6A)
                                 .frame(width: 34)
