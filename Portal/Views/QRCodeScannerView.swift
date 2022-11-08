@@ -26,10 +26,12 @@ struct QRCodeScannerView: View {
     
     @Environment(\.presentationMode) var presentation
     
+    private let config: QRScannerConfig
     private let detected: (QRCodeItem) -> ()
     private let onClose: () -> ()
     
-    init(detected: @escaping (QRCodeItem) -> (), onClose: @escaping () -> () = {}) {
+    init(config: QRScannerConfig, detected: @escaping (QRCodeItem) -> (), onClose: @escaping () -> () = {}) {
+        self.config = config
         self.detected = detected
         self.onClose = onClose
     }
@@ -50,9 +52,16 @@ struct QRCodeScannerView: View {
                                 let items = QRCodeParser.current.parse(result.string)
                                 let supportedItems = items.filter{ $0.type != .unsupported }
                                 if let item = supportedItems.first {
-                                    withAnimation(.easeInOut(duration: 0.25)) {
-                                        detectedItems = items
-                                        scanState = .detected
+                                    switch config {
+                                    case .send:
+                                        detectedItems.removeAll()
+                                        scanState = .detecting
+                                        detected(item)
+                                    case .universal:
+                                        withAnimation(.easeInOut(duration: 0.25)) {
+                                            detectedItems = items
+                                            scanState = .detected
+                                        }
                                     }
                                 } else {
                                     scanState = .unsupported
@@ -293,7 +302,7 @@ struct QRCodeScannerView_Previews: PreviewProvider {
             .foregroundColor(Color.black)
             .edgesIgnoringSafeArea(.all)
             .sheet(isPresented: .constant(true)) {
-                QRCodeScannerView(detected: {_ in })
+                QRCodeScannerView(config: .universal, detected: {_ in })
             }
     }
 }

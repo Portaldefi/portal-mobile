@@ -8,18 +8,18 @@
 import SwiftUI
 import Factory
 
+enum QRScannerConfig {
+    case send(Coin), universal
+}
+
 struct QRCodeReaderView: View {
     @State private var goToSend = false
     
-    enum Config {
-        case send, universal
-    }
-    
     @Environment(\.presentationMode) private var presentation
     private(set) var completion: (QRCodeItem) -> ()
-    private let config: Config
+    private let config: QRScannerConfig
     
-    init(config: Config, block: @escaping (QRCodeItem) -> () = { _ in } ) {
+    init(config: QRScannerConfig, block: @escaping (QRCodeItem) -> () = { _ in } ) {
         self.config = config
         completion = block
     }
@@ -27,7 +27,7 @@ struct QRCodeReaderView: View {
     var body: some View {
         NavigationView {
             VStack {
-                QRCodeScannerView { item in
+                QRCodeScannerView(config: config) { item in
                     switch config {
                     case .universal:
                         let vm = Container.sendViewModel()

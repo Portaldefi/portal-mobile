@@ -362,15 +362,12 @@ struct SendView: View {
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .navigationBarHidden(true)
         .sheet(isPresented: $viewModel.viewState.showQRCodeScannerFromRecipientView) {
-            QRCodeReaderView(config: .send) { item in
+            QRCodeReaderView(config: .send(viewModel.selectedItem!.viewModel.coin)) { item in
                 switch item.type {
                 case .bip21(let address, let amount, _):
                     viewModel.to = address
                     guard let _amount = amount else { return }
                     viewModel.exchanger.baseAmount.value = _amount
-                    withAnimation {
-                        viewModel.toReview()
-                    }
                 default:
                     break
                 }
