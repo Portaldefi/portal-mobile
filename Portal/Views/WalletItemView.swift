@@ -1,6 +1,6 @@
 //
 //  WalletItemView.swift
-// Portal
+//  Portal
 //
 //  Created by farid on 25/8/22.
 //
@@ -19,8 +19,8 @@ struct WalletItemView: View {
     
     var body: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 12) {
-                VStack(spacing: 4.2) {
+            VStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 4.2) {
                     HStack(spacing: 6) {
                         CoinImageView(
                             size: 24,
@@ -29,26 +29,25 @@ struct WalletItemView: View {
                         )
                         Text(viewModel.coin.name)
                             .font(.Main.fixed(.monoBold, size: 16))
-                            .foregroundColor(Palette.grayScaleCA)
+                            .foregroundColor(.white)
                             .frame(height: 16)
                     }
                     HStack(spacing: 4) {
                         Text("on")
-                            .font(.Main.fixed(.monoMedium, size: 12))
+                            .font(.Main.fixed(.monoMedium, size: 14))
                             .foregroundColor(Palette.grayScale6A)
                             .frame(height: 17)
                         viewModel.coin.chainIcon.resizable()
                             .frame(width: 12, height: 12)
                             .foregroundColor(Palette.grayScale8A)
                         Text(viewModel.coin.description)
-                            .font(.Main.fixed(.monoMedium, size: 12))
+                            .font(.Main.fixed(.monoMedium, size: 14))
                             .foregroundColor(Palette.grayScale6A)
                             .frame(height: 17)
                     }
                 }
             }
             Spacer()
-            
             if showBalance {
                 HStack(spacing: 6) {
                     VStack(alignment: .trailing, spacing: 0) {
@@ -62,15 +61,15 @@ struct WalletItemView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         HStack {
                             Text(viewModel.coin.unit.lowercased())
-                                .font(.Main.fixed(.monoMedium, size: 12))
+                                .font(.Main.fixed(.monoRegular, size: 14))
                                 .foregroundColor(Palette.grayScaleAA)
                             Spacer()
                         }
                         .frame(width: 40)
                         Text("usd")
-                            .font(.Main.fixed(.monoMedium, size: 12))
+                            .font(.Main.fixed(.monoRegular, size: 14))
                             .foregroundColor(Palette.grayScale6A)
-                            .offset(y: 7)
+                            .offset(y: 4)
                     }
                 }
             }
