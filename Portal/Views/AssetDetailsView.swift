@@ -1,6 +1,6 @@
 //
 //  AssetDetailsView.swift
-// Portal
+//  BDKDemoApp
 //
 //  Created by farid on 7/22/22.
 //
@@ -24,7 +24,7 @@ struct AssetDetailsView: View {
             Group {
                 HStack {
                     HStack(spacing: 8) {
-                        PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, color: Palette.grayScale6A, enabled: true) {
+                        PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
                             withAnimation {
                                 viewState.hideTabBar = false
                             }
@@ -34,17 +34,16 @@ struct AssetDetailsView: View {
                         
                         Text("All Assets")
                             .font(.Main.fixed(.monoBold, size: 16))
-                            .foregroundColor(Palette.grayScale6A)
                     }
                     Spacer()
                     Asset.gearIcon
                         .foregroundColor(Palette.grayScale6A)
                 }
-                .frame(height: 50)
+                .frame(height: 48)
                 .padding(.horizontal, 20)
                 
                 Divider()
-                    .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
+                    .overlay(Palette.grayScale2A)
                 
                 if let walletItem = item {
                     WalletItemView(viewModel: walletItem.viewModel)
@@ -58,19 +57,20 @@ struct AssetDetailsView: View {
             }
             
             Divider()
-                .overlay(Color(red: 17/255, green: 17/255, blue: 17/255))
+                .overlay(Palette.grayScale10)
             
             ZStack {
                 ScrollView {
-                    VStack(spacing: 0) {
-                        ForEach(viewModel.transactions, id: \.self) { transaction in
-                            SingleTxView(transaction: transaction)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    selectedTx = transaction
-                                    showTxDetails = true
-                                }
-                        }
+                    ForEach(viewModel.transactions, id: \.self) { transaction in
+                        SingleTxView(transaction: transaction)
+                            .padding(.horizontal, 8)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                selectedTx = transaction
+                                showTxDetails = true
+                            }
+                        Divider()
+                            .overlay(Palette.grayScale1A)
                     }
                 }
                 .background(Palette.grayScale20)
@@ -87,11 +87,7 @@ struct AssetDetailsView: View {
         .sheet(isPresented: $viewState.goToReceive) {
             NavigationView {
                 ReceiveView(
-                    viewModel: ReceiveViewModel.config(
-                        items: [WalletItem.mockedBtc],
-                        selectedItem: WalletItem.mockedBtc
-                    )
-                )
+                    viewModel: ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: WalletItem.mockedBtc))
             }
         }
         .sheet(isPresented: $viewState.goToSendFromDetails) {
