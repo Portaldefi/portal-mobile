@@ -1,6 +1,6 @@
 //
 //  SingleTxView.swift
-// Portal
+//  Portal
 //
 //  Created by farid on 7/21/22.
 //
@@ -90,6 +90,7 @@ struct SingleTxView: View {
                         .font(.Main.fixed(.monoRegular, size: 14))
                         .foregroundColor(Palette.grayScaleAA)
                         .padding(.leading, 40)
+                        .padding(.trailing, 8)
                 }
                 
                 if let labels = viewModel.tx.labels {
