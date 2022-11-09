@@ -10,8 +10,7 @@ import PortalUI
 import Combine
 
 class AmontEditorViewModel: ObservableObject {
-    let title = "Add Amount"
-    
+    let title: String
     let onCancelAcion: () -> ()
     let onSaveAcion: (String) -> ()
     
@@ -20,10 +19,12 @@ class AmontEditorViewModel: ObservableObject {
     let initialAmount: String
     
     init(
+        title: String,
         exchanger: Exchanger,
         onCancelAction: @escaping () -> (),
         onSaveAction: @escaping (String) -> ()
     ) {
+        self.title = title
         self.onCancelAcion = onCancelAction
         self.onSaveAcion = onSaveAction
         self.exchanger = exchanger
@@ -42,12 +43,14 @@ struct AmountEditorView: View {
     @StateObject private var viewModel: AmontEditorViewModel
     
     init(
+        title: String,
         exchanger: Exchanger,
         onCancelAction: @escaping () -> (),
         onSaveAction: @escaping (String) -> ()
     ) {
         _viewModel = StateObject(
             wrappedValue: AmontEditorViewModel(
+                title: title,
                 exchanger: exchanger,
                 onCancelAction: onCancelAction,
                 onSaveAction: onSaveAction
@@ -96,6 +99,7 @@ struct AmountEditorView: View {
 struct AmountEditorView_Previews: PreviewProvider {
     static var previews: some View {
         AmountEditorView(
+            title: "Add Amount",
             exchanger: Exchanger.mocked(),
             onCancelAction: {
                 
