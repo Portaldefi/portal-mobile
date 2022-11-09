@@ -81,6 +81,7 @@ class SendViewViewModel: ObservableObject {
     
     @Published var exchanger: Exchanger!
     @Published var clipboardIsEmpty = false
+    @Published var editingAmount = false
     
     private var subscriptions = Set<AnyCancellable>()
     
@@ -377,7 +378,11 @@ class SendViewViewModel: ObservableObject {
         case .amount:
             step = .recipient
         case .review:
-            step = .amount
+            if viewState.showQRCodeScannerFromTabBar {
+                shouldCloseSendFlow = true
+            } else {
+                step = .amount
+            }
         case .signing:
             step = .review
         case .sent:
