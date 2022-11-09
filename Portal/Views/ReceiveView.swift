@@ -157,7 +157,7 @@ struct ReceiveView: View {
                 }
                 
                 if viewModel.editingAmount {
-                    AmountEditorView(exchanger: viewModel.exchanger) {
+                    AmountEditorView(title: "Add Amount", exchanger: viewModel.exchanger) {
                         withAnimation {
                             viewModel.editingAmount.toggle()
                         }

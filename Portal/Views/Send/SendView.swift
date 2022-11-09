@@ -295,6 +295,20 @@ struct SendView: View {
                 }
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 
+            } else if viewModel.editingAmount {
+                AmountEditorView(title: "Edit Amount", exchanger: viewModel.exchanger) {
+                    withAnimation {
+                        viewModel.editingAmount.toggle()
+                    }
+                } onSaveAction: { amount in
+                    withAnimation {
+                        viewModel.editingAmount.toggle()
+                    }
+                }
+                .cornerRadius(8)
+                .offset(y: 5)
+                .transition(.move(edge: .bottom))
+                .zIndex(1)
             } else {
                 if viewModel.step != .selectAsset {
                     VStack(spacing: 0) {
