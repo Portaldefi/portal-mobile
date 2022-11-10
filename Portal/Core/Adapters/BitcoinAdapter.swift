@@ -141,11 +141,15 @@ final class BitcoinAdapter {
 extension BitcoinAdapter: ISendAdapter {
     func sendMax(to: String, fee: Int?, completion: @escaping (String?, Error?) -> Void) {
         do {
-            let psbt = try TxBuilder()
+            let txBuilderResult = try TxBuilder()
                 .drainWallet()
                 .drainTo(address: to)
                 .enableRbf()
                 .finish(wallet: wallet)
+            
+            let psbt = txBuilderResult.psbt
+            let txDetails = txBuilderResult.transactionDetails
+            print("txDetails: \(txDetails)")
             
             let finalized = try wallet.sign(psbt: psbt)
             print("Tx id: \(psbt.txid())")
@@ -167,14 +171,20 @@ extension BitcoinAdapter: ISendAdapter {
             let walletBalance = try wallet.getBalance().total
             let satAmountDouble = (Double(amount) ?? 0) * 100_000_000
             let satAmountInt = UInt64(satAmountDouble)
+            let recieverAddress = try Address(address: to)
+            let recieverAddressScript = recieverAddress.scriptPubkey()
             
             if walletBalance >= satAmountInt {
                 if let fee = fee {
-                    let psbt = try TxBuilder()
-                        .addRecipient(address: to, amount: satAmountInt)
+                    let txBuilderResult = try TxBuilder()
+                        .addRecipient(script: recieverAddressScript, amount: satAmountInt)
                         .feeRate(satPerVbyte: Float(fee))
                         .enableRbf()
                         .finish(wallet: wallet)
+                    
+                    let psbt = txBuilderResult.psbt
+                    let txDetails = txBuilderResult.transactionDetails
+                    print("txDetails: \(txDetails)")
                     
                     let finalized = try wallet.sign(psbt: psbt)
                     print("Tx id: \(psbt.txid())")
@@ -187,10 +197,14 @@ extension BitcoinAdapter: ISendAdapter {
                         completion(nil, SendFlowError.error("Tx not finalized"))
                     }
                 } else {
-                    let psbt = try TxBuilder()
-                        .addRecipient(address: to, amount: satAmountInt)
+                    let txBuilderResult = try TxBuilder()
+                        .addRecipient(script: recieverAddressScript, amount: satAmountInt)
                         .enableRbf()
                         .finish(wallet: wallet)
+                    
+                    let psbt = txBuilderResult.psbt
+                    let txDetails = txBuilderResult.transactionDetails
+                    print("txDetails: \(txDetails)")
                     
                     let finalized = try wallet.sign(psbt: psbt)
                     print("Tx id: \(psbt.txid())")
