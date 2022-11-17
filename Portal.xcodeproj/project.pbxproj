@@ -416,15 +416,13 @@
 		756A312F288844AD004978E2 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				7564C65028CF3C2E00ABA8CF /* Send */,
 				756DDD9228A28DE7002EDC60 /* RootView.swift */,
+				75883A10292618330089D714 /* Onboarding */,
+				7564C65028CF3C2E00ABA8CF /* Send */,
 				755C56D928EB090B00A4B57B /* TextFieldWrapper.swift */,
 				756A313E28902C6F004978E2 /* MainView.swift */,
 				756A3117288821F3004978E2 /* AccountView.swift */,
 				756A3136288AEAAD004978E2 /* AssetDetailsView.swift */,
-				756DDD6D28A272AB002EDC60 /* NoAccountView.swift */,
-				756DDD6F28A275AD002EDC60 /* CreateAccountView.swift */,
-				756DDD7328A27C86002EDC60 /* RestoreAccountView.swift */,
 				756A313A288AEFA2004978E2 /* ReceiveView.swift */,
 				75772A6B2906B57200BE80B7 /* AmountValueView.swift */,
 				756A313228898C73004978E2 /* SingleTxView.swift */,
@@ -485,6 +483,16 @@
 				756DDD8D28A28C06002EDC60 /* AccountRecord+CoreDataProperties.swift */,
 			);
 			path = DB;
+			sourceTree = "<group>";
+		};
+		75883A10292618330089D714 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				756DDD6D28A272AB002EDC60 /* NoAccountView.swift */,
+				756DDD6F28A275AD002EDC60 /* CreateAccountView.swift */,
+				756DDD7328A27C86002EDC60 /* RestoreAccountView.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		75D8C59328D8887300228298 /* Core */ = {
