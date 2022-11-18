@@ -38,7 +38,7 @@ class ViewState: ObservableObject {
     }
     @Published var showFeesPicker: Bool = false
     
-    @Published var showQRCodeScannerFromRecipientView = false
+    @Published var showInContextScanner = false
     @Published var goToReceive = false
     
     @Published private(set) var selectedTab: Tab = .wallet

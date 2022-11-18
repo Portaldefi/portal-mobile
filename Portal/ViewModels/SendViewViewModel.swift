@@ -452,7 +452,7 @@ class SendViewViewModel: ObservableObject {
     }
     
     func openScanner() {
-        viewState.showQRCodeScannerFromRecipientView = true
+        viewState.showInContextScanner = true
     }
     
     func useAllFunds() {
