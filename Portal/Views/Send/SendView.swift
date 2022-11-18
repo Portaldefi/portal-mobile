@@ -10,7 +10,6 @@ import PortalUI
 import Factory
 
 struct SendView: View {
-    @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject var viewModel: SendViewViewModel = Container.sendViewModel()
     @ObservedObject private var viewState = Container.viewState()
@@ -375,7 +374,7 @@ struct SendView: View {
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .navigationBarHidden(true)
-        .sheet(isPresented: $viewModel.viewState.showQRCodeScannerFromRecipientView) {
+        .sheet(isPresented: $viewModel.viewState.showInContextScanner) {
             QRCodeReaderView(config: .send(viewModel.selectedItem!.viewModel.coin)) { item in
                 switch item.type {
                 case .bip21(let address, let amount, _):
