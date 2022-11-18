@@ -11,10 +11,16 @@ import PortalUI
 struct CreateAccountView: View {
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
-    @ObservedObject private var viewModel = CreateAccountViewModel()
+    @ObservedObject private var viewModel: CreateAccountViewModel
     
-    init() {
+    init(words: [String]? = nil) {
         UITableView.appearance().backgroundColor = .clear
+
+        if let words = words {
+            viewModel = CreateAccountViewModel(words: words)
+        } else {
+            viewModel = CreateAccountViewModel()
+        }
     }
     
     var body: some View {
@@ -33,7 +39,7 @@ struct CreateAccountView: View {
                     .font(.Main.fixed(.monoBold, size: 16))
             }
             .frame(height: 62)
-            .padding([.top, .horizontal])
+            .padding(.horizontal)
             
             VStack(alignment: .leading, spacing: 8) {
                 TextField("Portfolio name", text: $viewModel.accountName)
@@ -87,7 +93,6 @@ struct CreateAccountView: View {
             }
         }
         .navigationBarHidden(true)
-        .modifier(BackButtonModifier())
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .onAppear {
             isFocused = true
