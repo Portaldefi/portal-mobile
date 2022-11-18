@@ -16,8 +16,13 @@ class CreateAccountViewModel: ObservableObject {
     
     @Injected(Container.accountManager) private var manager
     
-    init() {
-        mnemonic = try! generateMnemonic(wordCount: .words12)
+    init(words: [String]? = nil) {
+        if let words = words {
+            mnemonic = words.joined(separator: " ")
+        } else {
+            mnemonic = try! generateMnemonic(wordCount: .words12)
+        }
+        print("\(mnemonic)")
         extendedKey = try! DescriptorSecretKey(network: .testnet, mnemonic: mnemonic, password: nil)
     }
     
