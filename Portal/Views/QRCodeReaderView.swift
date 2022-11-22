@@ -45,7 +45,7 @@ struct QRCodeReaderView: View {
                 }
                 
                 switch config {
-                case .send:
+                case .universal, .send:
                     NavigationLink(
                         destination: SendView(),
                         isActive: $goToSend
