@@ -44,8 +44,8 @@ final class BitcoinAdapter {
         let account = wallet.account
         let bip32RootKey = wallet.account.rootKey
         let deriviationPath = try DerivationPath(path: "m/84h/0h/\(account.index)h/0")
-        let fullDescriptor = try bip32RootKey.derive(path: deriviationPath)
-        let descriptor = "wpkh(\(fullDescriptor.asString()))"
+        let derivedKey = try bip32RootKey.derive(path: deriviationPath)
+        let descriptor = "wpkh(\(derivedKey.asString()))"
         
         if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
             let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite" + "\(account.id)")
