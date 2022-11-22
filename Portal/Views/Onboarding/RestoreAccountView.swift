@@ -60,6 +60,7 @@ struct RestoreAccountView: View {
                         }
                         
                         TextEditor(text: $viewModel.input)
+                            .textInputAutocapitalization(.never)
                             .focused($isFocused)
                             .foregroundColor(viewModel.validInput ? .white : Color(red: 1, green: 0.349, blue: 0.349))
                             .font(.Main.fixed(.monoBold, size: 16))
@@ -164,7 +165,7 @@ struct RestoreAccountView: View {
             Alert(title: Text("Empty Clipboard"), message: Text("You don't have anything in your device clipboard."), dismissButton: .default(Text("OK")))
         }
         .sheet(isPresented: $viewState.showInContextScanner) {
-            QRCodeReaderView(config: .importing) { item in
+             QRCodeReaderView(config: .importing) { item in
                 switch item.type {
                 case .privKey(let key):
                     viewModel.input = key
