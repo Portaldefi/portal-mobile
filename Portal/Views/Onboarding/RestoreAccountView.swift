@@ -164,7 +164,7 @@ struct RestoreAccountView: View {
             Alert(title: Text("Empty Clipboard"), message: Text("You don't have anything in your device clipboard."), dismissButton: .default(Text("OK")))
         }
         .sheet(isPresented: $viewState.showInContextScanner) {
-            QRCodeReaderView(config: .send(.bitcoin())) { item in
+            QRCodeReaderView(config: .importing) { item in
                 switch item.type {
                 case .privKey(let key):
                     viewModel.input = key
