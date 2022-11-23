@@ -9,14 +9,14 @@ import BitcoinDevKit
 import Foundation
 
 enum TxType: Equatable {
-    case sent, recieved, swapped(for: Coin)
+    case sent, received, swapped(for: Coin)
     
     var description: String {
         switch self {
         case .sent:
             return "Sent"
-        case .recieved:
-            return "Recieved"
+        case .received:
+            return "Received"
         case .swapped(for: let coin):
             return "Swapped for \(coin.code)"
         }
@@ -47,7 +47,7 @@ extension BitcoinDevKit.TransactionDetails {
         if self.sent > 0 {
             return .sent
         } else {
-            return .recieved
+            return .received
         }
     }
     

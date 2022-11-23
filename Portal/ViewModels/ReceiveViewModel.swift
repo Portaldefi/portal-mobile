@@ -12,7 +12,7 @@ import CoreImage.CIFilterBuiltins
 import SwiftUI
 
 class ReceiveViewModel: ObservableObject {
-    enum RecieveStep {
+    enum ReceiveStep {
         case selectAsset, generateQR
     }
     
@@ -26,7 +26,7 @@ class ReceiveViewModel: ObservableObject {
     @Published var editingDescription = false
     
     @Published private(set) var qrCode = UIImage()
-    @Published private(set) var step: RecieveStep = .selectAsset
+    @Published private(set) var step: ReceiveStep = .selectAsset
     @Published private(set) var walletItems = [WalletItem]()
     
     @Published var sharedAddress: IdentifiableString?

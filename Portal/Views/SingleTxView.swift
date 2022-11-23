@@ -49,15 +49,15 @@ struct SingleTxView: View {
                     HStack(spacing: 6) {
                         VStack(alignment: .trailing, spacing: 0) {
                             HStack {
-                                Text("\(viewModel.tx.type == .recieved ? "+" : "-")")
+                                Text("\(viewModel.tx.type == .received ? "+" : "-")")
                                     .font(.Main.fixed(.monoMedium, size: 16))
-                                    .foregroundColor(viewModel.tx.type == .recieved ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA)
+                                    .foregroundColor(viewModel.tx.type == .received ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA)
                                 Text(viewModel.tx.value)
                                     .font(.Main.fixed(.monoMedium, size: 16))
-                                    .foregroundColor(viewModel.tx.type == .recieved ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA)
+                                    .foregroundColor(viewModel.tx.type == .received ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA)
                             }
                             HStack {
-                                Text("\(viewModel.tx.type == .recieved ? "+" : "-")")
+                                Text("\(viewModel.tx.type == .received ? "+" : "-")")
                                     .font(.Main.fixed(.monoBold, size: 16))
                                     .foregroundColor(Palette.grayScale6A)
                                 Text("4.55")
