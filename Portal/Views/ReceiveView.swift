@@ -36,7 +36,7 @@ struct ReceiveView: View {
                         }
                         .padding(.horizontal, 25)
                         
-                        Text("Recieve")
+                        Text("Receive")
                             .frame(width: 300, height: 62)
                             .font(.Main.fixed(.monoBold, size: 16))
                     }

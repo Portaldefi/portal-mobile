@@ -18,7 +18,7 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     enum TxSide {
-        case sent, recieved
+        case sent, received
     }
     
     let coin: Coin
@@ -33,14 +33,14 @@ class TransactionDetailsViewModel: ObservableObject {
     @LazyInjected(Container.viewState) var viewState: ViewState
     
     var title: String {
-        transaction.sent > 0 ? "Sent" : "Recieved"
+        transaction.sent > 0 ? "Sent" : "Received"
     }
     
     var amountString: String {
         switch txSide {
         case .sent:
             return (Double(transaction.sent)/100_000_000).toString(decimal: 8)
-        case .recieved:
+        case .received:
             return (Double(transaction.received)/100_000_000).toString(decimal: 8)
         }
     }
@@ -87,7 +87,7 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     private var txSide: TxSide {
-        transaction.sent > 0 ? .sent : .recieved
+        transaction.sent > 0 ? .sent : .received
     }
         
     private var subscriptions = Set<AnyCancellable>()
