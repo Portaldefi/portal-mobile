@@ -36,6 +36,12 @@
 		7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */ = {isa = PBXBuildFile; productRef = 7545BC4028CA107100ED92C3 /* Coinpaprika */; };
 		7545BC4328CA155100ED92C3 /* Decimal+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */; };
 		754EDF9128EC2E44004F10E2 /* ISendAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754EDF9028EC2E44004F10E2 /* ISendAdapter.swift */; };
+		7551706B2934AA7700CC84D7 /* BackUpDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551706A2934AA7700CC84D7 /* BackUpDetailsView.swift */; };
+		7551706D2934B10000CC84D7 /* RecoveryPhraseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551706C2934B10000CC84D7 /* RecoveryPhraseView.swift */; };
+		7551706F2935C76C00CC84D7 /* ClickableWordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551706E2935C76C00CC84D7 /* ClickableWordView.swift */; };
+		755170712935C81900CC84D7 /* RoundedCornerShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170702935C81900CC84D7 /* RoundedCornerShape.swift */; };
+		755170732935C96400CC84D7 /* RecoverPhraseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170722935C96400CC84D7 /* RecoverPhraseViewModel.swift */; };
+		755170752935E33F00CC84D7 /* RecoveryData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170742935E33F00CC84D7 /* RecoveryData.swift */; };
 		755C56AF28E5BDD600A4B57B /* WalletItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */; };
 		755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */; };
 		755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */; };
@@ -168,6 +174,12 @@
 		7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
 		7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+Extension.swift"; sourceTree = "<group>"; };
 		754EDF9028EC2E44004F10E2 /* ISendAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISendAdapter.swift; sourceTree = "<group>"; };
+		7551706A2934AA7700CC84D7 /* BackUpDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackUpDetailsView.swift; sourceTree = "<group>"; };
+		7551706C2934B10000CC84D7 /* RecoveryPhraseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryPhraseView.swift; sourceTree = "<group>"; };
+		7551706E2935C76C00CC84D7 /* ClickableWordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickableWordView.swift; sourceTree = "<group>"; };
+		755170702935C81900CC84D7 /* RoundedCornerShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedCornerShape.swift; sourceTree = "<group>"; };
+		755170722935C96400CC84D7 /* RecoverPhraseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverPhraseViewModel.swift; sourceTree = "<group>"; };
+		755170742935E33F00CC84D7 /* RecoveryData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryData.swift; sourceTree = "<group>"; };
 		755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemViewModel.swift; sourceTree = "<group>"; };
 		755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceAdapterMocked.swift; sourceTree = "<group>"; };
 		755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMarketDataRepository.swift; sourceTree = "<group>"; };
@@ -390,6 +402,7 @@
 				755C56DD28EB09B000A4B57B /* TextFieldAlertController.swift */,
 				75772A632901793300BE80B7 /* IdentifiableString.swift */,
 				75772A672902D73E00BE80B7 /* TextLimitter.swift */,
+				755170742935E33F00CC84D7 /* RecoveryData.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -409,6 +422,7 @@
 				755C56C828EAC99700A4B57B /* TextEditorViewModel.swift */,
 				755C56DF28EB09EC00A4B57B /* LabelManagerViewModel.swift */,
 				75CC43AE2913CBC300B15008 /* SingleTxViewModel.swift */,
+				755170722935C96400CC84D7 /* RecoverPhraseViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -421,6 +435,10 @@
 				755C56D928EB090B00A4B57B /* TextFieldWrapper.swift */,
 				756A313E28902C6F004978E2 /* MainView.swift */,
 				756A3117288821F3004978E2 /* AccountView.swift */,
+				7551706A2934AA7700CC84D7 /* BackUpDetailsView.swift */,
+				7551706C2934B10000CC84D7 /* RecoveryPhraseView.swift */,
+				755170702935C81900CC84D7 /* RoundedCornerShape.swift */,
+				7551706E2935C76C00CC84D7 /* ClickableWordView.swift */,
 				756A3136288AEAAD004978E2 /* AssetDetailsView.swift */,
 				756DDD6D28A272AB002EDC60 /* NoAccountView.swift */,
 				756DDD6F28A275AD002EDC60 /* CreateAccountView.swift */,
@@ -639,6 +657,7 @@
 				756A312D28884452004978E2 /* WalletItem.swift in Sources */,
 				756DDD8F28A28C06002EDC60 /* AccountRecord+CoreDataProperties.swift in Sources */,
 				755C56D128EACC4700A4B57B /* TxLabelView.swift in Sources */,
+				755170712935C81900CC84D7 /* RoundedCornerShape.swift in Sources */,
 				756A311F288821F4004978E2 /* Persistence.swift in Sources */,
 				756A313F28902C6F004978E2 /* MainView.swift in Sources */,
 				755C56BA28E9B03000A4B57B /* TxAmountView.swift in Sources */,
@@ -653,6 +672,7 @@
 				7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */,
 				756DDD7D28A28754002EDC60 /* AccountStorage.swift in Sources */,
 				755C56D728EACFD700A4B57B /* LabelsManagerView.swift in Sources */,
+				7551706D2934B10000CC84D7 /* RecoveryPhraseView.swift in Sources */,
 				75D8C59B28D88BE500228298 /* IAdapterFactory.swift in Sources */,
 				75D8C5B128DADE7500228298 /* IWalletManager.swift in Sources */,
 				755C56E228EB0A1900A4B57B /* SelectableTxLabelView.swift in Sources */,
@@ -671,6 +691,7 @@
 				755C56C028E9B0F600A4B57B /* TxIDView.swift in Sources */,
 				75DFA55828BD010400F23E02 /* QRCodeReaderView.swift in Sources */,
 				75D8C5CD28E1B40300228298 /* AsyncImageView.swift in Sources */,
+				755170752935E33F00CC84D7 /* RecoveryData.swift in Sources */,
 				755C56CB28EACA9100A4B57B /* WrappedHStack.swift in Sources */,
 				75D8C5C328DC715900228298 /* ICoinStorage.swift in Sources */,
 				75D8C5BF28DC710E00228298 /* ICoinManager.swift in Sources */,
@@ -681,6 +702,7 @@
 				752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */,
 				755C56D328EACC9000A4B57B /* TxLabel.swift in Sources */,
 				755C56C628EAAD7C00A4B57B /* TextEditorView.swift in Sources */,
+				755170732935C96400CC84D7 /* RecoverPhraseViewModel.swift in Sources */,
 				7545BC3E28C9E7AF00ED92C3 /* RepeatingTimer.swift in Sources */,
 				479A7ACD28B778CB0057E100 /* WalletItemView.swift in Sources */,
 				756A3137288AEAAD004978E2 /* AssetDetailsView.swift in Sources */,
@@ -707,6 +729,7 @@
 				4774D72028B4B0C600B7988B /* ViewState.swift in Sources */,
 				7545BC4328CA155100ED92C3 /* Decimal+Extension.swift in Sources */,
 				4774D72D28B4FCCC00B7988B /* AccountCurrency.swift in Sources */,
+				7551706B2934AA7700CC84D7 /* BackUpDetailsView.swift in Sources */,
 				756A313B288AEFA2004978E2 /* ReceiveView.swift in Sources */,
 				755C56D528EACDF500A4B57B /* BitcoinDevKitTransaction+Extension.swift in Sources */,
 				756A3122288821F4004978E2 /* PortalDB.xcdatamodeld in Sources */,
@@ -741,6 +764,7 @@
 				755C56DC28EB096E00A4B57B /* TextFieldAlert.swift in Sources */,
 				756DDD9728A28F8F002EDC60 /* IAccountManager.swift in Sources */,
 				754EDF9128EC2E44004F10E2 /* ISendAdapter.swift in Sources */,
+				7551706F2935C76C00CC84D7 /* ClickableWordView.swift in Sources */,
 				75D8C5A728D88E0900228298 /* IBalanceAdapter.swift in Sources */,
 				756DDD9D28A292D4002EDC60 /* RootViewViewModel.swift in Sources */,
 				756DDD8328A2879E002EDC60 /* ILocalStorage.swift in Sources */,
