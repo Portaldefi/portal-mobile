@@ -12,9 +12,41 @@ import Factory
 
 class RecoveryPhraseViewModel: ObservableObject {
     let recoveryPhrase: [String]
+    let recoveryTest: [String]
+    
+    @Published var goToVerify = false
+    @Published var recoveryArray = [String]()
+    
+    var testPassed: Bool {
+        recoveryPhrase.hashValue == recoveryArray.hashValue
+    }
     
     init(recoveryPhrase: [String]) {
+        print("recoveryPhrase: \(recoveryPhrase)")
         self.recoveryPhrase = recoveryPhrase
+        self.recoveryTest = recoveryPhrase.shuffled()
+    }
+    
+    func select(word: String) {
+        if let index = recoveryArray.firstIndex(of: word) {
+            recoveryArray.remove(at: index)
+        } else {
+            recoveryArray.append(word)
+        }
+    }
+    
+    func indexOf(word: String) -> Int {
+        if let index = recoveryArray.firstIndex(of: word) {
+            return index + 1
+        } else {
+            return 1
+        }
+    }
+        
+    func isCorrectSelection(word: String) -> Bool {
+        guard !recoveryArray.isEmpty else { return false }
+        let index = indexOf(word: word)
+        return recoveryPhrase[index - 1] == word
     }
 }
 
