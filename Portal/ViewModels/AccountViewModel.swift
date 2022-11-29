@@ -22,21 +22,28 @@ class AccountViewModel: ObservableObject {
     private let walletManager: IWalletManager
     private let adapterManager: IAdapterManager
     private let marketData: IMarketDataRepository
+    private let localStorage: ILocalStorage
     
     private var subscriptions = Set<AnyCancellable>()
     
     @ObservedObject private var viewState: ViewState
+    
+    var accountDataIsBackedUp: Bool {
+        localStorage.isAccountBackedUp
+    }
             
     init(
         accountManager: IAccountManager,
         walletManager: IWalletManager,
         adapterManager: IAdapterManager,
+        localStorage: ILocalStorage,
         marketData: IMarketDataRepository,
         viewState: ViewState
     ) {
         self.accountManager = accountManager
         self.walletManager = walletManager
         self.adapterManager = adapterManager
+        self.localStorage = localStorage
         self.marketData = marketData
         self.viewState = viewState
         
@@ -113,6 +120,7 @@ extension AccountViewModel {
             accountManager: AccountManager.mocked,
             walletManager: WalletManager.mocked,
             adapterManager: AdapterManager.mocked,
+            localStorage: LocalStorage.mocked,
             marketData: MarketData.mocked,
             viewState: ViewState()
         )
