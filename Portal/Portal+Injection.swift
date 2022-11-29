@@ -50,6 +50,8 @@ extension SharedContainer {
         let accountManager = Container.accountManager()
         let walletManager = Container.walletManager()
         let adapterManager = Container.adapterManager()
+        let userDefaults = UserDefaults.standard
+        let localStorage = LocalStorage(storage: userDefaults)
         let marketData = Container.marketData()
         let viewState = Container.viewState()
         
@@ -57,6 +59,7 @@ extension SharedContainer {
             accountManager: accountManager,
             walletManager: walletManager,
             adapterManager: adapterManager,
+            localStorage: localStorage,
             marketData: marketData,
             viewState: viewState
         )
