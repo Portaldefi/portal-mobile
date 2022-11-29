@@ -10,13 +10,14 @@ import PortalUI
 
 struct BackUpDetailsView: View {
     @Environment(\.presentationMode) private var presentationMode
+    @StateObject private var viewModel: RecoveryPhraseViewModel = RecoveryPhraseViewModel.config()
     @State private var showRecoveryPhrase = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
             
             NavigationLink(
-                destination: RecoveryPhraseView(),
+                destination: RecoveryPhraseView(viewModel: viewModel),
                 isActive: $showRecoveryPhrase
             ) {
                 EmptyView()
