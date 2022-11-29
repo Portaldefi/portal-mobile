@@ -29,6 +29,10 @@ final class AccountManager {
 }
 
 extension AccountManager: IAccountManager {
+    var activeAccountRecoveryData: RecoveryData? {
+        accountStorage.activeAccountRecoveryData
+    }
+    
     var activeAccount: Account? {
         accountStorage.activeAccount
     }
@@ -76,6 +80,10 @@ extension AccountManager: IAccountManager {
 
 extension AccountManager {
     private class AccountManagerMock: IAccountManager {
+        var activeAccountRecoveryData: RecoveryData? {
+            RecoveryData(words: ["point", "head", "pencil", "differ", "reopen", "damp", "wink", "minute", "improve", "toward", "during", "term"], salt: String())
+        }
+        
         var onActiveAccountUpdate = PassthroughSubject<Account?, Never>()
         
         var accounts: [Account] = []
