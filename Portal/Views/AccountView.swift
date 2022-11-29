@@ -102,10 +102,12 @@ struct AccountView: View {
             
             Spacer()
             
-            PButton(config: .onlyIcon(Asset.contatcIcon), style: .free, size: .medium, enabled: true) {
-                viewState.goToBackUp.toggle()
+            if !viewModel.accountDataIsBackedUp {
+                PButton(config: .onlyIcon(Asset.warningIcon), style: .free, size: .medium, color: .yellow, enabled: true) {
+                    viewState.goToBackUp.toggle()
+                }
+                .frame(width: 30, height: 30)
             }
-            .frame(width: 30, height: 30)
             
             Asset.gearIcon
                 .foregroundColor(Palette.grayScale6A)
