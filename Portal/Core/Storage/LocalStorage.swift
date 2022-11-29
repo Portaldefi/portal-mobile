@@ -13,6 +13,7 @@ final class LocalStorage {
     static let appLaunchesCountKey = "APP_LAUNCHES_COUNTER"
     static let currentAccountIDKey = "CURRENT_WALLET_ID"
     static let syncedExchangesIDsKey = "SYNCED_EXCHANGES_IDS"
+    static let backUpKey = "ACCOUNT_BACKUP_KEY"
     
     private var appLaunchesCounter: Int {
         storage.integer(forKey: Self.appLaunchesCountKey)
@@ -26,6 +27,11 @@ final class LocalStorage {
 }
 
 extension LocalStorage: ILocalStorage {
+    var isAccountBackedUp: Bool {
+        guard let currentAccountID = getCurrentAccountID() else { return false }
+        return storage.bool(forKey: Self.backUpKey + currentAccountID)
+    }
+    
     var isFirstLaunch: Bool {
         storage.integer(forKey: Self.appLaunchesCountKey) == 0
     }
@@ -70,10 +76,17 @@ extension LocalStorage: ILocalStorage {
             storage.set(exchangesIds, forKey: Self.syncedExchangesIDsKey)
         }
     }
+    
+    func markAccountIsBackeUp() {
+        guard let currentAccountID = getCurrentAccountID() else { return }
+        storage.set(true, forKey: Self.backUpKey + currentAccountID)
+    }
 }
 
 extension LocalStorage {
     fileprivate class LocalStorageMock: ILocalStorage {
+        var isAccountBackedUp: Bool { false }
+        
         var syncedExchangesIds: [String] = []
         
         var isFirstLaunch: Bool = false
@@ -101,6 +114,10 @@ extension LocalStorage {
         }
         
         func removeSyncedExchange(id: String) {
+            
+        }
+        
+        func markAccountIsBackeUp() {
             
         }
     }
