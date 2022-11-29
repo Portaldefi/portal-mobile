@@ -12,6 +12,7 @@ import Factory
 struct AccountView: View {
     @State private var goToDetails = false
     @State private var goToReceive = false
+    @State private var goToBackUp = false
     @State private var selectedItem: WalletItem?
     @State private var qrItem: QRCodeItem?
     
@@ -83,6 +84,11 @@ struct AccountView: View {
                 SendView()
             }
         }
+        .fullScreenCover(isPresented: $goToBackUp) {
+            NavigationView {
+                BackUpDetailsView()
+            }
+        }
     }
     
     func AccountView() -> some View {
@@ -94,7 +100,14 @@ struct AccountView: View {
                     .font(.Main.fixed(.bold, size: 16))
                     .foregroundColor(Palette.grayScaleF4)
             }
+            
             Spacer()
+            
+            PButton(config: .onlyIcon(Asset.contatcIcon), style: .free, size: .medium, enabled: true) {
+                goToBackUp.toggle()
+            }
+            .frame(width: 30, height: 30)
+            
             Asset.gearIcon
                 .foregroundColor(Palette.grayScale6A)
         }
