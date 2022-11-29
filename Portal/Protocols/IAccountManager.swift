@@ -12,6 +12,7 @@ protocol IAccountManager {
     var onActiveAccountUpdate: PassthroughSubject<Account?, Never> { get }
     var accounts: [Account] { get }
     var activeAccount: Account? { get }
+    var activeAccountRecoveryData: RecoveryData? { get }
     func account(id: String) -> Account?
     func updateWalletCurrency(code: String)
     func addCoin(coin: String)
