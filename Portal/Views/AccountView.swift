@@ -12,7 +12,6 @@ import Factory
 struct AccountView: View {
     @State private var goToDetails = false
     @State private var goToReceive = false
-    @State private var goToBackUp = false
     @State private var selectedItem: WalletItem?
     @State private var qrItem: QRCodeItem?
     
@@ -84,7 +83,7 @@ struct AccountView: View {
                 SendView()
             }
         }
-        .fullScreenCover(isPresented: $goToBackUp) {
+        .fullScreenCover(isPresented: $viewState.goToBackUp) {
             NavigationView {
                 BackUpDetailsView()
             }
@@ -104,7 +103,7 @@ struct AccountView: View {
             Spacer()
             
             PButton(config: .onlyIcon(Asset.contatcIcon), style: .free, size: .medium, enabled: true) {
-                goToBackUp.toggle()
+                viewState.goToBackUp.toggle()
             }
             .frame(width: 30, height: 30)
             
