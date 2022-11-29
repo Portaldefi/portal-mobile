@@ -95,7 +95,7 @@ struct RecoveryPhraseView_Previews: PreviewProvider {
     static var previews: some View {
         RecoveryPhraseView(
             viewModel: RecoveryPhraseViewModel(
-                recoveryPhrase: [
+                storage: LocalStorage.mocked, recoveryPhrase: [
                     "point", "head", "pencil", "differ", "reopen", "damp", "wink", "minute", "improve", "toward", "during", "term"
                 ]
             )
