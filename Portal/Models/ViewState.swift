@@ -40,6 +40,7 @@ class ViewState: ObservableObject {
     
     @Published var showQRCodeScannerFromRecipientView = false
     @Published var goToReceive = false
+    @Published var goToBackUp = false
     
     @Published private(set) var selectedTab: Tab = .wallet
     
