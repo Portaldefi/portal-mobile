@@ -81,6 +81,7 @@ struct RecoveryPhraseTestView: View {
                 
                 HStack {
                     PButton(config: .onlyLabel("Continue"), style: .filled, size: .big, enabled: viewModel.testPassed) {
+                        viewModel.markAccountAsBackedUp()
                         viewState.goToBackUp.toggle()
                     }
                 }
@@ -97,6 +98,11 @@ struct RecoveryPhraseTestView: View {
 
 struct RecoveryPhraseTestView_Previews: PreviewProvider {
     static var previews: some View {
-        RecoveryPhraseTestView(viewModel: RecoveryPhraseViewModel(recoveryPhrase: ["point", "head", "pencil", "differ", "reopen", "damp", "wink", "minute", "improve", "toward", "during", "term"]))
+        RecoveryPhraseTestView(
+            viewModel: RecoveryPhraseViewModel(
+                storage: LocalStorage.mocked,
+                recoveryPhrase: ["point", "head", "pencil", "differ", "reopen", "damp", "wink", "minute", "improve", "toward", "during", "term"]
+            )
+        )
     }
 }
