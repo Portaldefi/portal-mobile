@@ -10,14 +10,22 @@ import PortalUI
 
 struct RecoveryPhraseView: View {
     @Environment(\.presentationMode) private var presentationMode
-    @StateObject private var viewModel: RecoveryPhraseViewModel
+    @ObservedObject private var viewModel: RecoveryPhraseViewModel
     
-    init(viewModel: RecoveryPhraseViewModel = RecoveryPhraseViewModel.config()) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init(viewModel: RecoveryPhraseViewModel) {
+        self.viewModel = viewModel
     }
 
     var body: some View {
         ZStack(alignment: .bottom) {
+            
+            NavigationLink(
+                destination: RecoveryPhraseTestView(viewModel: viewModel),
+                isActive: $viewModel.goToVerify
+            ) {
+                EmptyView()
+            }
+            
             VStack(spacing: 0) {
                 HStack {
                     PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
@@ -46,13 +54,13 @@ struct RecoveryPhraseView: View {
                 HStack(spacing: 15) {
                     VStack(spacing: 10) {
                         ForEach((1...viewModel.recoveryPhrase.count/2), id: \.self) { index in
-                            ClickableWordView(index: index, word: viewModel.recoveryPhrase[index - 1])
+                            WordView(index: index, word: viewModel.recoveryPhrase[index - 1])
                         }
                     }
                     
                     VStack(spacing: 10) {
                         ForEach((viewModel.recoveryPhrase.count/2 + 1...viewModel.recoveryPhrase.count), id: \.self) { index in
-                            ClickableWordView(index: index, word: viewModel.recoveryPhrase[index - 1])
+                            WordView(index: index, word: viewModel.recoveryPhrase[index - 1])
                         }
                     }
                 }
@@ -69,7 +77,7 @@ struct RecoveryPhraseView: View {
                 
                 HStack {
                     PButton(config: .onlyLabel("Verify"), style: .filled, size: .big, enabled: true) {
-                        
+                        viewModel.goToVerify.toggle()
                     }
                 }
                 .padding(16)
