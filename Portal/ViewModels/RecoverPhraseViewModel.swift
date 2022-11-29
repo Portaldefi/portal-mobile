@@ -11,6 +11,7 @@ import Combine
 import Factory
 
 class RecoveryPhraseViewModel: ObservableObject {
+    private let storage: ILocalStorage
     let recoveryPhrase: [String]
     let recoveryTest: [String]
     
@@ -21,7 +22,8 @@ class RecoveryPhraseViewModel: ObservableObject {
         recoveryPhrase.hashValue == recoveryArray.hashValue
     }
     
-    init(recoveryPhrase: [String]) {
+    init(storage: ILocalStorage, recoveryPhrase: [String]) {
+        self.storage = storage
         print("recoveryPhrase: \(recoveryPhrase)")
         self.recoveryPhrase = recoveryPhrase
         self.recoveryTest = recoveryPhrase.shuffled()
@@ -48,11 +50,17 @@ class RecoveryPhraseViewModel: ObservableObject {
         let index = indexOf(word: word)
         return recoveryPhrase[index - 1] == word
     }
+    
+    func markAccountAsBackedUp() {
+        storage.markAccountIsBackeUp()
+    }
 }
 
 extension RecoveryPhraseViewModel {
     static func config() -> RecoveryPhraseViewModel {
         let accountManager: IAccountManager = Container.accountManager()
+        let userDefaults = UserDefaults.standard
+        let localStorage = LocalStorage(storage: userDefaults)
 
         guard
             let recoveryData = accountManager.activeAccountRecoveryData
@@ -60,6 +68,6 @@ extension RecoveryPhraseViewModel {
             fatalError("coudn't fetch dependencies")
         }
         
-        return RecoveryPhraseViewModel(recoveryPhrase: recoveryData.words)
+        return RecoveryPhraseViewModel(storage: localStorage, recoveryPhrase: recoveryData.words)
     }
 }
