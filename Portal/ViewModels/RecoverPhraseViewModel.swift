@@ -17,6 +17,7 @@ class RecoveryPhraseViewModel: ObservableObject {
     
     @Published var goToVerify = false
     @Published var recoveryArray = [String]()
+    @Published var isCorrectSelection = true
     
     var testPassed: Bool {
         recoveryPhrase.hashValue == recoveryArray.hashValue
@@ -32,8 +33,11 @@ class RecoveryPhraseViewModel: ObservableObject {
     func select(word: String) {
         if let index = recoveryArray.firstIndex(of: word) {
             recoveryArray.remove(at: index)
+            isCorrectSelection = true
         } else {
+            guard isCorrectSelection else { return }
             recoveryArray.append(word)
+            isCorrectSelection = isCorrectSelection(word: word)
         }
     }
     
