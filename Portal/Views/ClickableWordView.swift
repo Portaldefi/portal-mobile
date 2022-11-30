@@ -36,9 +36,11 @@ struct ClickableWordView: View {
                         .foregroundColor(isCorrectSelection ? correctSelectionColor : Color(red: 1, green: 0.349, blue: 0.349))
                         .cornerRadius(12, corners: [.topLeft, .bottomLeft])
                     
-                    Text("\(index)")
-                        .font(.Main.fixed(.monoBold, size: 18))
-                        .foregroundColor(Palette.grayScale10)
+                    if isCorrectSelection {
+                        Text("\(index)")
+                            .font(.Main.fixed(.monoBold, size: 18))
+                            .foregroundColor(Palette.grayScale10)
+                    }
                 }
             } else {
                 ZStack {
