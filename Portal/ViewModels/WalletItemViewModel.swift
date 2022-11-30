@@ -50,7 +50,10 @@ class WalletItemViewModel: ObservableObject {
         balanceAdapter.balanceUpdated
             .receive(on: RunLoop.main)
             .sink { [weak self] in
-                self?.viewState.onAssetBalancesUpdate.send()
+                guard let self = self else { return }
+                self.balance = self.balanceAdapter.balance
+                self.balanceString = "\(self.balanceAdapter.balance)"
+                self.viewState.onAssetBalancesUpdate.send()
             }
             .store(in: &subscriptions)
     }

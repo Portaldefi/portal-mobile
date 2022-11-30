@@ -8,7 +8,6 @@
 import SwiftUI
 import CodeScanner
 import PortalUI
-import Factory
 
 struct QRCodeScannerView: View {
     private let selectionFeedbackGenerator = UISelectionFeedbackGenerator()
@@ -62,6 +61,10 @@ struct QRCodeScannerView: View {
                                             detectedItems = items
                                             scanState = .detected
                                         }
+                                    case .importing:
+                                        detectedItems.removeAll()
+                                        scanState = .detecting
+                                        detected(item)
                                     }
                                 } else {
                                     scanState = .unsupported

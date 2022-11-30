@@ -8,8 +8,8 @@
 import SwiftUI
 import Factory
 
-enum QRScannerConfig {
-    case send(Coin), universal
+enum QRScannerConfig: Equatable {
+    case send(Coin), universal, importing
 }
 
 struct QRCodeReaderView: View {
@@ -36,15 +36,23 @@ struct QRCodeReaderView: View {
                     case .send:
                         completion(item)
                         presentation.wrappedValue.dismiss()
+                    case .importing:
+                        completion(item)
+                        presentation.wrappedValue.dismiss()
                     }
                 } onClose: {
                     presentation.wrappedValue.dismiss()
                 }
                 
-                NavigationLink(
-                    destination: SendView(),
-                    isActive: $goToSend
-                ) {
+                switch config {
+                case .universal, .send:
+                    NavigationLink(
+                        destination: SendView(),
+                        isActive: $goToSend
+                    ) {
+                        EmptyView()
+                    }
+                default:
                     EmptyView()
                 }
             }

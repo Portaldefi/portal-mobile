@@ -106,8 +106,8 @@ struct TransactionDetailsView: View {
                             viewModel.viewState.goToSendFromDetails = false
                         } else if viewModel.viewState.showQRCodeScannerFromTabBar {
                             viewModel.viewState.showQRCodeScannerFromTabBar = false
-                        } else if viewModel.viewState.showQRCodeScannerFromRecipientView {
-                            viewModel.viewState.showQRCodeScannerFromRecipientView = false
+                        } else if viewModel.viewState.showInContextScanner {
+                            viewModel.viewState.showInContextScanner = false
                         } else {
                             presentationMode.wrappedValue.dismiss()
                         }

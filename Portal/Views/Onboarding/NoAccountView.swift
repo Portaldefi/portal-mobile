@@ -25,10 +25,10 @@ struct NoAccountView: View {
                 }
                 .padding(.top, 144)
                 Spacer()
-                PButton(config: .onlyLabel("Create new wallet"), style: .filled, size: .big, enabled: true) {
+                PButton(config: .onlyLabel("Create Wallet"), style: .filled, size: .big, enabled: true) {
                     createAccount.toggle()
                 }
-                PButton(config: .onlyLabel("Import wallet"), style: .outline, size: .big, enabled: true) {
+                PButton(config: .onlyLabel("Import Wallet"), style: .outline, size: .big, enabled: true) {
                     restoreAccount.toggle()
                 }
                 NavigationLink(destination: CreateAccountView(), isActive: $createAccount) { EmptyView() }
