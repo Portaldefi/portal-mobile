@@ -91,24 +91,13 @@ struct RestoreAccountView: View {
                     .background(Color.black)
                     .cornerRadius(12)
                     
-                    HStack(spacing: 16) {
-                        PButton(
-                            config: .labelAndIconLeft(label: "Paste", icon: Asset.pasteIcon),
-                            style: .outline,
-                            size: .medium,
-                            enabled: true
-                        ) {
-                            viewModel.pasteFromClipboard()
-                        }
-                        
-                        PButton(
-                            config: .labelAndIconLeft(label: "Scan", icon: Asset.scanIcon),
-                            style: .outline,
-                            size: .medium,
-                            enabled: true
-                        ) {
-                            viewState.showInContextScanner = true
-                        }
+                    PButton(
+                        config: .labelAndIconLeft(label: "Paste", icon: Asset.pasteIcon),
+                        style: .outline,
+                        size: .medium,
+                        enabled: true
+                    ) {
+                        viewModel.pasteFromClipboard()
                     }
                 }
                 .padding(.horizontal)
