@@ -16,6 +16,7 @@ class RecoveryPhraseViewModel: ObservableObject {
     let recoveryTest: [String]
     
     @Published var goToVerify = false
+    @Published var goToWarnig = false
     @Published var recoveryArray = [String]()
     @Published var isCorrectSelection = true
     
