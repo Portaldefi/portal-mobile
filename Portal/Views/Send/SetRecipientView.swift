@@ -27,13 +27,11 @@ struct SetRecipientView: View {
                     if viewModel.recipientAddressIsValid {
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(Palette.grayScale3A, lineWidth: 1)
-                            .foregroundColor(Color.clear)
                             .allowsHitTesting(false)
 
                     } else {
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(Color(red: 255/255, green: 82/255, blue: 82/255), lineWidth: 1)
-                            .foregroundColor(Color.clear)
                             .allowsHitTesting(false)
                     }
                     
@@ -57,8 +55,8 @@ struct SetRecipientView: View {
                     }
                     .background(Color(red: 28/255, green: 28/255, blue: 30/255))
                     .frame(height: 58)
-                    .cornerRadius(12)
                 }
+                .cornerRadius(12)
             }
             
             HStack(spacing: 16) {
@@ -81,6 +79,7 @@ struct SetRecipientView: View {
                 }
             }
         }
+        .navigationBarHidden(true)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .alert(isPresented: $viewModel.clipboardIsEmpty) {
             Alert(title: Text("Empty Clipboard"), message: Text("You don't have anything in your device clipboard."), dismissButton: .default(Text("OK")))
