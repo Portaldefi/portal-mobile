@@ -45,6 +45,7 @@
 		755170752935E33F00CC84D7 /* RecoveryData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170742935E33F00CC84D7 /* RecoveryData.swift */; };
 		755170772935E47100CC84D7 /* RecoveryPhraseTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170762935E47100CC84D7 /* RecoveryPhraseTestView.swift */; };
 		7551707929364C5E00CC84D7 /* WordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551707829364C5E00CC84D7 /* WordView.swift */; };
+		7551707D2937A2AD00CC84D7 /* ResponsibleWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551707C2937A2AD00CC84D7 /* ResponsibleWarningView.swift */; };
 		755C56AF28E5BDD600A4B57B /* WalletItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */; };
 		755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */; };
 		755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */; };
@@ -186,6 +187,7 @@
 		755170742935E33F00CC84D7 /* RecoveryData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryData.swift; sourceTree = "<group>"; };
 		755170762935E47100CC84D7 /* RecoveryPhraseTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryPhraseTestView.swift; sourceTree = "<group>"; };
 		7551707829364C5E00CC84D7 /* WordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordView.swift; sourceTree = "<group>"; };
+		7551707C2937A2AD00CC84D7 /* ResponsibleWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponsibleWarningView.swift; sourceTree = "<group>"; };
 		755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemViewModel.swift; sourceTree = "<group>"; };
 		755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceAdapterMocked.swift; sourceTree = "<group>"; };
 		755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMarketDataRepository.swift; sourceTree = "<group>"; };
@@ -445,6 +447,7 @@
 				7551706A2934AA7700CC84D7 /* BackUpDetailsView.swift */,
 				7551706C2934B10000CC84D7 /* RecoveryPhraseView.swift */,
 				755170762935E47100CC84D7 /* RecoveryPhraseTestView.swift */,
+				7551707C2937A2AD00CC84D7 /* ResponsibleWarningView.swift */,
 				755170702935C81900CC84D7 /* RoundedCornerShape.swift */,
 				7551706E2935C76C00CC84D7 /* ClickableWordView.swift */,
 				7551707829364C5E00CC84D7 /* WordView.swift */,
@@ -734,6 +737,7 @@
 				755C56C928EAC99700A4B57B /* TextEditorViewModel.swift in Sources */,
 				75D8C5AE28D8939A00228298 /* BitcoinAdapter.swift in Sources */,
 				7545BC3828C9E32A00ED92C3 /* FiatRatesResponse.swift in Sources */,
+				7551707D2937A2AD00CC84D7 /* ResponsibleWarningView.swift in Sources */,
 				755C56C428E9B2CC00A4B57B /* AssetDetailsViewModel.swift in Sources */,
 				755C56DA28EB090B00A4B57B /* TextFieldWrapper.swift in Sources */,
 				756A3131288844FD004978E2 /* AccountViewModel.swift in Sources */,
