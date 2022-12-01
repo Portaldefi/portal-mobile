@@ -7,12 +7,10 @@
 
 import SwiftUI
 import PortalUI
-import Factory
 
 struct RecoveryPhraseTestView: View {
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel: RecoveryPhraseViewModel
-    @ObservedObject private var viewState: ViewState = Container.viewState()
     
     init(viewModel: RecoveryPhraseViewModel) {
         self.viewModel = viewModel
@@ -20,6 +18,14 @@ struct RecoveryPhraseTestView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
+            
+            NavigationLink(
+                destination: ResponsibleWarningView(viewModel: viewModel),
+                isActive: $viewModel.goToWarnig
+            ) {
+                EmptyView()
+            }
+            
             VStack(spacing: 0) {
                 HStack {
                     PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
@@ -92,8 +98,7 @@ struct RecoveryPhraseTestView: View {
                 
                 HStack {
                     PButton(config: .onlyLabel("Continue"), style: .filled, size: .big, enabled: viewModel.testPassed) {
-                        viewModel.markAccountAsBackedUp()
-                        viewState.goToBackUp.toggle()
+                        viewModel.goToWarnig.toggle()
                     }
                 }
                 .padding(16)
