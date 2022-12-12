@@ -54,6 +54,7 @@ struct NavigationStackView<Root>: View where Root: View {
     ) {
         self.rootView = rootView
         self.navigationStack = NavigationStack(configurator: configurator)
+        
         switch transitionType {
         case .none:
             self.rootViewtransitions = (.identity, .identity)
@@ -65,21 +66,20 @@ struct NavigationStackView<Root>: View where Root: View {
     }
     
     public var body: some View {
-        let showRoot = navigationStack.currentView == nil
-        let navigationType = navigationStack.navigationType
-        let currentView = navigationStack.currentView
-        let currentViewPushTransition = currentView?.pushTransition ?? defaultTransitions.push
-        let currentViewPopTransition = currentView?.popTransition ?? defaultTransitions.pop
-        
         VStack {
-            if showRoot {
+            let navigationType = navigationStack.navigationType
+
+            if let currentView = navigationStack.currentView {
+                let popTransition = currentView.popTransition
+                let pushTransition = currentView.pushTransition
+                
+                currentView.wrappedElement
+                    .id(currentView.id)
+                    .transition(navigationType == .push ? pushTransition : popTransition)
+            } else {
                 rootView
                     .id(rootViewID)
                     .transition(navigationType == .push ? rootViewtransitions.push : rootViewtransitions.pop)
-            } else {
-                currentView?.wrappedElement
-                    .id(currentView!.id)
-                    .transition(navigationType == .push ? currentViewPushTransition : currentViewPopTransition)
             }
         }
         .environmentObject(navigationStack)
