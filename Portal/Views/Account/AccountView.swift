@@ -71,9 +71,7 @@ struct AccountView: View {
             }
         }
         .sheet(isPresented: $viewState.goToSend) {
-            NavigationView {
-                SendView()
-            }
+            SendRootView()
         }
         .fullScreenCover(isPresented: $viewState.goToBackUp) {
             NavigationView {
