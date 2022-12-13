@@ -14,7 +14,7 @@ struct NoAccountRootView: View {
         let rootView = NoAccountView()
         
         navigationStack = NavigationStackView<NoAccountView>(
-            configurator: NoAccountViewConfigurator(),
+            configurator: NoAccountViewConfig(),
             rootView: rootView
         )
     }
