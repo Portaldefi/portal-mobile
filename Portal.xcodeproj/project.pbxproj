@@ -56,6 +56,8 @@
 		755170902948C7CD00CC84D7 /* SendRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551708F2948C7CD00CC84D7 /* SendRootView.swift */; };
 		755170932948CB0000CC84D7 /* ReceiveRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170922948CB0000CC84D7 /* ReceiveRootView.swift */; };
 		755170952948CBC300CC84D7 /* ReceiveViewNavigationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170942948CBC300CC84D7 /* ReceiveViewNavigationConfig.swift */; };
+		755170982948CF3400CC84D7 /* AccountBackupRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170972948CF3400CC84D7 /* AccountBackupRootView.swift */; };
+		7551709A2948D02700CC84D7 /* AccountBackupNavigationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170992948D02700CC84D7 /* AccountBackupNavigationConfig.swift */; };
 		755C56AF28E5BDD600A4B57B /* WalletItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */; };
 		755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */; };
 		755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */; };
@@ -208,6 +210,8 @@
 		7551708F2948C7CD00CC84D7 /* SendRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendRootView.swift; sourceTree = "<group>"; };
 		755170922948CB0000CC84D7 /* ReceiveRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveRootView.swift; sourceTree = "<group>"; };
 		755170942948CBC300CC84D7 /* ReceiveViewNavigationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveViewNavigationConfig.swift; sourceTree = "<group>"; };
+		755170972948CF3400CC84D7 /* AccountBackupRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountBackupRootView.swift; sourceTree = "<group>"; };
+		755170992948D02700CC84D7 /* AccountBackupNavigationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountBackupNavigationConfig.swift; sourceTree = "<group>"; };
 		755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemViewModel.swift; sourceTree = "<group>"; };
 		755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceAdapterMocked.swift; sourceTree = "<group>"; };
 		755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMarketDataRepository.swift; sourceTree = "<group>"; };
@@ -380,6 +384,19 @@
 			path = Receive;
 			sourceTree = "<group>";
 		};
+		755170962948CEEE00CC84D7 /* AccountBackup */ = {
+			isa = PBXGroup;
+			children = (
+				755170972948CF3400CC84D7 /* AccountBackupRootView.swift */,
+				755170992948D02700CC84D7 /* AccountBackupNavigationConfig.swift */,
+				7551706A2934AA7700CC84D7 /* BackUpDetailsView.swift */,
+				7551706C2934B10000CC84D7 /* RecoveryPhraseView.swift */,
+				755170762935E47100CC84D7 /* RecoveryPhraseTestView.swift */,
+				7551707C2937A2AD00CC84D7 /* ResponsibleWarningView.swift */,
+			);
+			path = AccountBackup;
+			sourceTree = "<group>";
+		};
 		7564C65028CF3C2E00ABA8CF /* Send */ = {
 			isa = PBXGroup;
 			children = (
@@ -506,10 +523,7 @@
 				755C56D928EB090B00A4B57B /* TextFieldWrapper.swift */,
 				756A313E28902C6F004978E2 /* MainView.swift */,
 				755170882948BFB700CC84D7 /* Account */,
-				7551706A2934AA7700CC84D7 /* BackUpDetailsView.swift */,
-				7551706C2934B10000CC84D7 /* RecoveryPhraseView.swift */,
-				755170762935E47100CC84D7 /* RecoveryPhraseTestView.swift */,
-				7551707C2937A2AD00CC84D7 /* ResponsibleWarningView.swift */,
+				755170962948CEEE00CC84D7 /* AccountBackup */,
 				755170702935C81900CC84D7 /* RoundedCornerShape.swift */,
 				7551706E2935C76C00CC84D7 /* ClickableWordView.swift */,
 				7551707829364C5E00CC84D7 /* WordView.swift */,
@@ -785,6 +799,7 @@
 				7564C65728CF6EC400ABA8CF /* SendFlowError.swift in Sources */,
 				479A7AD428B8F30B0057E100 /* ReviewTransactionView.swift in Sources */,
 				4774D71C28AF920100B7988B /* QRCodeParser.swift in Sources */,
+				755170982948CF3400CC84D7 /* AccountBackupRootView.swift in Sources */,
 				7543384C2927BE4700061E28 /* ConfirmImportAccountView.swift in Sources */,
 				755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */,
 				752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */,
@@ -807,6 +822,7 @@
 				7551707D2937A2AD00CC84D7 /* ResponsibleWarningView.swift in Sources */,
 				755C56C428E9B2CC00A4B57B /* AssetDetailsViewModel.swift in Sources */,
 				755C56DA28EB090B00A4B57B /* TextFieldWrapper.swift in Sources */,
+				7551709A2948D02700CC84D7 /* AccountBackupNavigationConfig.swift in Sources */,
 				756A3131288844FD004978E2 /* AccountViewModel.swift in Sources */,
 				755C56B528E5D12900A4B57B /* TransactionDetailsView.swift in Sources */,
 				7564C66228D85AA800ABA8CF /* Exchanger.swift in Sources */,

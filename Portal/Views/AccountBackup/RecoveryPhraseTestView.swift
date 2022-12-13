@@ -9,6 +9,7 @@ import SwiftUI
 import PortalUI
 
 struct RecoveryPhraseTestView: View {
+    @EnvironmentObject private var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel: RecoveryPhraseViewModel
     
@@ -17,20 +18,12 @@ struct RecoveryPhraseTestView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            
-            NavigationLink(
-                destination: ResponsibleWarningView(viewModel: viewModel),
-                isActive: $viewModel.goToWarnig
-            ) {
-                EmptyView()
-            }
-            
+        ZStack(alignment: .bottom) {            
             VStack(spacing: 0) {
                 HStack {
                     PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
                         viewModel.isCorrectSelection = true
-                        presentationMode.wrappedValue.dismiss()
+                        navigation.pop()
                     }
                     .frame(width: 20)
                     
@@ -98,7 +91,7 @@ struct RecoveryPhraseTestView: View {
                 
                 HStack {
                     PButton(config: .onlyLabel("Continue"), style: .filled, size: .big, enabled: viewModel.testPassed) {
-                        viewModel.goToWarnig.toggle()
+                        navigation.push(.recoveryWarning(viewModel: viewModel))
                     }
                 }
                 .padding(16)
@@ -107,7 +100,6 @@ struct RecoveryPhraseTestView: View {
                 Palette.grayScale2A.edgesIgnoringSafeArea(.bottom)
             )
         }
-        .navigationBarHidden(true)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
     }
 }

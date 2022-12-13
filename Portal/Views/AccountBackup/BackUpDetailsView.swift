@@ -9,23 +9,15 @@ import SwiftUI
 import PortalUI
 
 struct BackUpDetailsView: View {
+    @EnvironmentObject private var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
     @StateObject private var viewModel: RecoveryPhraseViewModel = RecoveryPhraseViewModel.config()
-    @State private var showRecoveryPhrase = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            
-            NavigationLink(
-                destination: RecoveryPhraseView(viewModel: viewModel),
-                isActive: $showRecoveryPhrase
-            ) {
-                EmptyView()
-            }
-
             VStack(spacing: 0) {
                 HStack {
-                    PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
+                    PButton(config: .onlyIcon(Asset.xIcon), style: .free, size: .medium, enabled: true) {
                         presentationMode.wrappedValue.dismiss()
                     }
                     .frame(width: 20)
@@ -63,7 +55,7 @@ struct BackUpDetailsView: View {
                     
                     HStack {
                         PButton(config: .onlyLabel("Continue"), style: .filled, size: .big, enabled: true) {
-                            showRecoveryPhrase.toggle()
+                            navigation.push(.recoveryPhrase(viewModel: viewModel))
                         }
                     }
                     .padding(16)
@@ -73,7 +65,6 @@ struct BackUpDetailsView: View {
                 )
             }
         }
-        .navigationBarHidden(true)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
     }
 }
