@@ -54,6 +54,8 @@
 		7551708C2948C1F500CC84D7 /* AccountViewNavigationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551708B2948C1F500CC84D7 /* AccountViewNavigationConfig.swift */; };
 		7551708E2948C79C00CC84D7 /* SendViewNavigationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551708D2948C79C00CC84D7 /* SendViewNavigationConfig.swift */; };
 		755170902948C7CD00CC84D7 /* SendRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551708F2948C7CD00CC84D7 /* SendRootView.swift */; };
+		755170932948CB0000CC84D7 /* ReceiveRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170922948CB0000CC84D7 /* ReceiveRootView.swift */; };
+		755170952948CBC300CC84D7 /* ReceiveViewNavigationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170942948CBC300CC84D7 /* ReceiveViewNavigationConfig.swift */; };
 		755C56AF28E5BDD600A4B57B /* WalletItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */; };
 		755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */; };
 		755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */; };
@@ -204,6 +206,8 @@
 		7551708B2948C1F500CC84D7 /* AccountViewNavigationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewNavigationConfig.swift; sourceTree = "<group>"; };
 		7551708D2948C79C00CC84D7 /* SendViewNavigationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendViewNavigationConfig.swift; sourceTree = "<group>"; };
 		7551708F2948C7CD00CC84D7 /* SendRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendRootView.swift; sourceTree = "<group>"; };
+		755170922948CB0000CC84D7 /* ReceiveRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveRootView.swift; sourceTree = "<group>"; };
+		755170942948CBC300CC84D7 /* ReceiveViewNavigationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveViewNavigationConfig.swift; sourceTree = "<group>"; };
 		755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemViewModel.swift; sourceTree = "<group>"; };
 		755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceAdapterMocked.swift; sourceTree = "<group>"; };
 		755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMarketDataRepository.swift; sourceTree = "<group>"; };
@@ -369,6 +373,8 @@
 		755170912948C8C800CC84D7 /* Receive */ = {
 			isa = PBXGroup;
 			children = (
+				755170922948CB0000CC84D7 /* ReceiveRootView.swift */,
+				755170942948CBC300CC84D7 /* ReceiveViewNavigationConfig.swift */,
 				756A313A288AEFA2004978E2 /* ReceiveView.swift */,
 			);
 			path = Receive;
@@ -747,6 +753,7 @@
 				75772A642901793300BE80B7 /* IdentifiableString.swift in Sources */,
 				755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */,
 				7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */,
+				755170952948CBC300CC84D7 /* ReceiveViewNavigationConfig.swift in Sources */,
 				756DDD7D28A28754002EDC60 /* AccountStorage.swift in Sources */,
 				755C56D728EACFD700A4B57B /* LabelsManagerView.swift in Sources */,
 				7551706D2934B10000CC84D7 /* RecoveryPhraseView.swift in Sources */,
@@ -817,6 +824,7 @@
 				755170772935E47100CC84D7 /* RecoveryPhraseTestView.swift in Sources */,
 				755C56D528EACDF500A4B57B /* BitcoinDevKitTransaction+Extension.swift in Sources */,
 				756A3122288821F4004978E2 /* PortalDB.xcdatamodeld in Sources */,
+				755170932948CB0000CC84D7 /* ReceiveRootView.swift in Sources */,
 				755C56B728E5D46500A4B57B /* ConfirmationCounterView.swift in Sources */,
 				756DDD7E28A28754002EDC60 /* DBLocalStorage.swift in Sources */,
 				75D8C5B328DADF8700228298 /* WalletManager.swift in Sources */,
