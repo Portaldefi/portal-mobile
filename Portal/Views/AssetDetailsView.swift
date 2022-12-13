@@ -11,7 +11,7 @@ import PortalUI
 import Factory
 
 struct AssetDetailsView: View {
-    @Environment(\.presentationMode) private var presentationMode
+    @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewState: ViewState = Container.viewState()
     @ObservedObject private var viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
     @State private var showTxDetails = false
@@ -28,7 +28,7 @@ struct AssetDetailsView: View {
                             withAnimation {
                                 viewState.hideTabBar = false
                             }
-                            presentationMode.wrappedValue.dismiss()
+                            navigation.pop()
                         }
                         .frame(width: 20)
                         
