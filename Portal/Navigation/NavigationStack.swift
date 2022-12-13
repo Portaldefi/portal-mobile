@@ -27,7 +27,8 @@ enum NavigationType {
 
 class NavigationStack: ObservableObject {
     private let configurator: NavigationConfigurator
-    private(set) var navigationType = NavigationType.push
+    
+    @Published private(set) var navigationType = NavigationType.push
     @Published private(set) var currentView: ViewElement?
     
     init(configurator: NavigationConfigurator) {
@@ -42,16 +43,18 @@ class NavigationStack: ObservableObject {
     
     func push(_ screen: Screen) {
         if let element = configurator.configure(screen) {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                navigationType = .push
+            navigationType = .push
+            
+            withAnimation(.easeInOut(duration: 0.3)) {
                 viewStack.push(element)
             }
         }
     }
     
     func pop(to screen: Screen? = nil) {
-        withAnimation(.easeInOut(duration: 0.2)) {
-            navigationType = .pop
+        navigationType = .pop
+        
+        withAnimation(.easeInOut(duration: 0.3)) {
             if let view = screen {
                 viewStack.popToView(withId: view.id)
             } else {
