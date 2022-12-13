@@ -1,5 +1,5 @@
 //
-//  NoAccountViewConfigurator.swift
+//  NoAccountViewConfig.swift
 //  Portal
 //
 //  Created by farid on 12/13/22.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NoAccountViewConfigurator: NavigationConfigurator {
+struct NoAccountViewConfig: NavigationConfigurator {
     func configure(_ screen: Screen) -> ViewElement? {
         switch screen {
         case .createAccount:
