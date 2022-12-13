@@ -12,7 +12,7 @@ struct ReceiveRootView: View {
     
     init(viewModel: ReceiveViewModel) {
         let rootView = ReceiveView(viewModel: viewModel)
-        let navigationConfigurator = AccountViewNavigationConfig()
+        let navigationConfigurator = ReceiveViewNavigationConfig()
         
         navigationStack = NavigationStackView<ReceiveView>(
             configurator: navigationConfigurator,
