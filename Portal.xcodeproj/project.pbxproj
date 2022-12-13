@@ -48,6 +48,8 @@
 		7551707D2937A2AD00CC84D7 /* ResponsibleWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551707C2937A2AD00CC84D7 /* ResponsibleWarningView.swift */; };
 		7551707F293A509A00CC84D7 /* NavigationStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551707E293A509A00CC84D7 /* NavigationStack.swift */; };
 		75517081293A515E00CC84D7 /* NavigationStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75517080293A515E00CC84D7 /* NavigationStackView.swift */; };
+		755170852948AD4B00CC84D7 /* NoAccountRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170842948AD4B00CC84D7 /* NoAccountRootView.swift */; };
+		755170872948AD8000CC84D7 /* NoAccountViewConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170862948AD8000CC84D7 /* NoAccountViewConfigurator.swift */; };
 		755C56AF28E5BDD600A4B57B /* WalletItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */; };
 		755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */; };
 		755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */; };
@@ -192,6 +194,8 @@
 		7551707C2937A2AD00CC84D7 /* ResponsibleWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponsibleWarningView.swift; sourceTree = "<group>"; };
 		7551707E293A509A00CC84D7 /* NavigationStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationStack.swift; sourceTree = "<group>"; };
 		75517080293A515E00CC84D7 /* NavigationStackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationStackView.swift; sourceTree = "<group>"; };
+		755170842948AD4B00CC84D7 /* NoAccountRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoAccountRootView.swift; sourceTree = "<group>"; };
+		755170862948AD8000CC84D7 /* NoAccountViewConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoAccountViewConfigurator.swift; sourceTree = "<group>"; };
 		755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemViewModel.swift; sourceTree = "<group>"; };
 		755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceAdapterMocked.swift; sourceTree = "<group>"; };
 		755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMarketDataRepository.swift; sourceTree = "<group>"; };
@@ -332,6 +336,16 @@
 				75517080293A515E00CC84D7 /* NavigationStackView.swift */,
 			);
 			path = Navigation;
+			sourceTree = "<group>";
+		};
+		755170832948AD2A00CC84D7 /* NoAccount */ = {
+			isa = PBXGroup;
+			children = (
+				755170862948AD8000CC84D7 /* NoAccountViewConfigurator.swift */,
+				755170842948AD4B00CC84D7 /* NoAccountRootView.swift */,
+				756DDD6D28A272AB002EDC60 /* NoAccountView.swift */,
+			);
+			path = NoAccount;
 			sourceTree = "<group>";
 		};
 		7564C65028CF3C2E00ABA8CF /* Send */ = {
@@ -531,7 +545,7 @@
 		75883A10292618330089D714 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
-				756DDD6D28A272AB002EDC60 /* NoAccountView.swift */,
+				755170832948AD2A00CC84D7 /* NoAccount */,
 				756DDD6F28A275AD002EDC60 /* CreateAccountView.swift */,
 				756DDD7328A27C86002EDC60 /* RestoreAccountView.swift */,
 				7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */,
@@ -782,6 +796,8 @@
 				756DDD8228A2879E002EDC60 /* IKeyChainStorage.swift in Sources */,
 				756DDD9928A28FC6002EDC60 /* AccountManager.swift in Sources */,
 				75D8C5A528D88E0900228298 /* IDepositAdapter.swift in Sources */,
+				755170852948AD4B00CC84D7 /* NoAccountRootView.swift in Sources */,
+				755170872948AD8000CC84D7 /* NoAccountViewConfigurator.swift in Sources */,
 				756A3139288AEAD2004978E2 /* BackButtonModifier.swift in Sources */,
 				7564C66028D219CB00ABA8CF /* Coin.swift in Sources */,
 				7545BC3A28C9E3A200ED92C3 /* FiatSymbols.swift in Sources */,
