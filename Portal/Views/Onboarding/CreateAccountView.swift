@@ -10,8 +10,8 @@ import PortalUI
 
 struct CreateAccountView: View {
     @FocusState private var isFocused: Bool
-    @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel: CreateAccountViewModel
+    @EnvironmentObject private var navigation: NavigationStack
     
     init(words: [String]? = nil) {
         UITableView.appearance().backgroundColor = .clear
@@ -28,7 +28,7 @@ struct CreateAccountView: View {
             ZStack {
                 HStack {
                     PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
-                        presentationMode.wrappedValue.dismiss()
+                        navigation.pop()
                     }
                     .frame(width: 20)
                     
