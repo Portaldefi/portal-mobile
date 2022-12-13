@@ -22,7 +22,7 @@ struct Mainview: View {
             ]
         
         views = [
-            AnyView(AccountView()),
+            AnyView(AccountRootView()),
             AnyView(ActivityView())
         ]
     }
