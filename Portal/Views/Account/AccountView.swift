@@ -66,9 +66,7 @@ struct AccountView: View {
             QRCodeReaderView(config: .universal)
         }
         .sheet(isPresented: $goToReceive) {
-            NavigationView {
-                ReceiveView(viewModel: ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: nil))
-            }
+            ReceiveRootView(viewModel: ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: nil))
         }
         .sheet(isPresented: $viewState.goToSend) {
             SendRootView()
