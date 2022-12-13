@@ -66,15 +66,15 @@ struct AccountView: View {
             QRCodeReaderView(config: .universal)
         }
         .sheet(isPresented: $goToReceive) {
-            ReceiveRootView(viewModel: ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: nil))
+            let viewModel = ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: nil)
+            
+            ReceiveRootView(viewModel: viewModel)
         }
         .sheet(isPresented: $viewState.goToSend) {
             SendRootView()
         }
         .fullScreenCover(isPresented: $viewState.goToBackUp) {
-            NavigationView {
-                BackUpDetailsView()
-            }
+            AccountBackupRootView()
         }
     }
     
