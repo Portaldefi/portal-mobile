@@ -12,20 +12,36 @@ enum Screen {
     typealias DismissAction = () -> (Void)
     typealias Identifier = String
     
-    case account
-    case send
-    case receive
+    case noAccount
+    case account(account: Account)
+    case send(item: WalletItem)
+    case receive(item: WalletItem)
+    case accountBackup
+    case assetDetails(item: WalletItem)
+    case createAccount
+    case restoreAccount
+    
 }
 
 extension Screen {
     var id: Identifier {
         switch self {
+        case .noAccount:
+            return "no_account_ID"
         case .account:
             return "account_ID"
         case .send:
             return "send_ID"
         case .receive:
             return "receive_ID"
+        case .createAccount:
+            return "create_account_ID"
+        case .restoreAccount:
+            return "restore_account_ID"
+        case .accountBackup:
+            return "account_backup_ID"
+        case .assetDetails:
+            return "asset_details_ID"
         }
     }
 }
