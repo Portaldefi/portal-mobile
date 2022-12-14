@@ -44,7 +44,9 @@ struct AccountView: View {
                                 .padding(.trailing, 8)
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    viewState.hideTabBar = true
+                                    withAnimation {
+                                        viewState.hideTabBar = true
+                                    }
                                     selectedItem = item
                                     
                                     navigation.push(.assetDetails(item: item))
