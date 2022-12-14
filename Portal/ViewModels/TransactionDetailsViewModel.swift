@@ -108,8 +108,6 @@ class TransactionDetailsViewModel: ObservableObject {
         
         if let blockTime = tx.confirmationTime {
             confirmations = blockChainHeight - Int32(blockTime.height) + 1
-        } else {
-            confirmations = 0
         }
         
         $labels.sink { [unowned self] labels in
