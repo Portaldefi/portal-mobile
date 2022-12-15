@@ -1,0 +1,6 @@
+framework module HsToolKit {
+  umbrella header "HsToolKit.swift-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,6 @@
+framework module UIExtensions {
+  umbrella header "UIExtensions.swift-umbrella.h"
+
+  export *
+  module * { export * }
+}

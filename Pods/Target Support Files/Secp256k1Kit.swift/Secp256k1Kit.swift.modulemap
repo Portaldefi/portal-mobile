@@ -1,0 +1,6 @@
+framework module Secp256k1Kit {
+  umbrella header "Secp256k1Kit.swift-umbrella.h"
+
+  export *
+  module * { export * }
+}

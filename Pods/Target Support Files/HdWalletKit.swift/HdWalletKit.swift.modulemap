@@ -1,0 +1,6 @@
+framework module HdWalletKit {
+  umbrella header "HdWalletKit.swift-umbrella.h"
+
+  export *
+  module * { export * }
+}
