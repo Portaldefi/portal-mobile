@@ -19,11 +19,28 @@ extension BitcoinDevKit.TransactionDetails: Identifiable {
 struct AssetDetailsView: View {
     @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewState: ViewState = Container.viewState()
-    @ObservedObject private var viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
+    @ObservedObject private var viewModel: AssetDetailsViewModel
     @State private var showTxDetails = false
     @State private var selectedTx: BitcoinDevKit.TransactionDetails?
     
     let item: WalletItem?
+    
+    init(item: WalletItem?) {
+        self.item = item
+        
+        if let coin = item?.viewModel.coin {
+            switch coin.type {
+            case .bitcoin:
+                viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
+            case .ethereum:
+                viewModel = AssetDetailsViewModel.config(coin: .ethereum())
+            default:
+                viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
+            }
+        } else {
+            viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
+        }
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -106,7 +123,7 @@ struct AssetDetailsView: View {
                 config: .labelAndIconLeft(label: "Receive", icon: Asset.receiveButtonIcon),
                 style: .filled,
                 size: .medium,
-                enabled: item?.viewModel.coin.name == "Bitcoin" && item?.viewModel.coin.unit == "BTC"
+                enabled: true
             ) {
                 viewState.goToReceive = true
             }
@@ -115,7 +132,7 @@ struct AssetDetailsView: View {
                 config: .labelAndIconLeft(label: "Send", icon: Asset.sendButtonIcon),
                 style: .filled,
                 size: .medium,
-                enabled: item?.viewModel.coin.name == "Bitcoin" && item?.viewModel.coin.unit == "BTC"
+                enabled: item?.viewModel.balance ?? 0 > 0
             ) {
                 if let item = item {
                     let sendViewViewModel = Container.sendViewModel()
