@@ -10,8 +10,10 @@ target 'Portal' do
   inhibit_all_warnings!
 
   # Pods for Portal
-  pod 'EthereumKit.swift', git: 'https://github.com/horizontalsystems/ethereum-kit-ios'
-  pod 'Erc20Kit.swift', git: 'https://github.com/horizontalsystems/ethereum-kit-ios'
+  pod 'EthereumKit-Universal'
+  pod 'Erc20Kit-Universal'
+  #ToolKits
+  pod 'Hodler-Universal.swift'
 
 end
 
