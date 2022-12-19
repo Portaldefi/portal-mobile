@@ -79,35 +79,43 @@ struct ReceiveView: View {
                     case .generateQR:
                         ScrollView {
                             HStack {
-                                VStack(alignment: .leading, spacing: 0) {
-                                    HStack(spacing: 8) {
-                                        Asset.btcIcon
-                                        Text("Bitcoin")
-                                            .font(.Main.fixed(.monoBold, size: 22))
-                                            .foregroundColor(Palette.grayScaleF4)
-                                    }
-                                    HStack {
-                                        Text("on")
-                                            .font(.Main.fixed(.monoMedium, size: 16))
-                                            .foregroundColor(Palette.grayScale8A)
-                                        HStack(spacing: 4) {
-                                            Asset.chainIcon
-                                            Text("Chain")
+                                if let coin = viewModel.selectedItem?.viewModel.coin {
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        HStack(spacing: 8) {
+                                            CoinImageView(
+                                                size: 24,
+                                                url: coin.icon,
+                                                placeholderForegroundColor: Color.gray
+                                            )
+                                            Text(coin.name)
+                                                .font(.Main.fixed(.monoBold, size: 22))
+                                                .foregroundColor(Palette.grayScaleF4)
+                                        }
+                                        HStack {
+                                            Text("on")
                                                 .font(.Main.fixed(.monoMedium, size: 16))
                                                 .foregroundColor(Palette.grayScale8A)
+                                            HStack(spacing: 4) {
+                                                Asset.chainIcon
+                                                Text("Chain")
+                                                    .font(.Main.fixed(.monoMedium, size: 16))
+                                                    .foregroundColor(Palette.grayScale8A)
+                                            }
                                         }
                                     }
                                 }
                                 
                                 Spacer()
                                 
-                                VStack {
-                                    Text("Address type")
-                                        .font(.Main.fixed(.monoRegular, size: 14))
-                                        .foregroundColor(Palette.grayScale6A)
-                                    Text("Segwit")
-                                        .font(.Main.fixed(.monoBold, size: 16))
-                                        .foregroundColor(Palette.grayScaleCA)
+                                if let coin = viewModel.selectedItem?.viewModel.coin, coin.type == .bitcoin {
+                                    VStack {
+                                        Text("Address type")
+                                            .font(.Main.fixed(.monoRegular, size: 14))
+                                            .foregroundColor(Palette.grayScale6A)
+                                        Text("Segwit")
+                                            .font(.Main.fixed(.monoBold, size: 16))
+                                            .foregroundColor(Palette.grayScaleCA)
+                                    }
                                 }
                             }
                             .padding(.horizontal, 40)
