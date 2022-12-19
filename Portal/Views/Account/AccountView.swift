@@ -68,7 +68,7 @@ struct AccountView: View {
             QRCodeReaderView(config: .universal)
         }
         .sheet(isPresented: $goToReceive) {
-            let viewModel = ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: nil)
+            let viewModel = ReceiveViewModel.config(items: viewModel.items, selectedItem: nil)
             
             ReceiveRootView(viewModel: viewModel)
         }
