@@ -37,6 +37,8 @@
 		7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */ = {isa = PBXBuildFile; productRef = 7545BC4028CA107100ED92C3 /* Coinpaprika */; };
 		7545BC4328CA155100ED92C3 /* Decimal+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */; };
 		754EDF9128EC2E44004F10E2 /* ISendAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754EDF9028EC2E44004F10E2 /* ISendAdapter.swift */; };
+		755105F3294C6B4300525A16 /* EvmKit in Frameworks */ = {isa = PBXBuildFile; productRef = 755105F2294C6B4300525A16 /* EvmKit */; };
+		755105F6294CA4AB00525A16 /* EthereumKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755105F5294CA4AB00525A16 /* EthereumKitManager.swift */; };
 		7551706B2934AA7700CC84D7 /* BackUpDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551706A2934AA7700CC84D7 /* BackUpDetailsView.swift */; };
 		7551706D2934B10000CC84D7 /* RecoveryPhraseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551706C2934B10000CC84D7 /* RecoveryPhraseView.swift */; };
 		7551706F2935C76C00CC84D7 /* ClickableWordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551706E2935C76C00CC84D7 /* ClickableWordView.swift */; };
@@ -132,6 +134,8 @@
 		75772A662901795C00BE80B7 /* ActivityShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A652901795C00BE80B7 /* ActivityShareView.swift */; };
 		75772A682902D73E00BE80B7 /* TextLimitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A672902D73E00BE80B7 /* TextLimitter.swift */; };
 		75772A6C2906B57200BE80B7 /* AmountValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A6B2906B57200BE80B7 /* AmountValueView.swift */; };
+		758DFC7E294B65BA00AB35CC /* EthereumAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758DFC7D294B65BA00AB35CC /* EthereumAdapter.swift */; };
+		758DFC85294B6A7600AB35CC /* TransactionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758DFC84294B6A7600AB35CC /* TransactionRecord.swift */; };
 		75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */ = {isa = PBXBuildFile; productRef = 75AA211028A668A400DD2E89 /* BitcoinAddressValidator */; };
 		75CC43AF2913CBC300B15008 /* SingleTxViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CC43AE2913CBC300B15008 /* SingleTxViewModel.swift */; };
 		75D8C59228D8867600228298 /* IAccountStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59128D8867600228298 /* IAccountStorage.swift */; };
@@ -160,11 +164,9 @@
 		75D8C5CD28E1B40300228298 /* AsyncImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C5CB28E1B40300228298 /* AsyncImageView.swift */; };
 		75D8C5CE28E1B40300228298 /* CoinImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C5CC28E1B40300228298 /* CoinImageView.swift */; };
 		75DFA55828BD010400F23E02 /* QRCodeReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */; };
-		7C0858072466B18199D826C8 /* Pods_Portal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E89B0E0E9D017BDEC898373 /* Pods_Portal.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		3E89B0E0E9D017BDEC898373 /* Pods_Portal.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Portal.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4774D71928AF916600B7988B /* QRCodeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeItem.swift; sourceTree = "<group>"; };
 		4774D71B28AF920100B7988B /* QRCodeParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeParser.swift; sourceTree = "<group>"; };
 		4774D71D28B4B06200B7988B /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
@@ -193,6 +195,7 @@
 		7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
 		7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+Extension.swift"; sourceTree = "<group>"; };
 		754EDF9028EC2E44004F10E2 /* ISendAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISendAdapter.swift; sourceTree = "<group>"; };
+		755105F5294CA4AB00525A16 /* EthereumKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EthereumKitManager.swift; sourceTree = "<group>"; };
 		7551706A2934AA7700CC84D7 /* BackUpDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackUpDetailsView.swift; sourceTree = "<group>"; };
 		7551706C2934B10000CC84D7 /* RecoveryPhraseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryPhraseView.swift; sourceTree = "<group>"; };
 		7551706E2935C76C00CC84D7 /* ClickableWordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickableWordView.swift; sourceTree = "<group>"; };
@@ -285,6 +288,8 @@
 		75772A652901795C00BE80B7 /* ActivityShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityShareView.swift; sourceTree = "<group>"; };
 		75772A672902D73E00BE80B7 /* TextLimitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLimitter.swift; sourceTree = "<group>"; };
 		75772A6B2906B57200BE80B7 /* AmountValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountValueView.swift; sourceTree = "<group>"; };
+		758DFC7D294B65BA00AB35CC /* EthereumAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EthereumAdapter.swift; sourceTree = "<group>"; };
+		758DFC84294B6A7600AB35CC /* TransactionRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionRecord.swift; sourceTree = "<group>"; };
 		75CC43AE2913CBC300B15008 /* SingleTxViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleTxViewModel.swift; sourceTree = "<group>"; };
 		75D8C59128D8867600228298 /* IAccountStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAccountStorage.swift; sourceTree = "<group>"; };
 		75D8C59528D88A1100228298 /* IAppConfigProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAppConfigProvider.swift; sourceTree = "<group>"; };
@@ -311,8 +316,6 @@
 		75D8C5CB28E1B40300228298 /* AsyncImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncImageView.swift; sourceTree = "<group>"; };
 		75D8C5CC28E1B40300228298 /* CoinImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoinImageView.swift; sourceTree = "<group>"; };
 		75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeReaderView.swift; sourceTree = "<group>"; };
-		E4F0662E053361ED1FCD530B /* Pods-Portal.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Portal.debug.xcconfig"; path = "Target Support Files/Pods-Portal/Pods-Portal.debug.xcconfig"; sourceTree = "<group>"; };
-		ECF2767120E94FABF2F31765 /* Pods-Portal.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Portal.release.xcconfig"; path = "Target Support Files/Pods-Portal/Pods-Portal.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -320,6 +323,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				755105F3294C6B4300525A16 /* EvmKit in Frameworks */,
 				7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */,
 				7502D68B289BD8EF00613323 /* PortalUI in Frameworks */,
 				75D8C5CA28E1B00800228298 /* Kingfisher in Frameworks */,
@@ -329,21 +333,12 @@
 				75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */,
 				7564C65E28D1F89E00ABA8CF /* DataField in Frameworks */,
 				75772A5D28F8192F00BE80B7 /* CodeScanner in Frameworks */,
-				7C0858072466B18199D826C8 /* Pods_Portal.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		41019D1FC6994124B01EEDBF /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				3E89B0E0E9D017BDEC898373 /* Pods_Portal.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		4774D73028B4FD1800B7988B /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -356,6 +351,17 @@
 				755C56D428EACDF500A4B57B /* BitcoinDevKitTransaction+Extension.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		755105F4294CA40D00525A16 /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				75D8C5B228DADF8700228298 /* WalletManager.swift */,
+				75D8C5BC28DC70AD00228298 /* AdapterManager.swift */,
+				75D8C5C028DC711F00228298 /* CoinManager.swift */,
+				755105F5294CA4AB00525A16 /* EthereumKitManager.swift */,
+			);
+			path = Manager;
 			sourceTree = "<group>";
 		};
 		75517082293A5D7B00CC84D7 /* Navigation */ = {
@@ -431,8 +437,6 @@
 			children = (
 				756A3114288821F3004978E2 /* Portal */,
 				756A3113288821F3004978E2 /* Products */,
-				A13181E54603BB0421CBBE03 /* Pods */,
-				41019D1FC6994124B01EEDBF /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -478,6 +482,7 @@
 		756A312B2888443A004978E2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				758DFC84294B6A7600AB35CC /* TransactionRecord.swift */,
 				75D8C5A828D88F8D00228298 /* AdapterState.swift */,
 				75D8C59E28D88C4F00228298 /* Wallet.swift */,
 				7545BC3728C9E32A00ED92C3 /* FiatRatesResponse.swift */,
@@ -533,17 +538,17 @@
 			isa = PBXGroup;
 			children = (
 				756DDD9228A28DE7002EDC60 /* RootView.swift */,
-				75883A10292618330089D714 /* Onboarding */,
-				7564C65028CF3C2E00ABA8CF /* Send */,
-				755C56D928EB090B00A4B57B /* TextFieldWrapper.swift */,
 				756A313E28902C6F004978E2 /* MainView.swift */,
+				75883A10292618330089D714 /* Onboarding */,
+				755170912948C8C800CC84D7 /* Receive */,
+				7564C65028CF3C2E00ABA8CF /* Send */,
 				755170882948BFB700CC84D7 /* Account */,
 				755170962948CEEE00CC84D7 /* AccountBackup */,
 				755170702935C81900CC84D7 /* RoundedCornerShape.swift */,
+				755C56D928EB090B00A4B57B /* TextFieldWrapper.swift */,
 				7551706E2935C76C00CC84D7 /* ClickableWordView.swift */,
 				7551707829364C5E00CC84D7 /* WordView.swift */,
 				756A3136288AEAAD004978E2 /* AssetDetailsView.swift */,
-				755170912948C8C800CC84D7 /* Receive */,
 				75772A6B2906B57200BE80B7 /* AmountValueView.swift */,
 				756A313228898C73004978E2 /* SingleTxView.swift */,
 				752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */,
@@ -619,9 +624,7 @@
 		75D8C59328D8887300228298 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				75D8C5B228DADF8700228298 /* WalletManager.swift */,
-				75D8C5BC28DC70AD00228298 /* AdapterManager.swift */,
-				75D8C5C028DC711F00228298 /* CoinManager.swift */,
+				755105F4294CA40D00525A16 /* Manager */,
 				75D8C5AC28D8908200228298 /* Factories */,
 				75D8C59928D88A6700228298 /* Providers */,
 				75D8C59428D8889E00228298 /* Storage */,
@@ -662,18 +665,9 @@
 			isa = PBXGroup;
 			children = (
 				75D8C5AD28D8939A00228298 /* BitcoinAdapter.swift */,
+				758DFC7D294B65BA00AB35CC /* EthereumAdapter.swift */,
 			);
 			path = Adapters;
-			sourceTree = "<group>";
-		};
-		A13181E54603BB0421CBBE03 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				E4F0662E053361ED1FCD530B /* Pods-Portal.debug.xcconfig */,
-				ECF2767120E94FABF2F31765 /* Pods-Portal.release.xcconfig */,
-			);
-			name = Pods;
-			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -683,11 +677,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 756A3125288821F4004978E2 /* Build configuration list for PBXNativeTarget "Portal" */;
 			buildPhases = (
-				B3DB4BF8723E669A14C1F706 /* [CP] Check Pods Manifest.lock */,
 				756A310E288821F3004978E2 /* Sources */,
 				756A310F288821F3004978E2 /* Frameworks */,
 				756A3110288821F3004978E2 /* Resources */,
-				6D43A7E45035B03989C8BE72 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -704,6 +696,7 @@
 				7564C65D28D1F89E00ABA8CF /* DataField */,
 				75D8C5C928E1B00800228298 /* Kingfisher */,
 				75772A5C28F8192F00BE80B7 /* CodeScanner */,
+				755105F2294C6B4300525A16 /* EvmKit */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* Portal.app */;
@@ -740,9 +733,10 @@
 				75AA210F28A668A400DD2E89 /* XCRemoteSwiftPackageReference "bitcoin-address-validator-swift" */,
 				479A7AC728B756DF0057E100 /* XCRemoteSwiftPackageReference "Factory" */,
 				7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */,
-				7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field.git" */,
+				7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field" */,
 				75D8C5C828E1B00800228298 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				75772A5B28F8192F00BE80B7 /* XCRemoteSwiftPackageReference "CodeScanner" */,
+				755105F1294C6B4300525A16 /* XCRemoteSwiftPackageReference "EvmKit" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -764,48 +758,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		6D43A7E45035B03989C8BE72 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Portal/Pods-Portal-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Portal/Pods-Portal-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Portal/Pods-Portal-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		B3DB4BF8723E669A14C1F706 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Portal-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		756A310E288821F3004978E2 /* Sources */ = {
@@ -834,6 +786,7 @@
 				756DDD7428A27C86002EDC60 /* RestoreAccountView.swift in Sources */,
 				756DDD9028A28C06002EDC60 /* AccountRecord+CoreDataClass.swift in Sources */,
 				75772A642901793300BE80B7 /* IdentifiableString.swift in Sources */,
+				758DFC85294B6A7600AB35CC /* TransactionRecord.swift in Sources */,
 				755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */,
 				7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */,
 				755170952948CBC300CC84D7 /* ReceiveViewNavigationConfig.swift in Sources */,
@@ -866,6 +819,7 @@
 				75D8C5C328DC715900228298 /* ICoinStorage.swift in Sources */,
 				75D8C5BF28DC710E00228298 /* ICoinManager.swift in Sources */,
 				7564C65728CF6EC400ABA8CF /* SendFlowError.swift in Sources */,
+				758DFC7E294B65BA00AB35CC /* EthereumAdapter.swift in Sources */,
 				479A7AD428B8F30B0057E100 /* ReviewTransactionView.swift in Sources */,
 				4774D71C28AF920100B7988B /* QRCodeParser.swift in Sources */,
 				755170982948CF3400CC84D7 /* AccountBackupRootView.swift in Sources */,
@@ -874,6 +828,7 @@
 				752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */,
 				755C56D328EACC9000A4B57B /* TxLabel.swift in Sources */,
 				755C56C628EAAD7C00A4B57B /* TextEditorView.swift in Sources */,
+				755105F6294CA4AB00525A16 /* EthereumKitManager.swift in Sources */,
 				755170902948C7CD00CC84D7 /* SendRootView.swift in Sources */,
 				755170732935C96400CC84D7 /* RecoverPhraseViewModel.swift in Sources */,
 				7545BC3E28C9E7AF00ED92C3 /* RepeatingTimer.swift in Sources */,
@@ -1076,7 +1031,6 @@
 		};
 		756A3126288821F4004978E2 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E4F0662E053361ED1FCD530B /* Pods-Portal.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -1116,7 +1070,6 @@
 		};
 		756A3127288821F4004978E2 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = ECF2767120E94FABF2F31765 /* Pods-Portal.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -1202,7 +1155,15 @@
 				kind = branch;
 			};
 		};
-		7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field.git" */ = {
+		755105F1294C6B4300525A16 /* XCRemoteSwiftPackageReference "EvmKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/horizontalsystems/EvmKit.Swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/marcusrossel/data-field.git";
 			requirement = {
@@ -1268,9 +1229,14 @@
 			package = 7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */;
 			productName = Coinpaprika;
 		};
+		755105F2294C6B4300525A16 /* EvmKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 755105F1294C6B4300525A16 /* XCRemoteSwiftPackageReference "EvmKit" */;
+			productName = EvmKit;
+		};
 		7564C65D28D1F89E00ABA8CF /* DataField */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field.git" */;
+			package = 7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field" */;
 			productName = DataField;
 		};
 		756A31292888252D004978E2 /* BitcoinDevKit */ = {
