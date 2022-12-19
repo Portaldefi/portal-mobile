@@ -94,9 +94,19 @@ class ReceiveViewModel: ObservableObject {
     
     private func generateQRCode() {
         guard let adapter = adapter else { return }
+        guard let selectedItem = selectedItem else { return }
         
-        var qrCodeString = "bitcoin:\(adapter.receiveAddress)"
+        var qrCodeString: String
         
+        switch selectedItem.viewModel.coin.type {
+        case .bitcoin:
+            qrCodeString = "bitcoin:\(adapter.receiveAddress)"
+        case .ethereum:
+            qrCodeString = "ethereum:\(adapter.receiveAddress)"
+        default:
+            qrCodeString = String()
+        }
+                
         var components = URLComponents()
         components.queryItems = []
         
