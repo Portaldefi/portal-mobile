@@ -17,6 +17,8 @@ class AdapterFactory: IAdapterFactory {
                 print(error.localizedDescription)
                 fatalError(error.localizedDescription)
             }
+        case .ethereum:
+            return EthereumKitManager.shared.adapter
         default:
             return nil
         }
