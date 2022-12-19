@@ -30,7 +30,7 @@ class WalletItemViewModel: ObservableObject {
             let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
             return (balance * btcPriceInUsd).double.usdFormatted()
         case .ethereum, .erc20:
-            return "not implemented"
+            return (balance * 1200).double.usdFormatted()
         }
     }
     
