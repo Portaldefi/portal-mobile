@@ -37,7 +37,7 @@ final class BitcoinAdapter {
     private let progressHandler = ProgressHandler()
     private let networkQueue = DispatchQueue(label: "com.portal.network.layer.queue", qos: .userInitiated)
     
-    private var adapterState: AdapterState = .empty
+    private var adapterState: AdapterState = .synced
     private var balanceSats: UInt64 = 0
     
     init(wallet: Wallet) throws {
@@ -61,9 +61,7 @@ final class BitcoinAdapter {
                 network: Network.testnet,
                 databaseConfig: dbConfig
             )
-            
-            adapterState = .loaded
-            
+                        
             self.loadCache()
             
             self.updateTimer.eventHandler = { [weak self] in
@@ -79,16 +77,14 @@ final class BitcoinAdapter {
             try fetchBalance()
             try fetchTransactions()
         } catch {
-            update(state: .failed(error))
+            update(state: .notSynced(error: error))
         }
     }
     
-    private func sync() {
-        guard adapterState != .empty, adapterState != .syncing else { return }
-        
+    private func sync() {        
         print("Syncing btc network...")
         
-        update(state: .syncing)
+        update(state: .syncing(progress: 0, lastBlockDate: nil))
         
         networkQueue.async {
             do {
@@ -96,7 +92,7 @@ final class BitcoinAdapter {
             } catch {
                 DispatchQueue.main.async {
                     print("Btc network synced error: \(error)")
-                    self.update(state: .failed(error))
+                    self.update(state: .notSynced(error: error))
                 }
             }
             
@@ -111,7 +107,7 @@ final class BitcoinAdapter {
             } catch {
                 DispatchQueue.main.async {
                     print("Btc network synced error: \(error)")
-                    self.update(state: .failed(error))
+                    self.update(state: .notSynced(error: error))
                 }
             }
         }
