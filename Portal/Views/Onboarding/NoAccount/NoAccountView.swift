@@ -13,15 +13,15 @@ struct NoAccountView: View {
     
     var body: some View {
         VStack {
-            VStack(spacing: 51) {
-                Asset.portalIcon
-                Text("Your Gateway To\nUncensorable Finance")
+            VStack(spacing: 56) {
+                Asset.portalBetaIcon
+                Text("Your Gateway To\nUncensorable Apps")
                     .foregroundColor(Palette.grayScaleCA)
                     .font(.Main.fixed(.monoBold, size: 21))
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
             }
-            .padding(.top, 144)
+            .padding(.top, 172)
             Spacer()
             PButton(config: .onlyLabel("Create Wallet"), style: .filled, size: .big, enabled: true) {
                 navigation.push(.createAccount)
