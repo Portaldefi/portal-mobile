@@ -10,78 +10,73 @@ import PortalUI
 import Factory
 
 struct AccountView: View {
-    @State private var goToDetails = false
     @State private var goToReceive = false
     @State private var selectedItem: WalletItem?
     @State private var qrItem: QRCodeItem?
     
+    @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewModel: AccountViewModel = Container.accountViewModel()
     @ObservedObject private var viewState: ViewState = Container.viewState()
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                Group {
-                    AccountView()
-                    Divider()
-                        .overlay(Palette.grayScale2A)
-                    BalanceView(balance: viewModel.totalBalance, value: viewModel.totalValue)
-                        .frame(height: 124)
-                        .padding(.horizontal, 16)
-                    ActionButtonsView
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 24)
-                }
-                
+        VStack(spacing: 0) {
+            Group {
+                AccountView()
                 Divider()
-                    .overlay(Palette.grayScale10)
-                
-                ScrollView {
-                    VStack(spacing: 0) {
-                        ForEach(viewModel.items) { item in
-                            ZStack(alignment: .trailing) {
-                                WalletItemView(viewModel: item.viewModel)
-                                    .padding(.leading, 16)
-                                    .padding(.trailing, 8)
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        viewState.hideTabBar = true
-                                        selectedItem = item
-                                        goToDetails = true
-                                    }
-                                Asset.chevronRightIcon
-                                    .foregroundColor(Palette.grayScale4A)
-                            }
-                            Divider()
-                                .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
-                        }
-                    }
+                    .overlay(Palette.grayScale2A)
+                BalanceView(balance: viewModel.totalBalance, value: viewModel.totalValue)
+                    .frame(height: 124)
                     .padding(.horizontal, 16)
-                    
-                    NavigationLink(
-                        destination: AssetDetailsView(item: selectedItem),
-                        isActive: $goToDetails
-                    ) {
-                        EmptyView()
+                ActionButtonsView
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
+            }
+            
+            Divider()
+                .overlay(Palette.grayScale10)
+            
+            ScrollView {
+                VStack(spacing: 0) {
+                    ForEach(viewModel.items) { item in
+                        ZStack(alignment: .trailing) {
+                            WalletItemView(viewModel: item.viewModel)
+                                .padding(.leading, 16)
+                                .padding(.trailing, 8)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    withAnimation {
+                                        viewState.hideTabBar = true
+                                    }
+                                    selectedItem = item
+                                    
+                                    navigation.push(.assetDetails(item: item))
+                                }
+                            Asset.chevronRightIcon
+                                .foregroundColor(Palette.grayScale4A)
+                        }
+                        Divider()
+                            .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
                     }
                 }
-                .background(Palette.grayScale20)
+                .padding(.horizontal, 16)
             }
-            .navigationBarHidden(true)
-            .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
+            .background(Palette.grayScale20)
         }
+        .navigationBarHidden(true)
+        .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         .sheet(isPresented: $viewState.showQRCodeScannerFromTabBar) {
             QRCodeReaderView(config: .universal)
         }
         .sheet(isPresented: $goToReceive) {
-            NavigationView {
-                ReceiveView(viewModel: ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: nil))
-            }
+            let viewModel = ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: nil)
+            
+            ReceiveRootView(viewModel: viewModel)
         }
         .sheet(isPresented: $viewState.goToSend) {
-            NavigationView {
-                SendView()
-            }
+            SendRootView()
+        }
+        .fullScreenCover(isPresented: $viewState.goToBackUp) {
+            AccountBackupRootView()
         }
     }
     
@@ -94,7 +89,16 @@ struct AccountView: View {
                     .font(.Main.fixed(.bold, size: 16))
                     .foregroundColor(Palette.grayScaleF4)
             }
+            
             Spacer()
+            
+            if !viewModel.accountDataIsBackedUp {
+                PButton(config: .onlyIcon(Asset.warningIcon), style: .free, size: .medium, color: .yellow, enabled: true) {
+                    viewState.goToBackUp.toggle()
+                }
+                .frame(width: 30, height: 30)
+            }
+            
             Asset.gearIcon
                 .foregroundColor(Palette.grayScale6A)
         }

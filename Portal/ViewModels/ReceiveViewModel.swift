@@ -146,6 +146,10 @@ class ReceiveViewModel: ObservableObject {
         guard let adapter = adapter else { return }
         sharedAddress = IdentifiableString(text: "\(adapter.receiveAddress)\n\nThis is a bitcoin network address. Only send BTC to this address. Do not send lightning network assets to his address.")
     }
+    
+    var isIPod: Bool {
+        return UIScreen.main.bounds.height == 568 && UIScreen.main.bounds.width == 320
+    }
 }
 
 extension ReceiveViewModel {

@@ -20,6 +20,12 @@ class AccountStorage {
     }
 
     private func createAccount(record: AccountRecord) -> Account? {
+        guard let recoveryData = recoveryData(record: record) else { return nil }
+        let key = try! DescriptorSecretKey(network: .testnet, mnemonic: recoveryData.recoveryString, password: recoveryData.salt)
+        return Account(record: record, key: key)
+    }
+    
+    private func recoveryData(record: AccountRecord) -> RecoveryData? {
         let id = record.id
 
         guard let words = recoverStringArray(id: id, typeName: .mnemonic, keyName: .words) else {
@@ -30,9 +36,7 @@ class AccountStorage {
             return nil
         }
         
-        let key = try! DescriptorSecretKey(network: .testnet, mnemonic: words.joined(separator: " "), password: salt)
-        
-        return Account(record: record, key: key)
+        return RecoveryData(words: words, salt: salt)
     }
 
     private func createRecord(account: Account, mnemonic: String, salt: String?) throws -> AccountRecord {
@@ -85,6 +89,15 @@ class AccountStorage {
 }
 
 extension AccountStorage: IAccountStorage {
+    var activeAccountRecoveryData: RecoveryData? {
+        guard
+            let currentAccountID = localStorage.getCurrentAccountID(),
+            let record = accountStorage.accountRecords.first(where: { $0.id == currentAccountID })
+        else { return nil }
+        
+        return recoveryData(record: record)
+    }
+    
     var activeAccount: Account? {
         guard
             let currentAccountID = localStorage.getCurrentAccountID(),

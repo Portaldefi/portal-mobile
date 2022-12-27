@@ -10,8 +10,14 @@ import BitcoinDevKit
 import PortalUI
 import Factory
 
+extension BitcoinDevKit.TransactionDetails: Identifiable {
+    public var id: String {
+        txid
+    }
+}
+
 struct AssetDetailsView: View {
-    @Environment(\.presentationMode) private var presentationMode
+    @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewState: ViewState = Container.viewState()
     @ObservedObject private var viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
     @State private var showTxDetails = false
@@ -28,7 +34,7 @@ struct AssetDetailsView: View {
                             withAnimation {
                                 viewState.hideTabBar = false
                             }
-                            presentationMode.wrappedValue.dismiss()
+                            navigation.pop()
                         }
                         .frame(width: 20)
                         
@@ -67,7 +73,6 @@ struct AssetDetailsView: View {
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 selectedTx = transaction
-                                showTxDetails = true
                             }
                         Divider()
                             .overlay(Palette.grayScale1A)
@@ -83,22 +88,15 @@ struct AssetDetailsView: View {
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
-        .navigationBarHidden(true)
+        .sheet(item: $selectedTx) { tx in
+            TransactionDetailsView(coin: viewModel.coin, tx: tx)
+        }
         .sheet(isPresented: $viewState.goToReceive) {
-            NavigationView {
-                ReceiveView(
-                    viewModel: ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: WalletItem.mockedBtc))
-            }
+            let viewModel = ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: WalletItem.mockedBtc)
+            ReceiveRootView(viewModel: viewModel)
         }
         .sheet(isPresented: $viewState.goToSendFromDetails) {
-            NavigationView {
-                SendView()
-            }
-        }
-        .sheet(isPresented: $showTxDetails) {
-            if let tx = selectedTx {
-                TransactionDetailsView(coin: viewModel.coin, tx: tx)
-            }
+            SendRootView()
         }
     }
     

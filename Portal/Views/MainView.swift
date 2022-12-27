@@ -22,7 +22,7 @@ struct Mainview: View {
             ]
         
         views = [
-            AnyView(AccountView()),
+            AnyView(AccountRootView()),
             AnyView(ActivityView())
         ]
     }
@@ -99,10 +99,9 @@ struct Mainview: View {
             views[viewState.selectedTab.rawValue]
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             
-            if !viewState.hideTabBar {
-                TabBar
-                    .transition(.move(edge: .bottom))
-            }
+            TabBar
+                .offset(y: viewState.hideTabBar ? 109 : 0)
+                .zIndex(1)
         }
     }
 }

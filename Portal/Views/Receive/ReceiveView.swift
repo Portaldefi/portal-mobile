@@ -83,7 +83,7 @@ struct ReceiveView: View {
                                     HStack(spacing: 8) {
                                         Asset.btcIcon
                                         Text("Bitcoin")
-                                            .font(.Main.fixed(.monoBold, size: 22))
+                                            .font(.Main.fixed(.monoBold, size: viewModel.isIPod ? 16 : 22))
                                             .foregroundColor(Palette.grayScaleF4)
                                     }
                                     HStack {

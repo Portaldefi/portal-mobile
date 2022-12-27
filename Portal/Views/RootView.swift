@@ -13,7 +13,7 @@ struct RootView: View {
     var body: some View {
         switch viewModel.state {
         case .empty:
-            NoAccountView()
+            NoAccountRootView()
         case .account:
             Mainview()
                 .animation(nil, value: false)
