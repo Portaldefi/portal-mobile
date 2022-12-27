@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hmlongco/Factory",
       "state" : {
-        "revision" : "8557426f3286e20b631ecdac8115242f888656e0",
-        "version" : "1.2.8"
+        "revision" : "ca5788b8621b185a0fbe6ef05bb9a73b3ef2833f",
+        "version" : "1.2.9"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/onevcat/Kingfisher",
       "state" : {
-        "revision" : "017f94ccfdacabb1ae7f45b75b4217b24c06e6ac",
-        "version" : "7.4.0"
+        "revision" : "44e891bdb61426a95e31492a67c7c0dfad1f87c5",
+        "version" : "7.4.1"
       }
     },
     {
@@ -177,7 +177,7 @@
       "location" : "https://github.com/FabricLabs/portal-ui-swift",
       "state" : {
         "branch" : "main",
-        "revision" : "ac192e4911a3e9912d50d9383620b973c816260a"
+        "revision" : "6d99459ef17857df41f00b0451347de89f5ad283"
       }
     },
     {
