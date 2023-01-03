@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import BitcoinDevKit
 import Factory
+import BigInt
 
 class TransactionDetailsViewModel: ObservableObject {
     let storage: UserDefaults
@@ -17,12 +18,8 @@ class TransactionDetailsViewModel: ObservableObject {
         let height: Int
     }
     
-    enum TxSide {
-        case sent, recieved
-    }
-    
     let coin: Coin
-    let transaction: TransactionDetails
+    let transaction: TransactionRecord
     let blockChainHeight: Int32
     
     @Published var editingNotes = false
@@ -33,15 +30,26 @@ class TransactionDetailsViewModel: ObservableObject {
     @LazyInjected(Container.viewState) var viewState: ViewState
     
     var title: String {
-        transaction.sent > 0 ? "Sent" : "Recieved"
+        transaction.type.description
+    }
+    
+    private func convertAmount(amount: BigUInt, decimals: Int, sign: FloatingPointSign) -> Decimal {
+        guard let significand = Decimal(string: amount.description), significand != 0 else {
+            return 0
+        }
+
+        return Decimal(sign: sign, exponent: -decimals, significand: significand)
     }
     
     var amountString: String {
-        switch txSide {
-        case .sent:
-            return (Double(transaction.sent)/100_000_000).toString(decimal: 8)
-        case .recieved:
-            return (Double(transaction.received)/100_000_000).toString(decimal: 8)
+        guard let amount = transaction.amount else { return "0" }
+        switch coin.type {
+        case .bitcoin:
+            return Double(amount.double/100_000_000).toString(decimal: 8)
+        case .ethereum:
+            return amount.double.toString(decimal: 8)
+        default:
+            return "0"
         }
     }
     
@@ -50,24 +58,24 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     var recipientString: String? {
-        storage.object(forKey: transaction.txid + "recipient") as? String
+        storage.object(forKey: transaction.id + "recipient") as? String
     }
     
     var dateString: String {
-        guard let blockTime = transaction.confirmationTime else {
+        guard let timestamp = transaction.timestamp else {
             return Date().extendedDate()
         }
         
-        return Date(timeIntervalSince1970: TimeInterval(blockTime.timestamp)).extendedDate()
+        return Date(timeIntervalSince1970: TimeInterval(timestamp)).extendedDate()
     }
     
     var feeString: String {
-        guard let fee = transaction.fee else { return "0.000000141" }
-        return String(format: "%.8f", Double(fee)/100_000_000)
+        //guard let fee = transaction.fee else { return "0.000000141" }
+        return String(format: "%.8f", Double(0.000001)/100_000_000)
     }
         
     var txIdString: String {
-        "\(transaction.txid.prefix(4))...\(transaction.txid.suffix(4))"
+        "\(transaction.id.prefix(4))...\(transaction.id.suffix(4))"
     }
     
     @Published var confirmations: Int32 = 0
@@ -78,52 +86,48 @@ class TransactionDetailsViewModel: ObservableObject {
     var explorerUrl: URL? {
         switch coin.type {
         case .bitcoin:
-            return URL(string: "https://blockstream.info/testnet/tx/\(transaction.txid)")
+            return URL(string: "https://blockstream.info/testnet/tx/\(transaction.id)")
         case .ethereum:
-            return URL(string: "https://ropsten.etherscan.io/tx/\(transaction.txid)")
+            return URL(string: "https://ropsten.etherscan.io/tx/\(transaction.id)")
         default:
             return nil
         }
     }
     
-    private var txSide: TxSide {
-        transaction.sent > 0 ? .sent : .recieved
-    }
-        
     private var subscriptions = Set<AnyCancellable>()
     
-    init(coin: Coin, tx: BitcoinDevKit.TransactionDetails, blockChainHeight: Int32) {
+    init(coin: Coin, tx: TransactionRecord, blockChainHeight: Int32) {
         self.coin = coin
         self.storage = UserDefaults.standard
         self.transaction = tx
         self.blockChainHeight = blockChainHeight
         
-        if let notes = storage.string(forKey: transaction.txid + "notes") {
+        if let notes = storage.string(forKey: transaction.id + "notes") {
             self.notes = notes
         }
         
-        if let tags = storage.object(forKey: transaction.txid + "labels") as? [String] {
+        if let tags = storage.object(forKey: transaction.id + "labels") as? [String] {
             self.labels = tags.map{ TxLable(label: $0 )}
         }
         
-        if let blockTime = tx.confirmationTime {
-            confirmations = blockChainHeight - Int32(blockTime.height) + 1
+        if let blockHeight = tx.blockHeight {
+            confirmations = blockChainHeight - Int32(blockHeight) + 1
         }
         
         $labels.sink { [unowned self] labels in
-            self.storage.set(labels.map{ $0.label }, forKey: self.transaction.txid + "labels")
+            self.storage.set(labels.map{ $0.label }, forKey: self.transaction.id + "labels")
         }
         .store(in: &subscriptions)
         
         $notes.sink { [unowned self] notes in
-            self.storage.set(notes, forKey: self.transaction.txid + "notes")
+            self.storage.set(notes, forKey: self.transaction.id + "notes")
         }
         .store(in: &subscriptions)
     }
 }
 
 extension TransactionDetailsViewModel {
-    static func config(coin: Coin, tx: BitcoinDevKit.TransactionDetails) -> TransactionDetailsViewModel {
+    static func config(coin: Coin, tx: TransactionRecord) -> TransactionDetailsViewModel {
         let adapterManager: IAdapterManager = Container.adapterManager()
         let walletManager: IWalletManager = Container.walletManager()
                 
