@@ -77,7 +77,7 @@ class SendViewViewModel: ObservableObject {
     @Published var recomendedFees: RecomendedFees?
     @Published var fee: TxFees = .normal
     @Published var publishedTxId: String?
-    @Published var unconfirmedTx: BitcoinDevKit.TransactionDetails?
+    @Published var unconfirmedTx: TransactionRecord?
     
     @Published var exchanger: Exchanger!
     @Published var clipboardIsEmpty = false
@@ -136,12 +136,12 @@ class SendViewViewModel: ObservableObject {
     private var url: URL? = URL(string: "https://bitcoinfees.earn.com/api/v1/fees/recommended")
     private var urlSession: URLSession!
     
-    init(balanceAdapter: IBalanceAdapter, sendAdapter: ISendAdapter) {
+    init(coin: Coin, balanceAdapter: IBalanceAdapter, sendAdapter: ISendAdapter) {
         self.balanceAdapter = balanceAdapter
         self.sendAdapter = sendAdapter
         
         self.exchanger = Exchanger(
-            base: .bitcoin(),
+            base: coin,
             quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)),
             balanceAdapter: balanceAdapter
         )
@@ -166,6 +166,15 @@ class SendViewViewModel: ObservableObject {
             switch item.type {
             case .bip21(let address, let amount, _):
                 self.selectedItem = walletItems.first
+                self.to = address
+                guard let amount = amount else {
+                    step = .amount
+                    return
+                }
+                self.exchanger.baseAmount.value = amount
+                self.step = .review
+            case .eth(let address, let amount, _):
+                self.selectedItem = walletItems.last
                 self.to = address
                 guard let amount = amount else {
                     step = .amount
@@ -269,11 +278,13 @@ class SendViewViewModel: ObservableObject {
                     if let id = txId {
                         self.publishedTxId = id
                         
-                        self.unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
+                        let unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
                             recipient: self.to,
                             amount: self.exchanger.baseAmount.value,
                             id: id
                         )
+                        
+//                        self.unconfirmedTx = TransactionRecord(transactionHash: unconfirmedTx.txid, transactionHashData: Data(), timestamp: unconfirmedTx.confirmationTime?.timestamp, isFailed: false, from: nil, to: nil, amount: unconfirmedTx.value, input: nil, blockHeight: unconfirmedTx.confirmationTime?.height, transactionIndex: nil, decoration: String())
                         
                         withAnimation {
                             self.step = .sent
@@ -296,7 +307,8 @@ class SendViewViewModel: ObservableObject {
                     if let id = txId {
                         self.publishedTxId = id
                         
-                        self.unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
+                        
+                        let unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
                             recipient: self.to,
                             amount: self.exchanger.baseAmount.value,
                             id: id
@@ -463,9 +475,9 @@ class SendViewViewModel: ObservableObject {
 
 extension SendViewViewModel {
     static var mocked: SendViewViewModel {
-        let vm = SendViewViewModel(balanceAdapter: BalanceAdapterMocked(), sendAdapter: SendAdapterMocked())
+        let vm = SendViewViewModel(coin: .bitcoin(), balanceAdapter: BalanceAdapterMocked(), sendAdapter: SendAdapterMocked())
         vm.walletItems = [WalletItem.mockedBtc]
-        vm.unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(recipient: "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3", amount: "0.000123", id: "9dbc955b20b0ad5ff5dced70875c9148769ef78481a0c299131034f33c04e2f6")
+        vm.unconfirmedTx = TransactionRecord(transaction: TransactionDetails.mockedConfirmed)
         vm.to = "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3"
         vm.balanceString = "0.000124"
         vm.valueString = "12.93"
@@ -485,6 +497,6 @@ extension SendViewViewModel {
             fatalError("coudn't fetch dependencies")
         }
 
-        return SendViewViewModel(balanceAdapter: balanceAdapter, sendAdapter: sendAdapter)
+        return SendViewViewModel(coin: coin, balanceAdapter: balanceAdapter, sendAdapter: sendAdapter)
     }
 }
