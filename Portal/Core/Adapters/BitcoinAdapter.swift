@@ -29,7 +29,7 @@ final class BitcoinAdapter {
         
     private let stateUpdatedSubject = PassthroughSubject<Void, Never>()
     private let balanceUpdatedSubject = PassthroughSubject<Void, Never>()
-    private let transactionsSubject = CurrentValueSubject<[BitcoinDevKit.TransactionDetails], Never>([])
+    private let transactionsSubject = CurrentValueSubject<[TransactionRecord], Never>([])
     
     private let wallet: BitcoinDevKit.Wallet
     private let blockchain: BitcoinDevKit.Blockchain
@@ -119,7 +119,9 @@ final class BitcoinAdapter {
     }
     
     private func fetchTransactions() throws {
-        update(txs: try wallet.listTransactions())
+        let txs = try wallet.listTransactions()
+        let convertedTxs = txs.map{ TransactionRecord(transaction: $0) }
+        update(txs: convertedTxs)
     }
     
     private func update(state: AdapterState) {
@@ -127,7 +129,7 @@ final class BitcoinAdapter {
         stateUpdatedSubject.send()
     }
     
-    private func update(txs: [BitcoinDevKit.TransactionDetails]) {
+    private func update(txs: [TransactionRecord]) {
         DispatchQueue.main.async {
             self.transactionsSubject.send(txs)
         }
@@ -276,7 +278,7 @@ extension BitcoinAdapter: IDepositAdapter {
 }
 
 extension BitcoinAdapter: ITransactionsAdapter {
-    var transactionRecords: AnyPublisher<[TransactionDetails], Never> {
+    var transactionRecords: AnyPublisher<[TransactionRecord], Never> {
         transactionsSubject.eraseToAnyPublisher()
     }
 }
