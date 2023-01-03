@@ -118,7 +118,7 @@ class ReceiveViewModel: ObservableObject {
             components.queryItems?.append(URLQueryItem(name: "message", value: description))
         }
                 
-        if let parameters = components.string {
+        if let parameters = components.string, parameters != "?" {
             qrCodeString += parameters
         }
         
