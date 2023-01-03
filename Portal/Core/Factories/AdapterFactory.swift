@@ -8,6 +8,14 @@
 import Foundation
 
 class AdapterFactory: IAdapterFactory {
+    private let appConfigProvider: IAppConfigProvider
+    private let ethereumKitManager: EthereumKitManager
+
+    init(appConfigProvider: IAppConfigProvider, ethereumKitManager: EthereumKitManager) {
+        self.appConfigProvider = appConfigProvider
+        self.ethereumKitManager = ethereumKitManager
+    }
+    
     func adapter(wallet: Wallet) -> IAdapter? {
         switch wallet.coin.type {
         case .bitcoin:
@@ -18,7 +26,11 @@ class AdapterFactory: IAdapterFactory {
                 fatalError(error.localizedDescription)
             }
         case .ethereum:
-            return EthereumKitManager.shared.adapter
+            if let ethKit = try? ethereumKitManager.kit(account: wallet.account) {
+                return EthereumAdapter(evmKit: ethKit, signer: ethereumKitManager.signer)
+            } else {
+                return nil
+            }
         default:
             return nil
         }
