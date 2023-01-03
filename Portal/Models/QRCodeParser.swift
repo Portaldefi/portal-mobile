@@ -66,6 +66,19 @@ struct QRCodeParser {
                 QRCodeItem.bip21(address: btcAddress, amount: amount, message: message),
                 QRCodeItem.bolt11(invoice: lightningInvoice)
             ]
+        case "ethereum":
+            let ethAddress = components.path
+
+            guard let queryItems = components.queryItems else {
+                return [QRCodeItem.eth(address: ethAddress)]
+            }
+
+            let amount = queryItems.first(where: {$0.name == "amount"})?.value
+            let message = queryItems.first(where: {$0.name == "message"})?.value
+
+            return [
+                QRCodeItem.eth(address: ethAddress, amount: amount, message: message),
+            ]
         default:
             if components.path.hasPrefix("xpub") {
                 return [QRCodeItem.publicKey(xpub: components.path)]
