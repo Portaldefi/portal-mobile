@@ -115,6 +115,8 @@ struct AccountView: View {
                         Text(balance)
                             .font(.Main.fixed(.monoBold, size: 32))
                             .foregroundColor(Palette.grayScaleEA)
+                            .minimumScaleFactor(0.5)
+                            .lineLimit(1)
                         Text("btc")
                             .font(.Main.fixed(.monoRegular, size: 18))
                             .foregroundColor(Palette.grayScale6A)

@@ -251,7 +251,7 @@ struct QRCodeScannerView: View {
                                     .frame(width: 16, height: 16)
                                 
                                 switch item.type {
-                                case .bip21, .privKey, .pubKey:
+                                case .bip21, .privKey, .pubKey, .eth:
                                     Text("on")
                                         .font(.Main.fixed(.monoMedium, size: 12))
                                         .fontWeight(.bold)

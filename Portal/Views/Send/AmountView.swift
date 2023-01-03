@@ -39,7 +39,7 @@ struct AmountView: View {
                             .foregroundColor(
                                 validate ? exchanger.amountIsValid ? Palette.grayScaleEA : warningColor : Palette.grayScaleEA
                             )
-                        Text("btc")
+                        Text(exchanger.base.code.lowercased())
                             .font(.Main.fixed(.monoRegular, size: 18))
                             .foregroundColor(Palette.grayScale6A)
                             .offset(y: 5)
@@ -84,7 +84,7 @@ struct AmountView: View {
                         Text(exchanger.baseAmount.value.isEmpty ? "0" : exchanger.baseAmount.value)
                             .font(.Main.fixed(.monoMedium, size: 16))
                             .foregroundColor(Palette.grayScale6A)
-                        Text("btc")
+                        Text(exchanger.base.code.lowercased())
                             .font(.Main.fixed(.monoMedium, size: 12))
                             .foregroundColor(Palette.grayScale6A)
                             .offset(y: 2)

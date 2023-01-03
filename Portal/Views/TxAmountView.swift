@@ -11,6 +11,7 @@ import PortalUI
 struct TxAmountView: View {
     let amount: String
     let value: String
+    let code: String
     
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
@@ -20,7 +21,7 @@ struct TxAmountView: View {
                     .foregroundColor(Palette.grayScaleEA)
                     .frame(height: 26)
                 
-                Text("btc")
+                Text(code)
                     .font(.Main.fixed(.monoRegular, size: 18))
                     .foregroundColor(Palette.grayScale6A)
             }
@@ -40,7 +41,7 @@ struct TxAmountView: View {
 
 struct TxAmountView_Previews: PreviewProvider {
     static var previews: some View {
-        TxAmountView(amount: "0.000055", value: "1.24")
+        TxAmountView(amount: "0.000055", value: "1.24", code: "btc")
             .padding()
             .previewLayout(.sizeThatFits)
     }
