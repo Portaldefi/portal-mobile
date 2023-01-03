@@ -11,8 +11,9 @@ import EvmKit
 import RxSwift
 import BigInt
 import Combine
-import BitcoinDevKit
 
+
+//MARK: - IAdapter
 class EthereumAdapter: IAdapter {
     var blockchainHeight: Int32 = 0
     
@@ -27,55 +28,28 @@ class EthereumAdapter: IAdapter {
 
     private func transactionRecord(fullTransaction: FullTransaction) -> TransactionRecord {
         let transaction = fullTransaction.transaction
-
         var amount: Decimal?
-
         if let value = transaction.value, let significand = Decimal(string: value.description) {
             amount = Decimal(sign: .plus, exponent: -decimal, significand: significand)
         }
-
-        return TransactionRecord(
-                transactionHash: transaction.hash.hs.hexString,
-                transactionHashData: transaction.hash,
-                timestamp: transaction.timestamp,
-                isFailed: transaction.isFailed,
-                from: transaction.from,
-                to: transaction.to,
-                amount: amount,
-                input: transaction.input.map {
-                    $0.hs.hexString
-                },
-                blockHeight: transaction.blockNumber,
-                transactionIndex: transaction.transactionIndex,
-                decoration: String(describing: fullTransaction.decoration)
-        )
-    }
-
-}
-
-extension EthereumAdapter: IBalanceAdapter {
-    var state: AdapterState {
-        .synced
+        
+        let type: TxType
+        
+        if transaction.to?.hex == receiveAddress {
+            type = .received
+        } else {
+            type = .sent
+        }
+        
+        return TransactionRecord(transaction: transaction, amount: amount, type: type)
     }
     
-    var balanceStateUpdated: AnyPublisher<Void, Never> {
-        Just(()).eraseToAnyPublisher()
-    }
-    
-    var balanceUpdated: AnyPublisher<Void, Never> {
-        Just(()).eraseToAnyPublisher()
-    }
-}
-
-extension EthereumAdapter: ITransactionsAdapter {
-    var transactionRecords: AnyPublisher<[BitcoinDevKit.TransactionDetails], Never> {
-        Just([]).eraseToAnyPublisher()
-    }
-}
-
-extension EthereumAdapter: IDepositAdapter {
-    var receiveAddress: String {
-        evmKit.receiveAddress.hex
+    private func convertToAdapterState(evmSyncState: SyncState) -> AdapterState {
+        switch evmSyncState {
+            case .synced: return .synced
+            case .notSynced(let error): return .notSynced(error: error)
+            case .syncing: return .syncing(progress: 50, lastBlockDate: nil)
+        }
     }
 }
 
@@ -92,14 +66,6 @@ extension EthereumAdapter {
         evmKit.refresh()
     }
 
-    var name: String {
-        "Ethereum"
-    }
-
-    var coin: String {
-        "ETH"
-    }
-
     var lastBlockHeight: Int? {
         evmKit.lastBlockHeight
     }
@@ -110,14 +76,6 @@ extension EthereumAdapter {
 
     var transactionsSyncState: SyncState {
         evmKit.transactionsSyncState
-    }
-
-    var balance: Decimal {
-        if let balance = evmKit.accountState?.balance, let significand = Decimal(string: balance.description) {
-            return Decimal(sign: .plus, exponent: -decimal, significand: significand)
-        }
-
-        return 0
     }
 
     var lastBlockHeightObservable: Observable<Void> {
@@ -140,13 +98,21 @@ extension EthereumAdapter {
         evmKit.transactionsObservable(tagQueries: []).map { _ in () }
     }
 
-    func transactionsSingle(from hash: Data?, limit: Int?) -> Single<[TransactionRecord]> {
-        evmKit.transactionsSingle(tagQueries: [], fromHash: hash, limit: limit)
-                .map { [weak self] in
-                    $0.compactMap {
-                        self?.transactionRecord(fullTransaction: $0)
+    func transactionsSingle(from hash: Data?, limit: Int?) -> Future<[TransactionRecord], Never> {
+        Future { [weak self] promise in
+            let disposeBag = DisposeBag()
+            
+            self?.evmKit.transactionsSingle(tagQueries: [], fromHash: hash, limit: limit)
+                    .map { [weak self] in
+                        $0.compactMap {
+                            self?.transactionRecord(fullTransaction: $0)
+                        }
                     }
-                }
+                    .subscribe(onSuccess: { records in
+                        promise(.success(records))
+                    })
+                    .disposed(by: disposeBag)
+        }
     }
 
     func transaction(hash: Data, interTransactionIndex: Int) -> TransactionRecord? {
@@ -163,12 +129,11 @@ extension EthereumAdapter {
         evmKit.transactionSingle(hash: hash)
     }
 
-    func sendSingle(to: EvmKit.Address, amount: Decimal, gasLimit: Int, gasPrice: GasPrice) -> Single<Void> {
+    func sendSingle(to: EvmKit.Address, amount: BigUInt, gasLimit: Int, gasPrice: GasPrice) -> Single<Void> {
         guard let signer = signer else {
             return Single.error(SendError.noSigner)
         }
 
-        let amount = BigUInt(amount.hs.roundedString(decimal: decimal))!
         let transactionData = evmKit.transferTransactionData(to: to, value: amount)
 
         return evmKit.rawTransaction(transactionData: transactionData, gasPrice: gasPrice, gasLimit: gasLimit)
@@ -183,10 +148,76 @@ extension EthereumAdapter {
                 }
                 .map { (tx: FullTransaction) in () }
     }
-}
-
-extension EthereumAdapter {
+    
     enum SendError: Error {
         case noSigner
+        case noTransaction
+        case error(String)
+        case unsupportedAccount
+    }
+}
+
+//MARK: - IBalanceAdapter
+extension EthereumAdapter: IBalanceAdapter {
+    var state: AdapterState {
+        convertToAdapterState(evmSyncState: syncState)
+    }
+    
+    var balanceStateUpdated: AnyPublisher<Void, Never> {
+        syncStateObservable.map { _ in() }.publisher.catch { _ in Just(()) }.eraseToAnyPublisher()
+    }
+    
+    var balanceUpdated: AnyPublisher<Void, Never> {
+        evmKit.accountStateObservable.map { _ in() }.publisher.catch { _ in Just(()) }.eraseToAnyPublisher()
+    }
+    
+    var balance: Decimal {
+        if let balance = evmKit.accountState?.balance, let significand = Decimal(string: balance.description) {
+            return Decimal(sign: .plus, exponent: -decimal, significand: significand)
+        }
+        return 0
+    }
+}
+
+//MARK: - ITransactionsAdapter
+extension EthereumAdapter: ITransactionsAdapter {
+    var transactionRecords: AnyPublisher<[TransactionRecord], Never> {
+        transactionsSingle(from: nil, limit: nil).eraseToAnyPublisher()
+    }
+}
+
+//MARK: - IDepositAdapter
+extension EthereumAdapter: IDepositAdapter {
+    var receiveAddress: String {
+        evmKit.receiveAddress.hex
+    }
+}
+
+//MARK: - ISendEthereumAdapter
+extension EthereumAdapter: ISendEthereumAdapter {
+    func transactionData(amount: BigUInt, address: EvmKit.Address) -> EvmKit.TransactionData {
+        evmKit.transferTransactionData(to: address, value: amount)
+    }
+    
+    func send(tx: SendETHService.Transaction) -> Future<Void, Error> {
+        Future { promise in
+            let disposeBag = DisposeBag()
+            
+            self
+                .sendSingle(
+                    to: tx.data.to,
+                    amount: tx.data.value,
+                    gasLimit: tx.gasData.gasLimit,
+                    gasPrice: .legacy(gasPrice: tx.gasData.gasPrice)
+                )
+                .subscribe { fullTransaction in
+                    print("Eth tx sent:")
+                    print(fullTransaction)
+                    promise(.success(()))
+                } onError: { error in
+                    promise(.failure(error))
+                }
+                .disposed(by: disposeBag)
+        }
     }
 }
