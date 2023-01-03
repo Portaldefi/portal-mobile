@@ -14,6 +14,7 @@ struct QRCodeItem: Identifiable {
              bolt12(offer: String),
              pubKey(xpub: String),
              privKey(key: String),
+             eth(address: String, amount: String?, message: String?),
              unsupported
     }
     
@@ -32,6 +33,8 @@ struct QRCodeItem: Identifiable {
             return "Bitcoin Public Key"
         case .privKey:
             return "Bitcoin Private Key"
+        case .eth:
+            return "Ethereum Address"
         case .unsupported:
             return "Unsupported item"
         }
@@ -39,16 +42,10 @@ struct QRCodeItem: Identifiable {
     
     var description: String {
         switch type {
-        case .bip21:
+        case .bip21, .pubKey, .privKey, .eth:
             return "Chain"
-        case .bolt11:
+        case .bolt11, .bolt12:
             return "Lightning"
-        case .bolt12:
-            return "Lightning"
-        case .pubKey:
-            return "Chain"
-        case .privKey:
-            return "Chain"
         case .unsupported:
             return String()
         }
@@ -72,5 +69,9 @@ struct QRCodeItem: Identifiable {
     
     static func privateKey(key: String) -> QRCodeItem {
         QRCodeItem(type: .privKey(key: key))
+    }
+    
+    static func eth(address: String, amount: String? = nil, message: String? = nil) -> QRCodeItem {
+        QRCodeItem(type: .eth(address: address, amount: amount, message: message))
     }
 }
