@@ -33,7 +33,9 @@ extension SharedContainer {
     }
     
     static let adapterManager = Factory<IAdapterManager>(scope: .singleton) {
-        let adapterFactory = AdapterFactory(appConfigProvider: Container.configProvider(), ethereumKitManager: Container.ethereumKitManager())
+        let appConfigProvider = Container.configProvider()
+        let ethereumKitManager = Container.ethereumKitManager()
+        let adapterFactory = AdapterFactory(appConfigProvider: appConfigProvider, ethereumKitManager: ethereumKitManager)
         let walletManager = Container.walletManager()
         return AdapterManager(adapterFactory: adapterFactory, walletManager: walletManager)
     }

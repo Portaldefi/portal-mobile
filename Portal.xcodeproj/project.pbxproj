@@ -432,6 +432,15 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		752FA6202964A2F700008796 /* ViewModifiers */ = {
+			isa = PBXGroup;
+			children = (
+				756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */,
+				756A3138288AEAD2004978E2 /* BackButtonModifier.swift */,
+			);
+			path = ViewModifiers;
+			sourceTree = "<group>";
+		};
 		755105F4294CA40D00525A16 /* Manager */ = {
 			isa = PBXGroup;
 			children = (
@@ -531,18 +540,17 @@
 			isa = PBXGroup;
 			children = (
 				4774D72328B4F62500B7988B /* Info.plist */,
+				756A3115288821F3004978E2 /* Portal.swift */,
+				479A7ACA28B759510057E100 /* Portal+Injection.swift */,
 				750C05E129641BB1005519FF /* RxCombine */,
 				75D8C59328D8887300228298 /* Core */,
-				479A7ACA28B759510057E100 /* Portal+Injection.swift */,
-				756A3115288821F3004978E2 /* Portal.swift */,
-				756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */,
-				756A3138288AEAD2004978E2 /* BackButtonModifier.swift */,
 				4774D73028B4FD1800B7988B /* Extensions */,
 				756DDD8528A287A7002EDC60 /* Protocols */,
 				756A312B2888443A004978E2 /* Models */,
 				756A312E2888448F004978E2 /* ViewModels */,
 				75517082293A5D7B00CC84D7 /* Navigation */,
 				756A312F288844AD004978E2 /* Views */,
+				752FA6202964A2F700008796 /* ViewModifiers */,
 				756A3119288821F4004978E2 /* Assets.xcassets */,
 				756A311E288821F4004978E2 /* Persistence.swift */,
 				756A3120288821F4004978E2 /* PortalDB.xcdatamodeld */,
