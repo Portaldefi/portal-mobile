@@ -18,6 +18,7 @@ class EthereumKitManager {
     
     let currentAccountSubject = CurrentValueSubject<Account?, Never>(nil)
     private let appConfigProvider: IAppConfigProvider
+    private let disposeBag = DisposeBag()
     weak var ethereumKit: Kit?
     weak var signer: Signer?
     
@@ -69,9 +70,7 @@ class EthereumKitManager {
     func gasLimit(gasPrice: Int, transactionData: TransactionData) -> Future<Int, Never> {
         Future { [weak self] promise in
             guard let self = self else { promise(.success(Kit.defaultGasLimit));  return }
-            
-            let disposeBag = DisposeBag()
-            
+                        
             self.ethereumKit?
                 .estimateGas(transactionData: transactionData, gasPrice: .legacy(gasPrice: gasPrice))
                 .subscribe(onSuccess: { estimatedGasLimit in
@@ -79,7 +78,7 @@ class EthereumKitManager {
                 }, onError: { error in
                     promise(.success(Kit.defaultGasLimit))
                 })
-                .disposed(by: disposeBag)
+                .disposed(by: self.disposeBag)
         }
     }
 }
