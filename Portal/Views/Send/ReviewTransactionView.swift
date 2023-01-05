@@ -13,7 +13,11 @@ import BitcoinDevKit
 struct ReviewTransactionView: View {
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
-    @ObservedObject private var viewModel: SendViewViewModel = Container.sendViewModel()
+    @ObservedObject private var viewModel: SendViewViewModel
+    
+    init(viewModel: SendViewViewModel) {
+        self.viewModel = viewModel
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -22,7 +26,7 @@ struct ReviewTransactionView: View {
                     .font(.Main.fixed(.monoBold, size: 14))
                     .foregroundColor(Palette.grayScaleAA)
                 
-                Text(viewModel.to)
+                Text(viewModel.receiverAddress)
                     .font(.Main.fixed(.monoRegular, size: 16))
                     .foregroundColor(Palette.grayScaleF4)
             }
@@ -37,48 +41,50 @@ struct ReviewTransactionView: View {
             } label: {
                 ZStack(alignment: .trailing) {
                     VStack {
-                        HStack(alignment: .top, spacing: 16) {
-                            Text("Amount")
-                                .font(.Main.fixed(.monoBold, size: 14))
-                                .foregroundColor(Palette.grayScaleAA)
-                            
-                            Spacer()
-                            
-                            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                                VStack(alignment: .trailing, spacing: 6) {
-                                    Text(viewModel.exchanger.baseAmount.value)
-                                        .font(.Main.fixed(.monoBold, size: 32))
-                                        .foregroundColor(viewModel.exchanger.amountIsValid ? Palette.grayScaleEA : Color(red: 1, green: 0.349, blue: 0.349))
-                                        .frame(height: 26)
-                                    
-                                    Text(viewModel.exchanger.quoteAmount.value)
-                                        .font(.Main.fixed(.monoMedium, size: 16))
-                                        .foregroundColor(Palette.grayScale6A)
-                                    
-                                }
+                        if let exchanger = viewModel.exchanger {
+                            HStack(alignment: .top, spacing: 16) {
+                                Text("Amount")
+                                    .font(.Main.fixed(.monoBold, size: 14))
+                                    .foregroundColor(Palette.grayScaleAA)
                                 
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text(viewModel.exchanger.base.code.lowercased())
-                                        .font(.Main.fixed(.monoRegular, size: 18))
-                                        .foregroundColor(Palette.grayScale6A)
-                                    
-                                    Text(viewModel.exchanger.quote.code.lowercased())
-                                        .font(.Main.fixed(.monoMedium, size: 12))
-                                        .foregroundColor(Palette.grayScale6A)
-                                }
-                                .padding(.bottom, 2)
-                            }
-                        }
-                        
-                        if !viewModel.exchanger.amountIsValid {
-                            HStack(spacing: 6) {
                                 Spacer()
-                                Text("Not enough funds.")
-                                    .font(.Main.fixed(.monoMedium, size: 12))
-                                Text("Tap to Edit")
-                                    .font(.Main.fixed(.monoSemiBold, size: 12))
+                                
+                                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                                    VStack(alignment: .trailing, spacing: 6) {
+                                        Text(exchanger.baseAmount.value)
+                                            .font(.Main.fixed(.monoBold, size: 32))
+                                            .foregroundColor(exchanger.amountIsValid ? Palette.grayScaleEA : Color(red: 1, green: 0.349, blue: 0.349))
+                                            .frame(height: 26)
+                                        
+                                        Text(exchanger.quoteAmount.value)
+                                            .font(.Main.fixed(.monoMedium, size: 16))
+                                            .foregroundColor(Palette.grayScale6A)
+                                        
+                                    }
+                                    
+                                    VStack(alignment: .leading, spacing: 6) {
+                                        Text(exchanger.base.code.lowercased())
+                                            .font(.Main.fixed(.monoRegular, size: 18))
+                                            .foregroundColor(Palette.grayScale6A)
+                                        
+                                        Text(exchanger.quote.code.lowercased())
+                                            .font(.Main.fixed(.monoMedium, size: 12))
+                                            .foregroundColor(Palette.grayScale6A)
+                                    }
+                                    .padding(.bottom, 2)
+                                }
                             }
-                            .foregroundColor(Color(red: 1, green: 0.349, blue: 0.349))
+                            
+                            if !exchanger.amountIsValid {
+                                HStack(spacing: 6) {
+                                    Spacer()
+                                    Text("Not enough funds.")
+                                        .font(.Main.fixed(.monoMedium, size: 12))
+                                    Text("Tap to Edit")
+                                        .font(.Main.fixed(.monoSemiBold, size: 12))
+                                }
+                                .foregroundColor(Color(red: 1, green: 0.349, blue: 0.349))
+                            }
                         }
                     }
                     .padding(.vertical, 16)
@@ -145,8 +151,7 @@ struct ReviewTransactionView: View {
 
 struct ReviewTransactionView_Previews: PreviewProvider {
     static var previews: some View {
-        let _ = Container.sendViewModel.register { SendViewViewModel.mocked }
-        ReviewTransactionView()
+        ReviewTransactionView(viewModel: SendViewViewModel.mocked)
             .padding(.top, 40)
             .padding()
             .previewLayout(.sizeThatFits)

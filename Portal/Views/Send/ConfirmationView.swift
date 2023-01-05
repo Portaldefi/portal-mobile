@@ -12,7 +12,11 @@ import Factory
 struct ConfirmationView: View {
     @Environment(\.presentationMode) private var presentationMode
     @Injected(Container.viewState) private var viewState: ViewState
-    @ObservedObject private var viewModel: SendViewViewModel = Container.sendViewModel()
+    @ObservedObject private var viewModel: SendViewViewModel
+    
+    init(viewModel: SendViewViewModel) {
+        self.viewModel = viewModel
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -59,7 +63,6 @@ struct ConfirmationView: View {
 
 struct ConfirmationView_Previews: PreviewProvider {
     static var previews: some View {
-        let _ = Container.sendViewModel.register { SendViewViewModel.mocked }
-        ConfirmationView()
+        ConfirmationView(viewModel: SendViewViewModel.mocked)
     }
 }

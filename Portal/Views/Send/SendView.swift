@@ -48,10 +48,10 @@ struct SendView: View {
                         SetAmountView(viewModel: viewModel)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                     case .review, .signing, .sent:
-                        ReviewTransactionView()
+                        ReviewTransactionView(viewModel: viewModel)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                     case .selectAsset:
-                        SelectAssetView(qrItem: $viewModel.qrCodeItem)
+                        SelectAssetView(qrItem: $viewModel.qrCodeItem, viewModel: viewModel)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
                     
@@ -295,7 +295,7 @@ struct SendView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 
             } else if viewModel.editingAmount {
-                AmountEditorView(title: "Edit Amount", exchanger: viewModel.exchanger) {
+                AmountEditorView(title: "Edit Amount", exchanger: viewModel.exchanger!) {
                     withAnimation {
                         viewModel.editingAmount.toggle()
                     }
@@ -321,7 +321,7 @@ struct SendView: View {
                                     .font(.Main.fixed(.monoRegular, size: 16))
                                     .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
                                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                            } else if !viewModel.exchanger.amountIsValid {
+                            } else if !viewModel.exchanger!.amountIsValid {
                                 Text("Not enough funds")
                                     .font(.Main.fixed(.monoRegular, size: 16))
                                     .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
@@ -378,9 +378,9 @@ struct SendView: View {
             QRCodeReaderView(config: .send(viewModel.selectedItem!.viewModel.coin)) { item in
                 switch item.type {
                 case .bip21(let address, let amount, _):
-                    viewModel.to = address
+                    viewModel.receiverAddress = address
                     guard let _amount = amount else { return }
-                    viewModel.exchanger.baseAmount.value = _amount
+                    viewModel.exchanger?.baseAmount.value = _amount
                 default:
                     break
                 }
@@ -391,7 +391,6 @@ struct SendView: View {
 
 struct SendView_Previews: PreviewProvider {
     static var previews: some View {
-        let _ = Container.sendViewModel.register { SendViewViewModel.mocked }
-        SendView()
+        SendView(viewModel: SendViewViewModel.mocked)
     }
 }

@@ -12,12 +12,13 @@ import Factory
 
 struct SelectAssetView: View {
     @Binding var item: QRCodeItem?
-    @ObservedObject private var viewModel: SendViewViewModel = Container.sendViewModel()
+    @ObservedObject private var viewModel: SendViewViewModel
     @State private var notEnoughFunds = false
     @State private var notEnoughFundsMessage = String()
     
-    init(qrItem: Binding<QRCodeItem?>) {
+    init(qrItem: Binding<QRCodeItem?>, viewModel: SendViewViewModel) {
         self._item = qrItem
+        self.viewModel = viewModel
     }
     
     var body: some View {
@@ -67,8 +68,7 @@ struct SelectAssetView: View {
 
 struct SendFromView_Previews: PreviewProvider {
     static var previews: some View {
-        let _ = Container.sendViewModel.register { SendViewViewModel.mocked }
-        SelectAssetView(qrItem: .constant(nil))
+        SelectAssetView(qrItem: .constant(nil), viewModel: SendViewViewModel.mocked)
             .padding()
             .previewLayout(.sizeThatFits)
     }
