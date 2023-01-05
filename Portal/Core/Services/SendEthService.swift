@@ -1,5 +1,5 @@
 //
-//  SendEthService.swift
+//  SendETHService.swift
 //  Portal
 //
 //  Created by farid on 1/3/23.
@@ -58,7 +58,7 @@ class SendETHService: ISendAssetService {
             .flatMap { amount, address, feeRate -> AnyPublisher<TransactionData?, Never> in
                 guard
                     let amountToSend = BigUInt(amount.hs.roundedString(decimal: coin.decimal)),
-                    let recepientAddress = try? Address(hex: self.receiverAddress.value)
+                    let recepientAddress = try? Address(hex: address)
                 else {
                     return Just(nil).eraseToAnyPublisher()
                 }
