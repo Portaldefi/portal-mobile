@@ -7,7 +7,6 @@
 
 import Foundation
 import Factory
-import BitcoinAddressValidator
 import Combine
 import LocalAuthentication.LAError
 import SwiftUI
@@ -15,85 +14,49 @@ import PortalUI
 import BitcoinDevKit
 
 class SendViewViewModel: ObservableObject {
+    private var balanceAdapter: IBalanceAdapter?
+    private var sendService: ISendAssetService?
+    private var subscriptions = Set<AnyCancellable>()
+    private var url: URL? = URL(string: "https://bitcoinfees.earn.com/api/v1/fees/recommended")
+    private var urlSession: URLSession!
+    private(set) var walletItems: [WalletItem] = []
     
-    struct RecomendedFees: Codable {
-        let fastestFee: Int
-        let halfHourFee: Int
-        let hourFee: Int
-        
-        func fee(_ state: TxFees) -> Int {
-            switch state {
-            case .normal:
-                return halfHourFee
-            case .fast:
-                return fastestFee
-            case .slow:
-                return hourFee
-            case .custom:
-                fatalError("custom fees not implemented")
-            }
+    @Published var receiverAddress = String() {
+        didSet {
+            sendService?.receiverAddress.send(receiverAddress)
         }
     }
     
-    enum SendStep {
-        case selectAsset, recipient, amount, review, signing, sent
-    }
-    
-    enum TxFees {
-        case fast, normal, slow, custom
-        
-        var description: String {
-            switch self {
-            case .fast:
-                return "Fast ~ 10 mins"
-            case .normal:
-                return "Normal ~ 30 mins"
-            case .slow:
-                return "Slow ~ 60 mins"
-            case .custom:
-                return "Not implemented"
-            }
-        }
-    }
-    
-    private let balanceAdapter: IBalanceAdapter
-    private let sendAdapter: ISendAdapter
-
-    var walletItems: [WalletItem] = []
-    
-    @Published var to = String()
     @Published var txSent = false
     @Published var selectedItem: WalletItem?
     @Published var qrCodeItem: QRCodeItem?
+    @Published var clipboardIsEmpty = false
+    @Published var editingAmount = false
+    @Published var fee: TxFees = .normal
     
-    @Published var balanceString = String()
-    @Published var valueString = String()
-    @Published var useAllFundsEnabled = true
-
+    @Published private(set) var balanceString = String()
+    @Published private(set) var valueString = String()
+    @Published private(set) var useAllFundsEnabled = true
     @Published private(set) var recipientAddressIsValid = true
     @Published private(set) var sendError: Error?
     @Published private(set) var step: SendStep = .selectAsset
-    
-    @Published var recomendedFees: RecomendedFees?
-    @Published var fee: TxFees = .normal
-    @Published var publishedTxId: String?
-    @Published var unconfirmedTx: TransactionRecord?
-    
-    @Published var exchanger: Exchanger!
-    @Published var clipboardIsEmpty = false
-    @Published var editingAmount = false
-    
-    private var subscriptions = Set<AnyCancellable>()
-    
-    @ObservedObject private var account: AccountViewModel = Container.accountViewModel()
-    @Injected(Container.marketData) private var marketData
+    @Published private(set) var recomendedFees: RecomendedFees?
+    @Published private(set) var publishedTxId: String?
+    @Published private(set) var unconfirmedTx: TransactionRecord?
+    @Published private(set) var exchanger: Exchanger?
+        
     @ObservedObject var viewState = Container.viewState()
+    @ObservedObject private var account: AccountViewModel = Container.accountViewModel()
+
+    @Injected(Container.marketData) private var marketData
     @LazyInjected(Container.biometricAuthentification) private var biometrics
     
     var actionButtonEnabled: Bool {
+        guard let exchanger = exchanger else { return false }
+        
         switch step {
         case .recipient:
-            return !to.isEmpty
+            return !receiverAddress.isEmpty
         case .amount:
             return exchanger.amountIsValid && Double(exchanger.baseAmount.value.replacingOccurrences(of: ",", with: ".")) ?? 0 > 0
         case .review:
@@ -133,30 +96,20 @@ class SendViewViewModel: ObservableObject {
         }
     }
     
-    private var url: URL? = URL(string: "https://bitcoinfees.earn.com/api/v1/fees/recommended")
-    private var urlSession: URLSession!
+    init() {
+        subscribeForUpdates()
+        updateRecomendedFees()
+    }
     
-    init(coin: Coin, balanceAdapter: IBalanceAdapter, sendAdapter: ISendAdapter) {
-        self.balanceAdapter = balanceAdapter
-        self.sendAdapter = sendAdapter
-        
-        self.exchanger = Exchanger(
-            base: coin,
-            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)),
-            balanceAdapter: balanceAdapter
-        )
-        
-        self.balanceString = balanceAdapter.balance.formatted()
-        let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
-        self.valueString = (balanceAdapter.balance * btcPriceInUsd).double.usdFormatted()
-        
-        self.walletItems = account.items
-        
-        $selectedItem.sink { item in
-            if item != nil {
-                withAnimation {
-                    self.step = .recipient
-                }
+    private func subscribeForUpdates() {
+        $selectedItem.sink { [weak self] item in
+            guard let self = self, let coin = item?.viewModel.coin else { return }
+
+            self.updateAdapters(coin: coin)
+            self.updateExchanger(coin: coin)
+            
+            withAnimation {
+                self.step = .recipient
             }
         }
         .store(in: &subscriptions)
@@ -166,21 +119,21 @@ class SendViewViewModel: ObservableObject {
             switch item.type {
             case .bip21(let address, let amount, _):
                 self.selectedItem = walletItems.first
-                self.to = address
+                self.receiverAddress = address
                 guard let amount = amount else {
                     step = .amount
                     return
                 }
-                self.exchanger.baseAmount.value = amount
+                self.exchanger?.baseAmount.value = amount
                 self.step = .review
             case .eth(let address, let amount, _):
                 self.selectedItem = walletItems.last
-                self.to = address
+                self.receiverAddress = address
                 guard let amount = amount else {
                     step = .amount
                     return
                 }
-                self.exchanger.baseAmount.value = amount
+                self.exchanger?.baseAmount.value = amount
                 self.step = .review
             default:
                 break
@@ -189,7 +142,7 @@ class SendViewViewModel: ObservableObject {
         }
         .store(in: &subscriptions)
         
-        $to.sink { [unowned self] _ in
+        $receiverAddress.sink { [unowned self] _ in
             guard sendError != nil, recipientAddressIsValid != true else { return }
             withAnimation {
                 self.sendError = nil
@@ -204,30 +157,22 @@ class SendViewViewModel: ObservableObject {
         .store(in: &subscriptions)
         
         marketData.onMarketDataUpdate.receive(on: RunLoop.main).sink { [weak self] _ in
-            guard let self = self else { return }
-            let btcPriceInUsd = self.marketData.btcTicker?[.usd].price ?? 1
-            self.valueString = (balanceAdapter.balance * btcPriceInUsd).double.usdFormatted()
-        }
-        .store(in: &subscriptions)
-        
-        exchanger.$baseAmount.sink { [weak self] _ in
-            guard let self = self else { return }
-            withAnimation {
-                guard
-                    let doubleValue = Double(self.exchanger.baseAmount.value),
-                    doubleValue > 0,
-                    self.exchanger.amountIsValid
-                else {
-                    self.useAllFundsEnabled = true
-                    return
-                }
-                self.useAllFundsEnabled = !(self.exchanger.baseAmount.value == self.balanceString)
+            guard
+                let self = self,
+                let balanceAdapter = self.balanceAdapter,
+                let coin = self.selectedItem?.viewModel.coin
+            else { return }
+            
+            switch coin.type {
+            case .bitcoin:
+                let btcPriceInUsd = self.marketData.btcTicker?[.usd].price ?? 1
+                self.valueString = (balanceAdapter.balance * btcPriceInUsd).double.usdFormatted()
+            case .lightningBitcoin:
+                fatalError("not implemented")
+            case .ethereum, .erc20:
+                let ethPriceInUsd: Decimal = 1200
+                self.valueString = (balanceAdapter.balance * ethPriceInUsd).double.usdFormatted()
             }
-        }
-        .store(in: &subscriptions)
-        
-        exchanger.objectWillChange.sink { [weak self] _ in
-            self?.objectWillChange.send()
         }
         .store(in: &subscriptions)
         
@@ -236,8 +181,89 @@ class SendViewViewModel: ObservableObject {
             .flatMap{ _ in Just(true) }
             .delay(for: .seconds(1), scheduler: RunLoop.main)
             .assign(to: &$txSent)
+    }
+    
+    private func updateExchanger(coin: Coin) {
+        guard let balanceAdapter = self.balanceAdapter else { return }
         
-        updateRecomendedFees()
+        exchanger = Exchanger(
+            base: coin,
+            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)),
+            balanceAdapter: balanceAdapter
+        )
+        
+        guard let exchanger = exchanger else { return }
+        
+        exchanger.$baseAmount.sink { [weak self] amount in
+            guard let self = self else { return }
+            withAnimation {
+                guard
+                    let doubleValue = Double(amount.value),
+                    doubleValue > 0,
+                    exchanger.amountIsValid,
+                    let decimal = Decimal(string: String(amount.value))
+                else {
+                    self.useAllFundsEnabled = true
+                    return
+                }
+                self.useAllFundsEnabled = !(self.exchanger!.baseAmount.value == self.balanceString)
+                self.sendService?.amount.send(decimal)
+            }
+        }
+        .store(in: &subscriptions)
+        
+        exchanger.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
+        .store(in: &subscriptions)
+    }
+    
+    private func updateAdapters(coin: Coin) {
+        let adapterManager: IAdapterManager = Container.adapterManager()
+        let walletManager: IWalletManager = Container.walletManager()
+
+        guard
+            let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
+            let adapter = adapterManager.adapter(for: wallet)
+        else {
+            fatalError("coudn't fetch dependencies")
+        }
+
+        switch coin.type {
+        case .bitcoin:
+            guard
+                let balanceAdapter = adapter as? IBalanceAdapter,
+                let sendAdapter = adapter as? ISendBitcoinAdapter
+            else {
+                fatalError("coudn't fetch dependencies")
+            }
+            self.balanceAdapter = balanceAdapter
+            self.sendService = SendBTCService(balanceAdapter: balanceAdapter, sendAdapter: sendAdapter, feeRateProvider: MockeFeeRateProvider())
+            
+            self.balanceString = balanceAdapter.balance.formatted()
+            let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
+            self.valueString = (balanceAdapter.balance * btcPriceInUsd).double.usdFormatted()
+        case .lightningBitcoin:
+            fatalError("not implemented yet")
+        case .ethereum, .erc20:
+            guard
+                let balanceAdapter = adapter as? IBalanceAdapter,
+                let sendAdapter = adapter as? ISendEthereumAdapter
+            else {
+                fatalError("coudn't fetch dependencies")
+            }
+            
+            let feeRateProvider = Container.feeRateProvider()
+            let ethFeeRateProvider = EthereumFeeRateProvider(feeRateProvider: feeRateProvider)
+            
+            let ethManager = Container.ethereumKitManager()
+            self.balanceAdapter = balanceAdapter
+            self.sendService = SendETHService(coin: coin, balanceAdapter: balanceAdapter, sendAdapter: sendAdapter, feeRateProvider: ethFeeRateProvider, manager: ethManager)
+            
+            self.balanceString = balanceAdapter.balance.formatted()
+            let btcPriceInUsd: Decimal = 1200
+            self.valueString = (balanceAdapter.balance * btcPriceInUsd).double.usdFormatted()
+        }
     }
     
     private func updateRecomendedFees() {
@@ -264,62 +290,62 @@ class SendViewViewModel: ObservableObject {
     
     func send(max: Bool) {
         if max {
-            sendAdapter.sendMax(to: to, fee: recomendedFees?.fee(fee)) { [weak self] txId, error in
-                guard let self = self else { return }
-                
-                DispatchQueue.main.async {
-                    guard error == nil else {
-                        withAnimation {
-                            self.step = .review
-                            self.sendError = SendFlowError.error(error.debugDescription)
-                        }
-                        return
-                    }
-                    if let id = txId {
-                        self.publishedTxId = id
-                        
-                        let unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
-                            recipient: self.to,
-                            amount: self.exchanger.baseAmount.value,
-                            id: id
-                        )
-                        
-//                        self.unconfirmedTx = TransactionRecord(transactionHash: unconfirmedTx.txid, transactionHashData: Data(), timestamp: unconfirmedTx.confirmationTime?.timestamp, isFailed: false, from: nil, to: nil, amount: unconfirmedTx.value, input: nil, blockHeight: unconfirmedTx.confirmationTime?.height, transactionIndex: nil, decoration: String())
-                        
-                        withAnimation {
-                            self.step = .sent
-                        }
-                    }
-                }
-            }
+//            sendAdapter.sendMax(to: to, fee: recomendedFees?.fee(fee)) { [weak self] txId, error in
+//                guard let self = self else { return }
+//
+//                DispatchQueue.main.async {
+//                    guard error == nil else {
+//                        withAnimation {
+//                            self.step = .review
+//                            self.sendError = SendFlowError.error(error.debugDescription)
+//                        }
+//                        return
+//                    }
+//                    if let id = txId {
+//                        self.publishedTxId = id
+//
+//                        let unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
+//                            recipient: self.to,
+//                            amount: self.exchanger.baseAmount.value,
+//                            id: id
+//                        )
+//
+////                        self.unconfirmedTx = TransactionRecord(transactionHash: unconfirmedTx.txid, transactionHashData: Data(), timestamp: unconfirmedTx.confirmationTime?.timestamp, isFailed: false, from: nil, to: nil, amount: unconfirmedTx.value, input: nil, blockHeight: unconfirmedTx.confirmationTime?.height, transactionIndex: nil, decoration: String())
+//
+//                        withAnimation {
+//                            self.step = .sent
+//                        }
+//                    }
+//                }
+//            }
         } else {
-            sendAdapter.send(to: to, amount: exchanger.baseAmount.value, fee: recomendedFees?.fee(fee), completion: { [weak self] txId, error in
-                guard let self = self else { return }
-                
-                DispatchQueue.main.async {
-                    guard error == nil else {
-                        withAnimation {
-                            self.step = .review
-                            self.sendError = SendFlowError.error(error.debugDescription)
-                        }
-                        return
-                    }
-                    if let id = txId {
-                        self.publishedTxId = id
-                        
-                        
-                        let unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
-                            recipient: self.to,
-                            amount: self.exchanger.baseAmount.value,
-                            id: id
-                        )
-                        
-                        withAnimation {
-                            self.step = .sent
-                        }
-                    }
-                }
-            })
+//            sendAdapter.send(to: to, amount: exchanger.baseAmount.value, fee: recomendedFees?.fee(fee), completion: { [weak self] txId, error in
+//                guard let self = self else { return }
+//
+//                DispatchQueue.main.async {
+//                    guard error == nil else {
+//                        withAnimation {
+//                            self.step = .review
+//                            self.sendError = SendFlowError.error(error.debugDescription)
+//                        }
+//                        return
+//                    }
+//                    if let id = txId {
+//                        self.publishedTxId = id
+//
+//
+//                        let unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
+//                            recipient: self.to,
+//                            amount: self.exchanger.baseAmount.value,
+//                            id: id
+//                        )
+//
+//                        withAnimation {
+//                            self.step = .sent
+//                        }
+//                    }
+//                }
+//            })
         }
     }
     
@@ -375,7 +401,7 @@ class SendViewViewModel: ObservableObject {
                 completion(true)
             default:
                 completion(success)
-            }            
+            }
         }
     }
     
@@ -415,9 +441,11 @@ class SendViewViewModel: ObservableObject {
         
         switch step {
         case .recipient:
-            if BitcoinAddressValidator.isValid(address: to) {
+            do {
+                try sendService?.validateAddress()
                 step = .amount
-            } else {
+            } catch {
+                print("validation error: \(error)")
                 recipientAddressIsValid = false
                 sendError = SendFlowError.addressIsntValid
             }
@@ -457,7 +485,7 @@ class SendViewViewModel: ObservableObject {
     func pasteFromClipboard() {
         let pasteboard = UIPasteboard.general
         if let pastboardString = pasteboard.string {
-            to = pastboardString
+            receiverAddress = pastboardString
         } else {
             clipboardIsEmpty.toggle()
         }
@@ -468,35 +496,61 @@ class SendViewViewModel: ObservableObject {
     }
     
     func useAllFunds() {
-        exchanger.baseAmount.value = balanceString
-        exchanger.baseAmount.value = balanceString
+        exchanger?.baseAmount.value = balanceString
+        exchanger?.baseAmount.value = balanceString
     }
 }
 
 extension SendViewViewModel {
-    static var mocked: SendViewViewModel {
-        let vm = SendViewViewModel(coin: .bitcoin(), balanceAdapter: BalanceAdapterMocked(), sendAdapter: SendAdapterMocked())
-        vm.walletItems = [WalletItem.mockedBtc]
-        vm.unconfirmedTx = TransactionRecord(transaction: TransactionDetails.mockedConfirmed)
-        vm.to = "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3"
-        vm.balanceString = "0.000124"
-        vm.valueString = "12.93"
-        vm.exchanger.baseAmount.value = "0.0000432"
-        return vm
+    struct RecomendedFees: Codable {
+        let fastestFee: Int
+        let halfHourFee: Int
+        let hourFee: Int
+        
+        func fee(_ state: TxFees) -> Int {
+            switch state {
+            case .normal:
+                return halfHourFee
+            case .fast:
+                return fastestFee
+            case .slow:
+                return hourFee
+            case .custom:
+                fatalError("custom fees not implemented")
+            }
+        }
     }
     
-    static func config(coin: Coin) -> SendViewViewModel {
-        let adapterManager: IAdapterManager = Container.adapterManager()
-        let walletManager: IWalletManager = Container.walletManager()
-
-        guard
-            let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
-            let balanceAdapter = adapterManager.balanceAdapter(for: wallet),
-            let sendAdapter = adapterManager.sendAdapter(for: wallet)
-        else {
-            fatalError("coudn't fetch dependencies")
+    enum SendStep {
+        case selectAsset, recipient, amount, review, signing, sent
+    }
+    
+    enum TxFees {
+        case fast, normal, slow, custom
+        
+        var description: String {
+            switch self {
+            case .fast:
+                return "Fast ~ 10 mins"
+            case .normal:
+                return "Normal ~ 30 mins"
+            case .slow:
+                return "Slow ~ 60 mins"
+            case .custom:
+                return "Not implemented"
+            }
         }
-
-        return SendViewViewModel(coin: coin, balanceAdapter: balanceAdapter, sendAdapter: sendAdapter)
+    }
+    
+    static var mocked: SendViewViewModel {
+        let vm = SendViewViewModel(/*coin: .bitcoin(), balanceAdapter: BalanceAdapterMocked(), sendService: SendAssetMockedService()*/)
+        vm.walletItems = [WalletItem.mockedBtc]
+        vm.selectedItem = WalletItem.mockedBtc
+        vm.unconfirmedTx = TransactionRecord(transaction: TransactionDetails.mockedConfirmed)
+        vm.receiverAddress = "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3"
+        vm.balanceString = "0.000124"
+        vm.valueString = "12.93"
+        vm.exchanger?.baseAmount.value = "0.0000432"
+        return vm
     }
 }
