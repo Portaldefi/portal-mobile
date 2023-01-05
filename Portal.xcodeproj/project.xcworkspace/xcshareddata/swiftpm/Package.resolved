@@ -100,6 +100,15 @@
       }
     },
     {
+      "identity" : "feeratekit.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/horizontalsystems/FeeRateKit.Swift.git",
+      "state" : {
+        "revision" : "749b07b44db150df024541f16d1e0fbecabde5e1",
+        "version" : "1.0.0"
+      }
+    },
+    {
       "identity" : "grdb.swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/groue/GRDB.swift.git",
