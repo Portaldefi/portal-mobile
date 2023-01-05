@@ -56,7 +56,11 @@ extension SharedContainer {
     }
     
     static let sendViewModel = Factory<SendViewViewModel>(scope: .cached) {
-        SendViewViewModel.config(coin: .bitcoin())
+        SendViewViewModel()
+    }
+    
+    static let feeRateProvider = Factory<FeeRateProvider>(scope: .singleton) {
+        FeeRateProvider(appConfigProvider: Container.configProvider())
     }
     
     static let accountViewModel = Factory<AccountViewModel>(scope: .singleton) {
