@@ -33,7 +33,7 @@ class Exchanger: ObservableObject {
         case .btc:
             return btcPriceInUsd.double
         case .eth:
-            return 1
+            return 1200
         case .fiat(let fiatCurrency):
             return btcPriceInUsd.double * fiatCurrency.rate
         }
