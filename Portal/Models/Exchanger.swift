@@ -10,9 +10,10 @@ import Combine
 import Factory
 
 class Exchanger: ObservableObject {
-    private let balanceAdapter: IBalanceAdapter
     let base: Coin
     let quote: AccountCurrency
+    let balance: Decimal
+    
     private var subscriptions = Set<AnyCancellable>()
     
     enum Side: Int, Hashable {
@@ -39,10 +40,10 @@ class Exchanger: ObservableObject {
         }
     }
     
-    init(base: Coin, quote: AccountCurrency, balanceAdapter: IBalanceAdapter) {
+    init(base: Coin, quote: AccountCurrency, balance: Decimal) {
         self.base = base
         self.quote = quote
-        self.balanceAdapter = balanceAdapter
+        self.balance = balance
         
         subscribe()
     }
@@ -53,7 +54,7 @@ class Exchanger: ObservableObject {
             .map { Double($0.replacingOccurrences(of: ",", with: ".")) ?? 0 }
             .map { [unowned self] doubleValue -> String in
                 withAnimation(.spring(response: 0.45, dampingFraction: 0.65, blendDuration: 0)) {
-                    self.amountIsValid = doubleValue <= self.balanceAdapter.balance.double
+                    self.amountIsValid = doubleValue <= self.balance.double
                 }
                 return "\((doubleValue * (price)).rounded(toPlaces: 2))"
             }
@@ -86,7 +87,7 @@ class Exchanger: ObservableObject {
 
 extension Exchanger {
     static func mocked() -> Exchanger {
-        let exchanger = Exchanger(base: .bitcoin(), quote: .fiat(FiatCurrency(code: "USD", name: "Dollar")), balanceAdapter: BalanceAdapterMocked())
+        let exchanger = Exchanger(base: .bitcoin(), quote: .fiat(FiatCurrency(code: "USD", name: "Dollar")), balance: 1.5)
         exchanger.baseAmount.value = "0.00001"
         return exchanger
     }
