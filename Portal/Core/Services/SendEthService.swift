@@ -16,7 +16,6 @@ class SendETHService: ISendAssetService {
     private var transaction: Transaction?
     
     private let sendAdapter: ISendEthereumAdapter
-    private let balanceAdapter: IBalanceAdapter
     private let manager: EthereumKitManager
     
     private(set) var feeRateProvider: IFeeRateProvider
@@ -24,19 +23,16 @@ class SendETHService: ISendAssetService {
     private var subscriptions = Set<AnyCancellable>()
     
     var amount = CurrentValueSubject<Decimal, Never>(0)
-    var feeRate = CurrentValueSubject<Int, Never>(1)
+    var feeRateType = CurrentValueSubject<TxFees, Never>(.normal)
     var receiverAddress = CurrentValueSubject<String, Never>(String())
+    var recomendedFees = CurrentValueSubject<RecomendedFees?, Never>(nil)
     
     var balance: Decimal {
-        balanceAdapter.balance
+        sendAdapter.balance
     }
     
     var spendable: Decimal {
-        guard let transaction = transaction, let significand = Decimal(string: String(transaction.totalAmount)) else {
-            return balance
-        }
-
-        return (balance - Decimal(sign: .plus, exponent: -coin.decimal, significand: significand))
+        balance - fee
     }
     
     var fee: Decimal {
@@ -47,17 +43,22 @@ class SendETHService: ISendAssetService {
         return Decimal(sign: .plus, exponent: -coin.decimal, significand: significand)
     }
     
-    init(coin: Coin, balanceAdapter: IBalanceAdapter, sendAdapter: ISendEthereumAdapter, feeRateProvider: IFeeRateProvider, manager: EthereumKitManager) {
+    init(coin: Coin, sendAdapter: ISendEthereumAdapter, feeRateProvider: IFeeRateProvider, manager: EthereumKitManager) {
         self.coin = coin
         self.sendAdapter = sendAdapter
-        self.balanceAdapter = balanceAdapter
         self.feeRateProvider = feeRateProvider
         self.manager = manager
         
-        Publishers.CombineLatest3(amount, receiverAddress, feeRate)
-            .flatMap { amount, address, feeRate -> AnyPublisher<TransactionData?, Never> in
+        Publishers.CombineLatest(amount, receiverAddress)
+            .flatMap { amount, address -> AnyPublisher<TransactionData?, Never> in
+                if amount == 0 {
+                    self.transaction = nil
+                    self.recomendedFees.send(nil)
+                }
+                
                 guard
                     let amountToSend = BigUInt(amount.hs.roundedString(decimal: coin.decimal)),
+                    amountToSend > 0,
                     let recepientAddress = try? Address(hex: address)
                 else {
                     return Just(nil).eraseToAnyPublisher()
@@ -79,8 +80,12 @@ class SendETHService: ISendAssetService {
                 print(transaction.gasData)
                                 
                 self.transaction = transaction
+                let fees = RecomendedFees(fastestFee: self.fee, halfHourFee: self.fee, hourFee: self.fee)
+                self.recomendedFees.send(fees)
             }
             .store(in: &subscriptions)
+        
+        amount.send(0.00001)
     }
     
     private func transaction(gasPrice: Int, transactionData: TransactionData) -> AnyPublisher<Transaction, Never> {
@@ -127,8 +132,22 @@ class SendETHService: ISendAssetService {
         _ = try EvmKit.Address.init(hex: receiverAddress.value)
     }
     
-    func send() -> Future<Void, Error> {
-        sendAdapter.send(tx: transaction!)
+    func send() -> Future<String, Error> {
+        guard let transaction = transaction else {
+            return Future { $0(.failure(SendError.noTransaction)) }
+        }
+        return sendAdapter.send(tx: transaction)
+    }
+    
+    func sendMax() -> Future<String, Error> {
+        send()
+    }
+    
+    func unconfirmedTx(id: String, amount: String) -> TransactionRecord {
+        let hash = Data(id.utf8)
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let unconfirmedTx = EvmKit.Transaction(hash: hash, timestamp: timestamp, isFailed: false)
+        return TransactionRecord(transaction: unconfirmedTx, amount: Decimal(string: amount), type: .sent)
     }
 }
 
