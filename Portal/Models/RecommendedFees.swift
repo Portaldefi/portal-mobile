@@ -8,11 +8,11 @@
 import Foundation
 
 struct RecomendedFees: Codable {
-    let fastestFee: Int
-    let halfHourFee: Int
-    let hourFee: Int
+    let fastestFee: Decimal
+    let halfHourFee: Decimal
+    let hourFee: Decimal
     
-    func fee(_ state: TxFees) -> Int {
+    func fee(_ state: TxFees) -> Decimal {
         switch state {
         case .normal:
             return halfHourFee
