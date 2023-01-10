@@ -102,24 +102,32 @@ struct ReviewTransactionView: View {
                     Text("Fees")
                         .font(.Main.fixed(.monoBold, size: 14))
                         .foregroundColor(Palette.grayScaleAA)
-                    Text(viewModel.fee.description)
+                    Text(viewModel.feeRate.description)
                         .font(.Main.fixed(.monoRegular, size: 14))
                         .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
                 }
                 
                 Spacer()
                 
-                if let fees = viewModel.recomendedFees {
+                if let coin = viewModel.selectedItem?.viewModel.coin {
                     VStack {
                         HStack(spacing: 6) {
-                            Text((Double(fees.fee(viewModel.fee))/100_000_000).formattedString(.btc, decimals: 8))
+                            Text(viewModel.fee)
                                 .font(.Main.fixed(.monoBold, size: 16))
                                 .foregroundColor(Palette.grayScaleEA)
                             
-                            Text("btc/vByte")
-                                .font(.Main.fixed(.monoMedium, size: 11))
-                                .foregroundColor(Palette.grayScale6A)
-                                .frame(width: 34)
+                            switch coin.type {
+                            case .bitcoin, .lightningBitcoin:
+                                Text("btc/vByte")
+                                    .font(.Main.fixed(.monoMedium, size: 11))
+                                    .foregroundColor(Palette.grayScale6A)
+                                    .frame(width: 34)
+                            case .ethereum, .erc20:
+                                Text("eth")
+                                    .font(.Main.fixed(.monoMedium, size: 11))
+                                    .foregroundColor(Palette.grayScale6A)
+                                    .frame(width: 34)
+                            }
                         }
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
