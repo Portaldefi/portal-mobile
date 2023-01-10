@@ -45,6 +45,8 @@
 		752FA62729670E0A00008796 /* EthereumFeeRateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752FA62629670E0A00008796 /* EthereumFeeRateProvider.swift */; };
 		752FA62929670E4500008796 /* FeeRateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752FA62829670E4500008796 /* FeeRateProvider.swift */; };
 		752FA62B2967165300008796 /* ISendBitcoinAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752FA62A2967165300008796 /* ISendBitcoinAdapter.swift */; };
+		752FA62D296C608C00008796 /* RecommendedFees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752FA62C296C608C00008796 /* RecommendedFees.swift */; };
+		752FA62F296C60C900008796 /* TxFees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752FA62E296C60C900008796 /* TxFees.swift */; };
 		7543384C2927BE4700061E28 /* ConfirmImportAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */; };
 		7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */; };
 		7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0828C211DA00ED92C3 /* View+Extension.swift */; };
@@ -56,7 +58,6 @@
 		7545BC3E28C9E7AF00ED92C3 /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */; };
 		7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */ = {isa = PBXBuildFile; productRef = 7545BC4028CA107100ED92C3 /* Coinpaprika */; };
 		7545BC4328CA155100ED92C3 /* Decimal+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */; };
-		754EDF9128EC2E44004F10E2 /* ISendAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754EDF9028EC2E44004F10E2 /* ISendAdapter.swift */; };
 		755105F3294C6B4300525A16 /* EvmKit in Frameworks */ = {isa = PBXBuildFile; productRef = 755105F2294C6B4300525A16 /* EvmKit */; };
 		755105F6294CA4AB00525A16 /* EthereumKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755105F5294CA4AB00525A16 /* EthereumKitManager.swift */; };
 		7551706B2934AA7700CC84D7 /* BackUpDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551706A2934AA7700CC84D7 /* BackUpDetailsView.swift */; };
@@ -223,6 +224,8 @@
 		752FA62629670E0A00008796 /* EthereumFeeRateProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthereumFeeRateProvider.swift; sourceTree = "<group>"; };
 		752FA62829670E4500008796 /* FeeRateProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeeRateProvider.swift; sourceTree = "<group>"; };
 		752FA62A2967165300008796 /* ISendBitcoinAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISendBitcoinAdapter.swift; sourceTree = "<group>"; };
+		752FA62C296C608C00008796 /* RecommendedFees.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendedFees.swift; sourceTree = "<group>"; };
+		752FA62E296C60C900008796 /* TxFees.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxFees.swift; sourceTree = "<group>"; };
 		7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmImportAccountView.swift; sourceTree = "<group>"; };
 		7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthentication.swift; sourceTree = "<group>"; };
 		7545BC0828C211DA00ED92C3 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
@@ -233,7 +236,6 @@
 		7545BC3B28C9E5B900ED92C3 /* MarketData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketData.swift; sourceTree = "<group>"; };
 		7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
 		7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+Extension.swift"; sourceTree = "<group>"; };
-		754EDF9028EC2E44004F10E2 /* ISendAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISendAdapter.swift; sourceTree = "<group>"; };
 		755105F5294CA4AB00525A16 /* EthereumKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EthereumKitManager.swift; sourceTree = "<group>"; };
 		7551706A2934AA7700CC84D7 /* BackUpDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackUpDetailsView.swift; sourceTree = "<group>"; };
 		7551706C2934B10000CC84D7 /* RecoveryPhraseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryPhraseView.swift; sourceTree = "<group>"; };
@@ -612,6 +614,8 @@
 				75772A672902D73E00BE80B7 /* TextLimitter.swift */,
 				755170742935E33F00CC84D7 /* RecoveryData.swift */,
 				750C05EB296468E5005519FF /* FeeRatePriority.swift */,
+				752FA62C296C608C00008796 /* RecommendedFees.swift */,
+				752FA62E296C60C900008796 /* TxFees.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -698,7 +702,6 @@
 				75D8C5B028DADE7500228298 /* IWalletManager.swift */,
 				75D8C5B428DAF11300228298 /* IWalletStorage.swift */,
 				755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */,
-				754EDF9028EC2E44004F10E2 /* ISendAdapter.swift */,
 				750C05E529646860005519FF /* ISendAssetService.swift */,
 				750C05E729646882005519FF /* IFeeRateProvider.swift */,
 				750C05E9296468B6005519FF /* ISendEthereumAdapter.swift */,
@@ -971,6 +974,7 @@
 				755C56B528E5D12900A4B57B /* TransactionDetailsView.swift in Sources */,
 				7564C66228D85AA800ABA8CF /* Exchanger.swift in Sources */,
 				479A7ACB28B759510057E100 /* Portal+Injection.swift in Sources */,
+				752FA62D296C608C00008796 /* RecommendedFees.swift in Sources */,
 				4774D72728B4FC5300B7988B /* Double+Extension.swift in Sources */,
 				756DDD7628A27DEA002EDC60 /* RestoreAccountViewModel.swift in Sources */,
 				75772A662901795C00BE80B7 /* ActivityShareView.swift in Sources */,
@@ -993,6 +997,7 @@
 				752FA6222965A0AF00008796 /* SendBTCService.swift in Sources */,
 				75D8C5BD28DC70AD00228298 /* AdapterManager.swift in Sources */,
 				750C05EA296468B6005519FF /* ISendEthereumAdapter.swift in Sources */,
+				752FA62F296C60C900008796 /* TxFees.swift in Sources */,
 				75D8C5CE28E1B40300228298 /* CoinImageView.swift in Sources */,
 				750C05D829641B97005519FF /* Observable+Combine.swift in Sources */,
 				750C05D929641B97005519FF /* BehaviorRelay+Combine.swift in Sources */,
@@ -1027,7 +1032,6 @@
 				756A3116288821F3004978E2 /* Portal.swift in Sources */,
 				755C56DC28EB096E00A4B57B /* TextFieldAlert.swift in Sources */,
 				756DDD9728A28F8F002EDC60 /* IAccountManager.swift in Sources */,
-				754EDF9128EC2E44004F10E2 /* ISendAdapter.swift in Sources */,
 				7551706F2935C76C00CC84D7 /* ClickableWordView.swift in Sources */,
 				75D8C5A728D88E0900228298 /* IBalanceAdapter.swift in Sources */,
 				756DDD9D28A292D4002EDC60 /* RootViewViewModel.swift in Sources */,
