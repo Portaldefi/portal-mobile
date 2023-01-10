@@ -153,7 +153,7 @@ struct AmountView_Previews: PreviewProvider {
             base: .bitcoin(),
             quote: .fiat(
                 FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)
-            ), balanceAdapter: BalanceAdapterMocked()
+            ), balance: BalanceAdapterMocked().balance
         ))
         .padding()
         .previewLayout(.sizeThatFits)
