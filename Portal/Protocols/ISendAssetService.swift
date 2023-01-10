@@ -12,13 +12,13 @@ protocol ISendAssetService {
     var balance: Decimal { get }
     var spendable: Decimal { get }
     var fee: Decimal { get }
-    
     var amount: CurrentValueSubject<Decimal, Never> { get }
-    var feeRate: CurrentValueSubject<Int, Never> { get }
     var receiverAddress: CurrentValueSubject<String, Never> { get }
-    
-    var feeRateProvider: IFeeRateProvider { get }
+    var feeRateType: CurrentValueSubject<TxFees, Never> { get }
+    var recomendedFees: CurrentValueSubject<RecomendedFees?, Never> { get }
     
     func validateAddress() throws
-    func send() -> Future<Void, Error>
+    func send() -> Future<String, Error>
+    func sendMax() -> Future<String, Error>
+    func unconfirmedTx(id: String, amount: String) -> TransactionRecord
 }

@@ -10,9 +10,8 @@ import Combine
 
 protocol ISendBitcoinAdapter {
     var balance: Decimal { get }
-    func availableBalance(feeRate: Int, address: String?) -> Decimal
-    func minimumSendAmount(address: String?) -> Decimal
     func validate(address: String) throws
-    func fee(amount: Decimal, feeRate: Int, address: String?) -> Decimal
-    func send(amount: Decimal, address: String, feeRate: Int) -> Future<Void, Error>
+    func fee(max: Bool, address: String, amount: Decimal, fee: Int?) throws -> UInt64?
+    func send(amount: Decimal, address: String, fee: Int?) -> Future<String, Error>
+    func sendMax(address: String, fee: Int?) -> Future<String, Error>
 }
