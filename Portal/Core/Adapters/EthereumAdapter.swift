@@ -129,7 +129,7 @@ extension EthereumAdapter {
         evmKit.transactionSingle(hash: hash)
     }
 
-    func sendSingle(to: EvmKit.Address, amount: BigUInt, gasLimit: Int, gasPrice: GasPrice) -> Single<Void> {
+    func sendSingle(to: EvmKit.Address, amount: BigUInt, gasLimit: Int, gasPrice: GasPrice) -> Single<FullTransaction> {
         guard let signer = signer else {
             return Single.error(SendError.noSigner)
         }
@@ -146,7 +146,7 @@ extension EthereumAdapter {
 
                     return strongSelf.evmKit.sendSingle(rawTransaction: rawTransaction, signature: signature)
                 }
-                .map { (tx: FullTransaction) in () }
+                .map { (tx: FullTransaction) in tx }
     }
     
     enum SendError: Error {
@@ -199,7 +199,7 @@ extension EthereumAdapter: ISendEthereumAdapter {
         evmKit.transferTransactionData(to: address, value: amount)
     }
     
-    func send(tx: SendETHService.Transaction) -> Future<Void, Error> {
+    func send(tx: SendETHService.Transaction) -> Future<String, Error> {
         Future { promise in
             let disposeBag = DisposeBag()
             
@@ -213,7 +213,7 @@ extension EthereumAdapter: ISendEthereumAdapter {
                 .subscribe { fullTransaction in
                     print("Eth tx sent:")
                     print(fullTransaction)
-                    promise(.success(()))
+                    promise(.success(String(decoding: fullTransaction.transaction.hash, as: UTF8.self)))
                 } onError: { error in
                     promise(.failure(error))
                 }
