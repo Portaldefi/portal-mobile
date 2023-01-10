@@ -205,49 +205,35 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                 let satAmountInt = UInt64(satAmountDouble)
                 let recieverAddress = try Address(address: address)
                 let recieverAddressScript = recieverAddress.scriptPubkey()
+                let txBuilderResult: TxBuilderResult
                 
                 if walletBalance >= satAmountInt {
                     if let fee = fee {
-                        let txBuilderResult = try TxBuilder()
+                        txBuilderResult = try TxBuilder()
                             .addRecipient(script: recieverAddressScript, amount: satAmountInt)
                             .feeRate(satPerVbyte: Float(fee))
                             .enableRbf()
                             .finish(wallet: wallet)
-                        
-                        let psbt = txBuilderResult.psbt
-                        let txDetails = txBuilderResult.transactionDetails
-                        print("txDetails: \(txDetails)")
-                        
-                        let finalized = try wallet.sign(psbt: psbt)
-                        print("Tx id: \(psbt.txid())")
-                        
-                        if finalized {
-                            try blockchain.broadcast(psbt: psbt)
-                            sync()
-                            promise(.success(psbt.txid()))
-                        } else {
-                            promise(.failure(SendFlowError.error("Tx not finalized")))
-                        }
                     } else {
-                        let txBuilderResult = try TxBuilder()
+                        txBuilderResult = try TxBuilder()
                             .addRecipient(script: recieverAddressScript, amount: satAmountInt)
                             .enableRbf()
                             .finish(wallet: wallet)
-                        
-                        let psbt = txBuilderResult.psbt
-                        let txDetails = txBuilderResult.transactionDetails
-                        print("txDetails: \(txDetails)")
-                        
-                        let finalized = try wallet.sign(psbt: psbt)
-                        print("Tx id: \(psbt.txid())")
-                        
-                        if finalized {
-                            try blockchain.broadcast(psbt: psbt)
-                            sync()
-                            promise(.success(psbt.txid()))
-                        } else {
-                            promise(.failure(SendFlowError.error("Tx not finalized")))
-                        }
+                    }
+                    
+                    let psbt = txBuilderResult.psbt
+                    let txDetails = txBuilderResult.transactionDetails
+                    print("txDetails: \(txDetails)")
+                    
+                    let finalized = try wallet.sign(psbt: psbt)
+                    print("Tx id: \(psbt.txid())")
+                    
+                    if finalized {
+                        try blockchain.broadcast(psbt: psbt)
+                        sync()
+                        promise(.success(psbt.txid()))
+                    } else {
+                        promise(.failure(SendFlowError.error("Tx not finalized")))
                     }
                 } else {
                     promise(.failure(SendFlowError.insufficientAmount))
@@ -258,15 +244,26 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         }
     }
     
-    func sendMax(address: String) -> Future<String, Error> {
+    func sendMax(address: String, fee: Int?) -> Future<String, Error> {
         Future { [unowned self] promise in
             do {
-                let txBuilderResult = try TxBuilder()
-                    .drainWallet()
-                    .drainTo(address: address)
-                    .enableRbf()
-                    .finish(wallet: wallet)
+                let txBuilderResult: TxBuilderResult
 
+                if let fee = fee {
+                    txBuilderResult = try TxBuilder()
+                        .drainWallet()
+                        .drainTo(address: address)
+                        .feeRate(satPerVbyte: Float(fee))
+                        .enableRbf()
+                        .finish(wallet: wallet)
+                } else {
+                    txBuilderResult = try TxBuilder()
+                        .drainWallet()
+                        .drainTo(address: address)
+                        .enableRbf()
+                        .finish(wallet: wallet)
+                }
+                
                 let psbt = txBuilderResult.psbt
                 let txDetails = txBuilderResult.transactionDetails
                 print("txDetails: \(txDetails)")
@@ -284,6 +281,58 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
             } catch {
                 promise(.failure(error))
             }
+        }
+    }
+    
+    func fee(max: Bool, address: String, amount: Decimal, fee: Int?) throws -> UInt64? {
+        do {
+            let txBuilderResult: TxBuilderResult
+            
+            if max {
+                if let fee = fee {
+                    txBuilderResult = try TxBuilder()
+                        .drainWallet()
+                        .drainTo(address: address)
+                        .feeRate(satPerVbyte: Float(fee))
+                        .enableRbf()
+                        .finish(wallet: wallet)
+                } else {
+                    txBuilderResult = try TxBuilder()
+                        .drainWallet()
+                        .drainTo(address: address)
+                        .enableRbf()
+                        .finish(wallet: wallet)
+                }
+                
+                return txBuilderResult.transactionDetails.fee
+            } else {
+                let walletBalance = try wallet.getBalance().total
+                let satAmountDouble = amount.double * 100_000_000
+                let satAmountInt = UInt64(satAmountDouble)
+                let recieverAddress = try Address(address: address)
+                let recieverAddressScript = recieverAddress.scriptPubkey()
+                
+                if walletBalance >= satAmountInt {
+                    if let fee = fee {
+                        txBuilderResult = try TxBuilder()
+                            .addRecipient(script: recieverAddressScript, amount: satAmountInt)
+                            .feeRate(satPerVbyte: Float(fee))
+                            .enableRbf()
+                            .finish(wallet: wallet)
+                    } else {
+                        txBuilderResult = try TxBuilder()
+                            .addRecipient(script: recieverAddressScript, amount: satAmountInt)
+                            .enableRbf()
+                            .finish(wallet: wallet)
+                    }
+                    
+                    return txBuilderResult.transactionDetails.fee
+                } else {
+                    throw SendFlowError.insufficientAmount
+                }
+            }
+        } catch {
+            throw error
         }
     }
     
