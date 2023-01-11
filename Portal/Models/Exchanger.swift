@@ -12,7 +12,6 @@ import Factory
 class Exchanger: ObservableObject {
     let base: Coin
     let quote: AccountCurrency
-    let balance: Decimal
     
     private var subscriptions = Set<AnyCancellable>()
     
@@ -22,7 +21,6 @@ class Exchanger: ObservableObject {
         
     @Published var baseAmount = TextLimiter(limit: 10)
     @Published var quoteAmount = TextLimiter(limit: 10)
-    @Published var amountIsValid: Bool = true
     @Published var side: Side = .base
     
     @Injected(Container.marketData) private var marketData
@@ -40,10 +38,9 @@ class Exchanger: ObservableObject {
         }
     }
     
-    init(base: Coin, quote: AccountCurrency, balance: Decimal) {
+    init(base: Coin, quote: AccountCurrency) {
         self.base = base
         self.quote = quote
-        self.balance = balance
         
         subscribe()
     }
@@ -53,9 +50,6 @@ class Exchanger: ObservableObject {
             .removeDuplicates()
             .map { Double($0.replacingOccurrences(of: ",", with: ".")) ?? 0 }
             .map { [unowned self] doubleValue -> String in
-                withAnimation(.spring(response: 0.45, dampingFraction: 0.65, blendDuration: 0)) {
-                    self.amountIsValid = doubleValue <= self.balance.double
-                }
                 return "\((doubleValue * (price)).rounded(toPlaces: 2))"
             }
             .sink { [weak self] value in
@@ -64,7 +58,7 @@ class Exchanger: ObservableObject {
                 } else {
                     self?.quoteAmount.value = value
                 }
-                
+                self?.objectWillChange.send()
             }
             .store(in: &subscriptions)
         
@@ -87,7 +81,7 @@ class Exchanger: ObservableObject {
 
 extension Exchanger {
     static func mocked() -> Exchanger {
-        let exchanger = Exchanger(base: .bitcoin(), quote: .fiat(FiatCurrency(code: "USD", name: "Dollar")), balance: 1.5)
+        let exchanger = Exchanger(base: .bitcoin(), quote: .fiat(FiatCurrency(code: "USD", name: "Dollar")))
         exchanger.baseAmount.value = "0.00001"
         return exchanger
     }

@@ -13,13 +13,16 @@ import Combine
 struct AmountView: View {
     private let warningColor = Color(red: 1, green: 0.321, blue: 0.321)
     private let validate: Bool
-    @ObservedObject private var exchanger: Exchanger
+    private let isValid: Bool
+    
     @FocusState private var focusedField: Exchanger.Side?
+    @ObservedObject private var exchanger: Exchanger
     @ObservedObject private var viewState = Container.viewState()
     
-    init(exchanger: Exchanger, validate: Bool = true) {
+    init(exchanger: Exchanger, isValid: Bool, validate: Bool = true) {
         self.exchanger = exchanger
         self.validate = validate
+        self.isValid = isValid
     }
         
     var body: some View {
@@ -37,7 +40,7 @@ struct AmountView: View {
                             .textInputAutocapitalization(.never)
                             .font(.Main.fixed(.monoBold, size: 32))
                             .foregroundColor(
-                                validate ? exchanger.amountIsValid ? Palette.grayScaleEA : warningColor : Palette.grayScaleEA
+                                validate ? isValid ? Palette.grayScaleEA : warningColor : Palette.grayScaleEA
                             )
                         Text(exchanger.base.code.lowercased())
                             .font(.Main.fixed(.monoRegular, size: 18))
@@ -70,7 +73,7 @@ struct AmountView: View {
                             .textInputAutocapitalization(.never)
                             .font(.Main.fixed(.monoBold, size: 32))
                             .foregroundColor(
-                                validate ? exchanger.amountIsValid ? Palette.grayScaleEA : warningColor : Palette.grayScaleEA
+                                validate ? isValid ? Palette.grayScaleEA : warningColor : Palette.grayScaleEA
                             )
                         Text("usd")
                             .font(.Main.fixed(.monoRegular, size: 18))
@@ -153,8 +156,8 @@ struct AmountView_Previews: PreviewProvider {
             base: .bitcoin(),
             quote: .fiat(
                 FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)
-            ), balance: BalanceAdapterMocked().balance
-        ))
+            )
+        ), isValid: true)
         .padding()
         .previewLayout(.sizeThatFits)
     }

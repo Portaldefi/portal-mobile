@@ -45,8 +45,7 @@ class ReceiveViewModel: ObservableObject {
         
         self.exchanger = Exchanger(
             base: .bitcoin(),
-            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)),
-            balance: BalanceAdapterMocked().balance
+            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1))
         )
         
         Publishers.CombineLatest(exchanger.baseAmount.$value, $description)

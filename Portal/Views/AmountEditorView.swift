@@ -82,7 +82,7 @@ struct AmountEditorView: View {
             }
             .frame(height: 62)
             
-            AmountView(exchanger: viewModel.exchanger, validate: false)
+            AmountView(exchanger: viewModel.exchanger, isValid: true, validate: false)
                 .background(Color(red: 28/255, green: 28/255, blue: 30/255))
                 .cornerRadius(8)
                 .padding(.bottom, 16)

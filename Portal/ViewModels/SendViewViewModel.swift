@@ -24,6 +24,7 @@ class SendViewViewModel: ObservableObject {
     @Published var clipboardIsEmpty = false
     @Published var editingAmount = false
     @Published var feeRate: TxFees = .normal
+    @Published var amountIsValid: Bool = true
     
     @Published private(set) var balanceString = String()
     @Published private(set) var valueString = String()
@@ -59,9 +60,9 @@ class SendViewViewModel: ObservableObject {
         case .recipient:
             return !receiverAddress.isEmpty
         case .amount:
-            return exchanger.amountIsValid && Double(exchanger.baseAmount.value.replacingOccurrences(of: ",", with: ".")) ?? 0 > 0
+            return amountIsValid && Double(exchanger.baseAmount.value.replacingOccurrences(of: ",", with: ".")) ?? 0 > 0
         case .review:
-            return exchanger.amountIsValid
+            return amountIsValid
         case .signing, .sent:
             return false
         case .selectAsset:
@@ -195,30 +196,33 @@ class SendViewViewModel: ObservableObject {
     }
     
     private func updateExchanger(coin: Coin) {
-        guard let sendService = self.sendService else { return }
-        
         exchanger = Exchanger(
             base: coin,
-            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)),
-            balance: sendService.balance
+            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1))
         )
         
         guard let exchanger = exchanger else { return }
         
         exchanger.$baseAmount.sink { [weak self] amount in
-            guard let self = self else { return }
+            guard
+                let self = self,
+                let decimalAmount = Decimal(string: amount.value),
+                let sendService = self.sendService
+            else { return }
+                        
+            withAnimation(.spring(response: 0.45, dampingFraction: 0.65, blendDuration: 0)) {
+                self.amountIsValid = decimalAmount <= sendService.spendable
+            }
+            
             withAnimation {
                 guard
-                    let doubleValue = Double(amount.value),
-                    doubleValue > 0,
-                    exchanger.amountIsValid,
-                    let decimal = Decimal(string: String(amount.value))
+                    self.amountIsValid, decimalAmount > 0
                 else {
                     self.useAllFundsEnabled = true
                     return
                 }
-                self.useAllFundsEnabled = !(self.exchanger!.baseAmount.value == self.balanceString)
-                self.sendService?.amount.send(decimal)
+                self.useAllFundsEnabled = !(exchanger.baseAmount.value == self.balanceString)
+                sendService.amount.send(decimalAmount)
             }
         }
         .store(in: &subscriptions)

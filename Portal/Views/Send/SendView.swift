@@ -321,7 +321,7 @@ struct SendView: View {
                                     .font(.Main.fixed(.monoRegular, size: 16))
                                     .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
                                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                            } else if !viewModel.exchanger!.amountIsValid {
+                            } else if !viewModel.amountIsValid {
                                 Text("Not enough funds")
                                     .font(.Main.fixed(.monoRegular, size: 16))
                                     .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))

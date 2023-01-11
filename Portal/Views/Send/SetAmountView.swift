@@ -42,7 +42,7 @@ struct SetAmountView: View {
                         .disabled(!viewModel.useAllFundsEnabled)
                     }
                     
-                    AmountView(exchanger: exchanger)
+                    AmountView(exchanger: exchanger, isValid: viewModel.amountIsValid)
                 }
                 
                 HStack(alignment: .top) {
@@ -59,7 +59,7 @@ struct SetAmountView: View {
                                 Text(viewModel.balanceString)
                                     .font(.Main.fixed(.monoMedium, size: 16))
                                     .if(exchanger.side == .base, then: { text in
-                                        text.foregroundColor(exchanger.amountIsValid ?  Palette.grayScaleCA : warningColor)
+                                        text.foregroundColor(viewModel.amountIsValid ?  Palette.grayScaleCA : warningColor)
                                     }, else: { text in
                                         text.foregroundColor(Palette.grayScaleCA)
                                     })
@@ -76,7 +76,7 @@ struct SetAmountView: View {
                                 Text(viewModel.valueString)
                                     .font(.Main.fixed(.monoMedium, size: 16))
                                     .if(exchanger.side == .quote, then: { text in
-                                        text.foregroundColor(exchanger.amountIsValid ?  Palette.grayScaleCA : warningColor)
+                                        text.foregroundColor(viewModel.amountIsValid ?  Palette.grayScaleCA : warningColor)
                                     }, else: { text in
                                         text.foregroundColor(Palette.grayScale6A)
                                     })
@@ -94,7 +94,7 @@ struct SetAmountView: View {
                                 Text(viewModel.valueString)
                                     .font(.Main.fixed(.monoMedium, size: 16))
                                     .if(exchanger.side == .quote, then: { text in
-                                        text.foregroundColor(exchanger.amountIsValid ?  Palette.grayScaleCA : warningColor)
+                                        text.foregroundColor(viewModel.amountIsValid ?  Palette.grayScaleCA : warningColor)
                                     }, else: { text in
                                         text.foregroundColor(Palette.grayScaleCA)
                                     })
@@ -111,7 +111,7 @@ struct SetAmountView: View {
                                 Text(viewModel.balanceString)
                                     .font(.Main.fixed(.monoMedium, size: 16))
                                     .if(exchanger.side == .base, then: { text in
-                                        text.foregroundColor(exchanger.amountIsValid ?  Palette.grayScaleCA : warningColor)
+                                        text.foregroundColor(viewModel.amountIsValid ?  Palette.grayScaleCA : warningColor)
                                     }, else: { text in
                                         text.foregroundColor(Palette.grayScale6A)
                                     })
@@ -131,7 +131,7 @@ struct SetAmountView: View {
                 
                 if
                     let exchanger = viewModel.exchanger,
-                    exchanger.amountIsValid,
+                    viewModel.amountIsValid,
                     let amount = Double(exchanger.baseAmount.value),
                     amount > 0
                 {

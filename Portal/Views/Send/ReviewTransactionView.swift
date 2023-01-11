@@ -53,7 +53,7 @@ struct ReviewTransactionView: View {
                                     VStack(alignment: .trailing, spacing: 6) {
                                         Text(exchanger.baseAmount.value)
                                             .font(.Main.fixed(.monoBold, size: 32))
-                                            .foregroundColor(exchanger.amountIsValid ? Palette.grayScaleEA : Color(red: 1, green: 0.349, blue: 0.349))
+                                            .foregroundColor(viewModel.amountIsValid ? Palette.grayScaleEA : Color(red: 1, green: 0.349, blue: 0.349))
                                             .frame(height: 26)
                                         
                                         Text(exchanger.quoteAmount.value)
@@ -75,7 +75,7 @@ struct ReviewTransactionView: View {
                                 }
                             }
                             
-                            if !exchanger.amountIsValid {
+                            if !viewModel.amountIsValid {
                                 HStack(spacing: 6) {
                                     Spacer()
                                     Text("Not enough funds.")
