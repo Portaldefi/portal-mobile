@@ -20,6 +20,16 @@ struct NoAccountViewConfig: NavigationConfigurator {
                 id: screen.id,
                 wrappedElement: AnyView(RestoreAccountView())
             )
+        case .restoreConfirmation(let viewModel):
+            return ViewElement(
+                id: screen.id,
+                wrappedElement: AnyView(ConfirmImportAccountView(viewModel: viewModel))
+            )
+        case .nameAccount(let words):
+            return ViewElement(
+                id: screen.id,
+                wrappedElement: AnyView(CreateAccountView(words: words))
+            )
         default:
             fatalError("unsupported navigation case")
         }
