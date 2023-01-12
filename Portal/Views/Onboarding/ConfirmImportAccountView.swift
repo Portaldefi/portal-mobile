@@ -9,16 +9,10 @@ import SwiftUI
 import PortalUI
 
 struct ConfirmImportAccountView: View {
-    @Environment(\.presentationMode) private var presentationMode
+    @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject var viewModel: RestoreAccountViewModel
-    @State private var goToCreate = false
     
     var body: some View {
-        NavigationLink(
-            destination: CreateAccountView(words: viewModel.input.components(separatedBy: " ").filter{ !$0.isEmpty && $0.count >= 3 }),
-            isActive: $goToCreate
-        ) { EmptyView() }
-        
         VStack(alignment: .leading, spacing: 10) {
             Text("We detected seed phrase")
                 .font(.Main.fixed(.monoBold, size: 24))
@@ -29,20 +23,17 @@ struct ConfirmImportAccountView: View {
             Spacer()
             
             PButton(config: .onlyLabel("Yes, import"), style: .filled, size: .big, enabled: true) {
-                withAnimation {
-                    goToCreate.toggle()
-                }
+                navigation.push(.nameAccount(words: viewModel.words))
             }
             
             PButton(config: .onlyLabel("No, go back"), style: .free, size: .big, enabled: true) {
-                presentationMode.wrappedValue.dismiss()
+                navigation.pop()
             }
         }
         .padding(.top, 108)
         .padding(.bottom, 87)
         .padding(.horizontal)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
-        .navigationBarHidden(true)
     }
 }
 

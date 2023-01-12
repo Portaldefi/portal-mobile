@@ -17,11 +17,6 @@ struct RestoreAccountView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            NavigationLink(
-                destination: ConfirmImportAccountView(viewModel: viewModel),
-                isActive: $viewModel.restorable
-            ) { EmptyView() }
-            
             VStack {
                 ZStack {
                     HStack {
@@ -148,7 +143,11 @@ struct RestoreAccountView: View {
                 Palette.grayScale2A.edgesIgnoringSafeArea(.bottom)
             )
         }
-        .navigationBarHidden(true)
+        .onChange(of: viewModel.restorable, perform: { restorable in
+            if restorable {
+                navigation.push(.restoreConfirmation(viewModel: viewModel))
+            }
+        })
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .alert(isPresented: $viewModel.clipboardIsEmpty) {
             Alert(title: Text("Empty Clipboard"), message: Text("You don't have anything in your device clipboard."), dismissButton: .default(Text("OK")))
