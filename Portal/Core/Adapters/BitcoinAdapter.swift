@@ -10,24 +10,7 @@ import Combine
 import BitcoinDevKit
 import BitcoinAddressValidator
 
-class ProgressHandler: BitcoinDevKit.Progress {
-    func update(progress: Float, message: String?) {
-        print("progress: \(progress), message: \(message ?? "-")")
-    }
-}
-
 final class BitcoinAdapter {
-    enum BtcAdapterError: Error {
-        case dbNotFound
-        
-        var descriptioin: String {
-            switch self {
-            case .dbNotFound:
-                return "DB not found"
-            }
-        }
-    }
-        
     private let stateUpdatedSubject = PassthroughSubject<Void, Never>()
     private let balanceUpdatedSubject = PassthroughSubject<Void, Never>()
     private let transactionsSubject = CurrentValueSubject<[TransactionRecord], Never>([])
@@ -35,11 +18,10 @@ final class BitcoinAdapter {
     private let wallet: BitcoinDevKit.Wallet
     private let blockchain: BitcoinDevKit.Blockchain
     private let updateTimer = RepeatingTimer(timeInterval: 60)
-    private let progressHandler = ProgressHandler()
     private let networkQueue = DispatchQueue(label: "com.portal.network.layer.queue", qos: .userInitiated)
     
-    private var adapterState: AdapterState = .synced
-    private var balanceSats: UInt64 = 0
+    private var adapterState: AdapterState = .syncing(progress: 0, lastBlockDate: nil)
+    private var satsBalance: Decimal = 0
     
     init(wallet: Wallet) throws {
         let account = wallet.account
@@ -54,7 +36,7 @@ final class BitcoinAdapter {
             let electrum = ElectrumConfig(url: "ssl://electrum.blockstream.info:60002", socks5: nil, retry: 5, timeout: nil, stopGap: 10)
             let blockchainConfig = BlockchainConfig.electrum(config: electrum)
             
-            self.blockchain = try Blockchain(config: blockchainConfig)
+            blockchain = try Blockchain(config: blockchainConfig)
             
             self.wallet = try BitcoinDevKit.Wallet(
                 descriptor: descriptor,
@@ -62,67 +44,38 @@ final class BitcoinAdapter {
                 network: Network.testnet,
                 databaseConfig: dbConfig
             )
-                        
-            self.loadCache()
             
-            self.updateTimer.eventHandler = { [weak self] in
-                self?.sync()
+            try update()
+            
+            updateTimer.eventHandler = { [unowned self] in
+                self.syncData()
             }
         } else {
             throw BtcAdapterError.dbNotFound
         }
     }
     
-    private func loadCache() {
+    private func syncData() {
+        update(state: .syncing(progress: 0, lastBlockDate: nil))
+        
         do {
-            try fetchBalance()
-            try fetchTransactions()
+            print("SYNCING WITH BITCOIN NETWORK...")
+            try wallet.sync(blockchain: blockchain, progress: nil)
+            print("BITCOIN NETWORK SYNCED")
+            try update()
+            print("BITCOIN DATA UPDATED")
+            update(state: .synced)
         } catch {
+            print("BITCOIN NETWORK SYNC ERROR: \(error)")
             update(state: .notSynced(error: error))
         }
     }
     
-    private func sync() {        
-        print("Syncing btc network...")
-        
-        update(state: .syncing(progress: 0, lastBlockDate: nil))
-        
-        networkQueue.async {
-            do {
-                try self.wallet.sync(blockchain: self.blockchain, progress: self.progressHandler)
-            } catch {
-                DispatchQueue.main.async {
-                    print("Btc network synced error: \(error)")
-                    self.update(state: .notSynced(error: error))
-                }
-            }
-            
-            do {
-                try self.fetchBalance()
-                try self.fetchTransactions()
-
-                DispatchQueue.main.async {
-                    print("Btc network synced...")
-                    self.update(state: .synced)
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    print("Btc network synced error: \(error)")
-                    self.update(state: .notSynced(error: error))
-                }
-            }
-        }
-    }
-    
-    private func fetchBalance() throws {
-        balanceSats = try wallet.getBalance().total
-        balanceUpdatedSubject.send()
-    }
-    
-    private func fetchTransactions() throws {
-        let txs = try wallet.listTransactions()
-        let convertedTxs = txs.map{ TransactionRecord(transaction: $0) }
-        update(txs: convertedTxs)
+    private func update() throws {
+        try updateBalance()
+        print("BITCOIN BALANCE UPDATED")
+        try updateTransactions()
+        print("BITCOIN TRANSACTIONS UPDATED")
     }
     
     private func update(state: AdapterState) {
@@ -130,10 +83,15 @@ final class BitcoinAdapter {
         stateUpdatedSubject.send()
     }
     
-    private func update(txs: [TransactionRecord]) {
-        DispatchQueue.main.async {
-            self.transactionsSubject.send(txs)
-        }
+    private func updateBalance() throws {
+        let totalBalance = try wallet.getBalance().spendable
+        satsBalance = Decimal(totalBalance)
+        balanceUpdatedSubject.send()
+    }
+    
+    private func updateTransactions() throws {
+        let transactions = try wallet.listTransactions().map{ TransactionRecord(transaction: $0) }
+        transactionsSubject.send(transactions)
     }
 }
 
@@ -164,7 +122,7 @@ extension BitcoinAdapter: IBalanceAdapter {
     }
     
     var balance: Decimal {
-        Decimal(balanceSats)/100_000_000
+        satsBalance/100_000_000
     }
     
     var balanceStateUpdated: AnyPublisher<Void, Never> {
@@ -200,43 +158,37 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
     func send(amount: Decimal, address: String, fee: Int?) -> Future<String, Error> {
         Future { [unowned self] promise in
             do {
-                let walletBalance = try wallet.getBalance().total
-                let satAmountDouble = amount.double * 100_000_000
-                let satAmountInt = UInt64(satAmountDouble)
+                let satsAmount = UInt64((amount * 100_000_000).double)
                 let recieverAddress = try Address(address: address)
                 let recieverAddressScript = recieverAddress.scriptPubkey()
                 let txBuilderResult: TxBuilderResult
                 
-                if walletBalance >= satAmountInt {
-                    if let fee = fee {
-                        txBuilderResult = try TxBuilder()
-                            .addRecipient(script: recieverAddressScript, amount: satAmountInt)
-                            .feeRate(satPerVbyte: Float(fee))
-                            .enableRbf()
-                            .finish(wallet: wallet)
-                    } else {
-                        txBuilderResult = try TxBuilder()
-                            .addRecipient(script: recieverAddressScript, amount: satAmountInt)
-                            .enableRbf()
-                            .finish(wallet: wallet)
-                    }
-                    
-                    let psbt = txBuilderResult.psbt
-                    let txDetails = txBuilderResult.transactionDetails
-                    print("txDetails: \(txDetails)")
-                    
-                    let finalized = try wallet.sign(psbt: psbt)
-                    print("Tx id: \(psbt.txid())")
-                    
-                    if finalized {
-                        try blockchain.broadcast(psbt: psbt)
-                        sync()
-                        promise(.success(psbt.txid()))
-                    } else {
-                        promise(.failure(SendFlowError.error("Tx not finalized")))
-                    }
+                if let fee = fee {
+                    txBuilderResult = try TxBuilder()
+                        .addRecipient(script: recieverAddressScript, amount: satsAmount)
+                        .feeRate(satPerVbyte: Float(fee))
+                        .enableRbf()
+                        .finish(wallet: wallet)
                 } else {
-                    promise(.failure(SendFlowError.insufficientAmount))
+                    txBuilderResult = try TxBuilder()
+                        .addRecipient(script: recieverAddressScript, amount: satsAmount)
+                        .enableRbf()
+                        .finish(wallet: wallet)
+                }
+                
+                let psbt = txBuilderResult.psbt
+                let txDetails = txBuilderResult.transactionDetails
+                print("txDetails: \(txDetails)")
+                
+                let finalized = try wallet.sign(psbt: psbt)
+                print("Tx id: \(psbt.txid())")
+                
+                if finalized {
+                    try blockchain.broadcast(psbt: psbt)
+                    sync()
+                    promise(.success(psbt.txid()))
+                } else {
+                    promise(.failure(SendFlowError.error("Tx not finalized")))
                 }
             } catch {
                 promise(.failure(error))
@@ -273,7 +225,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
 
                 if finalized {
                     try blockchain.broadcast(psbt: psbt)
-                    sync()
+                    syncData()
                     promise(.success(psbt.txid()))
                 } else {
                     promise(.failure(SendFlowError.error("Tx not finalized")))
@@ -306,30 +258,24 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                 
                 return txBuilderResult.transactionDetails.fee
             } else {
-                let walletBalance = try wallet.getBalance().total
-                let satAmountDouble = amount.double * 100_000_000
-                let satAmountInt = UInt64(satAmountDouble)
+                let satsAmount = UInt64((amount * 100_000_000).double)
                 let recieverAddress = try Address(address: address)
                 let recieverAddressScript = recieverAddress.scriptPubkey()
                 
-                if walletBalance >= satAmountInt {
-                    if let fee = fee {
-                        txBuilderResult = try TxBuilder()
-                            .addRecipient(script: recieverAddressScript, amount: satAmountInt)
-                            .feeRate(satPerVbyte: Float(fee))
-                            .enableRbf()
-                            .finish(wallet: wallet)
-                    } else {
-                        txBuilderResult = try TxBuilder()
-                            .addRecipient(script: recieverAddressScript, amount: satAmountInt)
-                            .enableRbf()
-                            .finish(wallet: wallet)
-                    }
-                    
-                    return txBuilderResult.transactionDetails.fee
+                if let fee = fee {
+                    txBuilderResult = try TxBuilder()
+                        .addRecipient(script: recieverAddressScript, amount: satsAmount)
+                        .feeRate(satPerVbyte: Float(fee))
+                        .enableRbf()
+                        .finish(wallet: wallet)
                 } else {
-                    throw SendFlowError.insufficientAmount
+                    txBuilderResult = try TxBuilder()
+                        .addRecipient(script: recieverAddressScript, amount: satsAmount)
+                        .enableRbf()
+                        .finish(wallet: wallet)
                 }
+                
+                return txBuilderResult.transactionDetails.fee
             }
         } catch {
             throw error
@@ -343,3 +289,15 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
     }
 }
 
+extension BitcoinAdapter {
+    enum BtcAdapterError: Error {
+        case dbNotFound
+        
+        var descriptioin: String {
+            switch self {
+            case .dbNotFound:
+                return "DB not found"
+            }
+        }
+    }
+}
