@@ -20,6 +20,9 @@ class RestoreAccountViewModel: ObservableObject {
     @Published var isDetecting = false
     
     var accountKey: DescriptorSecretKey?
+    var words: [String] {
+        input.components(separatedBy: " ").filter{ !$0.isEmpty && $0.count >= 3 }
+    }
     
     @Injected(Container.accountManager) private var manager
     
