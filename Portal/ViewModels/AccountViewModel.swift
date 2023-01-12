@@ -52,13 +52,10 @@ class AccountViewModel: ObservableObject {
     
     private func subscribeForUpdates() {
         adapterManager.adapterReady
-            .receive(on: DispatchQueue.global())
+            .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                let configuredItems = self.configuredItems()
-                DispatchQueue.main.async {
-                    self.items = configuredItems
-                }
+                self.items = self.configuredItems()
             }
             .store(in: &subscriptions)
         
