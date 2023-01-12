@@ -60,7 +60,7 @@ class SendViewViewModel: ObservableObject {
         case .recipient:
             return !receiverAddress.isEmpty
         case .amount:
-            return amountIsValid && Double(exchanger.baseAmount.value.replacingOccurrences(of: ",", with: ".")) ?? 0 > 0
+            return amountIsValid && Decimal(string: exchanger.baseAmount.value.replacingOccurrences(of: ",", with: ".")) ?? 0 > 0
         case .review:
             return amountIsValid
         case .signing, .sent:
@@ -96,6 +96,18 @@ class SendViewViewModel: ObservableObject {
         case .selectAsset:
             return "Send"
         }
+    }
+    
+    var showFees: Bool {
+        guard
+            let exchanger = exchanger,
+            amountIsValid,
+            let amount = Decimal(string: exchanger.baseAmount.value.replacingOccurrences(of: ",", with: "."))
+        else {
+            return false
+        }
+        print("amount = \(amount)")
+        return amount > 0
     }
     
     init() {
@@ -201,14 +213,10 @@ class SendViewViewModel: ObservableObject {
             quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1))
         )
         
-        guard let exchanger = exchanger else { return }
+        guard let exchanger = exchanger, let sendService = self.sendService else { return }
         
-        exchanger.$baseAmount.sink { [weak self] amount in
-            guard
-                let self = self,
-                let decimalAmount = Decimal(string: amount.value),
-                let sendService = self.sendService
-            else { return }
+        exchanger.baseAmount.$value.sink { [weak self] amount in
+            guard let self = self, let decimalAmount = Decimal(string: amount.replacingOccurrences(of: ",", with: ".")) else { return }
                         
             withAnimation(.spring(response: 0.45, dampingFraction: 0.65, blendDuration: 0)) {
                 self.amountIsValid = decimalAmount <= sendService.spendable
@@ -221,14 +229,9 @@ class SendViewViewModel: ObservableObject {
                     self.useAllFundsEnabled = true
                     return
                 }
-                self.useAllFundsEnabled = !(exchanger.baseAmount.value == self.balanceString)
+                self.useAllFundsEnabled = !(decimalAmount == sendService.spendable)
                 sendService.amount.send(decimalAmount)
             }
-        }
-        .store(in: &subscriptions)
-        
-        exchanger.objectWillChange.sink { [weak self] _ in
-            self?.objectWillChange.send()
         }
         .store(in: &subscriptions)
     }
@@ -404,6 +407,8 @@ class SendViewViewModel: ObservableObject {
             step = .selectAsset
         case .amount:
             exchanger?.baseAmount.value = String()
+            useAllFundsEnabled = true
+            sendError = nil
             step = .recipient
         case .review:
             if viewState.showQRCodeScannerFromTabBar {
@@ -489,6 +494,7 @@ class SendViewViewModel: ObservableObject {
         guard let sendService = sendService else { return }
         let spendable = sendService.spendable.formatted()
         exchanger?.baseAmount.value = spendable
+        useAllFundsEnabled = false
     }
 }
 
