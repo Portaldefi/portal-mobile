@@ -64,11 +64,11 @@ struct SetAmountView: View {
                                         text.foregroundColor(Palette.grayScaleCA)
                                     })
                                         
-                            Text(exchanger.base.code.lowercased())
-                                        .font(.Main.fixed(.monoMedium, size: 11))
-                                        .foregroundColor(Palette.grayScale6A)
-                                        .frame(width: 34)
-                                        .offset(y: 2)
+                                Text(exchanger.base.code.lowercased())
+                                    .font(.Main.fixed(.monoMedium, size: 11))
+                                    .foregroundColor(Palette.grayScale6A)
+                                    .frame(width: 34)
+                                    .offset(y: 2)
                             }
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                             
@@ -99,11 +99,11 @@ struct SetAmountView: View {
                                         text.foregroundColor(Palette.grayScaleCA)
                                     })
                                         
-                                        Text("usd")
-                                        .font(.Main.fixed(.monoMedium, size: 11))
-                                        .foregroundColor(Palette.grayScale6A)
-                                        .frame(width: 34)
-                                        .offset(y: 2)
+                                Text("usd")
+                                    .font(.Main.fixed(.monoMedium, size: 11))
+                                    .foregroundColor(Palette.grayScale6A)
+                                    .frame(width: 34)
+                                    .offset(y: 2)
                             }
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                             
@@ -129,12 +129,7 @@ struct SetAmountView: View {
                 }
                 .frame(height: 72)
                 
-                if
-                    let exchanger = viewModel.exchanger,
-                    viewModel.amountIsValid,
-                    let amount = Double(exchanger.baseAmount.value),
-                    amount > 0
-                {
+                if viewModel.showFees {
                     Divider()
                     
                     HStack(spacing: 0) {
@@ -162,7 +157,7 @@ struct SetAmountView: View {
                                             .font(.Main.fixed(.monoMedium, size: 11))
                                             .foregroundColor(Palette.grayScale6A)
                                             .frame(width: 20)
-
+                                        
                                     case .ethereum, .erc20:
                                         Text("eth")
                                             .font(.Main.fixed(.monoMedium, size: 11))
