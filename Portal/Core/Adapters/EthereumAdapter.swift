@@ -21,6 +21,8 @@ class EthereumAdapter: IAdapter {
     private let signer: Signer?
     private let decimal = 18
     
+    private let disposeBag = DisposeBag()
+    
     init(evmKit: Kit, signer: Signer?) {
         self.evmKit = evmKit
         self.signer = signer
@@ -201,8 +203,6 @@ extension EthereumAdapter: ISendEthereumAdapter {
     
     func send(tx: SendETHService.Transaction) -> Future<String, Error> {
         Future { promise in
-            let disposeBag = DisposeBag()
-            
             self
                 .sendSingle(
                     to: tx.data.to,
@@ -217,7 +217,7 @@ extension EthereumAdapter: ISendEthereumAdapter {
                 } onError: { error in
                     promise(.failure(error))
                 }
-                .disposed(by: disposeBag)
+                .disposed(by: self.disposeBag)
         }
     }
 }
