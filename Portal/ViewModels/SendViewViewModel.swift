@@ -15,7 +15,7 @@ import PortalUI
 class SendViewViewModel: ObservableObject {
     private var sendService: ISendAssetService?
     private var subscriptions = Set<AnyCancellable>()
-    private(set) var walletItems: [WalletItem] = []
+    private(set) var walletItems: [WalletItem]  = []
     
     @Published var receiverAddress = String()
     @Published var txSent = false
@@ -39,6 +39,7 @@ class SendViewViewModel: ObservableObject {
     @ObservedObject var viewState = Container.viewState()
     @ObservedObject private var account: AccountViewModel = Container.accountViewModel()
     @Published var recomendedFees: RecomendedFees?
+    @Published var sendMax: Bool = false
 
     @Injected(Container.marketData) private var marketData
     @LazyInjected(Container.biometricAuthentification) private var biometrics
@@ -60,7 +61,7 @@ class SendViewViewModel: ObservableObject {
         case .recipient:
             return !receiverAddress.isEmpty
         case .amount:
-            return amountIsValid && Decimal(string: exchanger.baseAmount.value.replacingOccurrences(of: ",", with: ".")) ?? 0 > 0
+            return amountIsValid && exchanger.baseAmountDecimal > 0
         case .review:
             return amountIsValid
         case .signing, .sent:
@@ -99,15 +100,10 @@ class SendViewViewModel: ObservableObject {
     }
     
     var showFees: Bool {
-        guard
-            let exchanger = exchanger,
-            amountIsValid,
-            let amount = Decimal(string: exchanger.baseAmount.value.replacingOccurrences(of: ",", with: "."))
-        else {
+        guard let exchanger = exchanger, amountIsValid else {
             return false
         }
-        print("amount = \(amount)")
-        return amount > 0
+        return exchanger.baseAmountDecimal > 0 && sendService?.fee != 0
     }
     
     init() {
@@ -139,7 +135,7 @@ class SendViewViewModel: ObservableObject {
                         step = .amount
                         return
                     }
-                    self.exchanger?.baseAmount.value = amount
+                    self.exchanger?.amount.string = amount
                     self.step = .review
                 case .eth(let address, let amount, _):
                     self.selectedItem = walletItems.last
@@ -148,7 +144,7 @@ class SendViewViewModel: ObservableObject {
                         step = .amount
                         return
                     }
-                    self.exchanger?.baseAmount.value = amount
+                    self.exchanger?.amount.string = amount
                     self.step = .review
                 default:
                     break
@@ -188,7 +184,7 @@ class SendViewViewModel: ObservableObject {
                 case .lightningBitcoin:
                     fatalError("not implemented")
                 case .ethereum, .erc20:
-                    let ethPriceInUsd: Decimal = 1200
+                    let ethPriceInUsd = self.marketData.ethTicker?[.usd].price ?? 1
                     self.valueString = (sendService.balance * ethPriceInUsd).double.usdFormatted()
                 }
             }
@@ -202,38 +198,42 @@ class SendViewViewModel: ObservableObject {
         
         $feeRate
             .sink { [unowned self] rate in
-                sendService?.feeRateType.send(rate)
+                self.sendService?.feeRateType.send(rate)
             }
             .store(in: &subscriptions)
     }
     
     private func updateExchanger(coin: Coin) {
+        let price: Decimal
+        
+        switch coin.type {
+        case .bitcoin, .lightningBitcoin:
+            price = marketData.btcTicker?[.usd].price ?? 1
+        case .ethereum, .erc20:
+            price = marketData.ethTicker?[.usd].price ?? 1
+        }
+        
         exchanger = Exchanger(
             base: coin,
-            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1))
+            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)),
+            price: price
         )
         
         guard let exchanger = exchanger, let sendService = self.sendService else { return }
         
-        exchanger.baseAmount.$value.sink { [weak self] amount in
-            guard let self = self, let decimalAmount = Decimal(string: amount.replacingOccurrences(of: ",", with: ".")) else { return }
-                        
-            withAnimation(.spring(response: 0.45, dampingFraction: 0.65, blendDuration: 0)) {
-                self.amountIsValid = decimalAmount <= sendService.spendable
-            }
-            
-            withAnimation {
-                guard
-                    self.amountIsValid, decimalAmount > 0
-                else {
-                    self.useAllFundsEnabled = true
-                    return
+        exchanger.$baseAmountDecimal
+            .sink { [weak self] amount in
+                guard let self = self else { return }
+                
+                withAnimation {
+                    self.amountIsValid = amount <= sendService.spendable
+                    self.useAllFundsEnabled = (amount != sendService.spendable)
                 }
-                self.useAllFundsEnabled = !(decimalAmount == sendService.spendable)
-                sendService.amount.send(decimalAmount)
+                
+                guard self.amountIsValid, amount > 0, sendService.amount.value != amount else { return }
+                sendService.amount.send(amount)
             }
-        }
-        .store(in: &subscriptions)
+            .store(in: &subscriptions)
     }
     
     private func updateAdapters(coin: Coin) {
@@ -256,7 +256,7 @@ class SendViewViewModel: ObservableObject {
             sendService = SendBTCService(sendAdapter: sendAdapter)
             
             if let service = sendService {
-                balanceString = service.balance.formatted()
+                balanceString = String(describing: service.spendable)
                 let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
                 valueString = (service.balance * btcPriceInUsd).double.usdFormatted()
             }
@@ -274,8 +274,8 @@ class SendViewViewModel: ObservableObject {
             sendService = SendETHService(coin: coin, sendAdapter: sendAdapter, feeRateProvider: ethFeeRateProvider, manager: ethManager)
             
             if let service = sendService {
-                balanceString = service.balance.formatted()
-                let ethPriceInUsd: Decimal = 1200
+                balanceString = String(describing: service.spendable)
+                let ethPriceInUsd = marketData.ethTicker?[.usd].price ?? 1
                 valueString = (service.balance * ethPriceInUsd).double.usdFormatted()
             }
         }
@@ -304,7 +304,7 @@ class SendViewViewModel: ObservableObject {
                     guard let self = self, let service = self.sendService, let exchanger = self.exchanger else { return }
 
                     self.publishedTxId = txId
-                    self.unconfirmedTx = service.unconfirmedTx(id: txId, amount: exchanger.baseAmount.value)
+                    self.unconfirmedTx = service.unconfirmedTx(id: txId, amount: exchanger.baseAmountString)
                     
                     withAnimation {
                         self.step = .sent
@@ -328,7 +328,7 @@ class SendViewViewModel: ObservableObject {
                     guard let self = self, let service = self.sendService, let exchanger = self.exchanger else { return }
 
                     self.publishedTxId = txId
-                    self.unconfirmedTx = service.unconfirmedTx(id: txId, amount: exchanger.baseAmount.value)
+                    self.unconfirmedTx = service.unconfirmedTx(id: txId, amount: exchanger.baseAmountString)
                     
                     withAnimation {
                         self.step = .sent
@@ -406,7 +406,7 @@ class SendViewViewModel: ObservableObject {
             sendError = nil
             step = .selectAsset
         case .amount:
-            exchanger?.baseAmount.value = String()
+            exchanger?.amount.string = String()
             useAllFundsEnabled = true
             sendError = nil
             step = .recipient
@@ -491,10 +491,17 @@ class SendViewViewModel: ObservableObject {
     }
     
     func useAllFunds() {
-        guard let sendService = sendService else { return }
-        let spendable = sendService.spendable.formatted()
-        exchanger?.baseAmount.value = spendable
-        useAllFundsEnabled = false
+        guard let sendService = sendService, let exchanger = exchanger else { return }
+        let spendable = sendService.spendable
+        
+        switch exchanger.side {
+        case .base:
+            exchanger.amount.string = String(describing: spendable)
+            exchanger.amount.string = String(describing: spendable)
+        case .quote:
+            exchanger.amount.string = String(describing: spendable * exchanger.price)
+            exchanger.amount.string = String(describing: spendable * exchanger.price)
+        }
     }
 }
 
@@ -510,7 +517,7 @@ extension SendViewViewModel {
         vm.receiverAddress = "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3"
         vm.balanceString = "0.000124"
         vm.valueString = "12.93"
-        vm.exchanger?.baseAmount.value = "0.0000432"
+        vm.exchanger?.amount.string = "0.0000432"
         return vm
     }
 }
