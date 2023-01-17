@@ -51,12 +51,12 @@ struct ReviewTransactionView: View {
                                 
                                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                                     VStack(alignment: .trailing, spacing: 6) {
-                                        Text(exchanger.baseAmount.value)
+                                        Text(exchanger.baseAmountString)
                                             .font(.Main.fixed(.monoBold, size: 32))
                                             .foregroundColor(viewModel.amountIsValid ? Palette.grayScaleEA : Color(red: 1, green: 0.349, blue: 0.349))
                                             .frame(height: 26)
                                         
-                                        Text(exchanger.quoteAmount.value)
+                                        Text(exchanger.quoteAmountString)
                                             .font(.Main.fixed(.monoMedium, size: 16))
                                             .foregroundColor(Palette.grayScale6A)
                                         

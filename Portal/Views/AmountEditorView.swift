@@ -29,9 +29,9 @@ class AmontEditorViewModel: ObservableObject {
         self.onSaveAcion = onSaveAction
         self.exchanger = exchanger
         
-        self.initialAmount = exchanger.baseAmount.value
+        self.initialAmount = exchanger.baseAmountString
         
-        self.exchanger.baseAmount.$value.flatMap {
+        self.exchanger.amount.$string.flatMap {
             Just($0 != self.initialAmount)
         }
         .assign(to: &$saveButtonEnabled)
@@ -74,7 +74,7 @@ struct AmountEditorView: View {
                     Spacer()
                     
                     PButton(config: .onlyLabel("Save"), style: .free, size: .small, applyGradient: true, enabled: viewModel.saveButtonEnabled) {
-                        viewModel.onSaveAcion(viewModel.exchanger.baseAmount.value)
+                        viewModel.onSaveAcion(viewModel.exchanger.baseAmountString)
                     }
                     .frame(width: 39)
                 }

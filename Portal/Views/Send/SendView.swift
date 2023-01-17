@@ -380,7 +380,7 @@ struct SendView: View {
                 case .bip21(let address, let amount, _):
                     viewModel.receiverAddress = address
                     guard let _amount = amount else { return }
-                    viewModel.exchanger?.baseAmount.value = _amount
+                    viewModel.exchanger?.amount.string = _amount
                 default:
                     break
                 }

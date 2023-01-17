@@ -32,7 +32,7 @@ struct AmountView: View {
                 case .base:
                     HStack(spacing: 8.5) {
                         Spacer()
-                        TextField("0", text: $exchanger.baseAmount.value)
+                        TextField("0", text: $exchanger.amount.string)
                             .keyboardType(.decimalPad)
                             .focused($focusedField, equals: .base)
                             .fixedSize(horizontal: true, vertical: true)
@@ -52,11 +52,11 @@ struct AmountView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
 
                     HStack(spacing: 4) {
-                        Text(exchanger.quoteAmount.value.isEmpty ? "0" : exchanger.quoteAmount.value)
+                        Text(exchanger.quoteAmountString.isEmpty ? "0" : exchanger.quoteAmountString)
                             .animation(nil)
                             .font(.Main.fixed(.monoMedium, size: 16))
                             .foregroundColor(Palette.grayScale6A)
-                        Text("usd")
+                        Text(exchanger.quote.code.lowercased())
                             .animation(nil)
                             .font(.Main.fixed(.monoMedium, size: 12))
                             .foregroundColor(Palette.grayScale6A)
@@ -65,7 +65,7 @@ struct AmountView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 case .quote:
                     HStack(spacing: 8.5) {
-                        TextField("0", text: $exchanger.quoteAmount.value)
+                        TextField("0", text: $exchanger.amount.string)
                             .keyboardType(.decimalPad)
                             .focused($focusedField, equals: .quote)
                             .fixedSize(horizontal: true, vertical: true)
@@ -75,7 +75,7 @@ struct AmountView: View {
                             .foregroundColor(
                                 validate ? isValid ? Palette.grayScaleEA : warningColor : Palette.grayScaleEA
                             )
-                        Text("usd")
+                        Text(exchanger.quote.code.lowercased())
                             .font(.Main.fixed(.monoRegular, size: 18))
                             .foregroundColor(Palette.grayScale6A)
                             .offset(y: 5)
@@ -84,7 +84,7 @@ struct AmountView: View {
 
                     HStack(spacing: 4) {
                         Spacer()
-                        Text(exchanger.baseAmount.value.isEmpty ? "0" : exchanger.baseAmount.value)
+                        Text(exchanger.baseAmountString.isEmpty ? "0" : exchanger.baseAmountString)
                             .font(.Main.fixed(.monoMedium, size: 16))
                             .foregroundColor(Palette.grayScale6A)
                         Text(exchanger.base.code.lowercased())
@@ -156,7 +156,7 @@ struct AmountView_Previews: PreviewProvider {
             base: .bitcoin(),
             quote: .fiat(
                 FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)
-            )
+            ), price: 21000
         ), isValid: true)
         .padding()
         .previewLayout(.sizeThatFits)
