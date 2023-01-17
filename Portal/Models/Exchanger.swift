@@ -7,72 +7,60 @@
 
 import SwiftUI
 import Combine
-import Factory
 
 class Exchanger: ObservableObject {
     let base: Coin
     let quote: AccountCurrency
+    let price: Decimal
     
     private var subscriptions = Set<AnyCancellable>()
-    
-    enum Side: Int, Hashable {
-        case base, quote
-    }
         
-    @Published var baseAmount = TextLimiter(limit: 10)
-    @Published var quoteAmount = TextLimiter(limit: 10)
+    @Published var amount = TextLimiter(initialText: "0", limit: 10)
+    
+    @Published private(set) var baseAmountString = "0"
+    @Published private(set) var quoteAmountString = "0"
+    @Published private(set) var baseAmountDecimal: Decimal = 0
+    @Published private(set) var quoteAmountDecimal: Decimal = 0
+    
     @Published var side: Side = .base
-    
-    @Injected(Container.marketData) private var marketData
-    
-    private var price: Double {
-        let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
         
-        switch quote {
-        case .btc:
-            return btcPriceInUsd.double
-        case .eth:
-            return 1200
-        case .fiat(let fiatCurrency):
-            return btcPriceInUsd.double * fiatCurrency.rate
-        }
-    }
-    
-    init(base: Coin, quote: AccountCurrency) {
+    init(base: Coin, quote: AccountCurrency, price: Decimal) {
         self.base = base
         self.quote = quote
-        
-        subscribe()
-    }
-    
-    private func subscribe() {
-        baseAmount.$value
-            .removeDuplicates()
-            .map { Double($0.replacingOccurrences(of: ",", with: ".")) ?? 0 }
-            .map { [unowned self] doubleValue -> String in
-                return "\((doubleValue * (price)).rounded(toPlaces: 2))"
-            }
-            .sink { [weak self] value in
-                if value == "0.0" {
-                    self?.quoteAmount.value = String()
+        self.price = price
+                
+        Publishers.CombineLatest(amount.$string, $side)
+            .sink { [unowned self] _, side in
+                
+                let decimalAmount = Decimal(string: self.amount.fullString.replacingOccurrences(of: ",", with: ".")) ?? 0
+                let newValueString = String(describing: decimalAmount)
+                
+                if side == self.side {
+                    switch side {
+                    case .base:
+                        self.baseAmountString = String(newValueString.prefix(10))
+                        self.quoteAmountString = String(describing: (decimalAmount * self.price).double.rounded(toPlaces: 2))
+                        self.quoteAmountDecimal = decimalAmount * self.price
+                        
+                        if self.baseAmountDecimal != decimalAmount {
+                            self.baseAmountDecimal = decimalAmount
+                        }
+                    case .quote:
+                        self.quoteAmountString = String(describing: decimalAmount.double.rounded(toPlaces: 2))
+                        self.baseAmountString = String(String(describing: decimalAmount / self.price).prefix(10))
+                        self.quoteAmountDecimal = decimalAmount
+                        
+                        if self.baseAmountDecimal != decimalAmount / self.price {
+                            self.baseAmountDecimal = decimalAmount / self.price
+                        }
+                    }
                 } else {
-                    self?.quoteAmount.value = value
-                }
-                self?.objectWillChange.send()
-            }
-            .store(in: &subscriptions)
-        
-        quoteAmount.$value
-            .removeDuplicates()
-            .map { Double($0.replacingOccurrences(of: ",", with: ".")) ?? 0 }
-            .map { [unowned self] in
-                "\(($0/price).rounded(toPlaces: 6).toString())"
-            }
-            .sink { [unowned self] value in
-                if value == "0.00" {
-                    self.baseAmount.value = String()
-                } else {
-                    self.baseAmount.value = value
+                    switch side {
+                    case .base:
+                        self.amount.string = String(describing: baseAmountDecimal)
+                    case .quote:
+                        self.amount.string = String(describing: quoteAmountDecimal)
+                    }
                 }
             }
             .store(in: &subscriptions)
@@ -80,9 +68,13 @@ class Exchanger: ObservableObject {
 }
 
 extension Exchanger {
+    enum Side: Int, Hashable {
+        case base, quote
+    }
+    
     static func mocked() -> Exchanger {
-        let exchanger = Exchanger(base: .bitcoin(), quote: .fiat(FiatCurrency(code: "USD", name: "Dollar")))
-        exchanger.baseAmount.value = "0.00001"
+        let exchanger = Exchanger(base: .bitcoin(), quote: .fiat(FiatCurrency(code: "USD", name: "Dollar")), price: 21000)
+        exchanger.amount.string = "0.00001"
         return exchanger
     }
 }
