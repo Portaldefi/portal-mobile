@@ -10,19 +10,32 @@ import SwiftUI
 class TextLimiter: ObservableObject {
     private let limit: Int
     
-    init(limit: Int) {
+    init(initialText: String, limit: Int) {
         self.limit = limit
+        string = initialText
+        fullString = initialText
     }
     
-    @Published var value = "0" {
+    @Published private(set) var fullString = "0"
+    @Published var string = "0" {
         didSet {
-            if value.count > limit {
-                value = String(value.prefix(limit))
-                hasReachedLimit = true
-            } else {
-                hasReachedLimit = false
-            }
+            updateFullString()
+            updateString()
         }
     }
-    @Published var hasReachedLimit = false
+    
+    private func updateFullString() {
+        guard fullString.contains(string) else {
+            fullString = string
+            return
+        }
+        guard string.count < limit else { return }
+        fullString = string
+    }
+    
+    private func updateString() {
+        if string.count > limit {
+            string = String(fullString.prefix(limit))
+        }
+    }
 }
