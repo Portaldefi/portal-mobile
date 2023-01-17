@@ -41,7 +41,6 @@ class SendBTCService: ISendAssetService {
         updateRecomendedFees()
         
         Publishers.CombineLatest3(amount, receiverAddress, feeRateType)
-            .throttle(for: 0.25, scheduler: RunLoop.current, latest: true)
             .flatMap{ amount, address, feeRateType -> AnyPublisher<UInt64?, Never> in
                 print("send btc service amount = \(String(describing: amount))")
                 
@@ -91,11 +90,23 @@ class SendBTCService: ISendAssetService {
     }
     
     func send() -> Future<String, Error> {
-        sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: (self.fee as NSDecimalNumber).intValue)
+        var fee: Int? = nil
+
+        if let recommendedFees = self.recomendedFees.value {
+            fee = (recommendedFees.fee(feeRateType.value) as NSDecimalNumber).intValue
+        }
+        
+        return sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: fee)
     }
     
     func sendMax() -> Future<String, Error> {
-        sendAdapter.sendMax(address: receiverAddress.value, fee: (self.fee as NSDecimalNumber).intValue)
+        var fee: Int? = nil
+
+        if let recommendedFees = self.recomendedFees.value {
+            fee = (recommendedFees.fee(feeRateType.value) as NSDecimalNumber).intValue
+        }
+        
+        return sendAdapter.sendMax(address: receiverAddress.value, fee: fee)
     }
     
     func unconfirmedTx(id: String, amount: String) -> TransactionRecord {
