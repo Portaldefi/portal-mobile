@@ -20,7 +20,7 @@ class EthereumKitManager {
     private let appConfigProvider: IAppConfigProvider
     private let disposeBag = DisposeBag()
     weak var ethereumKit: Kit?
-    weak var signer: Signer?
+    var signer: Signer?
     
     private var currentAccount: Account? {
         didSet {
@@ -45,7 +45,11 @@ class EthereumKitManager {
         }
 
         let chain: Chain = .ethereumGoerli
+        
         let address = try Signer.address(seed: seed, chain: chain)
+        let signer = try Signer.instance(seed: seed, chain: chain)
+        
+        self.signer = signer
         
         let ethereumKit = try Kit.instance(
             address: address,
