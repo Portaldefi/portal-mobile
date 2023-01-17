@@ -1316,7 +1316,7 @@
 			repositoryURL = "https://github.com/bitcoindevkit/bdk-swift";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 0.6.0;
+				minimumVersion = 0.26.0;
 			};
 		};
 		756DDD8A28A28858002EDC60 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
