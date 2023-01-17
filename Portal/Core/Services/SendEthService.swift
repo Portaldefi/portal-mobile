@@ -50,7 +50,10 @@ class SendETHService: ISendAssetService {
         self.manager = manager
         
         Publishers.CombineLatest(amount, receiverAddress)
+            .throttle(for: 0.25, scheduler: RunLoop.current, latest: true)
             .flatMap { amount, address -> AnyPublisher<TransactionData?, Never> in
+                print("send eth service amount = \(String(describing: amount))")
+
                 if amount == 0 {
                     self.transaction = nil
                     self.recomendedFees.send(nil)
