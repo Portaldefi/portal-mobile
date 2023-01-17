@@ -41,17 +41,20 @@ class SendBTCService: ISendAssetService {
         updateRecomendedFees()
         
         Publishers.CombineLatest3(amount, receiverAddress, feeRateType)
+            .throttle(for: 0.25, scheduler: RunLoop.current, latest: true)
             .flatMap{ amount, address, feeRateType -> AnyPublisher<UInt64?, Never> in
+                print("send btc service amount = \(String(describing: amount))")
+                
                 do {
+                    try self.validateAddress()
                     var fee: Int? = nil
                     if let recommendedFees = self.recomendedFees.value {
                         fee = (recommendedFees.fee(feeRateType) as NSDecimalNumber).intValue
                     }
-                    let txFee = try self.sendAdapter.fee(max: false, address: address, amount: amount, fee: fee)
+                    let txFee = try self.sendAdapter.fee(max: amount == self.spendable, address: address, amount: amount, fee: fee)
                     return Just(txFee).eraseToAnyPublisher()
                 } catch {
                     print(error)
-                    self.fee = 0
                     return Just(nil).eraseToAnyPublisher()
                 }
             }
