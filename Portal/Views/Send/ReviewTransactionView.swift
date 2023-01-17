@@ -14,6 +14,7 @@ struct ReviewTransactionView: View {
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel: SendViewViewModel
+    @EnvironmentObject private var navigation: NavigationStack
     
     init(viewModel: SendViewViewModel) {
         self.viewModel = viewModel
@@ -118,7 +119,7 @@ struct ReviewTransactionView: View {
                             
                             switch coin.type {
                             case .bitcoin, .lightningBitcoin:
-                                Text("btc/vByte")
+                                Text("btc")
                                     .font(.Main.fixed(.monoMedium, size: 11))
                                     .foregroundColor(Palette.grayScale6A)
                                     .frame(width: 34)
@@ -141,19 +142,13 @@ struct ReviewTransactionView: View {
             Divider()
             
             Spacer()
-            
-            NavigationLink(
-                destination:
-                    TransactionDetailsView(
-                        coin: .bitcoin(),
-                        tx: viewModel.unconfirmedTx != nil ? viewModel.unconfirmedTx! : TransactionRecord.mocked
-                    ),
-                isActive: $viewModel.txSent
-            ) {
-                EmptyView()
+        }
+        .onReceive(viewModel.$txSent) { sent in
+            guard let coin = viewModel.selectedItem?.viewModel.coin else { return }
+            if sent {
+                navigation.push(.transactionDetails(coin: coin, tx: viewModel.unconfirmedTx != nil ? viewModel.unconfirmedTx! : TransactionRecord.mocked))
             }
         }
-        .navigationBarHidden(true)
     }
 }
 
