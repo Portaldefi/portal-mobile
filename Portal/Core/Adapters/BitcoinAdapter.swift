@@ -185,7 +185,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                 
                 if finalized {
                     try blockchain.broadcast(psbt: psbt)
-                    sync()
+                    syncData()
                     promise(.success(psbt.txid()))
                 } else {
                     promise(.failure(SendFlowError.error("Tx not finalized")))
