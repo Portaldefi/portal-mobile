@@ -17,7 +17,7 @@ final class BitcoinAdapter {
     
     private let wallet: BitcoinDevKit.Wallet
     private let blockchain: BitcoinDevKit.Blockchain
-    private let updateTimer = RepeatingTimer(timeInterval: 60)
+    private let updateTimer = RepeatingTimer(timeInterval: 180)
     private let networkQueue = DispatchQueue(label: "com.portal.network.layer.queue", qos: .userInitiated)
     
     private var adapterState: AdapterState = .syncing(progress: 0, lastBlockDate: nil)
@@ -28,12 +28,12 @@ final class BitcoinAdapter {
         let bip32RootKey = wallet.account.rootKey
         let deriviationPath = try DerivationPath(path: "m/84h/0h/\(account.index)h/0")
         let derivedKey = try bip32RootKey.derive(path: deriviationPath)
-        let descriptor = "wpkh(\(derivedKey.asString()))"
+        let descriptor = try Descriptor(descriptor: "wpkh(\(derivedKey.asString()))", network: .testnet)
         
         if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
             let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite" + "\(account.id)")
             let dbConfig = DatabaseConfig.sqlite(config: sqliteConfig)
-            let electrum = ElectrumConfig(url: "ssl://electrum.blockstream.info:60002", socks5: nil, retry: 5, timeout: nil, stopGap: 10)
+            let electrum = ElectrumConfig(url: "ssl://electrum.blockstream.info:60002", socks5: nil, retry: 5, timeout: nil, stopGap: 10, validateDomain: false)
             let blockchainConfig = BlockchainConfig.electrum(config: electrum)
             
             blockchain = try Blockchain(config: blockchainConfig)
@@ -200,18 +200,19 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         Future { [unowned self] promise in
             do {
                 let txBuilderResult: TxBuilderResult
+                let receiverAddress = try Address(address: address)
 
                 if let fee = fee {
                     txBuilderResult = try TxBuilder()
                         .drainWallet()
-                        .drainTo(address: address)
+                        .drainTo(script: receiverAddress.scriptPubkey())
                         .feeRate(satPerVbyte: Float(fee))
                         .enableRbf()
                         .finish(wallet: wallet)
                 } else {
                     txBuilderResult = try TxBuilder()
                         .drainWallet()
-                        .drainTo(address: address)
+                        .drainTo(script: receiverAddress.scriptPubkey())
                         .enableRbf()
                         .finish(wallet: wallet)
                 }
@@ -239,19 +240,20 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
     func fee(max: Bool, address: String, amount: Decimal, fee: Int?) throws -> UInt64? {
         do {
             let txBuilderResult: TxBuilderResult
+            let receiverAddress = try Address(address: address)
             
             if max {
                 if let fee = fee {
                     txBuilderResult = try TxBuilder()
                         .drainWallet()
-                        .drainTo(address: address)
+                        .drainTo(script: receiverAddress.scriptPubkey())
                         .feeRate(satPerVbyte: Float(fee))
                         .enableRbf()
                         .finish(wallet: wallet)
                 } else {
                     txBuilderResult = try TxBuilder()
                         .drainWallet()
-                        .drainTo(address: address)
+                        .drainTo(script: receiverAddress.scriptPubkey())
                         .enableRbf()
                         .finish(wallet: wallet)
                 }
