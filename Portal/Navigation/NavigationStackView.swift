@@ -25,6 +25,7 @@ enum Screen {
     case recoveryPhrase(viewModel: RecoveryPhraseViewModel)
     case recoveryPhraseTest(viewModel: RecoveryPhraseViewModel)
     case recoveryWarning(viewModel: RecoveryPhraseViewModel)
+    case transactionDetails(coin: Coin, tx: TransactionRecord)
 }
 
 extension Screen {
@@ -56,6 +57,8 @@ extension Screen {
             return "recovery_phrase_ID"
         case .recoveryWarning:
             return "recovery_warning_ID"
+        case .transactionDetails:
+            return "transaction_details_ID"
         }
     }
 }
