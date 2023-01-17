@@ -25,64 +25,87 @@ class ReceiveViewModel: ObservableObject {
     @Published var description = String()
     @Published var editingDescription = false
     
-    @Published private(set) var qrCode = UIImage()
+    @Published private(set) var qrCode: UIImage?
     @Published private(set) var step: RecieveStep = .selectAsset
     @Published private(set) var walletItems = [WalletItem]()
     
     @Published var sharedAddress: IdentifiableString?
     @Published var selectedItem: WalletItem?
-    @Published var exchanger: Exchanger
+    @Published var exchanger: Exchanger?
+    
+    @Injected(Container.marketData) private var marketData
     
     private var subscriptions = Set<AnyCancellable>()
     
     var receiveAddress: String {
-        adapter?.receiveAddress ?? String()
+        adapter?.receiveAddress ?? "Address"
     }
     
     init(items: [WalletItem], selectedItem: WalletItem?) {
         self.walletItems = items
         self.selectedItem = selectedItem
         
-        self.exchanger = Exchanger(
-            base: .bitcoin(),
-            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1))
-        )
-        
-        Publishers.CombineLatest(exchanger.baseAmount.$value, $description)
-            .flatMap { _ in Just(()) }
-            .receive(on: RunLoop.main)
-            .sink { [unowned self] _ in
-                self.generateQRCode()
-            }
-            .store(in: &subscriptions)
-        
         $selectedItem
             .receive(on: RunLoop.main)
             .sink { [unowned self] item in
-                self.updateAdapter()
+                self.updateExchanger(coin: item?.viewModel.coin)
+                self.updateAdapter(coin: item?.viewModel.coin)
 
-                if item != nil {
+                if let item = item {
                     withAnimation {
-                        self.generateQRCode()
                         self.step = .generateQR
                     }
+                    self.generateQRCode(coin: item.viewModel.coin)
                 } else {
-                    withAnimation {
-                        self.step = .selectAsset
-                    }
+                    self.step = .selectAsset
                 }
         }
         .store(in: &subscriptions)
     }
     
-    private func updateAdapter() {
-        guard let selectedItem = selectedItem else { return }
+    private func updateExchanger(coin: Coin?) {
+        guard let coin = coin else {
+            exchanger = nil
+            return
+        }
         
+        let price: Decimal
+        
+        switch coin.type {
+        case .bitcoin, .lightningBitcoin:
+            price = marketData.btcTicker?[.usd].price ?? 1
+        case .ethereum, .erc20:
+            price = marketData.ethTicker?[.usd].price ?? 1
+        }
+        
+        exchanger = Exchanger(
+            base: coin,
+            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)),
+            price: price
+        )
+        
+        guard let exchanger = exchanger else { return }
+        
+        Publishers.CombineLatest(exchanger.$baseAmountString, $description)
+            .flatMap { _ in Just(()) }
+            .receive(on: RunLoop.main)
+            .sink { [unowned self] _ in
+                self.generateQRCode(coin: exchanger.base)
+            }
+            .store(in: &subscriptions)
+    }
+    
+    private func updateAdapter(coin: Coin?) {
+        guard let coin = coin else {
+            adapter = nil
+            return
+        }
+
         let adapterManager: IAdapterManager = Container.adapterManager()
         let walletManager: IWalletManager = Container.walletManager()
                 
         guard
-            let wallet = walletManager.activeWallets.first(where: { $0.coin == selectedItem.viewModel.coin }),
+            let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
             let depositAdapter = adapterManager.depositAdapter(for: wallet)
         else {
             fatalError("coudn't fetch dependencies")
@@ -91,17 +114,16 @@ class ReceiveViewModel: ObservableObject {
         self.adapter = depositAdapter
     }
     
-    private func generateQRCode() {
-        guard let adapter = adapter else { return }
-        guard let selectedItem = selectedItem else { return }
+    private func generateQRCode(coin: Coin) {
+        guard let exchanger = exchanger else { return }
         
         var qrCodeString: String
         
-        switch selectedItem.viewModel.coin.type {
+        switch coin.type {
         case .bitcoin:
-            qrCodeString = "bitcoin:\(adapter.receiveAddress)"
+            qrCodeString = "bitcoin:\(receiveAddress)"
         case .ethereum:
-            qrCodeString = "ethereum:\(adapter.receiveAddress)"
+            qrCodeString = "ethereum:\(receiveAddress)"
         default:
             qrCodeString = String()
         }
@@ -109,8 +131,8 @@ class ReceiveViewModel: ObservableObject {
         var components = URLComponents()
         components.queryItems = []
         
-        if !exchanger.baseAmount.value.isEmpty {
-            components.queryItems?.append(URLQueryItem(name: "amount", value: exchanger.baseAmount.value))
+        if !exchanger.baseAmountString.isEmpty {
+            components.queryItems?.append(URLQueryItem(name: "amount", value: exchanger.baseAmountString))
         }
 
         if !description.isEmpty {
@@ -130,7 +152,6 @@ class ReceiveViewModel: ObservableObject {
             let outputImage = filter.outputImage,
             let cgimg = context.createCGImage(outputImage, from: outputImage.extent)
         else {
-            qrCode = UIImage(systemName: "xmark.circle") ?? UIImage()
             return
         }
         
@@ -141,19 +162,16 @@ class ReceiveViewModel: ObservableObject {
         selectedItem = nil
         qrCode = UIImage()
         adapter = nil
-        exchanger.baseAmount.value = String()
+        exchanger?.amount.string = String()
         description = String()
     }
     
     func copyToClipboard() {
-        guard let adapter = adapter else { return }
-
-        UIPasteboard.general.string = adapter.receiveAddress
+        UIPasteboard.general.string = receiveAddress
     }
     
     func share() {
-        guard let adapter = adapter else { return }
-        sharedAddress = IdentifiableString(text: "\(adapter.receiveAddress)\n\nThis is a bitcoin network address. Only send BTC to this address. Do not send lightning network assets to his address.")
+        sharedAddress = IdentifiableString(text: "\(receiveAddress)\n\nThis is a bitcoin network address. Only send BTC to this address. Do not send lightning network assets to his address.")
     }
     
     var isIPod: Bool {
