@@ -36,7 +36,7 @@ extension Double {
             string = String(string.dropLast())
         }
         if string == "0" {
-            string = "0.00"
+            string = "0.0"
         }
         return string
     }
