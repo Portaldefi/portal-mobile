@@ -304,7 +304,7 @@ class SendViewViewModel: ObservableObject {
                     guard let self = self, let service = self.sendService, let exchanger = self.exchanger else { return }
 
                     self.publishedTxId = txId
-                    self.unconfirmedTx = service.unconfirmedTx(id: txId, amount: exchanger.baseAmountString)
+                    self.unconfirmedTx = service.unconfirmedTx(id: txId, amount: String(describing: exchanger.baseAmountDecimal))
                     
                     withAnimation {
                         self.step = .sent
@@ -328,7 +328,7 @@ class SendViewViewModel: ObservableObject {
                     guard let self = self, let service = self.sendService, let exchanger = self.exchanger else { return }
 
                     self.publishedTxId = txId
-                    self.unconfirmedTx = service.unconfirmedTx(id: txId, amount: exchanger.baseAmountString)
+                    self.unconfirmedTx = service.unconfirmedTx(id: txId, amount: String(describing: exchanger.baseAmountDecimal))
                     
                     withAnimation {
                         self.step = .sent
@@ -498,9 +498,17 @@ class SendViewViewModel: ObservableObject {
         case .base:
             exchanger.amount.string = String(describing: spendable)
             exchanger.amount.string = String(describing: spendable)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                let spendable = sendService.spendable
+                exchanger.amount.string = String(describing: spendable)
+            }
         case .quote:
             exchanger.amount.string = String(describing: spendable * exchanger.price)
             exchanger.amount.string = String(describing: spendable * exchanger.price)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                let spendable = sendService.spendable
+                exchanger.amount.string = String(describing: spendable * exchanger.price)
+            }
         }
     }
 }
