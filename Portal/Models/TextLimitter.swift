@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import Combine
 
 class TextLimiter: ObservableObject {
     private let limit: Int
+    var updated = CurrentValueSubject<String, Never>(String())
     
     init(initialText: String, limit: Int) {
         self.limit = limit
@@ -17,10 +19,13 @@ class TextLimiter: ObservableObject {
     }
     
     @Published private(set) var fullString = "0"
+    
     @Published var string = "0" {
         didSet {
             updateFullString()
             updateString()
+            
+            updated.send(fullString)
         }
     }
     
