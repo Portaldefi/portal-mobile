@@ -497,15 +497,14 @@ class SendViewViewModel: ObservableObject {
         switch exchanger.side {
         case .base:
             exchanger.amount.string = String(describing: spendable)
-            exchanger.amount.string = String(describing: spendable)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.125) {
                 let spendable = sendService.spendable
                 exchanger.amount.string = String(describing: spendable)
             }
         case .quote:
             exchanger.amount.string = String(describing: spendable * exchanger.price)
-            exchanger.amount.string = String(describing: spendable * exchanger.price)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.125) {
                 let spendable = sendService.spendable
                 exchanger.amount.string = String(describing: spendable * exchanger.price)
             }
