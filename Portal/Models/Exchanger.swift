@@ -29,30 +29,22 @@ class Exchanger: ObservableObject {
         self.quote = quote
         self.price = price
                 
-        Publishers.CombineLatest(amount.$string, $side)
-            .sink { [unowned self] _, side in
-                
-                let decimalAmount = Decimal(string: self.amount.fullString.replacingOccurrences(of: ",", with: ".")) ?? 0
-                let newValueString = String(describing: decimalAmount)
+        Publishers.CombineLatest(amount.updated, $side)
+            .sink { [unowned self] amount, side in
+                let decimalAmount = Decimal(string: amount) ?? 0
                 
                 if side == self.side {
                     switch side {
                     case .base:
-                        self.baseAmountString = String(newValueString.prefix(10))
+                        self.baseAmountString = String(amount.prefix(10))
                         self.quoteAmountString = String(describing: (decimalAmount * self.price).double.rounded(toPlaces: 2))
                         self.quoteAmountDecimal = decimalAmount * self.price
-                        
-                        if self.baseAmountDecimal != decimalAmount {
-                            self.baseAmountDecimal = decimalAmount
-                        }
+                        self.baseAmountDecimal = decimalAmount
                     case .quote:
                         self.quoteAmountString = String(describing: decimalAmount.double.rounded(toPlaces: 2))
                         self.baseAmountString = String(String(describing: decimalAmount / self.price).prefix(10))
                         self.quoteAmountDecimal = decimalAmount
-                        
-                        if self.baseAmountDecimal != decimalAmount / self.price {
-                            self.baseAmountDecimal = decimalAmount / self.price
-                        }
+                        self.baseAmountDecimal = decimalAmount / self.price
                     }
                 } else {
                     switch side {
