@@ -41,8 +41,15 @@ class SendBTCService: ISendAssetService {
         updateRecomendedFees()
         
         Publishers.CombineLatest3(amount, receiverAddress, feeRateType)
+            .filter{ amount, address, _ in
+                amount > 0 && !address.isEmpty
+            }
             .flatMap{ amount, address, feeRateType -> AnyPublisher<UInt64?, Never> in
                 print("send btc service amount = \(String(describing: amount))")
+                
+                guard amount > 0, !address.isEmpty else {
+                    return Just(nil).eraseToAnyPublisher()
+                }
                 
                 do {
                     try self.validateAddress()
@@ -64,8 +71,6 @@ class SendBTCService: ISendAssetService {
                 self.fee = Decimal(fee)
             }
             .store(in: &subscriptions)
-        
-        amount.send(0.00001)
     }
     
     private func updateRecomendedFees() {
