@@ -41,6 +41,7 @@ class SendBTCService: ISendAssetService {
         updateRecomendedFees()
         
         Publishers.CombineLatest3(amount, receiverAddress, feeRateType)
+            .receive(on: DispatchQueue.global(qos: .userInteractive))
             .filter{ amount, address, _ in
                 amount > 0 && !address.isEmpty
             }
