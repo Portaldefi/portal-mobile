@@ -21,7 +21,8 @@ final class BitcoinAdapter {
     private let networkQueue = DispatchQueue(label: "com.portal.network.layer.queue", qos: .userInitiated)
     
     private var adapterState: AdapterState = .syncing(progress: 0, lastBlockDate: nil)
-    private var satsBalance: Decimal = 0
+    private var _balance = Balance(immature: 0, trustedPending: 0, untrustedPending: 0, confirmed: 0, spendable: 0, total: 0)
+    private var _receiveAddress = AddressInfo(index: 0, address: String())
     
     init(wallet: Wallet) throws {
         let account = wallet.account
@@ -72,6 +73,7 @@ final class BitcoinAdapter {
     }
     
     private func update() throws {
+        try updateAddress()
         try updateBalance()
         print("BITCOIN BALANCE UPDATED")
         try updateTransactions()
@@ -84,9 +86,13 @@ final class BitcoinAdapter {
     }
     
     private func updateBalance() throws {
-        let totalBalance = try wallet.getBalance().spendable
-        satsBalance = Decimal(totalBalance)
+        _balance = try wallet.getBalance()
         balanceUpdatedSubject.send()
+    }
+    
+    private func updateAddress() throws {
+        let addressInfo = try wallet.getAddress(addressIndex: AddressIndex.lastUnused)
+        _receiveAddress = addressInfo
     }
     
     private func updateTransactions() throws {
@@ -122,7 +128,7 @@ extension BitcoinAdapter: IBalanceAdapter {
     }
     
     var balance: Decimal {
-        satsBalance/100_000_000
+        Decimal(_balance.spendable)/100_000_000
     }
     
     var balanceStateUpdated: AnyPublisher<Void, Never> {
@@ -136,15 +142,7 @@ extension BitcoinAdapter: IBalanceAdapter {
 
 extension BitcoinAdapter: IDepositAdapter {
     var receiveAddress: String {
-        do {
-            let addressInfo = try wallet.getAddress(addressIndex: AddressIndex.lastUnused)
-            print("======================================================")
-            print("btc receive address: \(addressInfo.address)")
-            print("======================================================")
-            return addressInfo.address
-        } catch {
-            return "ERROR"
-        }
+        _receiveAddress.address
     }
 }
 
@@ -159,19 +157,19 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         Future { [unowned self] promise in
             do {
                 let satsAmount = UInt64((amount * 100_000_000).double)
-                let recieverAddress = try Address(address: address)
-                let recieverAddressScript = recieverAddress.scriptPubkey()
+                let receiverAddress = try Address(address: address)
+                let receiverAddressScript = receiverAddress.scriptPubkey()
                 let txBuilderResult: TxBuilderResult
                 
                 if let fee = fee {
                     txBuilderResult = try TxBuilder()
-                        .addRecipient(script: recieverAddressScript, amount: satsAmount)
+                        .addRecipient(script: receiverAddressScript, amount: satsAmount)
                         .feeRate(satPerVbyte: Float(fee))
                         .enableRbf()
                         .finish(wallet: wallet)
                 } else {
                     txBuilderResult = try TxBuilder()
-                        .addRecipient(script: recieverAddressScript, amount: satsAmount)
+                        .addRecipient(script: receiverAddressScript, amount: satsAmount)
                         .enableRbf()
                         .finish(wallet: wallet)
                 }
