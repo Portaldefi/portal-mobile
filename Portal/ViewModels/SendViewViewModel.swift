@@ -300,11 +300,11 @@ class SendViewViewModel: ObservableObject {
                             self.sendError = error
                         }
                     }
-                }, receiveValue: { [weak self] txId in
-                    guard let self = self, let service = self.sendService, let exchanger = self.exchanger else { return }
+                }, receiveValue: { [weak self] transaction in
+                    guard let self = self else { return }
 
-                    self.publishedTxId = txId
-                    self.unconfirmedTx = service.unconfirmedTx(id: txId, amount: String(describing: exchanger.baseAmountDecimal))
+                    self.publishedTxId = transaction.id
+                    self.unconfirmedTx = transaction
                     
                     withAnimation {
                         self.step = .sent
@@ -324,11 +324,11 @@ class SendViewViewModel: ObservableObject {
                             self.sendError = error
                         }
                     }
-                }, receiveValue: { [weak self] txId in
-                    guard let self = self, let service = self.sendService, let exchanger = self.exchanger else { return }
+                }, receiveValue: { [weak self] transaction in
+                    guard let self = self else { return }
 
-                    self.publishedTxId = txId
-                    self.unconfirmedTx = service.unconfirmedTx(id: txId, amount: String(describing: exchanger.baseAmountDecimal))
+                    self.publishedTxId = transaction.id
+                    self.unconfirmedTx = transaction
                     
                     withAnimation {
                         self.step = .sent
