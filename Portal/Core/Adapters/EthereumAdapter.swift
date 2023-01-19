@@ -201,7 +201,7 @@ extension EthereumAdapter: ISendEthereumAdapter {
         evmKit.transferTransactionData(to: address, value: amount)
     }
     
-    func send(tx: SendETHService.Transaction) -> Future<String, Error> {
+    func send(tx: SendETHService.Transaction) -> Future<TransactionRecord, Error> {
         Future { promise in
             self
                 .sendSingle(
@@ -210,10 +210,11 @@ extension EthereumAdapter: ISendEthereumAdapter {
                     gasLimit: tx.gasData.gasLimit,
                     gasPrice: .legacy(gasPrice: tx.gasData.gasPrice)
                 )
-                .subscribe { fullTransaction in
-                    print("Eth tx sent:")
-                    print(fullTransaction)
-                    promise(.success(String(decoding: fullTransaction.transaction.hash, as: UTF8.self)))
+                .subscribe { [weak self] fullTransaction in
+                    guard let self = self else { return }
+                    let record = self.transactionRecord(fullTransaction: fullTransaction)
+                    print("Eth tx sent: \(record.id) ")
+                    promise(.success(record))
                 } onError: { error in
                     promise(.failure(error))
                 }
