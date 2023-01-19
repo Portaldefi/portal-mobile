@@ -95,7 +95,7 @@ class SendBTCService: ISendAssetService {
         try sendAdapter.validate(address: receiverAddress.value)
     }
     
-    func send() -> Future<String, Error> {
+    func send() -> Future<TransactionRecord, Error> {
         var fee: Int? = nil
 
         if let recommendedFees = self.recomendedFees.value {
@@ -105,7 +105,7 @@ class SendBTCService: ISendAssetService {
         return sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: fee)
     }
     
-    func sendMax() -> Future<String, Error> {
+    func sendMax() -> Future<TransactionRecord, Error> {
         var fee: Int? = nil
 
         if let recommendedFees = self.recomendedFees.value {
@@ -113,15 +113,5 @@ class SendBTCService: ISendAssetService {
         }
         
         return sendAdapter.sendMax(address: receiverAddress.value, fee: fee)
-    }
-    
-    func unconfirmedTx(id: String, amount: String) -> TransactionRecord {
-        let unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
-            recipient: receiverAddress.value,
-            amount: amount,
-            id: id
-        )
-        
-        return TransactionRecord(transaction: unconfirmedTx)
     }
 }
