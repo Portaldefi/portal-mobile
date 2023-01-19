@@ -18,7 +18,6 @@ protocol ISendAssetService {
     var recomendedFees: CurrentValueSubject<RecomendedFees?, Never> { get }
     
     func validateAddress() throws
-    func send() -> Future<String, Error>
-    func sendMax() -> Future<String, Error>
-    func unconfirmedTx(id: String, amount: String) -> TransactionRecord
+    func send() -> Future<TransactionRecord, Error>
+    func sendMax() -> Future<TransactionRecord, Error>
 }
