@@ -38,23 +38,14 @@ class SendAssetMockedService: ISendAssetService {
         
     }
     
-    func send() -> Future<String, Error> {
+    func send() -> Future<TransactionRecord, Error> {
         Future { promise in
-            promise(.success(("txId")))
+            promise(.success(TransactionRecord(transaction: TransactionDetails.mockedConfirmed)))
         }
     }
     
-    func sendMax() -> Future<String, Error> {
+    func sendMax() -> Future<TransactionRecord, Error> {
         send()
-    }
-    
-    func unconfirmedTx(id: String, amount: String) -> TransactionRecord {
-        let unconfirmedTx = BitcoinDevKit.TransactionDetails.unconfirmedSentTransaction(
-            recipient: receiverAddress.value,
-            amount: amount,
-            id: id
-        )
-        return TransactionRecord(transaction: unconfirmedTx)
     }
 }
 
