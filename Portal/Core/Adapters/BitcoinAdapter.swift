@@ -185,7 +185,6 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                     try blockchain.broadcast(psbt: psbt)
                     let record = TransactionRecord(transaction: txDetails)
                     promise(.success(record))
-                    syncData()
                 } else {
                     promise(.failure(SendFlowError.error("Tx not finalized")))
                 }
@@ -227,7 +226,6 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                     try blockchain.broadcast(psbt: psbt)
                     let record = TransactionRecord(transaction: txDetails)
                     promise(.success(record))
-                    syncData()
                 } else {
                     promise(.failure(SendFlowError.error("Tx not finalized")))
                 }
