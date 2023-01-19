@@ -20,7 +20,8 @@ class Exchanger: ObservableObject {
     @Published private(set) var baseAmountString = "0"
     @Published private(set) var quoteAmountString = "0"
     @Published private(set) var baseAmountDecimal: Decimal = 0
-    @Published private(set) var quoteAmountDecimal: Decimal = 0
+    
+    private var quoteAmountDecimal: Decimal = 0
     
     @Published var side: Side = .base
         
