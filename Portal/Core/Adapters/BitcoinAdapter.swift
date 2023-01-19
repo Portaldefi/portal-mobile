@@ -153,7 +153,7 @@ extension BitcoinAdapter: ITransactionsAdapter {
 }
 
 extension BitcoinAdapter: ISendBitcoinAdapter {
-    func send(amount: Decimal, address: String, fee: Int?) -> Future<String, Error> {
+    func send(amount: Decimal, address: String, fee: Int?) -> Future<TransactionRecord, Error> {
         Future { [unowned self] promise in
             do {
                 let satsAmount = UInt64((amount * 100_000_000).double)
@@ -183,8 +183,9 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                 
                 if finalized {
                     try blockchain.broadcast(psbt: psbt)
+                    let record = TransactionRecord(transaction: txDetails)
+                    promise(.success(record))
                     syncData()
-                    promise(.success(psbt.txid()))
                 } else {
                     promise(.failure(SendFlowError.error("Tx not finalized")))
                 }
@@ -194,7 +195,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         }
     }
     
-    func sendMax(address: String, fee: Int?) -> Future<String, Error> {
+    func sendMax(address: String, fee: Int?) -> Future<TransactionRecord, Error> {
         Future { [unowned self] promise in
             do {
                 let txBuilderResult: TxBuilderResult
@@ -224,8 +225,9 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
 
                 if finalized {
                     try blockchain.broadcast(psbt: psbt)
+                    let record = TransactionRecord(transaction: txDetails)
+                    promise(.success(record))
                     syncData()
-                    promise(.success(psbt.txid()))
                 } else {
                     promise(.failure(SendFlowError.error("Tx not finalized")))
                 }
