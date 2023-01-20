@@ -62,20 +62,8 @@ extension Double {
     
     func formattedString(_ currency: AccountCurrency, decimals: Int = 5) -> String {
         let formatter = NumberFormatter()
-
+        
         switch currency {
-        case .btc:
-            formatter.numberStyle = .decimal
-            formatter.maximumFractionDigits = decimals
-            formatter.minimumFractionDigits = 0
-            formatter.minimumIntegerDigits = 1
-            return (formatter.string(from: NSNumber(value: self)) ?? "-")
-        case .eth:
-            formatter.numberStyle = .decimal
-            formatter.maximumFractionDigits = decimals
-            formatter.minimumFractionDigits = 0
-            formatter.minimumIntegerDigits = 1
-            return (formatter.string(from: NSNumber(value: self)) ?? "-")
         case .fiat(let fiatCurrency):
             formatter.currencySymbol = fiatCurrency.symbol
             formatter.groupingSize = 3
@@ -84,6 +72,12 @@ extension Double {
             formatter.minimumFractionDigits = 0
             formatter.minimumIntegerDigits = 1
             return formatter.string(from: NSNumber(value: self)) ?? "-"
+        case .coin:
+            formatter.numberStyle = .decimal
+            formatter.maximumFractionDigits = decimals
+            formatter.minimumFractionDigits = 0
+            formatter.minimumIntegerDigits = 1
+            return (formatter.string(from: NSNumber(value: self)) ?? "-")
         }
     }
     
