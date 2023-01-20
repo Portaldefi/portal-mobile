@@ -70,8 +70,8 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     var feeString: String {
-        //guard let fee = transaction.fee else { return "0.000000141" }
-        return String(format: "%.8f", Double(0.000001)/100_000_000)
+        guard let fee = transaction.fee else { return "-" }
+        return String(describing: fee)
     }
         
     var txIdString: String {
@@ -88,7 +88,7 @@ class TransactionDetailsViewModel: ObservableObject {
         case .bitcoin:
             return URL(string: "https://blockstream.info/testnet/tx/\(transaction.id)")
         case .ethereum:
-            return URL(string: "https://ropsten.etherscan.io/tx/\(transaction.id)")
+            return URL(string: "https://goerli.etherscan.io/tx/\(transaction.id)")
         default:
             return nil
         }
