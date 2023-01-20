@@ -48,9 +48,9 @@ class SendViewViewModel: ObservableObject {
         guard let coin = selectedItem?.viewModel.coin, let recomendedFees = recomendedFees, let sendService = sendService else { return String() }
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            return ((sendService.fee.double)/100_000_000).formattedString(.btc, decimals: 8)
+            return ((sendService.fee.double)/100_000_000).formattedString(.coin(coin), decimals: 8)
         case .ethereum, .erc20:
-            return recomendedFees.fee(feeRate).double.formattedString(.btc, decimals: 8)
+            return recomendedFees.fee(feeRate).double.formattedString(.coin(coin), decimals: 8)
         }
     }
     

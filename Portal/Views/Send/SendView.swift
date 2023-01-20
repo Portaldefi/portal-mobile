@@ -60,7 +60,7 @@ struct SendView: View {
                 .padding(.horizontal, 16)
             }
             
-            if viewState.showFeesPicker, let fees = viewModel.recomendedFees {
+            if viewState.showFeesPicker, let fees = viewModel.recomendedFees, let coin = viewModel.selectedItem?.viewModel.coin {
                 ZStack(alignment: .top) {
                     VStack(spacing: 0) {
                         Divider()
@@ -129,7 +129,7 @@ struct SendView: View {
                                             Text("~10 mins")
                                                 .font(.Main.fixed(.monoRegular, size: 16))
                                                 .foregroundColor(Palette.grayScaleF4)
-                                            Text(fees.fastestFee.double.formattedString(.btc, decimals: 8) + "\(viewModel.selectedItem!.viewModel.coin.type == .bitcoin ? " sat/vByte" : " eth")")
+                                            Text(fees.fastestFee.double.formattedString(.coin(coin), decimals: 8) + "\(coin.type == .bitcoin ? " sat/vByte" : " eth")")
                                                 .font(.Main.fixed(.monoRegular, size: 14))
                                                 .foregroundColor(Palette.grayScale8A)
                                         }
@@ -179,7 +179,7 @@ struct SendView: View {
                                             Text("~30 mins")
                                                 .font(.Main.fixed(.monoRegular, size: 16))
                                                 .foregroundColor(Palette.grayScaleF4)
-                                            Text(fees.halfHourFee.double.formattedString(.btc, decimals: 8) + "\(viewModel.selectedItem!.viewModel.coin.type == .bitcoin ? " sat/vByte" : " eth")")
+                                            Text(fees.halfHourFee.double.formattedString(.coin(coin), decimals: 8) + "\(coin.type == .bitcoin ? " sat/vByte" : " eth")")
                                                 .font(.Main.fixed(.monoRegular, size: 14))
                                                 .foregroundColor(Palette.grayScale8A)
                                         }
@@ -229,7 +229,7 @@ struct SendView: View {
                                             Text("~60 mins")
                                                 .font(.Main.fixed(.monoRegular, size: 16))
                                                 .foregroundColor(Palette.grayScaleF4)
-                                            Text(fees.hourFee.double.formattedString(.btc, decimals: 8) + "\(viewModel.selectedItem!.viewModel.coin.type == .bitcoin ? " sat/vByte" : " eth")")
+                                            Text(fees.hourFee.double.formattedString(.coin(.bitcoin()), decimals: 8) + "\(viewModel.selectedItem!.viewModel.coin.type == .bitcoin ? " sat/vByte" : " eth")")
                                                 .font(.Main.fixed(.monoRegular, size: 14))
                                                 .foregroundColor(Palette.grayScale8A)
                                         }
