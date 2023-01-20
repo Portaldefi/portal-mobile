@@ -11,6 +11,8 @@ import BitcoinDevKit
 import BitcoinAddressValidator
 
 final class BitcoinAdapter {
+    private let coinRate: Decimal = pow(10, 8)
+    
     private let stateUpdatedSubject = PassthroughSubject<Void, Never>()
     private let balanceUpdatedSubject = PassthroughSubject<Void, Never>()
     private let transactionsSubject = CurrentValueSubject<[TransactionRecord], Never>([])
@@ -23,7 +25,7 @@ final class BitcoinAdapter {
     private var adapterState: AdapterState = .syncing(progress: 0, lastBlockDate: nil)
     private var _balance = Balance(immature: 0, trustedPending: 0, untrustedPending: 0, confirmed: 0, spendable: 0, total: 0)
     private var _receiveAddress = AddressInfo(index: 0, address: String())
-    
+        
     init(wallet: Wallet) throws {
         let account = wallet.account
         let bip32RootKey = wallet.account.rootKey
@@ -128,7 +130,7 @@ extension BitcoinAdapter: IBalanceAdapter {
     }
     
     var balance: Decimal {
-        Decimal(_balance.spendable)/100_000_000
+        Decimal(_balance.spendable)/coinRate
     }
     
     var balanceStateUpdated: AnyPublisher<Void, Never> {
