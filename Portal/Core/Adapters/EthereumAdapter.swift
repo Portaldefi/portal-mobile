@@ -43,7 +43,7 @@ class EthereumAdapter: IAdapter {
             type = .sent
         }
         
-        return TransactionRecord(transaction: transaction, amount: amount, type: type)
+        return TransactionRecord(coin: .ethereum(), transaction: transaction, amount: amount, type: type)
     }
     
     private func convertToAdapterState(evmSyncState: SyncState) -> AdapterState {
