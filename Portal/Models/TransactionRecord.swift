@@ -10,6 +10,7 @@ struct TransactionRecord: Identifiable {
     let from: String?
     let to: String?
     let amount: Decimal?
+    let fee: Decimal?
     
     var confirmationTimeString: String? {
         guard let confirmationTime = self.timestamp else { return nil }
@@ -50,9 +51,15 @@ struct TransactionRecord: Identifiable {
         
         self.from = nil
         self.to = nil
+        
+        if let fee = transaction.fee {
+            self.fee = Decimal(fee)/100_000_000
+        } else {
+            self.fee = nil
+        }
     }
     
-    init(transaction: EvmKit.Transaction, amount: Decimal?, type: TxType) {
+    init(coin: Coin, transaction: EvmKit.Transaction, amount: Decimal?, type: TxType) {
         self.id = transaction.hash.hs.hexString
         self.type = type
         self.amount = amount
@@ -60,6 +67,13 @@ struct TransactionRecord: Identifiable {
         self.from = transaction.from?.hex
         self.timestamp = transaction.timestamp
         self.blockHeight = transaction.blockNumber
+        
+        if let feeAmount = transaction.gasUsed ?? transaction.gasLimit, let gasPrice = transaction.gasPrice {
+            let feeDecimal = Decimal(sign: .plus, exponent: -coin.decimal, significand: Decimal(feeAmount) * Decimal(gasPrice))
+            fee = feeDecimal
+        } else {
+            fee = nil
+        }
     }
 }
 
