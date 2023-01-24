@@ -29,6 +29,10 @@ class SendBTCService: ISendAssetService {
     }
     
     var fee: Decimal = 0
+    
+    private var recomendedFee: Int? {
+        (self.recomendedFees.value?.fee(feeRateType.value) as? NSDecimalNumber)?.intValue
+    }
 
     init(sendAdapter: ISendBitcoinAdapter) {
         self.sendAdapter = sendAdapter
@@ -48,17 +52,16 @@ class SendBTCService: ISendAssetService {
             .flatMap{ amount, address, feeRateType -> AnyPublisher<UInt64?, Never> in
                 print("send btc service amount = \(String(describing: amount))")
                 
-                guard amount > 0, !address.isEmpty else {
-                    return Just(nil).eraseToAnyPublisher()
-                }
-                
                 do {
                     try self.validateAddress()
-                    var fee: Int? = nil
-                    if let recommendedFees = self.recomendedFees.value {
-                        fee = (recommendedFees.fee(feeRateType) as NSDecimalNumber).intValue
-                    }
-                    let txFee = try self.sendAdapter.fee(max: amount == self.spendable, address: address, amount: amount, fee: fee)
+                    
+                    let txFee = try self.sendAdapter.fee(
+                        max: amount == self.spendable,
+                        address: address,
+                        amount: amount,
+                        fee: self.recomendedFee
+                    )
+                    
                     return Just(txFee).eraseToAnyPublisher()
                 } catch {
                     print(error)
@@ -96,22 +99,10 @@ class SendBTCService: ISendAssetService {
     }
     
     func send() -> Future<TransactionRecord, Error> {
-        var fee: Int? = nil
-
-        if let recommendedFees = self.recomendedFees.value {
-            fee = (recommendedFees.fee(feeRateType.value) as NSDecimalNumber).intValue
-        }
-        
-        return sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: fee)
+        sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: self.recomendedFee)
     }
     
     func sendMax() -> Future<TransactionRecord, Error> {
-        var fee: Int? = nil
-
-        if let recommendedFees = self.recomendedFees.value {
-            fee = (recommendedFees.fee(feeRateType.value) as NSDecimalNumber).intValue
-        }
-        
-        return sendAdapter.sendMax(address: receiverAddress.value, fee: fee)
+        sendAdapter.sendMax(address: receiverAddress.value, fee: self.recomendedFee)
     }
 }
