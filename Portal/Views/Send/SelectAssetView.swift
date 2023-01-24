@@ -11,15 +11,10 @@ import PortalUI
 import Factory
 
 struct SelectAssetView: View {
-    @Binding var item: QRCodeItem?
-    @ObservedObject private var viewModel: SendViewViewModel = Container.sendViewModel()
+    @ObservedObject var viewModel: SendViewViewModel
     @State private var notEnoughFunds = false
     @State private var notEnoughFundsMessage = String()
-    
-    init(qrItem: Binding<QRCodeItem?>) {
-        self._item = qrItem
-    }
-    
+        
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Select Asset")
@@ -67,8 +62,7 @@ struct SelectAssetView: View {
 
 struct SendFromView_Previews: PreviewProvider {
     static var previews: some View {
-        let _ = Container.sendViewModel.register { SendViewViewModel.mocked }
-        SelectAssetView(qrItem: .constant(nil))
+        SelectAssetView(viewModel: SendViewViewModel.mocked)
             .padding()
             .previewLayout(.sizeThatFits)
     }

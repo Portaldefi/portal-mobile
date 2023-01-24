@@ -52,8 +52,8 @@ extension Account {
         let id = UUID().uuidString
         let index = 0
         let name = "Mocked"
-        let mnemonic = try! generateMnemonic(wordCount: .words12)
-        let key = try! DescriptorSecretKey(network: .testnet, mnemonic: mnemonic, password: nil)
+        let mnemonic = Mnemonic(wordCount: .words12)
+        let key = DescriptorSecretKey(network: .testnet, mnemonic: mnemonic, password: nil)
         
         return Account(
             id: id,

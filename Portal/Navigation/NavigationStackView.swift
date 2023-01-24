@@ -20,9 +20,12 @@ enum Screen {
     case assetDetails(item: WalletItem)
     case createAccount
     case restoreAccount
+    case restoreConfirmation(viewModel: RestoreAccountViewModel)
+    case nameAccount(words: [String]?)
     case recoveryPhrase(viewModel: RecoveryPhraseViewModel)
     case recoveryPhraseTest(viewModel: RecoveryPhraseViewModel)
     case recoveryWarning(viewModel: RecoveryPhraseViewModel)
+    case transactionDetails(coin: Coin, tx: TransactionRecord)
 }
 
 extension Screen {
@@ -40,6 +43,10 @@ extension Screen {
             return "create_account_ID"
         case .restoreAccount:
             return "restore_account_ID"
+        case .restoreConfirmation:
+            return "restore_confirmation_ID"
+        case .nameAccount:
+            return "name_account_ID"
         case .accountBackup:
             return "account_backup_ID"
         case .assetDetails:
@@ -50,6 +57,8 @@ extension Screen {
             return "recovery_phrase_ID"
         case .recoveryWarning:
             return "recovery_warning_ID"
+        case .transactionDetails:
+            return "transaction_details_ID"
         }
     }
 }

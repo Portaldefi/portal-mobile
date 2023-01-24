@@ -18,13 +18,14 @@ class AppConfigProvider: IAppConfigProvider {
     let testMode = true
 
     var infuraCredentials: (id: String, secret: String?) {
-        let id = (Bundle.main.object(forInfoDictionaryKey: "InfuraProjectId") as? String) ?? ""
-        let secret = Bundle.main.object(forInfoDictionaryKey: "InfuraProjectSecret") as? String
+        let id = "7bffa4b191da4e9682d4351178c4736e"//(Bundle.main.object(forInfoDictionaryKey: "InfuraProjectId") as? String) ?? ""
+        let secret = "5dedf9a8a4c4477687cfac3debbc23c6"//Bundle.main.object(forInfoDictionaryKey: "InfuraProjectSecret") as? String
         return (id: id, secret: secret)
     }
 
     var etherscanKey: String {
-        (Bundle.main.object(forInfoDictionaryKey: "EtherscanApiKey") as? String) ?? ""
+        "PYPJHJFA2MUT12KPTT8FCKPAMGHTRDQICB"
+        //(Bundle.main.object(forInfoDictionaryKey: "EtherscanApiKey") as? String) ?? ""
     }
 
     var coinPaprikaApiKey: String {

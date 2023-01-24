@@ -12,21 +12,26 @@ import PortalUI
 struct SingleTxView: View {
     @ObservedObject var viewModel: SingleTxViewModel
     
-    init(transaction: BitcoinDevKit.TransactionDetails) {
-        self._viewModel = ObservedObject(initialValue: SingleTxViewModel(tx: transaction))
+    init(coin: Coin, transaction: TransactionRecord) {
+        self._viewModel = ObservedObject(initialValue: SingleTxViewModel(coin: coin, tx: transaction))
     }
     
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 8) {
-                    if viewModel.tx.sent > 0 {
+                    switch viewModel.tx.type {
+                    case .sent:
                         Asset.txSentIcon.cornerRadius(16)
                             .offset(y: -6)
-                    } else {
+                    case .received:
+                        Asset.txReceivedIcon.cornerRadius(16)
+                            .offset(y: -6)
+                    case .swapped:
                         Asset.txReceivedIcon.cornerRadius(16)
                             .offset(y: -6)
                     }
+                    
                     VStack(alignment: .leading, spacing: 0) {
                         Text(viewModel.tx.type.description)
                             .font(.Main.fixed(.monoMedium, size: 16))
@@ -49,15 +54,15 @@ struct SingleTxView: View {
                     HStack(spacing: 6) {
                         VStack(alignment: .trailing, spacing: 0) {
                             HStack {
-                                Text("\(viewModel.tx.type == .recieved ? "+" : "-")")
+                                Text("\(viewModel.tx.type == .received ? "+" : "-")")
                                     .font(.Main.fixed(.monoMedium, size: 16))
-                                    .foregroundColor(viewModel.tx.type == .recieved ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA)
-                                Text(viewModel.tx.value)
+                                    .foregroundColor(viewModel.tx.type == .received ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA)
+                                Text(viewModel.value)
                                     .font(.Main.fixed(.monoMedium, size: 16))
-                                    .foregroundColor(viewModel.tx.type == .recieved ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA)
+                                    .foregroundColor(viewModel.tx.type == .received ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA)
                             }
                             HStack {
-                                Text("\(viewModel.tx.type == .recieved ? "+" : "-")")
+                                Text("\(viewModel.tx.type == .received ? "+" : "-")")
                                     .font(.Main.fixed(.monoBold, size: 16))
                                     .foregroundColor(Palette.grayScale6A)
                                 Text("4.55")
@@ -68,7 +73,7 @@ struct SingleTxView: View {
                         }
                         VStack(alignment: .leading, spacing: 0) {
                             HStack {
-                                Text("btc")
+                                Text(viewModel.coin.code.lowercased())
                                     .font(.Main.fixed(.monoMedium, size: 12))
                                     .foregroundColor(Palette.grayScale6A)
                                     .offset(y: -1)
@@ -108,7 +113,7 @@ struct SingleTxView: View {
         }
         .contextMenu {
             Button(action: {
-                UIPasteboard.general.string = viewModel.tx.txid}) {
+                UIPasteboard.general.string = viewModel.tx.id}) {
                     Text("Copy TXID")
                 }
         }
@@ -117,10 +122,7 @@ struct SingleTxView: View {
 
 struct SingleTxView_Previews: PreviewProvider {
     static var previews: some View {
-        let blockTime = BlockTime(height: 20087, timestamp: 1635863544)
-        let details = TransactionDetails(fee: 300, received: 0, sent: 1000, txid: "some-other-tx-id", confirmationTime: blockTime)
-        
-        SingleTxView(transaction: details)
+        SingleTxView(coin: .bitcoin(), transaction: TransactionRecord.mocked)
             .padding(.horizontal)
     }
 }

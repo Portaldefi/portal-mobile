@@ -36,16 +36,16 @@ struct SetRecipientView: View {
                     }
                     
                     ZStack(alignment: .leading) {
-                        TextEditor(text: $viewModel.to)
+                        TextEditor(text: $viewModel.receiverAddress)
                             .lineLimit(2)
-                            .frame(height: viewModel.to.count > 34 ? 60 : 40)
+                            .frame(height: viewModel.receiverAddress.count > 34 ? 60 : 40)
                             .disableAutocorrection(true)
                             .textInputAutocapitalization(.never)
                             .font(.Main.fixed(.monoRegular, size: 16))
                             .foregroundColor(viewModel.recipientAddressIsValid ? .white : Color(red: 1, green: 0.349, blue: 0.349))
                             .padding(8)
 
-                        if viewModel.to.isEmpty {
+                        if viewModel.receiverAddress.isEmpty {
                             Text("Enter address")
                                 .font(.Main.fixed(.monoRegular, size: 16))
                                 .foregroundColor(Palette.grayScale4A)

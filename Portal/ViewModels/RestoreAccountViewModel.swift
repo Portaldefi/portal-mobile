@@ -20,6 +20,9 @@ class RestoreAccountViewModel: ObservableObject {
     @Published var isDetecting = false
     
     var accountKey: DescriptorSecretKey?
+    var words: [String] {
+        input.components(separatedBy: " ").filter{ !$0.isEmpty && $0.count >= 3 }
+    }
     
     @Injected(Container.accountManager) private var manager
     
@@ -35,7 +38,8 @@ class RestoreAccountViewModel: ObservableObject {
             
             if words.count == 12 || words.count == 24 {
                 do {
-                    self.accountKey = try DescriptorSecretKey(network: .testnet, mnemonic: words.joined(separator:" "), password: nil)
+                    let mnemonic = try Mnemonic.fromString(mnemonic: words.joined(separator:" "))
+                    self.accountKey = DescriptorSecretKey(network: .testnet, mnemonic: mnemonic, password: nil)
                     self.restorable = true
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -74,7 +78,8 @@ class RestoreAccountViewModel: ObservableObject {
     
     private func restoreAccount(words: [String]) {
         do {
-            let restoredKey = try DescriptorSecretKey(network: .testnet, mnemonic: words.joined(separator:" "), password: nil)
+            let mnemonic = try Mnemonic.fromString(mnemonic: words.joined(separator:" "))
+            let restoredKey = DescriptorSecretKey(network: .testnet, mnemonic: mnemonic, password: nil)
             let account = Account(id: UUID().uuidString, index: 0, name: accountName, key: restoredKey)
             manager.save(account: account, mnemonic: words.joined(separator:" "), salt: nil)
         } catch {

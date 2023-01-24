@@ -36,7 +36,7 @@ struct ReceiveView: View {
                         }
                         .padding(.horizontal, 25)
                         
-                        Text("Recieve")
+                        Text("Receive")
                             .frame(width: 300, height: 62)
                             .font(.Main.fixed(.monoBold, size: 16))
                     }
@@ -79,52 +79,64 @@ struct ReceiveView: View {
                     case .generateQR:
                         ScrollView {
                             HStack {
-                                VStack(alignment: .leading, spacing: 0) {
-                                    HStack(spacing: 8) {
-                                        Asset.btcIcon
-                                        Text("Bitcoin")
-                                            .font(.Main.fixed(.monoBold, size: viewModel.isIPod ? 16 : 22))
-                                            .foregroundColor(Palette.grayScaleF4)
-                                    }
-                                    HStack {
-                                        Text("on")
-                                            .font(.Main.fixed(.monoMedium, size: 16))
-                                            .foregroundColor(Palette.grayScale8A)
-                                        HStack(spacing: 4) {
-                                            Asset.chainIcon
-                                            Text("Chain")
+                                if let coin = viewModel.selectedItem?.viewModel.coin {
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        HStack(spacing: 8) {
+                                            CoinImageView(
+                                                size: 24,
+                                                url: coin.icon,
+                                                placeholderForegroundColor: Color.gray
+                                            )
+                                            Text(coin.name)
+                                                .font(.Main.fixed(.monoBold, size: 22))
+                                                .foregroundColor(Palette.grayScaleF4)
+                                        }
+                                        HStack {
+                                            Text("on")
                                                 .font(.Main.fixed(.monoMedium, size: 16))
                                                 .foregroundColor(Palette.grayScale8A)
+                                            HStack(spacing: 4) {
+                                                Asset.chainIcon
+                                                Text("Chain")
+                                                    .font(.Main.fixed(.monoMedium, size: 16))
+                                                    .foregroundColor(Palette.grayScale8A)
+                                            }
                                         }
                                     }
                                 }
                                 
                                 Spacer()
                                 
-                                VStack {
-                                    Text("Address type")
-                                        .font(.Main.fixed(.monoRegular, size: 14))
-                                        .foregroundColor(Palette.grayScale6A)
-                                    Text("Segwit")
-                                        .font(.Main.fixed(.monoBold, size: 16))
-                                        .foregroundColor(Palette.grayScaleCA)
+                                if let coin = viewModel.selectedItem?.viewModel.coin, coin.type == .bitcoin {
+                                    VStack {
+                                        Text("Address type")
+                                            .font(.Main.fixed(.monoRegular, size: 14))
+                                            .foregroundColor(Palette.grayScale6A)
+                                        Text("Segwit")
+                                            .font(.Main.fixed(.monoBold, size: 16))
+                                            .foregroundColor(Palette.grayScaleCA)
+                                    }
                                 }
                             }
                             .padding(.horizontal, 40)
                             .padding(.bottom, 16)
                             
-                            ZStack {
-                                Image(uiImage: viewModel.qrCode)
-                                    .interpolation(.none)
-                                    .resizable()
-                                    .cornerRadius(12)
-                                
-                                Asset.portalQrIcon
-                                    .resizable()
-                                    .frame(width: 72, height: 72)
+                            if let qr = viewModel.qrCode {
+                                ZStack {
+                                    Image(uiImage: qr)
+                                        .interpolation(.none)
+                                        .resizable()
+                                        .cornerRadius(12)
+                                    
+                                    Asset.portalQrIcon
+                                        .resizable()
+                                        .frame(width: 72, height: 72)
+                                }
+                                .frame(width: geo.size.width - 80)
+                                .frame(height: geo.size.width - 80)
+                            } else {
+                                ProgressView().progressViewStyle(.circular)
                             }
-                            .frame(width: geo.size.width - 80)
-                            .frame(height: geo.size.width - 80)
                             
                             VStack(spacing: 10) {
                                 Text(viewModel.receiveAddress)
@@ -145,7 +157,9 @@ struct ReceiveView: View {
                             
                             VStack(spacing: 0) {
                                 Divider()
-                                AmountView()
+                                if let exchanger = viewModel.exchanger {
+                                    AmountView(exchanger: exchanger)
+                                }
                                 Divider()
                                 DescriptionView()
                                 Divider()
@@ -156,8 +170,8 @@ struct ReceiveView: View {
                     }
                 }
                 
-                if viewModel.editingAmount {
-                    AmountEditorView(title: "Add Amount", exchanger: viewModel.exchanger) {
+                if viewModel.editingAmount, let exchanger = viewModel.exchanger {
+                    AmountEditorView(title: "Add Amount", exchanger: exchanger) {
                         withAnimation {
                             viewModel.editingAmount.toggle()
                         }
@@ -200,9 +214,9 @@ struct ReceiveView: View {
         }
     }
     
-    private func AmountView() -> some View {
+    private func AmountView(exchanger: Exchanger) -> some View {
         Group {
-            if viewModel.exchanger.baseAmount.value.isEmpty {
+            if exchanger.baseAmountDecimal == 0 {
                 Button {
                     withAnimation {
                         viewModel.editingAmount.toggle()
@@ -227,7 +241,7 @@ struct ReceiveView: View {
                         viewModel.editingAmount.toggle()
                     }
                 } label: {
-                    AmountValueView(exchanger: viewModel.exchanger)
+                    AmountValueView(exchanger: exchanger)
                 }
             }
         }

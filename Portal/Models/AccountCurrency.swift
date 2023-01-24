@@ -13,17 +13,19 @@ enum AccountCurrency: Equatable {
     }
     
     case fiat(FiatCurrency)
-    case btc
-    case eth
+    case coin(Coin)
     
     var symbol: String {
         switch self {
         case .fiat(let currency):
             return currency.symbol
-        case .btc:
-            return "₿"
-        case .eth:
-            return "Ξ"
+        case .coin(let coin):
+            switch coin.type {
+            case .bitcoin, .lightningBitcoin:
+                return "₿"
+            case .ethereum, .erc20:
+                return "Ξ"
+            }
         }
     }
     
@@ -31,10 +33,8 @@ enum AccountCurrency: Equatable {
         switch self {
         case .fiat(let currency):
             return currency.code
-        case .btc:
-            return "BTC"
-        case .eth:
-            return "ETH"
+        case .coin(let coin):
+            return coin.code
         }
     }
     
@@ -42,10 +42,8 @@ enum AccountCurrency: Equatable {
         switch self {
         case .fiat(let currency):
             return currency.name
-        case .btc:
-            return "Bitcoin"
-        case .eth:
-            return "Ethereum"
+        case .coin(let coin):
+            return coin.name
         }
     }
 }

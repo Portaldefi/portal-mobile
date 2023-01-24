@@ -23,11 +23,11 @@ struct AmountValueView: View {
                 
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     VStack(alignment: .trailing, spacing: 4) {
-                        Text(exchanger.baseAmount.value)
+                        Text(exchanger.baseAmountString)
                             .font(.Main.fixed(.monoBold, size: 32))
                             .foregroundColor(Palette.grayScaleF4)
 
-                        Text(exchanger.quoteAmount.value)
+                        Text(exchanger.quoteAmountString)
                             .font(.Main.fixed(.monoRegular, size: 16))
                             .foregroundColor(Palette.grayScale6A)
                             .offset(y: -8)

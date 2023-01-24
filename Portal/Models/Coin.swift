@@ -11,7 +11,7 @@ import SwiftUI
 import PortalUI
 
 struct Coin: Identifiable {
-    enum CoinType {
+    enum CoinType: Equatable {
         case bitcoin
         case lightningBitcoin
         case ethereum

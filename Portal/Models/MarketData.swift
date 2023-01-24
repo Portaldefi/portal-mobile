@@ -41,6 +41,7 @@ final class MarketData {
     }
     
     private(set) var btcTicker: Ticker?
+    private(set) var ethTicker: Ticker?
     private(set) var fiatCurrencies = [FiatCurrency]()
     
     private let jsonDecoder: JSONDecoder
@@ -100,6 +101,16 @@ final class MarketData {
             switch response {
                 case .success(let ticker):
                     self.btcTicker = ticker
+                    self.onMarketDataUpdate.send()
+                case .failure(let error):
+                    print(error)
+              }
+        }
+        
+        Coinpaprika.API.ticker(id: "eth-ethereum", quotes: [.usd]).perform { response in
+            switch response {
+                case .success(let ticker):
+                    self.ethTicker = ticker
                     self.onMarketDataUpdate.send()
                 case .failure(let error):
                     print(error)

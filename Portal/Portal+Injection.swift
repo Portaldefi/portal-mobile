@@ -12,6 +12,10 @@ import CoreData
 
 extension SharedContainer {
     static let accountManager = Factory<IAccountManager>(scope: .singleton) {
+        AccountManager(accountStorage: Container.accountStorage())
+    }
+    
+    static let accountStorage = Factory<IAccountStorage>(scope: .singleton) {
         let userDefaults = UserDefaults.standard
         let localStorage = LocalStorage(storage: userDefaults)
         let keychain = Keychain(service: "com.portal.keychain")
@@ -25,14 +29,23 @@ extension SharedContainer {
         
         let dbStorage = DBlocalStorage(context: dbContext)
         
-        let accountStorage = AccountStorage(localStorage: localStorage, secureStorage: secureStorage, accountStorage: dbStorage)
-        return AccountManager(accountStorage: accountStorage)
+        return AccountStorage(localStorage: localStorage, secureStorage: secureStorage, accountStorage: dbStorage)
     }
     
     static let adapterManager = Factory<IAdapterManager>(scope: .singleton) {
-        let adapterFactory = AdapterFactory()
+        let appConfigProvider = Container.configProvider()
+        let ethereumKitManager = Container.ethereumKitManager()
+        let adapterFactory = AdapterFactory(appConfigProvider: appConfigProvider, ethereumKitManager: ethereumKitManager)
         let walletManager = Container.walletManager()
         return AdapterManager(adapterFactory: adapterFactory, walletManager: walletManager)
+    }
+    
+    static let ethereumKitManager = Factory<EthereumKitManager>(scope: .singleton) {
+        EthereumKitManager(appConfigProvider: Container.configProvider())
+    }
+    
+    static let configProvider = Factory<AppConfigProvider>(scope: .singleton) {
+        AppConfigProvider()
     }
     
     static let walletManager = Factory<IWalletManager>(scope: .singleton) {
@@ -43,7 +56,11 @@ extension SharedContainer {
     }
     
     static let sendViewModel = Factory<SendViewViewModel>(scope: .cached) {
-        SendViewViewModel.config(coin: .bitcoin())
+        SendViewViewModel()
+    }
+    
+    static let feeRateProvider = Factory<FeeRateProvider>(scope: .singleton) {
+        FeeRateProvider(appConfigProvider: Container.configProvider())
     }
     
     static let accountViewModel = Factory<AccountViewModel>(scope: .singleton) {

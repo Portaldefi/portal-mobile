@@ -14,13 +14,6 @@ struct Mainview: View {
     @ObservedObject private var viewState = Container.viewState()
     
     init() {
-        UINavigationBar
-            .appearance()
-            .largeTitleTextAttributes = [
-                .font : UIFont.monospacedSystemFont(ofSize: 28, weight: .bold),
-                .foregroundColor: UIColor.white
-            ]
-        
         views = [
             AnyView(AccountRootView()),
             AnyView(ActivityView())
@@ -97,7 +90,6 @@ struct Mainview: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             views[viewState.selectedTab.rawValue]
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
             
             TabBar
                 .offset(y: viewState.hideTabBar ? 109 : 0)

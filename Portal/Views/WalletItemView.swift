@@ -54,6 +54,8 @@ struct WalletItemView: View {
                         Text(viewModel.balanceString)
                             .font(.Main.fixed(.monoBold, size: 20))
                             .foregroundColor(Palette.grayScaleEA)
+                            .minimumScaleFactor(0.5)
+                            .lineLimit(1)
                         Text(viewModel.valueString)
                             .font(.Main.fixed(.monoMedium, size: 16))
                             .foregroundColor(Palette.grayScale6A)

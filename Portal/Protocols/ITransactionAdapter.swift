@@ -7,8 +7,7 @@
 
 import Foundation
 import Combine
-import BitcoinDevKit
 
 protocol ITransactionsAdapter {
-    var transactionRecords: AnyPublisher<[BitcoinDevKit.TransactionDetails], Never> { get }
+    var transactionRecords: AnyPublisher<[TransactionRecord], Never> { get }
 }

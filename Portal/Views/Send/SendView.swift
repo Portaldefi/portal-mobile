@@ -11,7 +11,7 @@ import Factory
 
 struct SendView: View {
     @Environment(\.presentationMode) private var presentationMode
-    @ObservedObject var viewModel: SendViewViewModel = Container.sendViewModel()
+    @StateObject var viewModel: SendViewViewModel = Container.sendViewModel()
     @ObservedObject private var viewState = Container.viewState()
     
     var body: some View {
@@ -48,10 +48,10 @@ struct SendView: View {
                         SetAmountView(viewModel: viewModel)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                     case .review, .signing, .sent:
-                        ReviewTransactionView()
+                        ReviewTransactionView(viewModel: viewModel)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                     case .selectAsset:
-                        SelectAssetView(qrItem: $viewModel.qrCodeItem)
+                        SelectAssetView(viewModel: viewModel)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
                     
@@ -60,7 +60,7 @@ struct SendView: View {
                 .padding(.horizontal, 16)
             }
             
-            if viewState.showFeesPicker, let fees = viewModel.recomendedFees {
+            if viewState.showFeesPicker, let fees = viewModel.recomendedFees, let coin = viewModel.selectedItem?.viewModel.coin {
                 ZStack(alignment: .top) {
                     VStack(spacing: 0) {
                         Divider()
@@ -94,7 +94,7 @@ struct SendView: View {
                             VStack(alignment: .leading, spacing: 0) {
                                 Button {
                                     withAnimation {
-                                        viewModel.fee = .fast
+                                        viewModel.feeRate = .fast
                                         viewModel.viewState.showFeesPicker = false
                                     }
                                 } label: {
@@ -109,7 +109,7 @@ struct SendView: View {
                                                     .foregroundColor(Palette.grayScale10)
                                                     .frame(width: 22, height: 22)
                                                 
-                                                if viewModel.fee == .fast {
+                                                if viewModel.feeRate == .fast {
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(
                                                             RadialGradient.main
@@ -129,7 +129,7 @@ struct SendView: View {
                                             Text("~10 mins")
                                                 .font(.Main.fixed(.monoRegular, size: 16))
                                                 .foregroundColor(Palette.grayScaleF4)
-                                            Text("\((Double(fees.fastestFee)/100_000_000).formattedString(.btc, decimals: 8)) btc/vByte")
+                                            Text(fees.fastestFee.double.formattedString(.coin(coin), decimals: 8) + "\(coin.type == .bitcoin ? " sat/vByte" : " eth")")
                                                 .font(.Main.fixed(.monoRegular, size: 14))
                                                 .foregroundColor(Palette.grayScale8A)
                                         }
@@ -144,7 +144,7 @@ struct SendView: View {
                                 
                                 Button {
                                     withAnimation {
-                                        viewModel.fee = .normal
+                                        viewModel.feeRate = .normal
                                         viewModel.viewState.showFeesPicker = false
                                     }
                                 } label: {
@@ -159,7 +159,7 @@ struct SendView: View {
                                                     .foregroundColor(Palette.grayScale10)
                                                     .frame(width: 22, height: 22)
                                                 
-                                                if viewModel.fee == .normal {
+                                                if viewModel.feeRate == .normal {
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(
                                                             RadialGradient.main
@@ -179,7 +179,7 @@ struct SendView: View {
                                             Text("~30 mins")
                                                 .font(.Main.fixed(.monoRegular, size: 16))
                                                 .foregroundColor(Palette.grayScaleF4)
-                                            Text("\((Double(fees.halfHourFee)/100_000_000).formattedString(.btc, decimals: 8)) btc/vByte")
+                                            Text(fees.halfHourFee.double.formattedString(.coin(coin), decimals: 8) + "\(coin.type == .bitcoin ? " sat/vByte" : " eth")")
                                                 .font(.Main.fixed(.monoRegular, size: 14))
                                                 .foregroundColor(Palette.grayScale8A)
                                         }
@@ -194,7 +194,7 @@ struct SendView: View {
                                 
                                 Button {
                                     withAnimation {
-                                        viewModel.fee = .slow
+                                        viewModel.feeRate = .slow
                                         viewModel.viewState.showFeesPicker = false
                                     }
                                 } label: {
@@ -209,7 +209,7 @@ struct SendView: View {
                                                     .foregroundColor(Palette.grayScale10)
                                                     .frame(width: 22, height: 22)
                                                 
-                                                if viewModel.fee == .slow {
+                                                if viewModel.feeRate == .slow {
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(
                                                             RadialGradient.main
@@ -229,7 +229,7 @@ struct SendView: View {
                                             Text("~60 mins")
                                                 .font(.Main.fixed(.monoRegular, size: 16))
                                                 .foregroundColor(Palette.grayScaleF4)
-                                            Text("\((Double(fees.hourFee)/100_000_000).formattedString(.btc, decimals: 8)) btc/vByte")
+                                            Text(fees.hourFee.double.formattedString(.coin(.bitcoin()), decimals: 8) + "\(viewModel.selectedItem!.viewModel.coin.type == .bitcoin ? " sat/vByte" : " eth")")
                                                 .font(.Main.fixed(.monoRegular, size: 14))
                                                 .foregroundColor(Palette.grayScale8A)
                                         }
@@ -259,7 +259,7 @@ struct SendView: View {
                                                     .foregroundColor(Palette.grayScale10)
                                                     .frame(width: 22, height: 22)
                                                 
-                                                if viewModel.fee == .custom {
+                                                if viewModel.feeRate == .custom {
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(
                                                             RadialGradient.main
@@ -295,7 +295,7 @@ struct SendView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 
             } else if viewModel.editingAmount {
-                AmountEditorView(title: "Edit Amount", exchanger: viewModel.exchanger) {
+                AmountEditorView(title: "Edit Amount", exchanger: viewModel.exchanger!) {
                     withAnimation {
                         viewModel.editingAmount.toggle()
                     }
@@ -321,7 +321,7 @@ struct SendView: View {
                                     .font(.Main.fixed(.monoRegular, size: 16))
                                     .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
                                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                            } else if !viewModel.exchanger.amountIsValid {
+                            } else if !viewModel.amountIsValid {
                                 Text("Not enough funds")
                                     .font(.Main.fixed(.monoRegular, size: 16))
                                     .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
@@ -378,9 +378,9 @@ struct SendView: View {
             QRCodeReaderView(config: .send(viewModel.selectedItem!.viewModel.coin)) { item in
                 switch item.type {
                 case .bip21(let address, let amount, _):
-                    viewModel.to = address
+                    viewModel.receiverAddress = address
                     guard let _amount = amount else { return }
-                    viewModel.exchanger.baseAmount.value = _amount
+                    viewModel.exchanger?.amount.string = _amount
                 default:
                     break
                 }
@@ -391,7 +391,6 @@ struct SendView: View {
 
 struct SendView_Previews: PreviewProvider {
     static var previews: some View {
-        let _ = Container.sendViewModel.register { SendViewViewModel.mocked }
-        SendView()
+        SendView(viewModel: SendViewViewModel.mocked)
     }
 }

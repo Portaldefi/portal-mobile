@@ -10,6 +10,7 @@ import PortalUI
 
 struct TxFeesView: View {
     let fees: String
+    let coin: String
     
     var body: some View {
         HStack {
@@ -20,7 +21,7 @@ struct TxFeesView: View {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(fees)
                     .font(.Main.fixed(.monoRegular, size: 16))
-                Text("btc")
+                Text(coin)
                     .font(.Main.fixed(.monoMedium, size: 12))
             }
             .foregroundColor(Palette.grayScaleF4)
@@ -31,7 +32,7 @@ struct TxFeesView: View {
 
 struct TxFeesView_Previews: PreviewProvider {
     static var previews: some View {
-        TxFeesView(fees: "0.000000134")
+        TxFeesView(fees: "0.000000134", coin: "btc")
             .padding()
             .previewLayout(.sizeThatFits)
     }

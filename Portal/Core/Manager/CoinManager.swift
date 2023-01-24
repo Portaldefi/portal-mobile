@@ -72,7 +72,7 @@ final class CoinManager: ICoinManager {
 
 class CoinManagerMocked: ICoinManager {
     var onCoinsUpdate = PassthroughSubject<[Coin], Never>()
-    var walletCoins: [Coin] = [.bitcoin()]
+    var walletCoins: [Coin] = [.bitcoin(), .ethereum()]
     var avaliableCoins: [Coin] = [.bitcoin()]
     
     init() {}

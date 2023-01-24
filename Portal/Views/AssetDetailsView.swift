@@ -10,20 +10,24 @@ import BitcoinDevKit
 import PortalUI
 import Factory
 
-extension BitcoinDevKit.TransactionDetails: Identifiable {
-    public var id: String {
-        txid
-    }
-}
-
 struct AssetDetailsView: View {
     @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewState: ViewState = Container.viewState()
-    @ObservedObject private var viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
+    @ObservedObject private var viewModel: AssetDetailsViewModel
     @State private var showTxDetails = false
-    @State private var selectedTx: BitcoinDevKit.TransactionDetails?
+    @State private var selectedTx: TransactionRecord?
     
     let item: WalletItem?
+    
+    init(item: WalletItem?) {
+        self.item = item
+        
+        if let coin = item?.viewModel.coin {
+            viewModel = AssetDetailsViewModel.config(coin: coin)
+        } else {
+            viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
+        }
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -68,7 +72,7 @@ struct AssetDetailsView: View {
             ZStack {
                 ScrollView {
                     ForEach(viewModel.transactions, id: \.self) { transaction in
-                        SingleTxView(transaction: transaction)
+                        SingleTxView(coin: viewModel.coin, transaction: transaction)
                             .padding(.horizontal, 8)
                             .contentShape(Rectangle())
                             .onTapGesture {
@@ -106,7 +110,7 @@ struct AssetDetailsView: View {
                 config: .labelAndIconLeft(label: "Receive", icon: Asset.receiveButtonIcon),
                 style: .filled,
                 size: .medium,
-                enabled: item?.viewModel.coin.name == "Bitcoin" && item?.viewModel.coin.unit == "BTC"
+                enabled: true
             ) {
                 viewState.goToReceive = true
             }
@@ -115,7 +119,7 @@ struct AssetDetailsView: View {
                 config: .labelAndIconLeft(label: "Send", icon: Asset.sendButtonIcon),
                 style: .filled,
                 size: .medium,
-                enabled: item?.viewModel.coin.name == "Bitcoin" && item?.viewModel.coin.unit == "BTC"
+                enabled: item?.viewModel.balance ?? 0 > 0
             ) {
                 if let item = item {
                     let sendViewViewModel = Container.sendViewModel()

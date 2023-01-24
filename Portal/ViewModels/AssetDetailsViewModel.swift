@@ -13,7 +13,7 @@ import Factory
 class AssetDetailsViewModel: ObservableObject {
     let coin: Coin
     
-    @Published private(set) var transactions: [BitcoinDevKit.TransactionDetails] = []
+    @Published private(set) var transactions: [TransactionRecord] = []
     
     private let transactionAdapter: ITransactionsAdapter
     private var subscriptions = Set<AnyCancellable>()

@@ -12,22 +12,26 @@ import Factory
 class CreateAccountViewModel: ObservableObject {
     @Published var accountName = String()
     @Published var extendedKey: DescriptorSecretKey
-    private let mnemonic: String
+    private let mnemonic: Mnemonic
     
     @Injected(Container.accountManager) private var manager
     
     init(words: [String]? = nil) {
-        if let words = words {
-            mnemonic = words.joined(separator: " ")
-        } else {
-            mnemonic = try! generateMnemonic(wordCount: .words12)
+        do {
+            if let words = words {
+                mnemonic = try Mnemonic.fromString(mnemonic: words.joined(separator: " "))
+            } else {
+                mnemonic = Mnemonic(wordCount: .words12)
+            }
+        } catch {
+            fatalError("Mnemonic creating error: \(error)")
         }
-        print("\(mnemonic)")
-        extendedKey = try! DescriptorSecretKey(network: .testnet, mnemonic: mnemonic, password: nil)
+        print("\(mnemonic.asString())")
+        extendedKey = DescriptorSecretKey(network: .testnet, mnemonic: mnemonic, password: nil)
     }
     
     func createAccount() {
         let account = Account(id: UUID().uuidString, index: 0, name: accountName, key: extendedKey)
-        manager.save(account: account, mnemonic: mnemonic, salt: nil)
+        manager.save(account: account, mnemonic: mnemonic.asString(), salt: nil)
     }
 }

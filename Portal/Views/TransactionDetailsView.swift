@@ -13,7 +13,7 @@ struct TransactionDetailsView: View {
     @StateObject private var viewModel: TransactionDetailsViewModel
     @Environment(\.presentationMode) private var presentationMode
     
-    init(coin: Coin, tx: BitcoinDevKit.TransactionDetails) {
+    init(coin: Coin, tx: TransactionRecord) {
         _viewModel = StateObject(wrappedValue: TransactionDetailsViewModel.config(coin: coin, tx: tx))
     }
     
@@ -34,7 +34,7 @@ struct TransactionDetailsView: View {
                         
                         Divider()
                         
-                        TxFeesView(fees: viewModel.feeString)
+                        TxFeesView(fees: viewModel.feeString, coin: viewModel.coin.code.lowercased())
                         
                         Divider()
                         
@@ -137,7 +137,7 @@ struct TransactionDetailsView: View {
         VStack(spacing: 24) {
             ConfirmationCounterView(confirmations: viewModel.confirmations)
             
-            TxAmountView(amount: viewModel.amountString, value: viewModel.currencyAmountString)
+            TxAmountView(amount: viewModel.amountString, value: viewModel.currencyAmountString, code: viewModel.coin.code.lowercased())
             
             Text(viewModel.dateString)
                 .font(.Main.fixed(.monoMedium, size: 16))
@@ -213,6 +213,6 @@ struct TransactionDetailsView: View {
 
 struct TransactionDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        TransactionDetailsView(coin: .bitcoin(), tx: BitcoinDevKit.TransactionDetails.mockedConfirmed)
+        TransactionDetailsView(coin: .bitcoin(), tx: TransactionRecord.mocked)
     }
 }

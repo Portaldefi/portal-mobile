@@ -68,7 +68,7 @@ struct AccountView: View {
             QRCodeReaderView(config: .universal)
         }
         .sheet(isPresented: $goToReceive) {
-            let viewModel = ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: nil)
+            let viewModel = ReceiveViewModel.config(items: viewModel.items, selectedItem: nil)
             
             ReceiveRootView(viewModel: viewModel)
         }
@@ -115,6 +115,8 @@ struct AccountView: View {
                         Text(balance)
                             .font(.Main.fixed(.monoBold, size: 32))
                             .foregroundColor(Palette.grayScaleEA)
+                            .minimumScaleFactor(0.5)
+                            .lineLimit(1)
                         Text("btc")
                             .font(.Main.fixed(.monoRegular, size: 18))
                             .foregroundColor(Palette.grayScale6A)
