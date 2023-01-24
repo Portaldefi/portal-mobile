@@ -13,20 +13,12 @@ import RxSwift
 import Factory
 
 class EthereumKitManager {
-    private let keyWords = "mnemonic_words"
-    private let keyAddress = "address"
-    
-    let currentAccountSubject = CurrentValueSubject<Account?, Never>(nil)
     private let appConfigProvider: IAppConfigProvider
     private let disposeBag = DisposeBag()
-    weak var ethereumKit: Kit?
-    var signer: Signer?
     
-    private var currentAccount: Account? {
-        didSet {
-            currentAccountSubject.send(currentAccount)
-        }
-    }
+    private(set) var signer: Signer?
+    private var ethereumKit: Kit?
+    private var currentAccount: Account?
     
     init(appConfigProvider: IAppConfigProvider) {
         self.appConfigProvider = appConfigProvider
