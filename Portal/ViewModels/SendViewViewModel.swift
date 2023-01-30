@@ -45,7 +45,7 @@ class SendViewViewModel: ObservableObject {
     @LazyInjected(Container.biometricAuthentification) private var biometrics
         
     var fee: String {
-        guard let coin = selectedItem?.viewModel.coin, let recomendedFees = recomendedFees, let sendService = sendService else { return String() }
+        guard let coin = selectedItem?.coin, let recomendedFees = recomendedFees, let sendService = sendService else { return String() }
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
             return ((sendService.fee.double)/100_000_000).formattedString(.coin(coin), decimals: 8)
@@ -113,7 +113,7 @@ class SendViewViewModel: ObservableObject {
     private func subscribeForUpdates() {
         $selectedItem
             .sink { [weak self] item in
-                guard let self = self, let coin = item?.viewModel.coin else { return }
+                guard let self = self, let coin = item?.coin else { return }
                 
                 self.updateAdapters(coin: coin)
                 self.updateExchanger(coin: coin)
@@ -175,7 +175,7 @@ class SendViewViewModel: ObservableObject {
             .onMarketDataUpdate
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
-                guard let self = self, let sendService = self.sendService, let coin = self.selectedItem?.viewModel.coin else { return }
+                guard let self = self, let sendService = self.sendService, let coin = self.selectedItem?.coin else { return }
                 
                 switch coin.type {
                 case .bitcoin:

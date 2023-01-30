@@ -22,7 +22,7 @@ struct AssetDetailsView: View {
     init(item: WalletItem?) {
         self.item = item
         
-        if let coin = item?.viewModel.coin {
+        if let coin = item?.coin {
             viewModel = AssetDetailsViewModel.config(coin: coin)
         } else {
             viewModel = AssetDetailsViewModel.config(coin: .bitcoin())

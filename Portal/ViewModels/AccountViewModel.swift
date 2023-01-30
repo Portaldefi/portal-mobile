@@ -104,10 +104,7 @@ class AccountViewModel: ObservableObject {
     }
     
     private func configuredItems() -> [WalletItem] {
-        walletManager.activeWallets.compactMap({ wallet in
-            let viewModel = WalletItemViewModel.config(coin: wallet.coin)
-            return WalletItem(viewModel: viewModel)
-        })
+        walletManager.activeWallets.compactMap{ WalletItem(coin: $0.coin) }
     }
 }
 
