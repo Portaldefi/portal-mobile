@@ -92,7 +92,9 @@ struct AssetDetailsView: View {
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
-        .sheet(item: $selectedTx) { tx in
+        .sheet(item: $selectedTx, onDismiss: {
+            viewModel.updateTransactions()
+        }) { tx in
             TransactionDetailsView(coin: viewModel.coin, tx: tx)
         }
         .sheet(isPresented: $viewState.goToReceive) {
