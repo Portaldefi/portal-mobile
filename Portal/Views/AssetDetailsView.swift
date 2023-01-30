@@ -96,8 +96,7 @@ struct AssetDetailsView: View {
             TransactionDetailsView(coin: viewModel.coin, tx: tx)
         }
         .sheet(isPresented: $viewState.goToReceive) {
-            let viewModel = ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: WalletItem.mockedBtc)
-            ReceiveRootView(viewModel: viewModel)
+            ReceiveRootView(viewModel: viewModel.receiveViewModel)
         }
         .sheet(isPresented: $viewState.goToSendFromDetails) {
             SendRootView()
