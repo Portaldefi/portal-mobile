@@ -171,7 +171,19 @@ class ReceiveViewModel: ObservableObject {
     }
     
     func share() {
-        sharedAddress = IdentifiableString(text: "\(receiveAddress)\n\nThis is a bitcoin network address. Only send BTC to this address. Do not send lightning network assets to his address.")
+        guard let coin = selectedItem?.coin else { return }
+        
+        let description: String
+        
+        switch coin.type {
+        case .bitcoin:
+            description = "\n\nThis is a bitcoin network address. Only send BTC to this address. Do not send lightning network assets to his address."
+        case .lightningBitcoin:
+            description = "\n\nThis is a lightning invoice."
+        case .ethereum, .erc20:
+            description = "\n\nThis is an ethereum network address."
+        }
+        sharedAddress = IdentifiableString(text: receiveAddress + description)
     }
     
     var isIPod: Bool {
