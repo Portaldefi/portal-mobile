@@ -131,7 +131,7 @@ class ReceiveViewModel: ObservableObject {
         var components = URLComponents()
         components.queryItems = []
         
-        if !exchanger.baseAmountString.isEmpty {
+        if exchanger.baseAmountDecimal > 0 {
             components.queryItems?.append(URLQueryItem(name: "amount", value: exchanger.baseAmountString))
         }
 
