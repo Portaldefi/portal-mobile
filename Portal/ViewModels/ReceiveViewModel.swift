@@ -48,14 +48,14 @@ class ReceiveViewModel: ObservableObject {
         $selectedItem
             .receive(on: RunLoop.main)
             .sink { [unowned self] item in
-                self.updateExchanger(coin: item?.viewModel.coin)
-                self.updateAdapter(coin: item?.viewModel.coin)
+                self.updateExchanger(coin: item?.coin)
+                self.updateAdapter(coin: item?.coin)
 
                 if let item = item {
                     withAnimation {
                         self.step = .generateQR
                     }
-                    self.generateQRCode(coin: item.viewModel.coin)
+                    self.generateQRCode(coin: item.coin)
                 } else {
                     self.step = .selectAsset
                 }
@@ -131,7 +131,7 @@ class ReceiveViewModel: ObservableObject {
         var components = URLComponents()
         components.queryItems = []
         
-        if !exchanger.baseAmountString.isEmpty {
+        if exchanger.baseAmountDecimal > 0 {
             components.queryItems?.append(URLQueryItem(name: "amount", value: exchanger.baseAmountString))
         }
 
@@ -171,7 +171,19 @@ class ReceiveViewModel: ObservableObject {
     }
     
     func share() {
-        sharedAddress = IdentifiableString(text: "\(receiveAddress)\n\nThis is a bitcoin network address. Only send BTC to this address. Do not send lightning network assets to his address.")
+        guard let coin = selectedItem?.coin else { return }
+        
+        let description: String
+        
+        switch coin.type {
+        case .bitcoin:
+            description = "\n\nThis is a bitcoin network address. Only send BTC to this address. Do not send lightning network assets to his address."
+        case .lightningBitcoin:
+            description = "\n\nThis is a lightning invoice."
+        case .ethereum, .erc20:
+            description = "\n\nThis is an ethereum network address."
+        }
+        sharedAddress = IdentifiableString(text: receiveAddress + description)
     }
     
     var isIPod: Bool {

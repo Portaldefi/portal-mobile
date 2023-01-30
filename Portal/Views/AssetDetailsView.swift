@@ -22,7 +22,7 @@ struct AssetDetailsView: View {
     init(item: WalletItem?) {
         self.item = item
         
-        if let coin = item?.viewModel.coin {
+        if let coin = item?.coin {
             viewModel = AssetDetailsViewModel.config(coin: coin)
         } else {
             viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
@@ -92,12 +92,13 @@ struct AssetDetailsView: View {
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
-        .sheet(item: $selectedTx) { tx in
+        .sheet(item: $selectedTx, onDismiss: {
+            viewModel.updateTransactions()
+        }) { tx in
             TransactionDetailsView(coin: viewModel.coin, tx: tx)
         }
         .sheet(isPresented: $viewState.goToReceive) {
-            let viewModel = ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: WalletItem.mockedBtc)
-            ReceiveRootView(viewModel: viewModel)
+            ReceiveRootView(viewModel: viewModel.receiveViewModel)
         }
         .sheet(isPresented: $viewState.goToSendFromDetails) {
             SendRootView()
