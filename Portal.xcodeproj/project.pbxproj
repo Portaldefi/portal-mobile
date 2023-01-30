@@ -59,7 +59,7 @@
 		7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */ = {isa = PBXBuildFile; productRef = 7545BC4028CA107100ED92C3 /* Coinpaprika */; };
 		7545BC4328CA155100ED92C3 /* Decimal+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */; };
 		754F61BE29802E220079621C /* LightningDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 754F61BD29802E220079621C /* LightningDevKit */; };
-		754F61C229815A480079621C /* LightningChannelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C129815A480079621C /* LightningChannelManager.swift */; };
+		754F61C229815A480079621C /* LightningKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C129815A480079621C /* LightningKitManager.swift */; };
 		754F61CA29815A8A0079621C /* LDKFeesEstimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C429815A8A0079621C /* LDKFeesEstimator.swift */; };
 		754F61CB29815A8A0079621C /* LDKTestNetBroadcasterInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */; };
 		754F61CC29815A8A0079621C /* LDKLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C629815A8A0079621C /* LDKLogger.swift */; };
@@ -252,7 +252,7 @@
 		7545BC3B28C9E5B900ED92C3 /* MarketData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketData.swift; sourceTree = "<group>"; };
 		7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
 		7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+Extension.swift"; sourceTree = "<group>"; };
-		754F61C129815A480079621C /* LightningChannelManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightningChannelManager.swift; sourceTree = "<group>"; };
+		754F61C129815A480079621C /* LightningKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightningKitManager.swift; sourceTree = "<group>"; };
 		754F61C429815A8A0079621C /* LDKFeesEstimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKFeesEstimator.swift; sourceTree = "<group>"; };
 		754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKTestNetBroadcasterInterface.swift; sourceTree = "<group>"; };
 		754F61C629815A8A0079621C /* LDKLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKLogger.swift; sourceTree = "<group>"; };
@@ -508,7 +508,7 @@
 				75D8C5BC28DC70AD00228298 /* AdapterManager.swift */,
 				75D8C5C028DC711F00228298 /* CoinManager.swift */,
 				755105F5294CA4AB00525A16 /* EthereumKitManager.swift */,
-				754F61C129815A480079621C /* LightningChannelManager.swift */,
+				754F61C129815A480079621C /* LightningKitManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -980,7 +980,7 @@
 				4774D72928B4FC7500B7988B /* UInt64+Extension.swift in Sources */,
 				75772A6228FEC0AD00BE80B7 /* AmountEditorView.swift in Sources */,
 				7551708E2948C79C00CC84D7 /* SendViewNavigationConfig.swift in Sources */,
-				754F61C229815A480079621C /* LightningChannelManager.swift in Sources */,
+				754F61C229815A480079621C /* LightningKitManager.swift in Sources */,
 				7551707929364C5E00CC84D7 /* WordView.swift in Sources */,
 				75D8C5BB28DAF46800228298 /* WalletStorage.swift in Sources */,
 				756A313D288EBBAD004978E2 /* SelectAssetView.swift in Sources */,
