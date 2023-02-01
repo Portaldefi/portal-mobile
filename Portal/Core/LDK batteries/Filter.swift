@@ -1,5 +1,5 @@
 //
-//  LDKFilter.swift
+//  Filter.swift
 //  Portal
 //
 //  Created by farid on 6/13/22.
@@ -7,7 +7,7 @@
 
 import LightningDevKit
 
-class LDKFilter: Filter {
+class Filter: LightningDevKit.Filter {
     override func registerTx(txid: [UInt8]?, scriptPubkey: [UInt8]) {
     
     }
