@@ -1,5 +1,5 @@
 //
-//  LDKLogger.swift
+//  Logger.swift
 //  Portal
 //
 //  Created by farid on 6/13/22.
@@ -7,7 +7,7 @@
 
 import LightningDevKit
 
-class LDKLogger: Logger {
+class Logger: LightningDevKit.Logger {
     override func log(record: Record) {
         let messageLevel = record.getLevel()
         let arguments = record.getArgs()

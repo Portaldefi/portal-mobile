@@ -62,7 +62,7 @@
 		754F61C229815A480079621C /* LightningKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C129815A480079621C /* LightningKitManager.swift */; };
 		754F61CA29815A8A0079621C /* FeesEstimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C429815A8A0079621C /* FeesEstimator.swift */; };
 		754F61CB29815A8A0079621C /* LDKTestNetBroadcasterInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */; };
-		754F61CC29815A8A0079621C /* LDKLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C629815A8A0079621C /* LDKLogger.swift */; };
+		754F61CC29815A8A0079621C /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C629815A8A0079621C /* Logger.swift */; };
 		754F61CD29815A8A0079621C /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C729815A8A0079621C /* Filter.swift */; };
 		754F61CE29815A8A0079621C /* LDKChannelPersister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C829815A8A0079621C /* LDKChannelPersister.swift */; };
 		754F61CF29815A8A0079621C /* LDKChannelManagerPersister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C929815A8A0079621C /* LDKChannelManagerPersister.swift */; };
@@ -255,7 +255,7 @@
 		754F61C129815A480079621C /* LightningKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightningKitManager.swift; sourceTree = "<group>"; };
 		754F61C429815A8A0079621C /* FeesEstimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeesEstimator.swift; sourceTree = "<group>"; };
 		754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKTestNetBroadcasterInterface.swift; sourceTree = "<group>"; };
-		754F61C629815A8A0079621C /* LDKLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKLogger.swift; sourceTree = "<group>"; };
+		754F61C629815A8A0079621C /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		754F61C729815A8A0079621C /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 		754F61C829815A8A0079621C /* LDKChannelPersister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKChannelPersister.swift; sourceTree = "<group>"; };
 		754F61C929815A8A0079621C /* LDKChannelManagerPersister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKChannelManagerPersister.swift; sourceTree = "<group>"; };
@@ -493,7 +493,7 @@
 			children = (
 				754F61C429815A8A0079621C /* FeesEstimator.swift */,
 				754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */,
-				754F61C629815A8A0079621C /* LDKLogger.swift */,
+				754F61C629815A8A0079621C /* Logger.swift */,
 				754F61C729815A8A0079621C /* Filter.swift */,
 				754F61C829815A8A0079621C /* LDKChannelPersister.swift */,
 				754F61C929815A8A0079621C /* LDKChannelManagerPersister.swift */,
@@ -1014,7 +1014,7 @@
 				755105F6294CA4AB00525A16 /* EthereumKitManager.swift in Sources */,
 				750C05D629641B97005519FF /* Relays+Combine.swift in Sources */,
 				755170902948C7CD00CC84D7 /* SendRootView.swift in Sources */,
-				754F61CC29815A8A0079621C /* LDKLogger.swift in Sources */,
+				754F61CC29815A8A0079621C /* Logger.swift in Sources */,
 				755170732935C96400CC84D7 /* RecoverPhraseViewModel.swift in Sources */,
 				7545BC3E28C9E7AF00ED92C3 /* RepeatingTimer.swift in Sources */,
 				479A7ACD28B778CB0057E100 /* WalletItemView.swift in Sources */,
