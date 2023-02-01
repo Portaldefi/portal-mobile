@@ -60,7 +60,7 @@
 		7545BC4328CA155100ED92C3 /* Decimal+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */; };
 		754F61BE29802E220079621C /* LightningDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 754F61BD29802E220079621C /* LightningDevKit */; };
 		754F61C229815A480079621C /* LightningKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C129815A480079621C /* LightningKitManager.swift */; };
-		754F61CA29815A8A0079621C /* LDKFeesEstimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C429815A8A0079621C /* LDKFeesEstimator.swift */; };
+		754F61CA29815A8A0079621C /* FeesEstimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C429815A8A0079621C /* FeesEstimator.swift */; };
 		754F61CB29815A8A0079621C /* LDKTestNetBroadcasterInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */; };
 		754F61CC29815A8A0079621C /* LDKLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C629815A8A0079621C /* LDKLogger.swift */; };
 		754F61CD29815A8A0079621C /* LDKFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C729815A8A0079621C /* LDKFilter.swift */; };
@@ -253,7 +253,7 @@
 		7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
 		7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+Extension.swift"; sourceTree = "<group>"; };
 		754F61C129815A480079621C /* LightningKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightningKitManager.swift; sourceTree = "<group>"; };
-		754F61C429815A8A0079621C /* LDKFeesEstimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKFeesEstimator.swift; sourceTree = "<group>"; };
+		754F61C429815A8A0079621C /* FeesEstimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeesEstimator.swift; sourceTree = "<group>"; };
 		754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKTestNetBroadcasterInterface.swift; sourceTree = "<group>"; };
 		754F61C629815A8A0079621C /* LDKLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKLogger.swift; sourceTree = "<group>"; };
 		754F61C729815A8A0079621C /* LDKFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKFilter.swift; sourceTree = "<group>"; };
@@ -491,7 +491,7 @@
 		754F61C329815A8A0079621C /* LDK batteries */ = {
 			isa = PBXGroup;
 			children = (
-				754F61C429815A8A0079621C /* LDKFeesEstimator.swift */,
+				754F61C429815A8A0079621C /* FeesEstimator.swift */,
 				754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */,
 				754F61C629815A8A0079621C /* LDKLogger.swift */,
 				754F61C729815A8A0079621C /* LDKFilter.swift */,
@@ -1032,7 +1032,7 @@
 				7545BC3828C9E32A00ED92C3 /* FiatRatesResponse.swift in Sources */,
 				7551707D2937A2AD00CC84D7 /* ResponsibleWarningView.swift in Sources */,
 				755C56C428E9B2CC00A4B57B /* AssetDetailsViewModel.swift in Sources */,
-				754F61CA29815A8A0079621C /* LDKFeesEstimator.swift in Sources */,
+				754F61CA29815A8A0079621C /* FeesEstimator.swift in Sources */,
 				754F61D429816C830079621C /* ILightningDataService.swift in Sources */,
 				755C56DA28EB090B00A4B57B /* TextFieldWrapper.swift in Sources */,
 				750C05E629646860005519FF /* ISendAssetService.swift in Sources */,
