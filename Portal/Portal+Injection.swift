@@ -9,6 +9,7 @@ import Foundation
 import Factory
 import KeychainAccess
 import CoreData
+import Lightning
 
 extension SharedContainer {
     static let accountManager = Factory<IAccountManager>(scope: .singleton) {
@@ -53,6 +54,10 @@ extension SharedContainer {
         let coinManager = CoinManagerMocked()
         let walletStorage = WalletStorage(coinManager: coinManager, accountManager: accountManager)
         return WalletManager(accountManager: accountManager, storage: walletStorage)
+    }
+    
+    static let lightningKitManager = Factory<LightningKitManager>(scope: .singleton) {
+        LightningKitManager(connectionType: .regtest(BitcoinCoreRpcConfig(username: "polaruser", password: "polarpass", port: 18443, host: "localhost")))
     }
     
     static let sendViewModel = Factory<SendViewViewModel>(scope: .cached) {
