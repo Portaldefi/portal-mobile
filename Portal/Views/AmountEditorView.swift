@@ -13,10 +13,11 @@ class AmontEditorViewModel: ObservableObject {
     let title: String
     let onCancelAcion: () -> ()
     let onSaveAcion: (String) -> ()
-    
+        
     @Published var saveButtonEnabled = false
     @Published var exchanger: Exchanger
-    let initialAmount: String
+    
+    private let initialAmount: String
     
     init(
         title: String,
@@ -29,12 +30,9 @@ class AmontEditorViewModel: ObservableObject {
         self.onSaveAcion = onSaveAction
         self.exchanger = exchanger
         
-        self.initialAmount = exchanger.baseAmountString
+        self.initialAmount = exchanger.amount.string
         
-        self.exchanger.amount.$string.flatMap {
-            Just($0 != self.initialAmount)
-        }
-        .assign(to: &$saveButtonEnabled)
+        self.exchanger.amount.$string.flatMap{Just($0 != self.initialAmount)}.assign(to: &$saveButtonEnabled)
     }
 }
 
@@ -74,7 +72,7 @@ struct AmountEditorView: View {
                     Spacer()
                     
                     PButton(config: .onlyLabel("Save"), style: .free, size: .small, applyGradient: true, enabled: viewModel.saveButtonEnabled) {
-                        viewModel.onSaveAcion(viewModel.exchanger.baseAmountString)
+                        viewModel.onSaveAcion(viewModel.exchanger.amount.string)
                     }
                     .frame(width: 39)
                 }
