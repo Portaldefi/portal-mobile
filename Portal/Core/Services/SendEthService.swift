@@ -78,8 +78,7 @@ class SendETHService: ISendAssetService {
             }
             .receive(on: RunLoop.main)
             .sink { transaction in
-                print("Gas data")
-                print(transaction.gasData)
+                print("eth tx gas data: \(transaction.gasData)")
                                 
                 self.transaction = transaction
                 let fees = RecomendedFees(fastestFee: self.fee, halfHourFee: self.fee, hourFee: self.fee)
