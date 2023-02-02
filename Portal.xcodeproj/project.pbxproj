@@ -47,6 +47,8 @@
 		752FA62B2967165300008796 /* ISendBitcoinAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752FA62A2967165300008796 /* ISendBitcoinAdapter.swift */; };
 		752FA62D296C608C00008796 /* RecommendedFees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752FA62C296C608C00008796 /* RecommendedFees.swift */; };
 		752FA62F296C60C900008796 /* TxFees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752FA62E296C60C900008796 /* TxFees.swift */; };
+		75421841298BD2A80028D5DF /* Lightning in Frameworks */ = {isa = PBXBuildFile; productRef = 75421840298BD2A80028D5DF /* Lightning */; };
+		75421843298BD5720028D5DF /* Peer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75421842298BD5720028D5DF /* Peer.swift */; };
 		7543384C2927BE4700061E28 /* ConfirmImportAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */; };
 		7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */; };
 		7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0828C211DA00ED92C3 /* View+Extension.swift */; };
@@ -58,21 +60,7 @@
 		7545BC3E28C9E7AF00ED92C3 /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */; };
 		7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */ = {isa = PBXBuildFile; productRef = 7545BC4028CA107100ED92C3 /* Coinpaprika */; };
 		7545BC4328CA155100ED92C3 /* Decimal+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */; };
-		754F61BE29802E220079621C /* LightningDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 754F61BD29802E220079621C /* LightningDevKit */; };
 		754F61C229815A480079621C /* LightningKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C129815A480079621C /* LightningKitManager.swift */; };
-		754F61CA29815A8A0079621C /* FeesEstimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C429815A8A0079621C /* FeesEstimator.swift */; };
-		754F61CB29815A8A0079621C /* LDKTestNetBroadcasterInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */; };
-		754F61CC29815A8A0079621C /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C629815A8A0079621C /* Logger.swift */; };
-		754F61CD29815A8A0079621C /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C729815A8A0079621C /* Filter.swift */; };
-		754F61CE29815A8A0079621C /* ChannelPersister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C829815A8A0079621C /* ChannelPersister.swift */; };
-		754F61CF29815A8A0079621C /* LDKChannelManagerPersister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C929815A8A0079621C /* LDKChannelManagerPersister.swift */; };
-		754F61D429816C830079621C /* ILightningDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61D029816C830079621C /* ILightningDataService.swift */; };
-		754F61D529816C830079621C /* ILightningSerivice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61D129816C830079621C /* ILightningSerivice.swift */; };
-		754F61D629816C830079621C /* ILightningDataStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61D229816C830079621C /* ILightningDataStorage.swift */; };
-		754F61D729816C830079621C /* ILightningChannelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61D329816C830079621C /* ILightningChannelManager.swift */; };
-		754F61DB29816D080079621C /* LightningNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61D829816D070079621C /* LightningNode.swift */; };
-		754F61DC29816D080079621C /* LightningPayment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61D929816D080079621C /* LightningPayment.swift */; };
-		754F61DD29816D080079621C /* LightningChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61DA29816D080079621C /* LightningChannel.swift */; };
 		754F61DF298178060079621C /* INotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61DE298178050079621C /* INotificationService.swift */; };
 		755105F3294C6B4300525A16 /* EvmKit in Frameworks */ = {isa = PBXBuildFile; productRef = 755105F2294C6B4300525A16 /* EvmKit */; };
 		755105F6294CA4AB00525A16 /* EthereumKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755105F5294CA4AB00525A16 /* EthereumKitManager.swift */; };
@@ -242,6 +230,8 @@
 		752FA62A2967165300008796 /* ISendBitcoinAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISendBitcoinAdapter.swift; sourceTree = "<group>"; };
 		752FA62C296C608C00008796 /* RecommendedFees.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendedFees.swift; sourceTree = "<group>"; };
 		752FA62E296C60C900008796 /* TxFees.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxFees.swift; sourceTree = "<group>"; };
+		7542183C298955410028D5DF /* Lightning */ = {isa = PBXFileReference; lastKnownFileType = text; path = Lightning; sourceTree = SOURCE_ROOT; };
+		75421842298BD5720028D5DF /* Peer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Peer.swift; sourceTree = "<group>"; };
 		7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmImportAccountView.swift; sourceTree = "<group>"; };
 		7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthentication.swift; sourceTree = "<group>"; };
 		7545BC0828C211DA00ED92C3 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
@@ -253,19 +243,6 @@
 		7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
 		7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+Extension.swift"; sourceTree = "<group>"; };
 		754F61C129815A480079621C /* LightningKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightningKitManager.swift; sourceTree = "<group>"; };
-		754F61C429815A8A0079621C /* FeesEstimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeesEstimator.swift; sourceTree = "<group>"; };
-		754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKTestNetBroadcasterInterface.swift; sourceTree = "<group>"; };
-		754F61C629815A8A0079621C /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
-		754F61C729815A8A0079621C /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
-		754F61C829815A8A0079621C /* ChannelPersister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChannelPersister.swift; sourceTree = "<group>"; };
-		754F61C929815A8A0079621C /* LDKChannelManagerPersister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKChannelManagerPersister.swift; sourceTree = "<group>"; };
-		754F61D029816C830079621C /* ILightningDataService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ILightningDataService.swift; sourceTree = "<group>"; };
-		754F61D129816C830079621C /* ILightningSerivice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ILightningSerivice.swift; sourceTree = "<group>"; };
-		754F61D229816C830079621C /* ILightningDataStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ILightningDataStorage.swift; sourceTree = "<group>"; };
-		754F61D329816C830079621C /* ILightningChannelManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ILightningChannelManager.swift; sourceTree = "<group>"; };
-		754F61D829816D070079621C /* LightningNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightningNode.swift; sourceTree = "<group>"; };
-		754F61D929816D080079621C /* LightningPayment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightningPayment.swift; sourceTree = "<group>"; };
-		754F61DA29816D080079621C /* LightningChannel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightningChannel.swift; sourceTree = "<group>"; };
 		754F61DE298178050079621C /* INotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = INotificationService.swift; sourceTree = "<group>"; };
 		755105F5294CA4AB00525A16 /* EthereumKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EthereumKitManager.swift; sourceTree = "<group>"; };
 		7551706A2934AA7700CC84D7 /* BackUpDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackUpDetailsView.swift; sourceTree = "<group>"; };
@@ -396,6 +373,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				752FA62529670DD900008796 /* FeeRateKit in Frameworks */,
+				75421841298BD2A80028D5DF /* Lightning in Frameworks */,
 				755105F3294C6B4300525A16 /* EvmKit in Frameworks */,
 				7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */,
 				7502D68B289BD8EF00613323 /* PortalUI in Frameworks */,
@@ -405,7 +383,6 @@
 				756DDD8C28A28858002EDC60 /* KeychainAccess in Frameworks */,
 				75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */,
 				7564C65E28D1F89E00ABA8CF /* DataField in Frameworks */,
-				754F61BE29802E220079621C /* LightningDevKit in Frameworks */,
 				75772A5D28F8192F00BE80B7 /* CodeScanner in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -488,17 +465,11 @@
 			path = ViewModifiers;
 			sourceTree = "<group>";
 		};
-		754F61C329815A8A0079621C /* LDK batteries */ = {
+		7542183F298BD2A80028D5DF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				754F61C429815A8A0079621C /* FeesEstimator.swift */,
-				754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */,
-				754F61C629815A8A0079621C /* Logger.swift */,
-				754F61C729815A8A0079621C /* Filter.swift */,
-				754F61C829815A8A0079621C /* ChannelPersister.swift */,
-				754F61C929815A8A0079621C /* LDKChannelManagerPersister.swift */,
 			);
-			path = "LDK batteries";
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		755105F4294CA40D00525A16 /* Manager */ = {
@@ -586,6 +557,7 @@
 			children = (
 				756A3114288821F3004978E2 /* Portal */,
 				756A3113288821F3004978E2 /* Products */,
+				7542183F298BD2A80028D5DF /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -600,6 +572,7 @@
 		756A3114288821F3004978E2 /* Portal */ = {
 			isa = PBXGroup;
 			children = (
+				7542183C298955410028D5DF /* Lightning */,
 				4774D72328B4F62500B7988B /* Info.plist */,
 				756A3115288821F3004978E2 /* Portal.swift */,
 				479A7ACA28B759510057E100 /* Portal+Injection.swift */,
@@ -631,9 +604,7 @@
 		756A312B2888443A004978E2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				754F61DA29816D080079621C /* LightningChannel.swift */,
-				754F61D829816D070079621C /* LightningNode.swift */,
-				754F61D929816D080079621C /* LightningPayment.swift */,
+				75421842298BD5720028D5DF /* Peer.swift */,
 				758DFC84294B6A7600AB35CC /* TransactionRecord.swift */,
 				75D8C5A828D88F8D00228298 /* AdapterState.swift */,
 				75D8C59E28D88C4F00228298 /* Wallet.swift */,
@@ -735,10 +706,6 @@
 			isa = PBXGroup;
 			children = (
 				754F61DE298178050079621C /* INotificationService.swift */,
-				754F61D329816C830079621C /* ILightningChannelManager.swift */,
-				754F61D029816C830079621C /* ILightningDataService.swift */,
-				754F61D229816C830079621C /* ILightningDataStorage.swift */,
-				754F61D129816C830079621C /* ILightningSerivice.swift */,
 				75D8C5BE28DC710E00228298 /* ICoinManager.swift */,
 				75D8C5C228DC715900228298 /* ICoinStorage.swift */,
 				756DDD8128A2879E002EDC60 /* IAccountRecordStorage.swift */,
@@ -787,7 +754,6 @@
 		75D8C59328D8887300228298 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				754F61C329815A8A0079621C /* LDK batteries */,
 				750C05E429646838005519FF /* Services */,
 				755105F4294CA40D00525A16 /* Manager */,
 				75D8C5AC28D8908200228298 /* Factories */,
@@ -863,7 +829,7 @@
 				75772A5C28F8192F00BE80B7 /* CodeScanner */,
 				755105F2294C6B4300525A16 /* EvmKit */,
 				752FA62429670DD900008796 /* FeeRateKit */,
-				754F61BD29802E220079621C /* LightningDevKit */,
+				75421840298BD2A80028D5DF /* Lightning */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* Portal.app */;
@@ -905,7 +871,6 @@
 				75772A5B28F8192F00BE80B7 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 				755105F1294C6B4300525A16 /* XCRemoteSwiftPackageReference "EvmKit" */,
 				752FA62329670DD900008796 /* XCRemoteSwiftPackageReference "FeeRateKit.Swift" */,
-				754F61BC29802E220079621C /* XCRemoteSwiftPackageReference "ldk-swift" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -943,11 +908,9 @@
 				7564C65428CF3D3900ABA8CF /* SetAmountView.swift in Sources */,
 				756A312D28884452004978E2 /* WalletItem.swift in Sources */,
 				756DDD8F28A28C06002EDC60 /* AccountRecord+CoreDataProperties.swift in Sources */,
-				754F61CF29815A8A0079621C /* LDKChannelManagerPersister.swift in Sources */,
 				755C56D128EACC4700A4B57B /* TxLabelView.swift in Sources */,
 				755170712935C81900CC84D7 /* RoundedCornerShape.swift in Sources */,
 				756A311F288821F4004978E2 /* Persistence.swift in Sources */,
-				754F61D529816C830079621C /* ILightningSerivice.swift in Sources */,
 				756A313F28902C6F004978E2 /* MainView.swift in Sources */,
 				750C05DE29641B97005519FF /* Subject+Rx.swift in Sources */,
 				755C56BA28E9B03000A4B57B /* TxAmountView.swift in Sources */,
@@ -975,7 +938,6 @@
 				75D8C59B28D88BE500228298 /* IAdapterFactory.swift in Sources */,
 				75D8C5B128DADE7500228298 /* IWalletManager.swift in Sources */,
 				755C56E228EB0A1900A4B57B /* SelectableTxLabelView.swift in Sources */,
-				754F61D729816C830079621C /* ILightningChannelManager.swift in Sources */,
 				75772A6C2906B57200BE80B7 /* AmountValueView.swift in Sources */,
 				4774D72928B4FC7500B7988B /* UInt64+Extension.swift in Sources */,
 				75772A6228FEC0AD00BE80B7 /* AmountEditorView.swift in Sources */,
@@ -1005,16 +967,13 @@
 				4774D71C28AF920100B7988B /* QRCodeParser.swift in Sources */,
 				755170982948CF3400CC84D7 /* AccountBackupRootView.swift in Sources */,
 				7543384C2927BE4700061E28 /* ConfirmImportAccountView.swift in Sources */,
-				754F61D629816C830079621C /* ILightningDataStorage.swift in Sources */,
 				755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */,
 				752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */,
 				755C56D328EACC9000A4B57B /* TxLabel.swift in Sources */,
 				755C56C628EAAD7C00A4B57B /* TextEditorView.swift in Sources */,
-				754F61CE29815A8A0079621C /* ChannelPersister.swift in Sources */,
 				755105F6294CA4AB00525A16 /* EthereumKitManager.swift in Sources */,
 				750C05D629641B97005519FF /* Relays+Combine.swift in Sources */,
 				755170902948C7CD00CC84D7 /* SendRootView.swift in Sources */,
-				754F61CC29815A8A0079621C /* Logger.swift in Sources */,
 				755170732935C96400CC84D7 /* RecoverPhraseViewModel.swift in Sources */,
 				7545BC3E28C9E7AF00ED92C3 /* RepeatingTimer.swift in Sources */,
 				479A7ACD28B778CB0057E100 /* WalletItemView.swift in Sources */,
@@ -1022,7 +981,6 @@
 				4774D71A28AF916600B7988B /* QRCodeItem.swift in Sources */,
 				756DDD9328A28DE7002EDC60 /* RootView.swift in Sources */,
 				750C05DF29641B97005519FF /* Publisher+Rx.swift in Sources */,
-				754F61DB29816D080079621C /* LightningNode.swift in Sources */,
 				4774D72528B4FC2000B7988B /* StringFormatter.swift in Sources */,
 				75772A682902D73E00BE80B7 /* TextLimitter.swift in Sources */,
 				756DDD6E28A272AB002EDC60 /* NoAccountView.swift in Sources */,
@@ -1032,8 +990,6 @@
 				7545BC3828C9E32A00ED92C3 /* FiatRatesResponse.swift in Sources */,
 				7551707D2937A2AD00CC84D7 /* ResponsibleWarningView.swift in Sources */,
 				755C56C428E9B2CC00A4B57B /* AssetDetailsViewModel.swift in Sources */,
-				754F61CA29815A8A0079621C /* FeesEstimator.swift in Sources */,
-				754F61D429816C830079621C /* ILightningDataService.swift in Sources */,
 				755C56DA28EB090B00A4B57B /* TextFieldWrapper.swift in Sources */,
 				750C05E629646860005519FF /* ISendAssetService.swift in Sources */,
 				7551709A2948D02700CC84D7 /* AccountBackupNavigationConfig.swift in Sources */,
@@ -1058,8 +1014,6 @@
 				755C56D528EACDF500A4B57B /* BitcoinDevKitTransaction+Extension.swift in Sources */,
 				756A3122288821F4004978E2 /* PortalDB.xcdatamodeld in Sources */,
 				750C05EC296468E5005519FF /* FeeRatePriority.swift in Sources */,
-				754F61CB29815A8A0079621C /* LDKTestNetBroadcasterInterface.swift in Sources */,
-				754F61DC29816D080079621C /* LightningPayment.swift in Sources */,
 				755170932948CB0000CC84D7 /* ReceiveRootView.swift in Sources */,
 				755C56B728E5D46500A4B57B /* ConfirmationCounterView.swift in Sources */,
 				756DDD7E28A28754002EDC60 /* DBLocalStorage.swift in Sources */,
@@ -1077,7 +1031,6 @@
 				756DDD9928A28FC6002EDC60 /* AccountManager.swift in Sources */,
 				75D8C5A528D88E0900228298 /* IDepositAdapter.swift in Sources */,
 				755170852948AD4B00CC84D7 /* NoAccountRootView.swift in Sources */,
-				754F61CD29815A8A0079621C /* Filter.swift in Sources */,
 				755170872948AD8000CC84D7 /* NoAccountViewConfig.swift in Sources */,
 				756A3139288AEAD2004978E2 /* BackButtonModifier.swift in Sources */,
 				7564C66028D219CB00ABA8CF /* Coin.swift in Sources */,
@@ -1106,13 +1059,13 @@
 				7551706F2935C76C00CC84D7 /* ClickableWordView.swift in Sources */,
 				75D8C5A728D88E0900228298 /* IBalanceAdapter.swift in Sources */,
 				756DDD9D28A292D4002EDC60 /* RootViewViewModel.swift in Sources */,
-				754F61DD29816D080079621C /* LightningChannel.swift in Sources */,
 				756DDD8328A2879E002EDC60 /* ILocalStorage.swift in Sources */,
 				75D8C5A628D88E0900228298 /* ITransactionAdapter.swift in Sources */,
 				755C56AF28E5BDD600A4B57B /* WalletItemViewModel.swift in Sources */,
 				75D8C5A128D88D9C00228298 /* IAdapterManager.swift in Sources */,
 				75D8C5AB28D8907D00228298 /* AdapterFactory.swift in Sources */,
 				7545BC3C28C9E5B900ED92C3 /* MarketData.swift in Sources */,
+				75421843298BD5720028D5DF /* Peer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1367,14 +1320,6 @@
 				kind = branch;
 			};
 		};
-		754F61BC29802E220079621C /* XCRemoteSwiftPackageReference "ldk-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/lightningdevkit/ldk-swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.0.113;
-			};
-		};
 		755105F1294C6B4300525A16 /* XCRemoteSwiftPackageReference "EvmKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/horizontalsystems/EvmKit.Swift";
@@ -1449,15 +1394,14 @@
 			package = 752FA62329670DD900008796 /* XCRemoteSwiftPackageReference "FeeRateKit.Swift" */;
 			productName = FeeRateKit;
 		};
+		75421840298BD2A80028D5DF /* Lightning */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Lightning;
+		};
 		7545BC4028CA107100ED92C3 /* Coinpaprika */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */;
 			productName = Coinpaprika;
-		};
-		754F61BD29802E220079621C /* LightningDevKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 754F61BC29802E220079621C /* XCRemoteSwiftPackageReference "ldk-swift" */;
-			productName = LightningDevKit;
 		};
 		755105F2294C6B4300525A16 /* EvmKit */ = {
 			isa = XCSwiftPackageProductDependency;
