@@ -6,7 +6,9 @@
 //
 
 import Foundation
-import LightningDevKit
+import Combine
+import Lightning
+import CryptoSwift
 
 public struct BlockInfo {
     public let height: Int
@@ -14,130 +16,64 @@ public struct BlockInfo {
 }
 
 class LightningKitManager {
-    private var constructor: ChannelManagerConstructor
+    private let instance: Node
+    private let fileManager = LightningFileManager()
     
-    var channelManager: ChannelManager {
-        constructor.channelManager
+    private var started = false
+    private var cancellabels = Set<AnyCancellable>()
+    
+    init(connectionType: ConnectionType) {
+        switch connectionType {
+        case .regtest(let config):
+            instance = Node(type: .regtest(config))
+        case .testnet:
+            fatalError("Not implemented!")
+        }
     }
     
-    var peerManager: PeerManager {
-        constructor.peerManager
-    }
-    
-    var peerNetworkHandler: TCPPeerHandler {
-        constructor.getTCPPeerHandler()
-    }
-    
-    var payer: InvoicePayer? {
-        constructor.payer
-    }
-    
-    private var chainMonitor: ChainMonitor
-    private var keysManager: KeysManager
-    private var channelManagerPersister: ExtendedChannelManagerPersister
-    private var dataService: ILightningDataService
-    
-    private(set) var logger: LDKLogger
-    
-    init(bestBlock: BlockInfo?, dataService: ILightningDataService) {
-        self.dataService = dataService
+    func start() async throws {
+        guard !started else { throw ServiceError.alreadyRunning }
         
-        let userConfig: Bindings.UserConfig = .initWithDefault()
-        let network: Bindings.Network = .Testnet
-        
-        let feeEstimator = LDKFeesEstimator()
-        let filter = LDKFilter()
-        let persister = LDKChannelPersister(dataService: dataService)
-        let broadcaster = LDKTestNetBroadcasterInterface()
-        let timestampSeconds = UInt64(Date().timeIntervalSince1970)
-        let timestampNanos = UInt32(truncating: NSNumber(value: timestampSeconds * 1000 * 1000))
-        
-        logger = LDKLogger()
-        
-        guard let seedData = Data(base64Encoded: "point head pencil differ reopen damp wink minute improve toward during term") else {
-            fatalError("Failed to wrap seed string")
+        // FIXME: Make this data write await-able
+        if !fileManager.hasKeySeed {
+            generateKeySeed()
         }
         
-        let seed: [UInt8] = [UInt8](seedData)
+        guard let _ = fileManager.getKeysSeed() else { throw ServiceError.keySeedNotFound }
         
-        keysManager = KeysManager(seed: seed, startingTimeSecs: timestampSeconds, startingTimeNanos: timestampNanos)
-        
-        chainMonitor = ChainMonitor(
-            chainSource: filter,
-            broadcaster: broadcaster,
-            logger: logger,
-            feeest: feeEstimator,
-            persister: persister
-        )
-        
-        if let channelManagerSerialized = dataService.channelManagerData?.bytes {
-            //restoring node
-            
-            let networkGraphSerizlized = dataService.networkGraph?.bytes ?? []
-            let channelMonitorsSeriaziled = dataService.channelMonitors?.map{ $0.bytes } ?? []
+        do {
+            try await instance.start()
+        } catch {
+            throw error
+        }
+    }
+    
+    func connectPeer(_ peer: Peer) async throws {
+        try await instance.connectPeer(pubKey: peer.peerPubKey, hostname: peer.connectionInformation.hostname, port: peer.connectionInformation.port)
+    }
+}
 
-            do {
-                constructor = try ChannelManagerConstructor(
-                    channelManagerSerialized: channelManagerSerialized,
-                    channelMonitorsSerialized: channelMonitorsSeriaziled,
-                    keysInterface: keysManager.asKeysInterface(),
-                    feeEstimator: feeEstimator,
-                    chainMonitor: chainMonitor,
-                    filter: filter,
-                    netGraphSerialized: networkGraphSerizlized,
-                    txBroadcaster: broadcaster,
-                    logger: logger
-                )
-            } catch {
-                fatalError("\(error)")
-            }
-        } else {
-            //start new node
-            
-            //test net genesis block hash
-            let reversedGenesisBlockHash = "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943".reversed
-
-            guard
-                let bestBlock = bestBlock,
-                let chainTipHash = bestBlock.headerHash.reversed.hexStringToBytes(),
-                let genesisHash = reversedGenesisBlockHash.hexStringToBytes()
-            else {
-                fatalError("header hash :/")
-            }
-        
-            let chainTipHeight = UInt32(bestBlock.height)
-            let networkGraph = NetworkGraph(genesisHash: genesisHash, logger: logger)
-            
-            constructor = ChannelManagerConstructor(
-                network: network,
-                config: userConfig,
-                currentBlockchainTipHash: chainTipHash,
-                currentBlockchainTipHeight: chainTipHeight,
-                keysInterface: keysManager.asKeysInterface(),
-                feeEstimator: feeEstimator,
-                chainMonitor: chainMonitor,
-                netGraph: networkGraph,
-                txBroadcaster: broadcaster,
-                logger: logger
-            )
-        }
-        
-        let bestBlockHeight = constructor.channelManager.currentBestBlock().height()
-        let bestBlockHash = constructor.channelManager.currentBestBlock().blockHash()
-        print("Best block height: \(bestBlockHeight), hash: \(bestBlockHash.toHexString())")
-        
-        channelManagerPersister = LDKChannelManagerPersister(
-            channelManager: constructor.channelManager,
-            dataService: dataService
-        )
+// MARK: Helpers
+extension LightningKitManager {
+    func generateKeySeed() {
+        let seed = AES.randomIV(32)
+        _ = fileManager.persistKeySeed(keySeed: seed)
     }
-    
-    func chainSyncCompleted() {
-        if let networkGraph = constructor.netGraph {
-            let probabalisticScorer = ProbabilisticScorer(params: .initWithDefault(), networkGraph: networkGraph, logger: logger)
-            let score = probabalisticScorer.asScore()
-            let multiThreadedScorer = MultiThreadedLockableScore(score: score)
-            constructor.chainSyncCompleted(persister: channelManagerPersister, scorer: multiThreadedScorer)
-        }
+}
+
+// MARK: Publishers
+extension LightningKitManager {
+    var activePeersPublisher: AnyPublisher<[String], Never> {
+        return instance.connectedPeers
+    }
+}
+
+// MARK: Errors
+extension LightningKitManager {
+    public enum ServiceError: Error {
+        case alreadyRunning
+        case invalidHash
+        case cannotOpenChannel
+        case keySeedNotFound
     }
 }
