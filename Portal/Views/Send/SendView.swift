@@ -60,7 +60,7 @@ struct SendView: View {
                 .padding(.horizontal, 16)
             }
             
-            if viewState.showFeesPicker, let fees = viewModel.recomendedFees, let coin = viewModel.selectedItem?.viewModel.coin {
+            if viewState.showFeesPicker, let fees = viewModel.recomendedFees, let coin = viewModel.coin {
                 ZStack(alignment: .top) {
                     VStack(spacing: 0) {
                         Divider()
@@ -229,7 +229,7 @@ struct SendView: View {
                                             Text("~60 mins")
                                                 .font(.Main.fixed(.monoRegular, size: 16))
                                                 .foregroundColor(Palette.grayScaleF4)
-                                            Text(fees.hourFee.double.formattedString(.coin(.bitcoin()), decimals: 8) + "\(viewModel.selectedItem!.viewModel.coin.type == .bitcoin ? " sat/vByte" : " eth")")
+                                            Text(fees.hourFee.double.formattedString(.coin(.bitcoin()), decimals: 8) + "\(coin.type == .bitcoin ? " sat/vByte" : " eth")")
                                                 .font(.Main.fixed(.monoRegular, size: 14))
                                                 .foregroundColor(Palette.grayScale8A)
                                         }
@@ -375,14 +375,16 @@ struct SendView: View {
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .navigationBarHidden(true)
         .sheet(isPresented: $viewModel.viewState.showInContextScanner) {
-            QRCodeReaderView(config: .send(viewModel.selectedItem!.viewModel.coin)) { item in
-                switch item.type {
-                case .bip21(let address, let amount, _):
-                    viewModel.receiverAddress = address
-                    guard let _amount = amount else { return }
-                    viewModel.exchanger?.amount.string = _amount
-                default:
-                    break
+            if let coin = viewModel.coin {
+                QRCodeReaderView(config: .send(coin)) { item in
+                    switch item.type {
+                    case .bip21(let address, let amount, _):
+                        viewModel.receiverAddress = address
+                        guard let _amount = amount else { return }
+                        viewModel.exchanger?.amount.string = _amount
+                    default:
+                        break
+                    }
                 }
             }
         }

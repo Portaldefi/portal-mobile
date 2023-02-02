@@ -110,7 +110,7 @@ struct ReviewTransactionView: View {
                 
                 Spacer()
                 
-                if let coin = viewModel.selectedItem?.viewModel.coin {
+                if let coin = viewModel.coin {
                     VStack {
                         HStack(spacing: 6) {
                             Text(viewModel.fee)
@@ -144,7 +144,7 @@ struct ReviewTransactionView: View {
             Spacer()
         }
         .onReceive(viewModel.$txSent) { sent in
-            guard let coin = viewModel.selectedItem?.viewModel.coin else { return }
+            guard let coin = viewModel.coin else { return }
             if sent {
                 navigation.push(.transactionDetails(coin: coin, tx: viewModel.unconfirmedTx != nil ? viewModel.unconfirmedTx! : TransactionRecord.mocked))
             }

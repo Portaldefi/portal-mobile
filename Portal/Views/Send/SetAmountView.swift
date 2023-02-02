@@ -144,7 +144,7 @@ struct SetAmountView: View {
                         
                         Spacer()
                         
-                        if let coin = viewModel.selectedItem?.viewModel.coin, viewModel.recomendedFees != nil {
+                        if let coin = viewModel.coin, viewModel.recomendedFees != nil {
                             VStack {
                                 HStack(spacing: 8) {
                                     Text(viewModel.fee)
@@ -172,7 +172,7 @@ struct SetAmountView: View {
                                 .progressViewStyle(CircularProgressViewStyle())
                         }
                         
-                        if let coin = viewModel.selectedItem?.viewModel.coin, coin == .bitcoin() {
+                        if let coin = viewModel.coin, coin == .bitcoin() {
                             Asset.chevronRightIcon
                                 .foregroundColor(Palette.grayScale4A)
                         }
@@ -181,7 +181,7 @@ struct SetAmountView: View {
                     .transition(.opacity)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        guard let coin = viewModel.selectedItem?.viewModel.coin, coin == .bitcoin() else { return }
+                        guard let coin = viewModel.coin, coin == .bitcoin() else { return }
                         withAnimation {
                             viewState.showFeesPicker.toggle()
                         }

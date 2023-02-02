@@ -36,7 +36,7 @@ struct SelectAssetView: View {
                                             notEnoughFundsMessage = "\(item.viewModel.coin.code) on \(item.viewModel.coin.description)"
                                             return notEnoughFunds.toggle()
                                         }
-                                        viewModel.selectedItem = item
+                                        viewModel.coin = item.viewModel.coin
                                     }
                                 Asset.chevronRightIcon
                                     .foregroundColor(Palette.grayScale4A)

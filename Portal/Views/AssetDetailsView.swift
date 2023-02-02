@@ -14,6 +14,8 @@ struct AssetDetailsView: View {
     @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewState: ViewState = Container.viewState()
     @ObservedObject private var viewModel: AssetDetailsViewModel
+    @ObservedObject private var accountViewModel: AccountViewModel = Container.accountViewModel()
+    
     @State private var showTxDetails = false
     @State private var selectedTx: TransactionRecord?
     
@@ -96,8 +98,10 @@ struct AssetDetailsView: View {
             TransactionDetailsView(coin: viewModel.coin, tx: tx)
         }
         .sheet(isPresented: $viewState.goToReceive) {
-            let viewModel = ReceiveViewModel.config(items: [WalletItem.mockedBtc], selectedItem: WalletItem.mockedBtc)
-            ReceiveRootView(viewModel: viewModel)
+            let vm = ReceiveViewModel.config(items: accountViewModel.items, selectedItem: accountViewModel.items.first(where: { item in
+                item.viewModel.coin == viewModel.coin
+            }))
+            ReceiveRootView(viewModel: vm)
         }
         .sheet(isPresented: $viewState.goToSendFromDetails) {
             SendRootView()
@@ -123,7 +127,7 @@ struct AssetDetailsView: View {
             ) {
                 if let item = item {
                     let sendViewViewModel = Container.sendViewModel()
-                    sendViewViewModel.selectedItem = item
+                    sendViewViewModel.coin = item.viewModel.coin
                     viewState.goToSendFromDetails = true
                 }
             }
