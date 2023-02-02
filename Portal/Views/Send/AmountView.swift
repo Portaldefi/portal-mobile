@@ -84,7 +84,7 @@ struct AmountView: View {
 
                     HStack(spacing: 4) {
                         Spacer()
-                        Text(exchanger.baseAmountString.isEmpty ? "0" : exchanger.baseAmountString)
+                        Text(exchanger.amount.string.isEmpty ? "0" : exchanger.baseAmountString)
                             .font(.Main.fixed(.monoMedium, size: 16))
                             .foregroundColor(Palette.grayScale6A)
                         Text(exchanger.base.code.lowercased())
