@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 import BitcoinDevKit
-import LightningDevKit
 import BitcoinAddressValidator
 
 final class BitcoinAdapter {
