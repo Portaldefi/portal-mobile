@@ -64,7 +64,7 @@
 		754F61CB29815A8A0079621C /* LDKTestNetBroadcasterInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */; };
 		754F61CC29815A8A0079621C /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C629815A8A0079621C /* Logger.swift */; };
 		754F61CD29815A8A0079621C /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C729815A8A0079621C /* Filter.swift */; };
-		754F61CE29815A8A0079621C /* LDKChannelPersister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C829815A8A0079621C /* LDKChannelPersister.swift */; };
+		754F61CE29815A8A0079621C /* ChannelPersister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C829815A8A0079621C /* ChannelPersister.swift */; };
 		754F61CF29815A8A0079621C /* LDKChannelManagerPersister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C929815A8A0079621C /* LDKChannelManagerPersister.swift */; };
 		754F61D429816C830079621C /* ILightningDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61D029816C830079621C /* ILightningDataService.swift */; };
 		754F61D529816C830079621C /* ILightningSerivice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61D129816C830079621C /* ILightningSerivice.swift */; };
@@ -257,7 +257,7 @@
 		754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKTestNetBroadcasterInterface.swift; sourceTree = "<group>"; };
 		754F61C629815A8A0079621C /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		754F61C729815A8A0079621C /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
-		754F61C829815A8A0079621C /* LDKChannelPersister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKChannelPersister.swift; sourceTree = "<group>"; };
+		754F61C829815A8A0079621C /* ChannelPersister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChannelPersister.swift; sourceTree = "<group>"; };
 		754F61C929815A8A0079621C /* LDKChannelManagerPersister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LDKChannelManagerPersister.swift; sourceTree = "<group>"; };
 		754F61D029816C830079621C /* ILightningDataService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ILightningDataService.swift; sourceTree = "<group>"; };
 		754F61D129816C830079621C /* ILightningSerivice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ILightningSerivice.swift; sourceTree = "<group>"; };
@@ -495,7 +495,7 @@
 				754F61C529815A8A0079621C /* LDKTestNetBroadcasterInterface.swift */,
 				754F61C629815A8A0079621C /* Logger.swift */,
 				754F61C729815A8A0079621C /* Filter.swift */,
-				754F61C829815A8A0079621C /* LDKChannelPersister.swift */,
+				754F61C829815A8A0079621C /* ChannelPersister.swift */,
 				754F61C929815A8A0079621C /* LDKChannelManagerPersister.swift */,
 			);
 			path = "LDK batteries";
@@ -1010,7 +1010,7 @@
 				752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */,
 				755C56D328EACC9000A4B57B /* TxLabel.swift in Sources */,
 				755C56C628EAAD7C00A4B57B /* TextEditorView.swift in Sources */,
-				754F61CE29815A8A0079621C /* LDKChannelPersister.swift in Sources */,
+				754F61CE29815A8A0079621C /* ChannelPersister.swift in Sources */,
 				755105F6294CA4AB00525A16 /* EthereumKitManager.swift in Sources */,
 				750C05D629641B97005519FF /* Relays+Combine.swift in Sources */,
 				755170902948C7CD00CC84D7 /* SendRootView.swift in Sources */,
