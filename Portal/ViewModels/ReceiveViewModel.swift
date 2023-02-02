@@ -86,7 +86,7 @@ class ReceiveViewModel: ObservableObject {
         
         guard let exchanger = exchanger else { return }
         
-        Publishers.CombineLatest(exchanger.$baseAmountString, $description)
+        Publishers.CombineLatest(exchanger.amount.$fullString, $description)
             .flatMap { _ in Just(()) }
             .receive(on: RunLoop.main)
             .sink { [unowned self] _ in
