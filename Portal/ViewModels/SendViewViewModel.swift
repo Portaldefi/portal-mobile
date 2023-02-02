@@ -19,17 +19,19 @@ class SendViewViewModel: ObservableObject {
     
     @Published var receiverAddress = String()
     @Published var txSent = false
-    @Published var selectedItem: WalletItem?
+    @Published var coin: Coin?
     @Published var qrCodeItem: QRCodeItem?
     @Published var clipboardIsEmpty = false
     @Published var editingAmount = false
     @Published var feeRate: TxFees = .normal
     @Published var amountIsValid: Bool = true
+    @Published var sendMax: Bool = false
     
     @Published private(set) var balanceString = String()
     @Published private(set) var valueString = String()
     @Published private(set) var useAllFundsEnabled = true
     @Published private(set) var recipientAddressIsValid = true
+    @Published private(set) var recomendedFees: RecomendedFees?
     @Published private(set) var sendError: Error?
     @Published private(set) var step: SendStep = .selectAsset
     @Published private(set) var publishedTxId: String?
@@ -38,14 +40,12 @@ class SendViewViewModel: ObservableObject {
         
     @ObservedObject var viewState = Container.viewState()
     @ObservedObject private var account: AccountViewModel = Container.accountViewModel()
-    @Published var recomendedFees: RecomendedFees?
-    @Published var sendMax: Bool = false
 
     @Injected(Container.marketData) private var marketData
     @LazyInjected(Container.biometricAuthentification) private var biometrics
         
     var fee: String {
-        guard let coin = selectedItem?.viewModel.coin, let recomendedFees = recomendedFees, let sendService = sendService else { return String() }
+        guard let coin = coin, let recomendedFees = recomendedFees, let sendService = sendService else { return String() }
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
             return ((sendService.fee.double)/100_000_000).formattedString(.coin(coin), decimals: 8)
@@ -111,12 +111,12 @@ class SendViewViewModel: ObservableObject {
     }
     
     private func subscribeForUpdates() {
-        $selectedItem
-            .sink { [weak self] item in
-                guard let self = self, let coin = item?.viewModel.coin else { return }
+        $coin
+            .sink { [weak self] newCoin in
+                guard let self = self, let coin = newCoin else { return }
                 
-                self.updateAdapters(coin: coin)
-                self.updateExchanger(coin: coin)
+                self.syncSendService(coin: coin)
+                self.syncExchanger(coin: coin)
                 
                 withAnimation {
                     self.step = .recipient
@@ -129,7 +129,7 @@ class SendViewViewModel: ObservableObject {
                 guard let item = item else { return }
                 switch item.type {
                 case .bip21(let address, let amount, _):
-                    self.selectedItem = walletItems.first
+                    self.coin = walletItems.first?.viewModel.coin
                     self.receiverAddress = address
                     guard let amount = amount else {
                         step = .amount
@@ -138,7 +138,7 @@ class SendViewViewModel: ObservableObject {
                     self.exchanger?.amount.string = amount
                     self.step = .review
                 case .eth(let address, let amount, _):
-                    self.selectedItem = walletItems.last
+                    self.coin = walletItems.last?.viewModel.coin
                     self.receiverAddress = address
                     guard let amount = amount else {
                         step = .amount
@@ -175,7 +175,7 @@ class SendViewViewModel: ObservableObject {
             .onMarketDataUpdate
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
-                guard let self = self, let sendService = self.sendService, let coin = self.selectedItem?.viewModel.coin else { return }
+                guard let self = self, let sendService = self.sendService, let coin = self.coin else { return }
                 
                 switch coin.type {
                 case .bitcoin:
@@ -203,7 +203,7 @@ class SendViewViewModel: ObservableObject {
             .store(in: &subscriptions)
     }
     
-    private func updateExchanger(coin: Coin) {
+    private func syncExchanger(coin: Coin) {
         let price: Decimal
         
         switch coin.type {
@@ -236,7 +236,7 @@ class SendViewViewModel: ObservableObject {
             .store(in: &subscriptions)
     }
     
-    private func updateAdapters(coin: Coin) {
+    private func syncSendService(coin: Coin) {
         let adapterManager: IAdapterManager = Container.adapterManager()
         let walletManager: IWalletManager = Container.walletManager()
 
@@ -400,7 +400,7 @@ class SendViewViewModel: ObservableObject {
         
         switch step {
         case .recipient:
-            selectedItem = nil
+            coin = nil
             receiverAddress = String()
             recipientAddressIsValid = true
             sendError = nil
@@ -520,7 +520,7 @@ extension SendViewViewModel {
     static var mocked: SendViewViewModel {
         let vm = SendViewViewModel()
         vm.walletItems = [WalletItem.mockedBtc]
-        vm.selectedItem = WalletItem.mockedBtc
+        vm.coin = .bitcoin()
         vm.receiverAddress = "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3"
         vm.balanceString = "0.000124"
         vm.valueString = "12.93"
