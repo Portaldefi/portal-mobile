@@ -110,7 +110,7 @@ struct AccountView: View {
         HStack {
             VStack(alignment: .leading, spacing: 10) {
                 VStack(spacing: 4) {
-                    HStack(alignment: .bottom, spacing: 6) {
+                    HStack(alignment: .lastTextBaseline, spacing: 6) {
                         Spacer()
                         Text(balance)
                             .font(.Main.fixed(.monoBold, size: 32))
