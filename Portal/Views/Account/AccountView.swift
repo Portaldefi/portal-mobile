@@ -23,16 +23,19 @@ struct AccountView: View {
             Group {
                 AccountView()
                 Divider()
+                    .frame(height: 1)
                     .overlay(Palette.grayScale2A)
                 BalanceView(balance: viewModel.totalBalance, value: viewModel.totalValue)
                     .frame(height: 124)
                     .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                 ActionButtonsView
                     .padding(.horizontal, 16)
                     .padding(.bottom, 24)
             }
             
             Divider()
+                .frame(height: 1)
                 .overlay(Palette.grayScale10)
             
             ScrollView {
@@ -55,6 +58,7 @@ struct AccountView: View {
                                 .foregroundColor(Palette.grayScale4A)
                         }
                         Divider()
+                            .frame(height: 1)
                             .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
                     }
                 }
@@ -82,28 +86,44 @@ struct AccountView: View {
     
     func AccountView() -> some View {
         HStack {
-            HStack {
-                Asset.walletIcon
-                    .foregroundColor(Palette.grayScale6A)
+            VStack(alignment: .leading, spacing: 4) {
                 Text(viewModel.accountName)
-                    .font(.Main.fixed(.bold, size: 16))
+                    .font(.Main.fixed(.bold, size: 24))
                     .foregroundColor(Palette.grayScaleF4)
+
+                HStack {
+                    RoundedRectangle(cornerRadius: 4)
+                        .frame(width: 16, height: 16)
+                    Text("All systems ok!")
+                        .font(.Main.fixed(.monoRegular, size: 14))
+
+                }
+                .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
             }
+            .padding(.bottom)
+            .padding(.leading, 20)
             
             Spacer()
             
-            if !viewModel.accountDataIsBackedUp {
-                PButton(config: .onlyIcon(Asset.warningIcon), style: .free, size: .medium, color: .yellow, enabled: true) {
-                    viewState.goToBackUp.toggle()
+            HStack(spacing: 0) {
+                Divider()
+                    .frame(width: 1, height: 70)
+                    .overlay(Palette.grayScale2A)
+                
+                if !viewModel.accountDataIsBackedUp {
+                    PButton(config: .onlyIcon(Asset.warningIcon), style: .free, size: .medium, color: .yellow, enabled: true) {
+                        viewState.goToBackUp.toggle()
+                    }
+                    .frame(width: 30, height: 30)
+                    .padding(.leading)
                 }
-                .frame(width: 30, height: 30)
+                
+                Asset.gearIcon
+                    .foregroundColor(Palette.grayScale6A)
+                    .padding()
             }
-            
-            Asset.gearIcon
-                .foregroundColor(Palette.grayScale6A)
         }
-        .frame(height: 48)
-        .padding(.horizontal, 20)
+        .frame(height: 73)
     }
     
     func BalanceView(balance: String, value: String) -> some View {
