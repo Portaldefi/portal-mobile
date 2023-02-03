@@ -145,11 +145,19 @@ struct AccountView: View {
     }
     
     var ActionButtonsView: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 16) {
             PButton(
                 config: .labelAndIconLeft(label: "Receive", icon: Asset.receiveButtonIcon),
-                style: .filled,
-                size: .medium,
+                style: .outline,
+                size: .custom(
+                    PButtonConfig(
+                        fontSize: 16,
+                        spacing: 8,
+                        height: 48,
+                        cornerRadius: 12,
+                        iconSize: 26
+                    )
+                ),
                 enabled: true
             ) {
                 goToReceive.toggle()
@@ -157,8 +165,16 @@ struct AccountView: View {
             
             PButton(
                 config: .labelAndIconLeft(label: "Send", icon: Asset.sendButtonIcon),
-                style: .filled,
-                size: .medium,
+                style: .outline,
+                size: .custom(
+                    PButtonConfig(
+                        fontSize: 16,
+                        spacing: 8,
+                        height: 48,
+                        cornerRadius: 12,
+                        iconSize: 26
+                    )
+                ),
                 enabled: true
             ) {
                 withAnimation {
