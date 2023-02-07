@@ -41,11 +41,15 @@ class NavigationStack: ObservableObject {
         }
     }
     
-    func push(_ screen: Screen) {
+    func push(_ screen: Screen, animated: Bool = true) {
         if let element = configurator.configure(screen) {
             navigationType = .push
             
-            withAnimation(.easeInOut(duration: 0.3)) {
+            if animated {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    viewStack.push(element)
+                }
+            } else {
                 viewStack.push(element)
             }
         }
