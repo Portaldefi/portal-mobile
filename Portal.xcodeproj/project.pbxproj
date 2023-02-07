@@ -21,7 +21,6 @@
 		479A7ACB28B759510057E100 /* Portal+Injection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479A7ACA28B759510057E100 /* Portal+Injection.swift */; };
 		479A7ACD28B778CB0057E100 /* WalletItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479A7ACC28B778CA0057E100 /* WalletItemView.swift */; };
 		479A7AD028B7A92C0057E100 /* SendViewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479A7ACF28B7A92C0057E100 /* SendViewViewModel.swift */; };
-		479A7AD228B8F1530057E100 /* SendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479A7AD128B8F1530057E100 /* SendView.swift */; };
 		479A7AD428B8F30B0057E100 /* ReviewTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479A7AD328B8F30B0057E100 /* ReviewTransactionView.swift */; };
 		7502D68B289BD8EF00613323 /* PortalUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7502D68A289BD8EF00613323 /* PortalUI */; };
 		750C05D629641B97005519FF /* Relays+Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750C05CA29641B97005519FF /* Relays+Combine.swift */; };
@@ -49,6 +48,8 @@
 		752FA62F296C60C900008796 /* TxFees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752FA62E296C60C900008796 /* TxFees.swift */; };
 		75421841298BD2A80028D5DF /* Lightning in Frameworks */ = {isa = PBXBuildFile; productRef = 75421840298BD2A80028D5DF /* Lightning */; };
 		75421843298BD5720028D5DF /* Peer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75421842298BD5720028D5DF /* Peer.swift */; };
+		75421846299262E10028D5DF /* ReceiveSelectAssetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75421845299262E10028D5DF /* ReceiveSelectAssetView.swift */; };
+		75421848299273270028D5DF /* QRReaderRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75421847299273270028D5DF /* QRReaderRootView.swift */; };
 		7543384C2927BE4700061E28 /* ConfirmImportAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */; };
 		7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */; };
 		7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0828C211DA00ED92C3 /* View+Extension.swift */; };
@@ -130,8 +131,8 @@
 		756A313528898CA2004978E2 /* BasicTextStyleModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */; };
 		756A3137288AEAAD004978E2 /* AssetDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3136288AEAAD004978E2 /* AssetDetailsView.swift */; };
 		756A3139288AEAD2004978E2 /* BackButtonModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A3138288AEAD2004978E2 /* BackButtonModifier.swift */; };
-		756A313B288AEFA2004978E2 /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313A288AEFA2004978E2 /* ReceiveView.swift */; };
-		756A313D288EBBAD004978E2 /* SelectAssetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313C288EBBAD004978E2 /* SelectAssetView.swift */; };
+		756A313B288AEFA2004978E2 /* QRCodeGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313A288AEFA2004978E2 /* QRCodeGeneratorView.swift */; };
+		756A313D288EBBAD004978E2 /* SendSelectAssetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313C288EBBAD004978E2 /* SendSelectAssetView.swift */; };
 		756A313F28902C6F004978E2 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756A313E28902C6F004978E2 /* MainView.swift */; };
 		756DDD6E28A272AB002EDC60 /* NoAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD6D28A272AB002EDC60 /* NoAccountView.swift */; };
 		756DDD7028A275AD002EDC60 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD6F28A275AD002EDC60 /* CreateAccountView.swift */; };
@@ -206,7 +207,6 @@
 		479A7ACA28B759510057E100 /* Portal+Injection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Portal+Injection.swift"; sourceTree = "<group>"; };
 		479A7ACC28B778CA0057E100 /* WalletItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemView.swift; sourceTree = "<group>"; };
 		479A7ACF28B7A92C0057E100 /* SendViewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendViewViewModel.swift; sourceTree = "<group>"; };
-		479A7AD128B8F1530057E100 /* SendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendView.swift; sourceTree = "<group>"; };
 		479A7AD328B8F30B0057E100 /* ReviewTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewTransactionView.swift; sourceTree = "<group>"; };
 		750C05CA29641B97005519FF /* Relays+Combine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Relays+Combine.swift"; sourceTree = "<group>"; };
 		750C05CB29641B97005519FF /* PublishSubject+Combine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PublishSubject+Combine.swift"; sourceTree = "<group>"; };
@@ -232,6 +232,8 @@
 		752FA62E296C60C900008796 /* TxFees.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxFees.swift; sourceTree = "<group>"; };
 		7542183C298955410028D5DF /* Lightning */ = {isa = PBXFileReference; lastKnownFileType = text; path = Lightning; sourceTree = SOURCE_ROOT; };
 		75421842298BD5720028D5DF /* Peer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Peer.swift; sourceTree = "<group>"; };
+		75421845299262E10028D5DF /* ReceiveSelectAssetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveSelectAssetView.swift; sourceTree = "<group>"; };
+		75421847299273270028D5DF /* QRReaderRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRReaderRootView.swift; sourceTree = "<group>"; };
 		7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmImportAccountView.swift; sourceTree = "<group>"; };
 		7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthentication.swift; sourceTree = "<group>"; };
 		7545BC0828C211DA00ED92C3 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
@@ -310,8 +312,8 @@
 		756A313428898CA2004978E2 /* BasicTextStyleModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTextStyleModifier.swift; sourceTree = "<group>"; };
 		756A3136288AEAAD004978E2 /* AssetDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetDetailsView.swift; sourceTree = "<group>"; };
 		756A3138288AEAD2004978E2 /* BackButtonModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackButtonModifier.swift; sourceTree = "<group>"; };
-		756A313A288AEFA2004978E2 /* ReceiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
-		756A313C288EBBAD004978E2 /* SelectAssetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectAssetView.swift; sourceTree = "<group>"; };
+		756A313A288AEFA2004978E2 /* QRCodeGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeGeneratorView.swift; sourceTree = "<group>"; };
+		756A313C288EBBAD004978E2 /* SendSelectAssetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendSelectAssetView.swift; sourceTree = "<group>"; };
 		756A313E28902C6F004978E2 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		756DDD6D28A272AB002EDC60 /* NoAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoAccountView.swift; sourceTree = "<group>"; };
 		756DDD6F28A275AD002EDC60 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
@@ -472,6 +474,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		754218492992733B0028D5DF /* QRCodeReader */ = {
+			isa = PBXGroup;
+			children = (
+				75421847299273270028D5DF /* QRReaderRootView.swift */,
+				752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */,
+				75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */,
+			);
+			path = QRCodeReader;
+			sourceTree = "<group>";
+		};
 		755105F4294CA40D00525A16 /* Manager */ = {
 			isa = PBXGroup;
 			children = (
@@ -506,9 +518,9 @@
 		755170882948BFB700CC84D7 /* Account */ = {
 			isa = PBXGroup;
 			children = (
+				7551708B2948C1F500CC84D7 /* AccountViewNavigationConfig.swift */,
 				755170892948C1C300CC84D7 /* AccountRootView.swift */,
 				756A3117288821F3004978E2 /* AccountView.swift */,
-				7551708B2948C1F500CC84D7 /* AccountViewNavigationConfig.swift */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -516,9 +528,10 @@
 		755170912948C8C800CC84D7 /* Receive */ = {
 			isa = PBXGroup;
 			children = (
-				755170922948CB0000CC84D7 /* ReceiveRootView.swift */,
 				755170942948CBC300CC84D7 /* ReceiveViewNavigationConfig.swift */,
-				756A313A288AEFA2004978E2 /* ReceiveView.swift */,
+				755170922948CB0000CC84D7 /* ReceiveRootView.swift */,
+				75421845299262E10028D5DF /* ReceiveSelectAssetView.swift */,
+				756A313A288AEFA2004978E2 /* QRCodeGeneratorView.swift */,
 			);
 			path = Receive;
 			sourceTree = "<group>";
@@ -526,8 +539,8 @@
 		755170962948CEEE00CC84D7 /* AccountBackup */ = {
 			isa = PBXGroup;
 			children = (
-				755170972948CF3400CC84D7 /* AccountBackupRootView.swift */,
 				755170992948D02700CC84D7 /* AccountBackupNavigationConfig.swift */,
+				755170972948CF3400CC84D7 /* AccountBackupRootView.swift */,
 				7551706A2934AA7700CC84D7 /* BackUpDetailsView.swift */,
 				7551706C2934B10000CC84D7 /* RecoveryPhraseView.swift */,
 				755170762935E47100CC84D7 /* RecoveryPhraseTestView.swift */,
@@ -541,13 +554,12 @@
 			children = (
 				7551708D2948C79C00CC84D7 /* SendViewNavigationConfig.swift */,
 				7551708F2948C7CD00CC84D7 /* SendRootView.swift */,
-				479A7AD128B8F1530057E100 /* SendView.swift */,
 				479A7AD328B8F30B0057E100 /* ReviewTransactionView.swift */,
 				7545BC0A28C2339900ED92C3 /* ConfirmationView.swift */,
 				7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */,
 				7564C65328CF3D3900ABA8CF /* SetAmountView.swift */,
 				7564C65A28D08F6F00ABA8CF /* AmountView.swift */,
-				756A313C288EBBAD004978E2 /* SelectAssetView.swift */,
+				756A313C288EBBAD004978E2 /* SendSelectAssetView.swift */,
 			);
 			path = Send;
 			sourceTree = "<group>";
@@ -670,6 +682,7 @@
 				7564C65028CF3C2E00ABA8CF /* Send */,
 				755170882948BFB700CC84D7 /* Account */,
 				755170962948CEEE00CC84D7 /* AccountBackup */,
+				754218492992733B0028D5DF /* QRCodeReader */,
 				755170702935C81900CC84D7 /* RoundedCornerShape.swift */,
 				755C56D928EB090B00A4B57B /* TextFieldWrapper.swift */,
 				7551706E2935C76C00CC84D7 /* ClickableWordView.swift */,
@@ -677,8 +690,6 @@
 				756A3136288AEAAD004978E2 /* AssetDetailsView.swift */,
 				75772A6B2906B57200BE80B7 /* AmountValueView.swift */,
 				756A313228898C73004978E2 /* SingleTxView.swift */,
-				752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */,
-				75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */,
 				4774D71D28B4B06200B7988B /* ActivityView.swift */,
 				479A7ACC28B778CA0057E100 /* WalletItemView.swift */,
 				75D8C5CB28E1B40300228298 /* AsyncImageView.swift */,
@@ -945,14 +956,13 @@
 				754F61C229815A480079621C /* LightningKitManager.swift in Sources */,
 				7551707929364C5E00CC84D7 /* WordView.swift in Sources */,
 				75D8C5BB28DAF46800228298 /* WalletStorage.swift in Sources */,
-				756A313D288EBBAD004978E2 /* SelectAssetView.swift in Sources */,
+				756A313D288EBBAD004978E2 /* SendSelectAssetView.swift in Sources */,
 				755C56CF28EACBC800A4B57B /* TxLabelsView.swift in Sources */,
 				752FA62B2967165300008796 /* ISendBitcoinAdapter.swift in Sources */,
 				756DDD7228A27C11002EDC60 /* CreateAccountViewModel.swift in Sources */,
 				755C56CD28EACAC700A4B57B /* EditableTextFieldView.swift in Sources */,
 				75D8C5A928D88F8D00228298 /* AdapterState.swift in Sources */,
 				75D8C59228D8867600228298 /* IAccountStorage.swift in Sources */,
-				479A7AD228B8F1530057E100 /* SendView.swift in Sources */,
 				756A313328898C73004978E2 /* SingleTxView.swift in Sources */,
 				755C56C028E9B0F600A4B57B /* TxIDView.swift in Sources */,
 				75DFA55828BD010400F23E02 /* QRCodeReaderView.swift in Sources */,
@@ -994,6 +1004,7 @@
 				750C05E629646860005519FF /* ISendAssetService.swift in Sources */,
 				7551709A2948D02700CC84D7 /* AccountBackupNavigationConfig.swift in Sources */,
 				756A3131288844FD004978E2 /* AccountViewModel.swift in Sources */,
+				75421846299262E10028D5DF /* ReceiveSelectAssetView.swift in Sources */,
 				755C56B528E5D12900A4B57B /* TransactionDetailsView.swift in Sources */,
 				7564C66228D85AA800ABA8CF /* Exchanger.swift in Sources */,
 				479A7ACB28B759510057E100 /* Portal+Injection.swift in Sources */,
@@ -1008,9 +1019,10 @@
 				7545BC4328CA155100ED92C3 /* Decimal+Extension.swift in Sources */,
 				4774D72D28B4FCCC00B7988B /* AccountCurrency.swift in Sources */,
 				7551706B2934AA7700CC84D7 /* BackUpDetailsView.swift in Sources */,
-				756A313B288AEFA2004978E2 /* ReceiveView.swift in Sources */,
+				756A313B288AEFA2004978E2 /* QRCodeGeneratorView.swift in Sources */,
 				750C05DB29641B97005519FF /* PublishRelay+Combine.swift in Sources */,
 				755170772935E47100CC84D7 /* RecoveryPhraseTestView.swift in Sources */,
+				75421848299273270028D5DF /* QRReaderRootView.swift in Sources */,
 				755C56D528EACDF500A4B57B /* BitcoinDevKitTransaction+Extension.swift in Sources */,
 				756A3122288821F4004978E2 /* PortalDB.xcdatamodeld in Sources */,
 				750C05EC296468E5005519FF /* FeeRatePriority.swift in Sources */,
