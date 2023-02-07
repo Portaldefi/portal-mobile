@@ -12,12 +12,11 @@ import SwiftUI
 
 class WalletItemViewModel: ObservableObject {
     let coin: Coin
-    private let balanceAdapter: IBalanceAdapter
+    let balanceAdapter: IBalanceAdapter
+    
     private var subscriptions = Set<AnyCancellable>()
     private var marketData: IMarketDataRepository
-    
-    @ObservedObject private var viewState: ViewState
-    
+        
     @Published var balance: Decimal
     @Published var balanceString: String
     
@@ -34,11 +33,10 @@ class WalletItemViewModel: ObservableObject {
         }
     }
     
-    init(coin: Coin, balanceAdapter: IBalanceAdapter, marketData: IMarketDataRepository, viewState: ViewState) {
+    init(coin: Coin, balanceAdapter: IBalanceAdapter, marketData: IMarketDataRepository) {
         self.coin = coin
         self.balanceAdapter = balanceAdapter
         self.marketData = marketData
-        self.viewState = viewState
         
         self.balance = balanceAdapter.balance
         self.balanceString = "\(balanceAdapter.balance)"
@@ -53,7 +51,6 @@ class WalletItemViewModel: ObservableObject {
                 guard let self = self else { return }
                 self.balance = self.balanceAdapter.balance
                 self.balanceString = "\(self.balanceAdapter.balance)"
-                self.viewState.onAssetBalancesUpdate.send()
             }
             .store(in: &subscriptions)
     }
@@ -63,7 +60,6 @@ extension WalletItemViewModel {
     static func config(coin: Coin) -> WalletItemViewModel {
         let adapterManager = Container.adapterManager()
         let marketData = Container.marketData()
-        let viewState = Container.viewState()
         let walletManager = Container.walletManager()
         
         guard
@@ -72,15 +68,14 @@ extension WalletItemViewModel {
         else {
             fatalError("Balance adapter for \(coin) is nil")
         }
-        return WalletItemViewModel(coin: coin, balanceAdapter: balanceAdapter, marketData: marketData, viewState: viewState)
+        return WalletItemViewModel(coin: coin, balanceAdapter: balanceAdapter, marketData: marketData)
     }
     
     static var mocked: WalletItemViewModel {
         WalletItemViewModel(
             coin: .bitcoin(),
             balanceAdapter: BalanceAdapterMocked(),
-            marketData: MarketData.mocked,
-            viewState: ViewState()
+            marketData: MarketData.mocked
         )
     }
 }
