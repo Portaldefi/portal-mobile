@@ -18,12 +18,12 @@ struct SendViewNavigationConfig: NavigationConfigurator {
         case .sendSelectAsset(let viewModel):
             return ViewElement(
                 id: screen.id,
-                wrappedElement: AnyView(SelectAssetView(viewModel: viewModel))
+                wrappedElement: AnyView(SendSelectAssetView(viewModel: viewModel))
             )
         case .sendSetRecipient(let viewModel):
             return ViewElement(
                 id: screen.id,
-                wrappedElement: AnyView(SetRecipientView(viewModel: viewModel, dismissable: false))
+                wrappedElement: AnyView(SetRecipientView(viewModel: viewModel, rootView: false))
             )
         case .sendSetAmount(let viewModel):
             return ViewElement(
