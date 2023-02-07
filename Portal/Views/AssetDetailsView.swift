@@ -19,16 +19,11 @@ struct AssetDetailsView: View {
     @State private var showTxDetails = false
     @State private var selectedTx: TransactionRecord?
     
-    let item: WalletItem?
+    let item: WalletItem
     
-    init(item: WalletItem?) {
+    init(item: WalletItem) {
         self.item = item
-        
-        if let coin = item?.coin {
-            viewModel = AssetDetailsViewModel.config(coin: coin)
-        } else {
-            viewModel = AssetDetailsViewModel.config(coin: .bitcoin())
-        }
+        viewModel = AssetDetailsViewModel.config(coin: item.coin)
     }
     
     var body: some View {
@@ -100,10 +95,11 @@ struct AssetDetailsView: View {
             TransactionDetailsView(coin: viewModel.coin, tx: tx)
         }
         .sheet(isPresented: $viewState.goToReceive) {
-            ReceiveRootView(viewModel: viewModel.receiveViewModel)
+            let viewModel = ReceiveViewModel.config(items: viewModel.walletItems, selectedItem: viewModel.walletItems.first{ $0.coin == item.coin })
+            ReceiveRootView(viewModel: viewModel, withAssetPicker: false)
         }
         .sheet(isPresented: $viewState.goToSendFromDetails) {
-            SendRootView()
+            SendRootView(withAssetPicker: false)
         }
     }
     
@@ -122,13 +118,11 @@ struct AssetDetailsView: View {
                 config: .labelAndIconLeft(label: "Send", icon: Asset.sendButtonIcon),
                 style: .filled,
                 size: .medium,
-                enabled: item?.viewModel.balance ?? 0 > 0
+                enabled: item.viewModel.balance > 0
             ) {
-                if let item = item {
-                    let sendViewViewModel = Container.sendViewModel()
-                    sendViewViewModel.coin = item.viewModel.coin
-                    viewState.goToSendFromDetails = true
-                }
+                let sendViewViewModel = Container.sendViewModel()
+                sendViewViewModel.coin = item.viewModel.coin
+                viewState.goToSendFromDetails = true
             }
         }
     }
