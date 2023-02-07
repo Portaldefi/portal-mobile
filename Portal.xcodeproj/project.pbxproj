@@ -53,7 +53,6 @@
 		7543384C2927BE4700061E28 /* ConfirmImportAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */; };
 		7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */; };
 		7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0828C211DA00ED92C3 /* View+Extension.swift */; };
-		7545BC0B28C2339900ED92C3 /* ConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0A28C2339900ED92C3 /* ConfirmationView.swift */; };
 		7545BC0D28C7948900ED92C3 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0C28C7948900ED92C3 /* String+Extension.swift */; };
 		7545BC3828C9E32A00ED92C3 /* FiatRatesResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3728C9E32A00ED92C3 /* FiatRatesResponse.swift */; };
 		7545BC3A28C9E3A200ED92C3 /* FiatSymbols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3928C9E3A200ED92C3 /* FiatSymbols.swift */; };
@@ -237,7 +236,6 @@
 		7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmImportAccountView.swift; sourceTree = "<group>"; };
 		7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthentication.swift; sourceTree = "<group>"; };
 		7545BC0828C211DA00ED92C3 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
-		7545BC0A28C2339900ED92C3 /* ConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationView.swift; sourceTree = "<group>"; };
 		7545BC0C28C7948900ED92C3 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 		7545BC3728C9E32A00ED92C3 /* FiatRatesResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FiatRatesResponse.swift; sourceTree = "<group>"; };
 		7545BC3928C9E3A200ED92C3 /* FiatSymbols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FiatSymbols.swift; sourceTree = "<group>"; };
@@ -555,7 +553,6 @@
 				7551708D2948C79C00CC84D7 /* SendViewNavigationConfig.swift */,
 				7551708F2948C7CD00CC84D7 /* SendRootView.swift */,
 				479A7AD328B8F30B0057E100 /* ReviewTransactionView.swift */,
-				7545BC0A28C2339900ED92C3 /* ConfirmationView.swift */,
 				7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */,
 				7564C65328CF3D3900ABA8CF /* SetAmountView.swift */,
 				7564C65A28D08F6F00ABA8CF /* AmountView.swift */,
@@ -1050,7 +1047,6 @@
 				75D8C59628D88A1100228298 /* IAppConfigProvider.swift in Sources */,
 				750C05E829646882005519FF /* IFeeRateProvider.swift in Sources */,
 				479A7AD028B7A92C0057E100 /* SendViewViewModel.swift in Sources */,
-				7545BC0B28C2339900ED92C3 /* ConfirmationView.swift in Sources */,
 				4774D72F28B4FD0D00B7988B /* Date+Extension.swift in Sources */,
 				75D8C59D28D88BFB00228298 /* IAdapter.swift in Sources */,
 				7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */,
