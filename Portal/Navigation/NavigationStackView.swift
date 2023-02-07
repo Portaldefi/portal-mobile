@@ -31,6 +31,8 @@ enum Screen {
     case sendSetRecipient(viewModel: SendViewViewModel)
     case sendSetAmount(viewModel: SendViewViewModel)
     case sendReviewTxView(viewModel: SendViewViewModel)
+    
+    case receiveGenerateQRCode(viewModel: ReceiveViewModel)
 }
 
 extension Screen {
@@ -72,6 +74,8 @@ extension Screen {
             return "send_set_amount_ID"
         case .sendReviewTxView:
             return "send_review_tx_ID"
+        case .receiveGenerateQRCode:
+            return "receive_generate_qr_code_ID"
         }
     }
 }
