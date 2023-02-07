@@ -6,20 +6,27 @@
 //
 
 import SwiftUI
+import Factory
 
 struct SendRootView: View {
-    private let navigationStack: NavigationStackView<SendView>
+    private let navigationStack: NavigationStackView<AnyView>
     
-    init() {
-        let rootView = SendView()
+    init(withAssetPicker: Bool) {
+        let rootView: AnyView
         
-        navigationStack = NavigationStackView<SendView>(
+        if withAssetPicker {
+            rootView = AnyView(SendSelectAssetView(viewModel: Container.sendViewModel()))
+        } else {
+            rootView = AnyView(SetRecipientView(viewModel: Container.sendViewModel(), rootView: true))
+        }
+        
+        navigationStack = NavigationStackView<AnyView>(
             configurator: SendViewNavigationConfig(),
             rootView: rootView
         )
     }
     
     var body: some View {
-        navigationStack.zIndex(1)
+        navigationStack.zIndex(1).navigationBarBackButtonHidden()
     }
 }
