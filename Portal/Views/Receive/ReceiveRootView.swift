@@ -8,13 +8,20 @@
 import SwiftUI
 
 struct ReceiveRootView: View {
-    private let navigationStack: NavigationStackView<ReceiveView>
+    private let navigationStack: NavigationStackView<AnyView>
     
-    init(viewModel: ReceiveViewModel) {
-        let rootView = ReceiveView(viewModel: viewModel)
+    init(viewModel: ReceiveViewModel, withAssetPicker: Bool) {
+        let rootView: AnyView
+        
+        if withAssetPicker {
+            rootView = AnyView(ReceiveSelectAssetView(viewModel: viewModel))
+        } else {
+            rootView = AnyView(QRCodeGeneratorView(rootView: true, viewModel: viewModel))
+        }
+                
         let navigationConfigurator = ReceiveViewNavigationConfig()
         
-        navigationStack = NavigationStackView<ReceiveView>(
+        navigationStack = NavigationStackView<AnyView>(
             configurator: navigationConfigurator,
             rootView: rootView
         )
