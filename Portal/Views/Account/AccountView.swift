@@ -11,7 +11,6 @@ import Factory
 
 struct AccountView: View {
     @State private var goToReceive = false
-    @State private var selectedItem: WalletItem?
     @State private var qrItem: QRCodeItem?
     
     @EnvironmentObject private var navigation: NavigationStack
@@ -50,8 +49,6 @@ struct AccountView: View {
                                     withAnimation {
                                         viewState.hideTabBar = true
                                     }
-                                    selectedItem = item
-                                    
                                     navigation.push(.assetDetails(item: item))
                                 }
                             Asset.chevronRightIcon
@@ -69,15 +66,14 @@ struct AccountView: View {
         .navigationBarHidden(true)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         .sheet(isPresented: $viewState.showQRCodeScannerFromTabBar) {
-            QRCodeReaderView(config: .universal)
+            QRCodeReaderRootView(config: .universal)
         }
         .sheet(isPresented: $goToReceive) {
             let viewModel = ReceiveViewModel.config(items: viewModel.items, selectedItem: nil)
-            
-            ReceiveRootView(viewModel: viewModel)
+            ReceiveRootView(viewModel: viewModel, withAssetPicker: true)
         }
         .sheet(isPresented: $viewState.goToSend) {
-            SendRootView()
+            SendRootView(withAssetPicker: true)
         }
         .fullScreenCover(isPresented: $viewState.goToBackUp) {
             AccountBackupRootView()
