@@ -26,7 +26,6 @@ class ReceiveViewModel: ObservableObject {
     @Published var editingDescription = false
     
     @Published private(set) var qrCode: UIImage?
-    @Published private(set) var step: RecieveStep = .selectAsset
     @Published private(set) var walletItems = [WalletItem]()
     
     @Published var sharedAddress: IdentifiableString?
@@ -46,19 +45,13 @@ class ReceiveViewModel: ObservableObject {
         self.selectedItem = selectedItem
         
         $selectedItem
+            .compactMap{ $0 }
             .receive(on: RunLoop.main)
             .sink { [unowned self] item in
-                self.updateExchanger(coin: item?.coin)
-                self.updateAdapter(coin: item?.coin)
+                self.updateExchanger(coin: item.coin)
+                self.updateAdapter(coin: item.coin)
 
-                if let item = item {
-                    withAnimation {
-                        self.step = .generateQR
-                    }
-                    self.generateQRCode(coin: item.coin)
-                } else {
-                    self.step = .selectAsset
-                }
+                self.generateQRCode(coin: item.coin)
         }
         .store(in: &subscriptions)
     }
