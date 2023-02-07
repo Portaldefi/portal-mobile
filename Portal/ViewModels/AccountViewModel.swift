@@ -15,7 +15,19 @@ class AccountViewModel: ObservableObject {
     @Published private(set) var accountName = String()
     @Published private(set) var totalBalance: String = "0"
     @Published private(set) var totalValue: String = "0"
-    @Published private(set) var items: [WalletItem] = []
+    
+    @Published private(set) var items: [WalletItem] = [] {
+        didSet {
+            Publishers.Sequence(sequence: items)
+                .flatMap { $0.balanceUpdated }
+                .sink { [weak self] _ in
+                    self?.updateBalance()
+                    self?.updateValue()
+                }
+                .store(in: &subscriptions)
+        }
+    }
+    
     @Published var selectedItem: WalletItem?
     
     private let accountManager: IAccountManager
@@ -25,9 +37,7 @@ class AccountViewModel: ObservableObject {
     private let localStorage: ILocalStorage
     
     private var subscriptions = Set<AnyCancellable>()
-    
-    @ObservedObject private var viewState: ViewState
-    
+        
     var accountDataIsBackedUp: Bool {
         localStorage.isAccountBackedUp
     }
@@ -37,21 +47,24 @@ class AccountViewModel: ObservableObject {
         walletManager: IWalletManager,
         adapterManager: IAdapterManager,
         localStorage: ILocalStorage,
-        marketData: IMarketDataRepository,
-        viewState: ViewState
+        marketData: IMarketDataRepository
     ) {
         self.accountManager = accountManager
         self.walletManager = walletManager
         self.adapterManager = adapterManager
         self.localStorage = localStorage
         self.marketData = marketData
-        self.viewState = viewState
         
         subscribeForUpdates()
+        
+        if let account = accountManager.activeAccount {
+            accountName = account.name
+        }
     }
-    
+        
     private func subscribeForUpdates() {
         adapterManager.adapterReady
+            .compactMap { $0 }
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
@@ -67,26 +80,17 @@ class AccountViewModel: ObservableObject {
             }
             .store(in: &subscriptions)
         
-        if let account = accountManager.activeAccount {
-            accountName = account.name
-        }
-        
-        accountManager.onActiveAccountUpdate.sink { [weak self] account in
-            guard let account = account else { return }
-            self?.accountName = account.name
-        }
-        .store(in: &subscriptions)
-        
-        $items
-            .delay(for: .seconds(0.1), scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.updateBalance()
-                self?.updateValue()
+        accountManager
+            .onActiveAccountUpdate
+            .compactMap { $0 }
+            .sink { [weak self] account in
+                self?.accountName = account.name
             }
             .store(in: &subscriptions)
         
-        viewState.onAssetBalancesUpdate
-            .receive(on: RunLoop.main)
+        $items
+            .filter{ !$0.isEmpty }
+            .delay(for: .seconds(0.1), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 self?.updateBalance()
                 self?.updateValue()
@@ -96,11 +100,16 @@ class AccountViewModel: ObservableObject {
     
     private func updateBalance() {
         let balance = items.map{ $0.viewModel.balance }.reduce(0){ $0 + $1 }
-        totalBalance = "\(balance)"
+        
+        if totalBalance != "\(balance)" {
+            totalBalance = "\(balance)"
+        }
     }
     
     private func updateValue() {
-        totalValue = items.first?.viewModel.valueString ?? "0"
+        if let value = items.first?.viewModel.valueString, totalValue != value {
+            totalValue = value
+        }
     }
     
     private func configuredItems() -> [WalletItem] {
@@ -115,8 +124,7 @@ extension AccountViewModel {
             walletManager: WalletManager.mocked,
             adapterManager: AdapterManager.mocked,
             localStorage: LocalStorage.mocked,
-            marketData: MarketData.mocked,
-            viewState: ViewState()
+            marketData: MarketData.mocked
         )
         viewModel.accountName = "Mocked"
         viewModel.totalBalance = "0.00055"
