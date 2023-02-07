@@ -12,16 +12,12 @@ import Factory
 
 class AssetDetailsViewModel: ObservableObject {
     let coin: Coin
-    private let walletItems: [WalletItem]
+    let walletItems: [WalletItem]
     
     @Published private(set) var transactions: [TransactionRecord] = []
     
     private let transactionAdapter: ITransactionsAdapter
     private var subscriptions = Set<AnyCancellable>()
-    
-    lazy var receiveViewModel: ReceiveViewModel = {
-        ReceiveViewModel.config(items: walletItems, selectedItem: walletItems.first{ $0.coin == coin })
-    }()
     
     init(coin: Coin, transactionAdapter: ITransactionsAdapter, walletItems: [WalletItem]) {
         self.coin = coin
