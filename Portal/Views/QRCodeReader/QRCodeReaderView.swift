@@ -51,15 +51,15 @@ struct QRCodeReaderView: View {
                 vm.receiverAddress = address
                 
                 guard let amt = amount else {
-                    navigation.push(.sendSetRecipient(viewModel: vm))
+                    navigation.push(.sendSetRecipient(viewModel: vm), animated: false)
                     navigation.push(.sendSetAmount(viewModel: vm))
                     return
                 }
                 
                 vm.exchanger?.amount.string = amt
                 
-                navigation.push(.sendSetRecipient(viewModel: vm))
-                navigation.push(.sendSetAmount(viewModel: vm))
+                navigation.push(.sendSetRecipient(viewModel: vm), animated: false)
+                navigation.push(.sendSetAmount(viewModel: vm), animated: false)
                 navigation.push(.sendReviewTxView(viewModel: vm))
             case .send:
                 completion(item)
