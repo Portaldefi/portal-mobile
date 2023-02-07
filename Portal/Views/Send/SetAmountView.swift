@@ -14,6 +14,7 @@ struct SetAmountView: View {
     @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewModel: SendViewViewModel
     @State private var showFeesPicker = false
+    @FocusState private var focusedField: Bool
     
     init(viewModel: SendViewViewModel) {
         self.viewModel = viewModel
@@ -61,6 +62,7 @@ struct SetAmountView: View {
                         }
                         
                         AmountView(exchanger: exchanger, isValid: viewModel.amountIsValid)
+                            .focused($focusedField)
                     }
                     
                     HStack(alignment: .top) {
@@ -200,6 +202,7 @@ struct SetAmountView: View {
                         .contentShape(Rectangle())
                         .onTapGesture {
                             guard let coin = viewModel.coin, coin == .bitcoin() else { return }
+                            focusedField = false
                             withAnimation {
                                 showFeesPicker.toggle()
                             }
@@ -225,6 +228,7 @@ struct SetAmountView: View {
 
                             HStack {
                                 PButton(config: .onlyLabel("Cancel"), style: .free, size: .small, applyGradient: true, enabled: true) {
+                                    focusedField = true
                                     withAnimation {
                                         showFeesPicker = false
                                     }
@@ -244,6 +248,8 @@ struct SetAmountView: View {
                                 )
                             VStack(alignment: .leading, spacing: 0) {
                                 Button {
+                                    focusedField = true
+
                                     withAnimation {
                                         viewModel.feeRate = .fast
                                         showFeesPicker = false
@@ -294,6 +300,8 @@ struct SetAmountView: View {
                                 Divider()
 
                                 Button {
+                                    focusedField = true
+
                                     withAnimation {
                                         viewModel.feeRate = .normal
                                         showFeesPicker = false
@@ -344,6 +352,8 @@ struct SetAmountView: View {
                                 Divider()
 
                                 Button {
+                                    focusedField = true
+
                                     withAnimation {
                                         viewModel.feeRate = .slow
                                         showFeesPicker = false
@@ -395,6 +405,8 @@ struct SetAmountView: View {
                                 Divider()
 
                                 Button {
+                                    focusedField = true
+
 //                                    withAnimation {
 //                                        viewModel.fee = .custom
 //                                    }
@@ -446,35 +458,40 @@ struct SetAmountView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
 
             }
-                        
-            VStack(spacing: 0) {
-                Divider()
-                    .frame(height: 1)
-                    .overlay(Palette.grayScale4A)
-                
-                VStack(alignment: .leading, spacing: 16) {
-                    if !viewModel.amountIsValid {
-                        Text("Not enough funds")
-                            .font(.Main.fixed(.monoRegular, size: 16))
-                            .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
+            
+            if focusedField {
+                VStack(spacing: 0) {
+                    Divider()
+                        .frame(height: 1)
+                        .overlay(Palette.grayScale4A)
                     
-                    if let exchanger = viewModel.exchanger {
-                        PButton(config: .onlyLabel("Continue"), style: .filled, size: .big, enabled: viewModel.amountIsValid && exchanger.baseAmountDecimal > 0) {
-                            navigation.push(.sendReviewTxView(viewModel: viewModel))
+                    VStack(alignment: .leading, spacing: 16) {
+                        if !viewModel.amountIsValid {
+                            Text("Not enough funds")
+                                .font(.Main.fixed(.monoRegular, size: 16))
+                                .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
+                                .transition(.move(edge: .bottom).combined(with: .opacity))
+                        }
+                        
+                        if let exchanger = viewModel.exchanger {
+                            PButton(config: .onlyLabel("Continue"), style: .filled, size: .big, enabled: viewModel.amountIsValid && exchanger.baseAmountDecimal > 0) {
+                                navigation.push(.sendReviewTxView(viewModel: viewModel))
+                            }
                         }
                     }
+                    .padding(16)
                 }
-                .padding(16)
+                .background(
+                    Palette.grayScale2A.edgesIgnoringSafeArea(.bottom)
+                )
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .zIndex(1)
             }
-            .background(
-                Palette.grayScale2A.edgesIgnoringSafeArea(.bottom)
-            )
-            .transition(.move(edge: .bottom).combined(with: .opacity))
-            .zIndex(1)
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
+        .onAppear {
+            focusedField = true
+        }
     }
 }
 
