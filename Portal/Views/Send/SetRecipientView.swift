@@ -176,7 +176,7 @@ struct SetRecipientView: View {
                     
                     viewModel.exchanger?.amount.string = amt
                     
-                    navigation.push(.sendSetAmount(viewModel: viewModel), animated: false)
+                    navigation.push(.sendSetAmount(viewModel: viewModel))
                     navigation.push(.sendReviewTxView(viewModel: viewModel))
                 }
             }
