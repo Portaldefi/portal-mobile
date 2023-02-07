@@ -75,15 +75,13 @@ extension SharedContainer {
         let userDefaults = UserDefaults.standard
         let localStorage = LocalStorage(storage: userDefaults)
         let marketData = Container.marketData()
-        let viewState = Container.viewState()
         
         return AccountViewModel(
             accountManager: accountManager,
             walletManager: walletManager,
             adapterManager: adapterManager,
             localStorage: localStorage,
-            marketData: marketData,
-            viewState: viewState
+            marketData: marketData
         )
     }
     
