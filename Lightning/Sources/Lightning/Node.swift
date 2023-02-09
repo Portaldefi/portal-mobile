@@ -229,6 +229,10 @@ public class Node {
         
         throw NodeError.Channels.fundingFailure
     }
+    
+    public func getFundingTransactionScriptPubKey(outputScript: [UInt8]) async -> String? {
+        return "address"
+    }
 }
 
 extension Node {
