@@ -33,21 +33,22 @@ struct SendSelectAssetView: View {
                     .frame(width: 300, height: 62)
                     .font(.Main.fixed(.monoBold, size: 16))
             }
+            .padding(.horizontal, 10)
             
             VStack(alignment: .leading, spacing: 16) {
                 Text("Select Asset")
                     .font(.Main.fixed(.bold, size: 24))
                     .foregroundColor(Palette.grayScaleCA)
+                    .padding(.horizontal, 8)
                 
                 ScrollView {
                     VStack {
                         VStack(spacing: 0) {
-                            Divider()
                             ForEach(viewModel.walletItems) { item in
                                 ZStack(alignment: .trailing) {
                                     WalletItemView(viewModel: item.viewModel)
-                                        .padding(.leading)
-                                        .padding(.trailing, 6)
+                                        .padding(.leading, 16)
+                                        .padding(.trailing, 14)
                                         .contentShape(Rectangle())
                                         .onTapGesture {
                                             guard item.viewModel.balance > 0 else {
@@ -62,6 +63,7 @@ struct SendSelectAssetView: View {
                                 }
                                 
                                 Divider()
+                                    .frame(height: 1)
                                     .overlay(Palette.grayScale2A)
                             }
                         }
@@ -70,7 +72,7 @@ struct SendSelectAssetView: View {
                 .frame(height: CGFloat(viewModel.walletItems.count) * 72)
             }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 8)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .alert(isPresented: $notEnoughFunds) {
             Alert(title: Text("Not Enough Funds"),

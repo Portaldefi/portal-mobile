@@ -18,7 +18,7 @@ struct WalletItemView: View {
     }
     
     var body: some View {
-        HStack {
+        HStack(alignment: .firstTextBaseline) {
             VStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 4.2) {
                     HStack(spacing: 6) {

@@ -18,7 +18,7 @@ struct EditableTextFieldView: View {
                 Text(description)
                     .font(.Main.fixed(.monoBold, size: 14))
                     .foregroundColor(Palette.grayScaleAA)
-                    .padding(.horizontal, 8)
+                    .padding(.trailing, 8)
                 Spacer()
                 Text(text)
                     .font(.Main.fixed(.monoBold, size: 14))

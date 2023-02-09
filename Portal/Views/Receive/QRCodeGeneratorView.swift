@@ -54,17 +54,6 @@ struct QRCodeGeneratorView: View {
                                             .font(.Main.fixed(.monoBold, size: 22))
                                             .foregroundColor(Palette.grayScaleF4)
                                     }
-                                    HStack {
-                                        Text("on")
-                                            .font(.Main.fixed(.monoMedium, size: 16))
-                                            .foregroundColor(Palette.grayScale8A)
-                                        HStack(spacing: 4) {
-                                            Asset.chainIcon
-                                            Text("Chain")
-                                                .font(.Main.fixed(.monoMedium, size: 16))
-                                                .foregroundColor(Palette.grayScale8A)
-                                        }
-                                    }
                                 }
                             }
                             
@@ -116,16 +105,20 @@ struct QRCodeGeneratorView: View {
                             }
                         }
                         .padding(.horizontal, 40)
-                        .padding(.vertical, 16)
+                        .padding(.top, 16)
+                        .padding(.bottom, 10)
                         
                         VStack(spacing: 0) {
                             Divider()
+                                .frame(height: 1)
                             if let exchanger = viewModel.exchanger {
                                 AmountView(exchanger: exchanger)
                             }
                             Divider()
+                                .frame(height: 1)
                             DescriptionView()
                             Divider()
+                                .frame(height: 1)
                         }
                         .padding(.horizontal, 24)
                     }

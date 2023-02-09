@@ -29,8 +29,8 @@ struct AccountView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                 ActionButtonsView
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 24)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 16)
             }
             
             Divider()
@@ -43,7 +43,7 @@ struct AccountView: View {
                         ZStack(alignment: .trailing) {
                             WalletItemView(viewModel: item.viewModel)
                                 .padding(.leading, 16)
-                                .padding(.trailing, 8)
+                                .padding(.trailing, 10)
                                 .contentShape(Rectangle())
                                 .onTapGesture {
                                     withAnimation {
@@ -53,13 +53,14 @@ struct AccountView: View {
                                 }
                             Asset.chevronRightIcon
                                 .foregroundColor(Palette.grayScale4A)
+                                .offset(x: 5)
                         }
                         Divider()
                             .frame(height: 1)
                             .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
                     }
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 8)
             }
             .background(Palette.grayScale20)
         }
