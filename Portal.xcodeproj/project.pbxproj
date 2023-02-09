@@ -50,6 +50,7 @@
 		75421843298BD5720028D5DF /* Peer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75421842298BD5720028D5DF /* Peer.swift */; };
 		75421846299262E10028D5DF /* ReceiveSelectAssetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75421845299262E10028D5DF /* ReceiveSelectAssetView.swift */; };
 		75421848299273270028D5DF /* QRReaderRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75421847299273270028D5DF /* QRReaderRootView.swift */; };
+		7542184B2993C8950028D5DF /* PeerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7542184A2993C8950028D5DF /* PeerStore.swift */; };
 		7543384C2927BE4700061E28 /* ConfirmImportAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */; };
 		7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */; };
 		7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0828C211DA00ED92C3 /* View+Extension.swift */; };
@@ -233,6 +234,7 @@
 		75421842298BD5720028D5DF /* Peer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Peer.swift; sourceTree = "<group>"; };
 		75421845299262E10028D5DF /* ReceiveSelectAssetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveSelectAssetView.swift; sourceTree = "<group>"; };
 		75421847299273270028D5DF /* QRReaderRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRReaderRootView.swift; sourceTree = "<group>"; };
+		7542184A2993C8950028D5DF /* PeerStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PeerStore.swift; sourceTree = "<group>"; };
 		7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmImportAccountView.swift; sourceTree = "<group>"; };
 		7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthentication.swift; sourceTree = "<group>"; };
 		7545BC0828C211DA00ED92C3 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
@@ -775,6 +777,7 @@
 		75D8C59428D8889E00228298 /* Storage */ = {
 			isa = PBXGroup;
 			children = (
+				7542184A2993C8950028D5DF /* PeerStore.swift */,
 				756DDD7928A28754002EDC60 /* AccountStorage.swift */,
 				756DDD7A28A28754002EDC60 /* DBLocalStorage.swift */,
 				756DDD7728A28754002EDC60 /* KeychainStorage.swift */,
@@ -1045,6 +1048,7 @@
 				7564C66028D219CB00ABA8CF /* Coin.swift in Sources */,
 				7545BC3A28C9E3A200ED92C3 /* FiatSymbols.swift in Sources */,
 				75D8C59628D88A1100228298 /* IAppConfigProvider.swift in Sources */,
+				7542184B2993C8950028D5DF /* PeerStore.swift in Sources */,
 				750C05E829646882005519FF /* IFeeRateProvider.swift in Sources */,
 				479A7AD028B7A92C0057E100 /* SendViewViewModel.swift in Sources */,
 				4774D72F28B4FD0D00B7988B /* Date+Extension.swift in Sources */,
