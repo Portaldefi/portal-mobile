@@ -26,8 +26,8 @@ class LightningKitManager {
         switch connectionType {
         case .regtest(let config):
             instance = Node(type: .regtest(config))
-        case .testnet:
-            fatalError("Not implemented!")
+        case .testnet(let config):
+            instance = Node(type: .testnet(config))
         }
     }
     
