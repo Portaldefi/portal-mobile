@@ -7,6 +7,10 @@
 
 import Foundation
 
+public enum BitcoinTestNetConfig {
+    case blockStream
+}
+
 public struct BitcoinCoreRpcConfig {
     let username: String
     let password: String
