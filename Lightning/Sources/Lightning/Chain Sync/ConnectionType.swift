@@ -9,5 +9,5 @@ import Foundation
 
 public enum ConnectionType {
     case regtest(BitcoinCoreRpcConfig)
-    case testnet
+    case testnet(BitcoinTestNetConfig)
 }
