@@ -14,6 +14,7 @@ public enum NodeError: Error {
     case keySeedNotFound
     case alreadyRunning
     case noChainManager
+    case noRpcInterface
     case channelMaterialNotFound
     
     public enum Channels: Error {
