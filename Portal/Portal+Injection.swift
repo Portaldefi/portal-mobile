@@ -57,7 +57,7 @@ extension SharedContainer {
     }
     
     static let lightningKitManager = Factory<LightningKitManager>(scope: .singleton) {
-        LightningKitManager(connectionType: .regtest(BitcoinCoreRpcConfig(username: "polaruser", password: "polarpass", port: 18443, host: "localhost")))
+        LightningKitManager(connectionType: .testnet(.blockStream))
     }
     
     static let sendViewModel = Factory<SendViewViewModel>(scope: .cached) {
