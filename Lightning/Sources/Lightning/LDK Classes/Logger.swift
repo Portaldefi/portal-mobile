@@ -25,7 +25,7 @@ class Logger: LightningDevKit.Logger {
         case .Gossip:
             print("\nGossip Logger:\n>\(arguments)\n")
         case .Trace:
-            print("\nSentinel Logger:\n>\(arguments)\n")
+            print("\nTrace Logger:\n>\(arguments)\n")
         @unknown default:
             print("\nUnknown Logger:\n>\(arguments)\n")
         }
