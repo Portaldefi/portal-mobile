@@ -51,6 +51,7 @@
 		75421846299262E10028D5DF /* ReceiveSelectAssetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75421845299262E10028D5DF /* ReceiveSelectAssetView.swift */; };
 		75421848299273270028D5DF /* QRReaderRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75421847299273270028D5DF /* QRReaderRootView.swift */; };
 		7542184B2993C8950028D5DF /* PeerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7542184A2993C8950028D5DF /* PeerStore.swift */; };
+		7542184F299BDE320028D5DF /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 7542184E299BDE320028D5DF /* PopupView */; };
 		7543384C2927BE4700061E28 /* ConfirmImportAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */; };
 		7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */; };
 		7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0828C211DA00ED92C3 /* View+Extension.swift */; };
@@ -386,6 +387,7 @@
 				75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */,
 				7564C65E28D1F89E00ABA8CF /* DataField in Frameworks */,
 				75772A5D28F8192F00BE80B7 /* CodeScanner in Frameworks */,
+				7542184F299BDE320028D5DF /* PopupView in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -841,6 +843,7 @@
 				755105F2294C6B4300525A16 /* EvmKit */,
 				752FA62429670DD900008796 /* FeeRateKit */,
 				75421840298BD2A80028D5DF /* Lightning */,
+				7542184E299BDE320028D5DF /* PopupView */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* Portal.app */;
@@ -882,6 +885,7 @@
 				75772A5B28F8192F00BE80B7 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 				755105F1294C6B4300525A16 /* XCRemoteSwiftPackageReference "EvmKit" */,
 				752FA62329670DD900008796 /* XCRemoteSwiftPackageReference "FeeRateKit.Swift" */,
+				7542184D299BDE310028D5DF /* XCRemoteSwiftPackageReference "PopupView" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -1324,6 +1328,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		7542184D299BDE310028D5DF /* XCRemoteSwiftPackageReference "PopupView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/PopupView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/coinpaprika/coinpaprika-api-swift-client";
@@ -1409,6 +1421,11 @@
 		75421840298BD2A80028D5DF /* Lightning */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Lightning;
+		};
+		7542184E299BDE320028D5DF /* PopupView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7542184D299BDE310028D5DF /* XCRemoteSwiftPackageReference "PopupView" */;
+			productName = PopupView;
 		};
 		7545BC4028CA107100ED92C3 /* Coinpaprika */ = {
 			isa = XCSwiftPackageProductDependency;
