@@ -9,6 +9,7 @@ import SwiftUI
 import PortalUI
 import Factory
 import BitcoinDevKit
+import PopupView
 
 struct ReviewTransactionView: View {
     @FocusState private var isFocused: Bool
@@ -17,6 +18,7 @@ struct ReviewTransactionView: View {
     @EnvironmentObject private var navigation: NavigationStack
     @State private var step: ReviewStep = .reviewing
     @State private var actionButtonEnabled = true
+    @State private var editingAmount = false
     
     enum ReviewStep {
         case reviewing, signing, sent
@@ -81,9 +83,7 @@ struct ReviewTransactionView: View {
                     .frame(height: 1)
                 
                 Button {
-                    withAnimation {
-                        //viewModel.editingAmount.toggle()
-                    }
+                    editingAmount.toggle()
                 } label: {
                     ZStack(alignment: .trailing) {
                         VStack {
@@ -181,9 +181,15 @@ struct ReviewTransactionView: View {
                     } else {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle())
-                    }
+                    }                    
                 }
                 .padding(.vertical, 16)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    if let coin = viewModel.coin, coin == .bitcoin() {
+                        viewModel.showFeesPicker.toggle()
+                    }
+                }
                 
                 Divider()
                     .frame(height: 1)
@@ -270,6 +276,39 @@ struct ReviewTransactionView: View {
         ) { transaction in
             guard let coin = viewModel.coin else { return }
             navigation.push(.transactionDetails(coin: coin, tx: transaction))
+        }
+        //TxFeesPickerView
+        .popup(isPresented: $viewModel.showFeesPicker) {
+            if let fees = viewModel.recomendedFees, let coin = viewModel.coin {
+                TxFeesPickerView(
+                    coin: coin,
+                    recommendedFees: fees,
+                    feeRate: $viewModel.feeRate,
+                    onDismiss: {
+                        viewModel.showFeesPicker.toggle()
+                    }
+                )
+            } else {
+                EmptyView()
+            }
+        } customize: {
+            $0.type(.toast).position(.bottom).animation(.spring()).closeOnTapOutside(true)
+        }
+        //Amount view
+        .popup(isPresented: $editingAmount) {
+            if let exchanger = viewModel.exchanger {
+                AmountEditorView(title: "Edit Amount", exchanger: exchanger) {
+                    editingAmount.toggle()
+                } onSaveAction: { amount in
+                    editingAmount.toggle()
+                }
+                .cornerRadius(20, corners: [.topLeft, .topRight])
+                .padding(.bottom, 32)
+            } else {
+                EmptyView()
+            }
+        } customize: {
+            $0.type(.toast).position(.bottom).closeOnTapOutside(false)
         }
     }
 }
