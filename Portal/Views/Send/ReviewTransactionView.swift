@@ -83,6 +83,9 @@ struct ReviewTransactionView: View {
                     .frame(height: 1)
                 
                 Button {
+                    if viewModel.showFeesPicker  {
+                        viewModel.showFeesPicker.toggle()
+                    }
                     editingAmount.toggle()
                 } label: {
                     ZStack(alignment: .trailing) {
@@ -186,6 +189,10 @@ struct ReviewTransactionView: View {
                 .padding(.vertical, 16)
                 .contentShape(Rectangle())
                 .onTapGesture {
+                    if editingAmount {
+                        editingAmount.toggle()
+                    }
+                    
                     if let coin = viewModel.coin, coin == .bitcoin() {
                         viewModel.showFeesPicker.toggle()
                     }
@@ -292,7 +299,7 @@ struct ReviewTransactionView: View {
                 EmptyView()
             }
         } customize: {
-            $0.type(.toast).position(.bottom).animation(.spring()).closeOnTapOutside(true)
+            $0.type(.toast).position(.bottom).animation(.spring()).closeOnTapOutside(false)
         }
         //Amount view
         .popup(isPresented: $editingAmount) {
