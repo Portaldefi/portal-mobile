@@ -27,6 +27,7 @@ class SendViewViewModel: ObservableObject {
     @Published private(set) var balanceString = String()
     @Published private(set) var valueString = String()
     @Published private(set) var useAllFundsEnabled = true
+    @Published var showFeesPicker = false
     
     @Published private(set) var unconfirmedTx: TransactionRecord?
     @Published private(set) var recomendedFees: RecomendedFees?
