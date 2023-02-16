@@ -153,13 +153,9 @@ struct QRCodeGeneratorView: View {
         .popup(isPresented: $viewModel.editingAmount) {
             if let exchanger = viewModel.exchanger {
                 AmountEditorView(title: "Add Amount", exchanger: exchanger) {
-                    withAnimation {
-                        viewModel.editingAmount.toggle()
-                    }
+                    viewModel.editingAmount.toggle()
                 } onSaveAction: { amount in
-                    withAnimation {
-                        viewModel.editingAmount.toggle()
-                    }
+                    viewModel.editingAmount.toggle()
                 }
                 .cornerRadius(20, corners: [.topLeft, .topRight])
                 .padding(.bottom, 32)
@@ -176,14 +172,12 @@ struct QRCodeGeneratorView: View {
                 placeholder: "Write a payment description",
                 initialText: viewModel.description,
                 onCancelAction: {
-                    withAnimation {
-                        viewModel.editingDescription.toggle()
-                    }
+                    viewModel.editingDescription.toggle()
                 }, onSaveAction: { description in
                     withAnimation {
                         viewModel.description = description
-                        viewModel.editingDescription.toggle()
                     }
+                    viewModel.editingDescription.toggle()
                 }
             )
             .cornerRadius(20, corners: [.topLeft, .topRight])
