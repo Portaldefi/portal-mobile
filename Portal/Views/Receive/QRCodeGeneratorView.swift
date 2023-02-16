@@ -7,8 +7,11 @@
 
 import SwiftUI
 import PortalUI
+import PopupView
 
 struct QRCodeGeneratorView: View {
+    @State var showingPopup = false
+
     let rootView: Bool
     
     @Environment(\.presentationMode) private var presentationMode
@@ -74,18 +77,12 @@ struct QRCodeGeneratorView: View {
                         .padding(.bottom, 16)
                         
                         if let qr = viewModel.qrCode {
-                            ZStack {
-                                Image(uiImage: qr)
-                                    .interpolation(.none)
-                                    .resizable()
-                                    .cornerRadius(12)
-                                
-                                Asset.portalQrIcon
-                                    .resizable()
-                                    .frame(width: 72, height: 72)
-                            }
-                            .frame(width: geo.size.width - 80)
-                            .frame(height: geo.size.width - 80)
+                            Image(uiImage: qr)
+                                .interpolation(.none)
+                                .resizable()
+                                .cornerRadius(12)
+                                .frame(width: geo.size.width - 80)
+                                .frame(height: geo.size.width - 80)
                         } else {
                             ProgressView().progressViewStyle(.circular)
                         }
@@ -97,6 +94,7 @@ struct QRCodeGeneratorView: View {
                             HStack(spacing: 10) {
                                 PButton(config: .labelAndIconLeft(label: "Copy", icon: Asset.copyIcon), style: .outline, size: .medium, color: Palette.grayScaleEA, enabled: true) {
                                     viewModel.copyToClipboard()
+                                    showingPopup.toggle()
                                 }
                                 
                                 PButton(config: .labelAndIconLeft(label: "Share", icon: Asset.arrowUprightIcon), style: .outline, size: .medium, color: Palette.grayScaleEA, enabled: true) {
@@ -161,10 +159,37 @@ struct QRCodeGeneratorView: View {
                 }
             }
         }
-        .navigationBarHidden(true)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .sheet(item: $viewModel.sharedAddress) { address in
             ActivityShareView(text: address.text)
+        }
+        .popup(isPresented: $showingPopup) {
+            HStack {
+                ZStack {
+                    Circle()
+                        .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
+                    Asset.checkIcon
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .foregroundColor(.black)
+                }
+                .frame(width: 32, height: 32)
+                .padding(.horizontal, 12)
+                
+                Text("Address copied!")
+                    .font(.Main.fixed(.monoBold, size: 16))
+                    .foregroundColor(.white)
+                Spacer()
+            }
+            .frame(width: 300, height: 56)
+            .background(Color(red: 0.165, green: 0.165, blue: 0.165))
+            .cornerRadius(16)
+        } customize: {
+            $0.autohideIn(2)
+                .type(.floater())
+                .position(.top)
+                .animation(.spring())
+                .closeOnTapOutside(true)
         }
     }
     
