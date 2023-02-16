@@ -10,8 +10,6 @@ import PortalUI
 import PopupView
 
 struct QRCodeGeneratorView: View {
-    @State var showingPopup = false
-
     let rootView: Bool
     
     @Environment(\.presentationMode) private var presentationMode
@@ -94,7 +92,6 @@ struct QRCodeGeneratorView: View {
                             HStack(spacing: 10) {
                                 PButton(config: .labelAndIconLeft(label: "Copy", icon: Asset.copyIcon), style: .outline, size: .medium, color: Palette.grayScaleEA, enabled: true) {
                                     viewModel.copyToClipboard()
-                                    showingPopup.toggle()
                                 }
                                 
                                 PButton(config: .labelAndIconLeft(label: "Share", icon: Asset.arrowUprightIcon), style: .outline, size: .medium, color: Palette.grayScaleEA, enabled: true) {
@@ -121,49 +118,14 @@ struct QRCodeGeneratorView: View {
                         .padding(.horizontal, 24)
                     }
                 }
-                
-                if viewModel.editingAmount, let exchanger = viewModel.exchanger {
-                    AmountEditorView(title: "Add Amount", exchanger: exchanger) {
-                        withAnimation {
-                            viewModel.editingAmount.toggle()
-                        }
-                    } onSaveAction: { amount in
-                        withAnimation {
-                            viewModel.editingAmount.toggle()
-                        }
-                    }
-                    .cornerRadius(8)
-                    .offset(y: 5)
-                    .transition(.move(edge: .bottom))
-                    .zIndex(1)
-                } else if viewModel.editingDescription {
-                    TextEditorView(
-                        title: "Description",
-                        placeholder: "Write a payment description",
-                        initialText: viewModel.description,
-                        onCancelAction: {
-                            withAnimation {
-                                viewModel.editingDescription.toggle()
-                            }
-                        }, onSaveAction: { description in
-                            withAnimation {
-                                viewModel.description = description
-                                viewModel.editingDescription.toggle()
-                            }
-                        }
-                    )
-                    .cornerRadius(8)
-                    .offset(y: 5)
-                    .transition(.move(edge: .bottom))
-                    .zIndex(1)
-                }
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .sheet(item: $viewModel.sharedAddress) { address in
             ActivityShareView(text: address.text)
         }
-        .popup(isPresented: $showingPopup) {
+        //Confirmation message on copy from clipboard action
+        .popup(isPresented: $viewModel.showConfirmationOnCopy) {
             HStack {
                 ZStack {
                     Circle()
@@ -185,11 +147,49 @@ struct QRCodeGeneratorView: View {
             .background(Color(red: 0.165, green: 0.165, blue: 0.165))
             .cornerRadius(16)
         } customize: {
-            $0.autohideIn(2)
-                .type(.floater())
-                .position(.top)
-                .animation(.spring())
-                .closeOnTapOutside(true)
+            $0.autohideIn(2).type(.floater()).position(.top).animation(.spring()).closeOnTapOutside(true)
+        }
+        //Amount field
+        .popup(isPresented: $viewModel.editingAmount) {
+            if let exchanger = viewModel.exchanger {
+                AmountEditorView(title: "Add Amount", exchanger: exchanger) {
+                    withAnimation {
+                        viewModel.editingAmount.toggle()
+                    }
+                } onSaveAction: { amount in
+                    withAnimation {
+                        viewModel.editingAmount.toggle()
+                    }
+                }
+                .cornerRadius(20, corners: [.topLeft, .topRight])
+                .padding(.bottom, 32)
+            } else {
+                EmptyView()
+            }
+        } customize: {
+            $0.type(.toast).position(.bottom).closeOnTapOutside(false)
+        }
+        //Description field
+        .popup(isPresented: $viewModel.editingDescription) {
+            TextEditorView(
+                title: "Description",
+                placeholder: "Write a payment description",
+                initialText: viewModel.description,
+                onCancelAction: {
+                    withAnimation {
+                        viewModel.editingDescription.toggle()
+                    }
+                }, onSaveAction: { description in
+                    withAnimation {
+                        viewModel.description = description
+                        viewModel.editingDescription.toggle()
+                    }
+                }
+            )
+            .cornerRadius(20, corners: [.topLeft, .topRight])
+            .padding(.bottom, 32)
+        } customize: {
+            $0.type(.toast).position(.bottom).closeOnTapOutside(false)
         }
     }
     

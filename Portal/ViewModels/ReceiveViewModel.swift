@@ -24,6 +24,7 @@ class ReceiveViewModel: ObservableObject {
     
     @Published var description = String()
     @Published var editingDescription = false
+    @Published var showConfirmationOnCopy = false
     
     @Published private(set) var qrCode: UIImage?
     @Published private(set) var walletItems = [WalletItem]()
@@ -161,6 +162,7 @@ class ReceiveViewModel: ObservableObject {
     
     func copyToClipboard() {
         UIPasteboard.general.string = receiveAddress
+        showConfirmationOnCopy.toggle()
     }
     
     func share() {
