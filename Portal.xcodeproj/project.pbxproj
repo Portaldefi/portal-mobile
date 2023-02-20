@@ -53,6 +53,7 @@
 		7542184B2993C8950028D5DF /* PeerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7542184A2993C8950028D5DF /* PeerStore.swift */; };
 		7542184F299BDE320028D5DF /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 7542184E299BDE320028D5DF /* PopupView */; };
 		75421851299E67600028D5DF /* TxFeesPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75421850299E67600028D5DF /* TxFeesPickerView.swift */; };
+		7542185629A3C3F10028D5DF /* BTCQRCodeAddressType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7542185529A3C3F10028D5DF /* BTCQRCodeAddressType.swift */; };
 		7543384C2927BE4700061E28 /* ConfirmImportAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */; };
 		7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */; };
 		7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0828C211DA00ED92C3 /* View+Extension.swift */; };
@@ -238,6 +239,7 @@
 		75421847299273270028D5DF /* QRReaderRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRReaderRootView.swift; sourceTree = "<group>"; };
 		7542184A2993C8950028D5DF /* PeerStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PeerStore.swift; sourceTree = "<group>"; };
 		75421850299E67600028D5DF /* TxFeesPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxFeesPickerView.swift; sourceTree = "<group>"; };
+		7542185529A3C3F10028D5DF /* BTCQRCodeAddressType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTCQRCodeAddressType.swift; sourceTree = "<group>"; };
 		7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmImportAccountView.swift; sourceTree = "<group>"; };
 		7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthentication.swift; sourceTree = "<group>"; };
 		7545BC0828C211DA00ED92C3 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
@@ -685,6 +687,7 @@
 				750C05EB296468E5005519FF /* FeeRatePriority.swift */,
 				752FA62C296C608C00008796 /* RecommendedFees.swift */,
 				752FA62E296C60C900008796 /* TxFees.swift */,
+				7542185529A3C3F10028D5DF /* BTCQRCodeAddressType.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1051,6 +1054,7 @@
 				752FA62F296C60C900008796 /* TxFees.swift in Sources */,
 				75D8C5CE28E1B40300228298 /* CoinImageView.swift in Sources */,
 				750C05D829641B97005519FF /* Observable+Combine.swift in Sources */,
+				7542185629A3C3F10028D5DF /* BTCQRCodeAddressType.swift in Sources */,
 				750C05D929641B97005519FF /* BehaviorRelay+Combine.swift in Sources */,
 				755C56C228E9B13700A4B57B /* TransactionDetailsViewModel.swift in Sources */,
 				75517081293A515E00CC84D7 /* NavigationStackView.swift in Sources */,
