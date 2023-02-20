@@ -566,6 +566,8 @@
 				7551708B2948C1F500CC84D7 /* AccountViewNavigationConfig.swift */,
 				755170892948C1C300CC84D7 /* AccountRootView.swift */,
 				756A3117288821F3004978E2 /* AccountView.swift */,
+				755170912948C8C800CC84D7 /* Receive */,
+				7564C65028CF3C2E00ABA8CF /* Send */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -724,8 +726,6 @@
 				756DDD9228A28DE7002EDC60 /* RootView.swift */,
 				756A313E28902C6F004978E2 /* MainView.swift */,
 				75883A10292618330089D714 /* Onboarding */,
-				755170912948C8C800CC84D7 /* Receive */,
-				7564C65028CF3C2E00ABA8CF /* Send */,
 				755170882948BFB700CC84D7 /* Account */,
 				755170962948CEEE00CC84D7 /* AccountBackup */,
 				754218492992733B0028D5DF /* QRCodeReader */,

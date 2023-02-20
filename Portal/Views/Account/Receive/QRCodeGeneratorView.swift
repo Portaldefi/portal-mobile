@@ -61,13 +61,26 @@ struct QRCodeGeneratorView: View {
                             Spacer()
                             
                             if let coin = viewModel.selectedItem?.viewModel.coin, coin.type == .bitcoin {
-                                VStack {
-                                    Text("Address type")
-                                        .font(.Main.fixed(.monoRegular, size: 14))
-                                        .foregroundColor(Palette.grayScale6A)
-                                    Text("Segwit")
-                                        .font(.Main.fixed(.monoBold, size: 16))
-                                        .foregroundColor(Palette.grayScaleCA)
+                                Button {
+                                    viewModel.showNetworkSelector.toggle()
+                                } label: {
+                                    HStack(spacing: 6.8) {
+                                        Asset.helpIcon
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                            .foregroundColor(Palette.grayScale8A)
+                                            
+                                        Text(viewModel.qrAddressType.title)
+                                            .font(.Main.fixed(.monoBold, size: 16))
+                                            .foregroundColor(Palette.grayScaleCA)
+                                        
+                                        Asset.chevronLeftIcon
+                                            .resizable()
+                                            .frame(width: 5, height: 9)
+                                            .foregroundColor(Palette.grayScale8A)
+                                            .rotationEffect(.degrees(270))
+                                            .padding(.leading, 2)
+                                    }
                                 }
                             }
                         }
@@ -88,6 +101,7 @@ struct QRCodeGeneratorView: View {
                         VStack(spacing: 10) {
                             Text(viewModel.receiveAddress)
                                 .font(.Main.fixed(.monoRegular, size: 14))
+                                .foregroundColor(Palette.grayScaleAA)
                             
                             HStack(spacing: 10) {
                                 PButton(config: .labelAndIconLeft(label: "Copy", icon: Asset.copyIcon), style: .outline, size: .medium, color: Palette.grayScaleEA, enabled: true) {
@@ -185,6 +199,14 @@ struct QRCodeGeneratorView: View {
         } customize: {
             $0.type(.toast).position(.bottom).closeOnTapOutside(false)
         }
+        //Network Selector popup
+        .popup(isPresented: $viewModel.showNetworkSelector) {
+            QRCodeAddressTypeView(coin: .bitcoin(), addressType: $viewModel.qrAddressType, onDismiss: {
+                viewModel.showNetworkSelector.toggle()
+            })
+        } customize: {
+            $0.type(.toast).position(.bottom).closeOnTapOutside(true).backgroundColor(.black.opacity(0.5))
+        }
     }
     
     private func AmountView(exchanger: Exchanger) -> some View {
@@ -254,8 +276,13 @@ struct QRCodeGeneratorView: View {
     }
 }
 
+import Factory
+
 struct QRCodeGeneratorView_Previews: PreviewProvider {
     static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        
         QRCodeGeneratorView(rootView: true, viewModel: ReceiveViewModel.mocked)
     }
 }
