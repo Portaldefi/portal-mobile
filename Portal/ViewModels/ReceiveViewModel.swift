@@ -25,6 +25,7 @@ class ReceiveViewModel: ObservableObject {
     @Published var description = String()
     @Published var editingDescription = false
     @Published var showConfirmationOnCopy = false
+    @Published var showNetworkSelector = false
     
     @Published private(set) var qrCode: UIImage?
     @Published private(set) var walletItems = [WalletItem]()
@@ -32,6 +33,7 @@ class ReceiveViewModel: ObservableObject {
     @Published var sharedAddress: IdentifiableString?
     @Published var selectedItem: WalletItem?
     @Published var exchanger: Exchanger?
+    @Published var qrAddressType: BTCQRCodeAddressTypes = .lightning
     
     @Injected(Container.marketData) private var marketData
     
