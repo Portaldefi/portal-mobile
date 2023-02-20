@@ -53,4 +53,8 @@ extension AssetDetailsViewModel {
         }
         return AssetDetailsViewModel(coin: coin, transactionAdapter: transactionsAdapter, walletItems: account.items)
     }
+    
+    static var mocked: AssetDetailsViewModel {
+        AssetDetailsViewModel(coin: .bitcoin(), transactionAdapter: MockedAdapter(), walletItems: [WalletItem.mockedBtc])
+    }
 }
