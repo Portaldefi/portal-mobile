@@ -27,7 +27,7 @@ struct SendRootView: View {
     }
     
     var body: some View {
-        navigationStack.zIndex(1).navigationBarBackButtonHidden()
+        navigationStack.zIndex(1)
     }
 }
 
