@@ -30,3 +30,9 @@ struct SendRootView: View {
         navigationStack.zIndex(1).navigationBarBackButtonHidden()
     }
 }
+
+struct SendRootView_Previews: PreviewProvider {
+    static var previews: some View {
+        SendRootView(withAssetPicker: false)
+    }
+}

@@ -35,3 +35,11 @@ struct CoinImageView: View {
         }
     }
 }
+
+struct CoinImageView_Previews: PreviewProvider {
+    static var previews: some View {
+        CoinImageView(size: 30, url: "")
+            .previewLayout(PreviewLayout.sizeThatFits)
+            .padding()
+    }
+}

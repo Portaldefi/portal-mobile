@@ -69,8 +69,12 @@ struct BackUpDetailsView: View {
     }
 }
 
+import Factory
+
 struct BackUpDetailsView_Previews: PreviewProvider {
     static var previews: some View {
+        let _ = Container.accountManager.register { AccountManager.mocked }
+
         BackUpDetailsView()
     }
 }

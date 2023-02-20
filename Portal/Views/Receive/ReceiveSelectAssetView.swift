@@ -70,9 +70,13 @@ struct ReceiveSelectAssetView: View {
     }
 }
 
+import Factory
 
 struct ReceiveSelectAssetView_Previews: PreviewProvider {
     static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        
         ReceiveSelectAssetView(viewModel: ReceiveViewModel.mocked)
     }
 }

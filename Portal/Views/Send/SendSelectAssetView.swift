@@ -85,8 +85,9 @@ struct SendSelectAssetView: View {
 
 struct SendFromView_Previews: PreviewProvider {
     static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        
         SendSelectAssetView(viewModel: SendViewViewModel.mocked)
-            .padding()
-            .previewLayout(.sizeThatFits)
     }
 }

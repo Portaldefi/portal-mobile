@@ -21,9 +21,9 @@ struct AssetDetailsView: View {
     
     let item: WalletItem
     
-    init(item: WalletItem) {
+    init(item: WalletItem, viewModel: AssetDetailsViewModel) {
         self.item = item
-        viewModel = AssetDetailsViewModel.config(coin: item.coin)
+        self.viewModel = viewModel
     }
     
     var body: some View {
@@ -130,7 +130,7 @@ struct AssetDetailsView: View {
 
 struct TxsView_Previews: PreviewProvider {
     static var previews: some View {
-        AssetDetailsView(item: WalletItem.mockedBtc)
+        AssetDetailsView(item: WalletItem.mockedBtc, viewModel: AssetDetailsViewModel.mocked)
     }
 }
 

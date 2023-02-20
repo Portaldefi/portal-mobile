@@ -13,7 +13,7 @@ struct AccountViewNavigationConfig: NavigationConfigurator {
         case .assetDetails(let item):
             return ViewElement(
                 id: screen.id,
-                wrappedElement: AnyView(AssetDetailsView(item: item))
+                wrappedElement: AnyView(AssetDetailsView(item: item, viewModel: AssetDetailsViewModel.config(coin: item.coin)))
             )
         default:
             fatalError("unsupported navigation case")

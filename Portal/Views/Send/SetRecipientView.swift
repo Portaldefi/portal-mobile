@@ -194,10 +194,13 @@ extension TextEditor {
     }
 }
 
+import Factory
+
 struct RecipientView_Previews: PreviewProvider {
     static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        
         SetRecipientView(viewModel: SendViewViewModel.mocked, rootView: true)
-            .padding()
-            .previewLayout(.sizeThatFits)
     }
 }

@@ -22,3 +22,10 @@ struct QRCodeReaderRootView: View {
         navigationStack.zIndex(1).navigationBarBackButtonHidden()
     }
 }
+
+struct QRCodeReaderRootView_Previews: PreviewProvider {
+    static var previews: some View {
+        QRCodeReaderRootView(config: .universal)
+    }
+}
+

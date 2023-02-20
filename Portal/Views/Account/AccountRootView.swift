@@ -24,3 +24,10 @@ struct AccountRootView: View {
         navigationStack.zIndex(1)
     }
 }
+
+struct AccountRootView_Previews: PreviewProvider {
+    static var previews: some View {
+        AccountRootView()
+    }
+}
+

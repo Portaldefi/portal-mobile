@@ -23,3 +23,10 @@ struct NoAccountRootView: View {
         navigationStack.zIndex(1)
     }
 }
+
+struct NoAccountRootView_Previews: PreviewProvider {
+    static var previews: some View {
+        NoAccountRootView()
+    }
+}
+

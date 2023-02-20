@@ -31,3 +31,9 @@ struct ReceiveRootView: View {
         navigationStack.zIndex(1)
     }
 }
+
+struct ReceiveRootView_Previews: PreviewProvider {
+    static var previews: some View {
+        ReceiveRootView(viewModel: ReceiveViewModel.mocked, withAssetPicker: true)
+    }
+}

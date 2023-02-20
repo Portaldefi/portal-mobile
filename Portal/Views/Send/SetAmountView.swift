@@ -269,8 +269,9 @@ struct SetAmountView: View {
 
 struct SetAmountView_Previews: PreviewProvider {
     static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        
         SetAmountView(viewModel: SendViewViewModel.mocked)
-            .padding()
-            .previewLayout(.sizeThatFits)
     }
 }

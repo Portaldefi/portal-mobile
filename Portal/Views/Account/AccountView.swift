@@ -205,6 +205,7 @@ struct AccountView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let _ = Container.accountViewModel.register { AccountViewModel.mocked }
+        
         AccountView()
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
             .preferredColorScheme(.dark)

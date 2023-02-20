@@ -211,8 +211,13 @@ struct TransactionDetailsView: View {
     }
 }
 
+import Factory
+
 struct TransactionDetailsView_Previews: PreviewProvider {
     static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        
         TransactionDetailsView(coin: .bitcoin(), tx: TransactionRecord.mocked)
     }
 }

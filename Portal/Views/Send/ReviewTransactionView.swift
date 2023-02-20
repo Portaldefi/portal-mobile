@@ -322,9 +322,9 @@ struct ReviewTransactionView: View {
 
 struct ReviewTransactionView_Previews: PreviewProvider {
     static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        
         ReviewTransactionView(viewModel: SendViewViewModel.mocked)
-            .padding(.top, 40)
-            .padding()
-            .previewLayout(.sizeThatFits)
     }
 }
