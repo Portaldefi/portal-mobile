@@ -97,3 +97,10 @@ struct Mainview: View {
         }
     }
 }
+
+struct Mainview_Previews: PreviewProvider {
+    static var previews: some View {
+        Mainview()
+    }
+}
+
