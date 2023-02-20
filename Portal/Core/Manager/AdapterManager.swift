@@ -126,23 +126,23 @@ extension AdapterManager {
         var adapterReady = CurrentValueSubject<Bool, Never>(true)
         
         func adapter(for wallet: Wallet) -> IAdapter? {
-            nil
+            MockedAdapter()
         }
         
         func adapter(for coin: Coin) -> IAdapter? {
-            nil
+            MockedAdapter()
         }
         
         func balanceAdapter(for wallet: Wallet) -> IBalanceAdapter? {
-            nil
+            MockedAdapter()
         }
         
         func transactionsAdapter(for wallet: Wallet) -> ITransactionsAdapter? {
-            nil
+            MockedAdapter()
         }
         
         func depositAdapter(for wallet: Wallet) -> IDepositAdapter? {
-            nil
+            MockedAdapter()
         }
         
         func refresh() {
