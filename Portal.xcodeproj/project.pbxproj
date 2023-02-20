@@ -55,6 +55,7 @@
 		75421851299E67600028D5DF /* TxFeesPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75421850299E67600028D5DF /* TxFeesPickerView.swift */; };
 		7542185429A3ABAC0028D5DF /* QRCodeAddressTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7542185329A3ABAC0028D5DF /* QRCodeAddressTypeView.swift */; };
 		7542185629A3C3F10028D5DF /* BTCQRCodeAddressType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7542185529A3C3F10028D5DF /* BTCQRCodeAddressType.swift */; };
+		7542185829A3E01A0028D5DF /* MockedAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7542185729A3E01A0028D5DF /* MockedAdapter.swift */; };
 		7543384C2927BE4700061E28 /* ConfirmImportAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */; };
 		7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */; };
 		7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0828C211DA00ED92C3 /* View+Extension.swift */; };
@@ -242,6 +243,7 @@
 		75421850299E67600028D5DF /* TxFeesPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxFeesPickerView.swift; sourceTree = "<group>"; };
 		7542185329A3ABAC0028D5DF /* QRCodeAddressTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeAddressTypeView.swift; sourceTree = "<group>"; };
 		7542185529A3C3F10028D5DF /* BTCQRCodeAddressType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTCQRCodeAddressType.swift; sourceTree = "<group>"; };
+		7542185729A3E01A0028D5DF /* MockedAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedAdapter.swift; sourceTree = "<group>"; };
 		7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmImportAccountView.swift; sourceTree = "<group>"; };
 		7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthentication.swift; sourceTree = "<group>"; };
 		7545BC0828C211DA00ED92C3 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
@@ -680,6 +682,7 @@
 				7564C65628CF6EC400ABA8CF /* SendFlowError.swift */,
 				7564C66128D85AA800ABA8CF /* Exchanger.swift */,
 				755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */,
+				7542185729A3E01A0028D5DF /* MockedAdapter.swift */,
 				756DDD9128A28C0A002EDC60 /* DB */,
 				755C56D228EACC9000A4B57B /* TxLabel.swift */,
 				755C56DB28EB096E00A4B57B /* TextFieldAlert.swift */,
@@ -1001,6 +1004,7 @@
 				7543384C2927BE4700061E28 /* ConfirmImportAccountView.swift in Sources */,
 				755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */,
 				752A2D5028A503B200BC6BE2 /* QRCodeScannerView.swift in Sources */,
+				7542185829A3E01A0028D5DF /* MockedAdapter.swift in Sources */,
 				755C56D328EACC9000A4B57B /* TxLabel.swift in Sources */,
 				755C56C628EAAD7C00A4B57B /* TextEditorView.swift in Sources */,
 				755105F6294CA4AB00525A16 /* EthereumKitManager.swift in Sources */,
