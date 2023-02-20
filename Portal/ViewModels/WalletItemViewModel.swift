@@ -66,7 +66,7 @@ extension WalletItemViewModel {
             let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
             let balanceAdapter = adapterManager.balanceAdapter(for: wallet)
         else {
-            fatalError("Balance adapter for \(coin) is nil")
+            return WalletItemViewModel.mocked
         }
         return WalletItemViewModel(coin: coin, balanceAdapter: balanceAdapter, marketData: marketData)
     }
