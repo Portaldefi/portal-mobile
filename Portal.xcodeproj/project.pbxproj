@@ -488,6 +488,40 @@
 			path = QRCodeReader;
 			sourceTree = "<group>";
 		};
+		7542185229A39DEC0028D5DF /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				755170702935C81900CC84D7 /* RoundedCornerShape.swift */,
+				755C56D928EB090B00A4B57B /* TextFieldWrapper.swift */,
+				7551706E2935C76C00CC84D7 /* ClickableWordView.swift */,
+				7551707829364C5E00CC84D7 /* WordView.swift */,
+				756A3136288AEAAD004978E2 /* AssetDetailsView.swift */,
+				75772A6B2906B57200BE80B7 /* AmountValueView.swift */,
+				756A313228898C73004978E2 /* SingleTxView.swift */,
+				4774D71D28B4B06200B7988B /* ActivityView.swift */,
+				479A7ACC28B778CA0057E100 /* WalletItemView.swift */,
+				75D8C5CB28E1B40300228298 /* AsyncImageView.swift */,
+				75D8C5CC28E1B40300228298 /* CoinImageView.swift */,
+				755C56B428E5D12900A4B57B /* TransactionDetailsView.swift */,
+				755C56CE28EACBC800A4B57B /* TxLabelsView.swift */,
+				755C56D028EACC4700A4B57B /* TxLabelView.swift */,
+				755C56CC28EACAC700A4B57B /* EditableTextFieldView.swift */,
+				755C56B628E5D46500A4B57B /* ConfirmationCounterView.swift */,
+				755C56B928E9B03000A4B57B /* TxAmountView.swift */,
+				755C56BB28E9B07E00A4B57B /* TxRecipientView.swift */,
+				755C56BD28E9B0B700A4B57B /* TxFeesView.swift */,
+				755C56BF28E9B0F600A4B57B /* TxIDView.swift */,
+				755C56C528EAAD7C00A4B57B /* TextEditorView.swift */,
+				75772A6128FEC0AD00BE80B7 /* AmountEditorView.swift */,
+				755C56CA28EACA9100A4B57B /* WrappedHStack.swift */,
+				755C56D628EACFD700A4B57B /* LabelsManagerView.swift */,
+				755C56E128EB0A1900A4B57B /* SelectableTxLabelView.swift */,
+				75772A652901795C00BE80B7 /* ActivityShareView.swift */,
+				75421850299E67600028D5DF /* TxFeesPickerView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 		755105F4294CA40D00525A16 /* Manager */ = {
 			isa = PBXGroup;
 			children = (
@@ -686,33 +720,7 @@
 				755170882948BFB700CC84D7 /* Account */,
 				755170962948CEEE00CC84D7 /* AccountBackup */,
 				754218492992733B0028D5DF /* QRCodeReader */,
-				755170702935C81900CC84D7 /* RoundedCornerShape.swift */,
-				755C56D928EB090B00A4B57B /* TextFieldWrapper.swift */,
-				7551706E2935C76C00CC84D7 /* ClickableWordView.swift */,
-				7551707829364C5E00CC84D7 /* WordView.swift */,
-				756A3136288AEAAD004978E2 /* AssetDetailsView.swift */,
-				75772A6B2906B57200BE80B7 /* AmountValueView.swift */,
-				756A313228898C73004978E2 /* SingleTxView.swift */,
-				4774D71D28B4B06200B7988B /* ActivityView.swift */,
-				479A7ACC28B778CA0057E100 /* WalletItemView.swift */,
-				75D8C5CB28E1B40300228298 /* AsyncImageView.swift */,
-				75D8C5CC28E1B40300228298 /* CoinImageView.swift */,
-				755C56B428E5D12900A4B57B /* TransactionDetailsView.swift */,
-				755C56CE28EACBC800A4B57B /* TxLabelsView.swift */,
-				755C56D028EACC4700A4B57B /* TxLabelView.swift */,
-				755C56CC28EACAC700A4B57B /* EditableTextFieldView.swift */,
-				755C56B628E5D46500A4B57B /* ConfirmationCounterView.swift */,
-				755C56B928E9B03000A4B57B /* TxAmountView.swift */,
-				755C56BB28E9B07E00A4B57B /* TxRecipientView.swift */,
-				755C56BD28E9B0B700A4B57B /* TxFeesView.swift */,
-				755C56BF28E9B0F600A4B57B /* TxIDView.swift */,
-				755C56C528EAAD7C00A4B57B /* TextEditorView.swift */,
-				75772A6128FEC0AD00BE80B7 /* AmountEditorView.swift */,
-				755C56CA28EACA9100A4B57B /* WrappedHStack.swift */,
-				755C56D628EACFD700A4B57B /* LabelsManagerView.swift */,
-				755C56E128EB0A1900A4B57B /* SelectableTxLabelView.swift */,
-				75772A652901795C00BE80B7 /* ActivityShareView.swift */,
-				75421850299E67600028D5DF /* TxFeesPickerView.swift */,
+				7542185229A39DEC0028D5DF /* Components */,
 			);
 			path = Views;
 			sourceTree = "<group>";
