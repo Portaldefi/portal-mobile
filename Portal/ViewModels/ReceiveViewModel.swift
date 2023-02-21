@@ -26,6 +26,7 @@ class ReceiveViewModel: ObservableObject {
     @Published var editingDescription = false
     @Published var showConfirmationOnCopy = false
     @Published var showNetworkSelector = false
+    @Published var showFullQRCodeString = false
     
     @Published private(set) var qrCode: UIImage?
     @Published private(set) var walletItems = [WalletItem]()
@@ -33,14 +34,33 @@ class ReceiveViewModel: ObservableObject {
     @Published var sharedAddress: IdentifiableString?
     @Published var selectedItem: WalletItem?
     @Published var exchanger: Exchanger?
-    @Published var qrAddressType: BTCQRCodeAddressTypes = .lightning
+    @Published var qrAddressType: BTCQRCodeAddressType = .lightning
     
     @Injected(Container.marketData) private var marketData
     
     private var subscriptions = Set<AnyCancellable>()
     
     var receiveAddress: String {
-        adapter?.receiveAddress ?? "Address"
+        // temp impl
+        switch qrAddressType {
+        case .lightning:
+            return "LNBC10U1P3PJ257PP5YZTKWJCZ5FTL5LAXKAV23ZMZEKAW37ZK6KMV80PK4XAEV5QHTZ7QDPDWD3XGER9WD5KWM36YPRX7U3QD36KUCMGYP282ETNV3SHJCQZPGXQYZ5VQSP5USYC4LK9CHSFP53KVCNVQ456GANH60D89REYKDNGSMTJ6YW3NHVQ9QYYSSQJCEWM5CJWZ4A6RFJX77C490YCED6PEMK0UPKXHY89CMM7SCT66K8GNEANWYKZGDRWRFJE69H9U5U0W57RRCSYSAS7GADWMZXC8C6T0SPJAZUP6"
+        case .onChain:
+            return adapter?.receiveAddress ?? "Address"
+        case .unified:
+            return adapter?.receiveAddress ?? "Address" + "\n" + "LNBC10U1P3PJ257PP5YZTKWJCZ5FTL5LAXKAV23ZMZEKAW37ZK6KMV80PK4XAEV5QHTZ7QDPDWD3XGER9WD5KWM36YPRX7U3QD36KUCMGYP282ETNV3SHJCQZPGXQYZ5VQSP5USYC4LK9CHSFP53KVCNVQ456GANH60D89REYKDNGSMTJ6YW3NHVQ9QYYSSQJCEWM5CJWZ4A6RFJX77C490YCED6PEMK0UPKXHY89CMM7SCT66K8GNEANWYKZGDRWRFJE69H9U5U0W57RRCSYSAS7GADWMZXC8C6T0SPJAZUP6"
+        }
+    }
+    
+    var displayedString: String {
+        switch qrAddressType {
+        case .lightning:
+            return receiveAddress.turnicated.uppercased()
+        case .onChain:
+            return receiveAddress.groupedByThree.uppercased()
+        case .unified:
+            return receiveAddress
+        }
     }
     
     init(items: [WalletItem], selectedItem: WalletItem?) {
@@ -82,7 +102,7 @@ class ReceiveViewModel: ObservableObject {
         
         guard let exchanger = exchanger else { return }
         
-        Publishers.CombineLatest(exchanger.amount.$fullString, $description)
+        Publishers.CombineLatest3(exchanger.amount.$fullString, $description, $qrAddressType)
             .flatMap { _ in Just(()) }
             .receive(on: RunLoop.main)
             .sink { [unowned self] _ in
@@ -111,32 +131,36 @@ class ReceiveViewModel: ObservableObject {
     }
     
     private func generateQRCode(coin: Coin) {
-        guard let exchanger = exchanger else { return }
-        
         var qrCodeString: String
         
         switch coin.type {
         case .bitcoin:
-            qrCodeString = "bitcoin:\(receiveAddress)"
+            switch qrAddressType {
+            case .lightning:
+                qrCodeString = "lightning=LNBC10U1P3PJ257PP5YZTKWJCZ5FTL5LAXKAV23ZMZEKAW37ZK6KMV80PK4XAEV5QHTZ7QDPDWD3XGER9WD5KWM36YPRX7U3QD36KUCMGYP282ETNV3SHJCQZPGXQYZ5VQSP5USYC4LK9CHSFP53KVCNVQ456GANH60D89REYKDNGSMTJ6YW3NHVQ9QYYSSQJCEWM5CJWZ4A6RFJX77C490YCED6PEMK0UPKXHY89CMM7SCT66K8GNEANWYKZGDRWRFJE69H9U5U0W57RRCSYSAS7GADWMZXC8C6T0SPJAZUP6"
+            case .onChain:
+                qrCodeString = "bitcoin:\(receiveAddress)"
+                
+                if let components = pathComponents() {
+                    qrCodeString += components
+                }
+            case .unified:
+                qrCodeString = "bitcoin:\(receiveAddress)"
+                
+                if let components = pathComponents() {
+                    qrCodeString += components
+                }
+                
+                qrCodeString += "&lightning=LNBC10U1P3PJ257PP5YZTKWJCZ5FTL5LAXKAV23ZMZEKAW37ZK6KMV80PK4XAEV5QHTZ7QDPDWD3XGER9WD5KWM36YPRX7U3QD36KUCMGYP282ETNV3SHJCQZPGXQYZ5VQSP5USYC4LK9CHSFP53KVCNVQ456GANH60D89REYKDNGSMTJ6YW3NHVQ9QYYSSQJCEWM5CJWZ4A6RFJX77C490YCED6PEMK0UPKXHY89CMM7SCT66K8GNEANWYKZGDRWRFJE69H9U5U0W57RRCSYSAS7GADWMZXC8C6T0SPJAZUP6"
+            }
         case .ethereum:
             qrCodeString = "ethereum:\(receiveAddress)"
+            
+            if let components = pathComponents() {
+                qrCodeString += components
+            }
         default:
             qrCodeString = String()
-        }
-                
-        var components = URLComponents()
-        components.queryItems = []
-        
-        if exchanger.baseAmountDecimal > 0 {
-            components.queryItems?.append(URLQueryItem(name: "amount", value: exchanger.baseAmountString))
-        }
-
-        if !description.isEmpty {
-            components.queryItems?.append(URLQueryItem(name: "message", value: description))
-        }
-                
-        if let parameters = components.string, parameters != "?" {
-            qrCodeString += parameters
         }
         
         print("QR CODE STRING: \(qrCodeString)")
@@ -154,12 +178,25 @@ class ReceiveViewModel: ObservableObject {
         qrCode = UIImage(cgImage: cgimg)
     }
     
-    func clear() {
-        selectedItem = nil
-        qrCode = UIImage()
-        adapter = nil
-        exchanger?.amount.string = String()
-        description = String()
+    private func pathComponents() -> String? {
+        guard let exchanger = exchanger else { return nil }
+
+        var components = URLComponents()
+        components.queryItems = []
+        
+        if exchanger.baseAmountDecimal > 0 {
+            components.queryItems?.append(URLQueryItem(name: "amount", value: exchanger.baseAmountString))
+        }
+
+        if !description.isEmpty {
+            components.queryItems?.append(URLQueryItem(name: "message", value: description))
+        }
+                
+        if let parameters = components.string, parameters != "?" {
+            return parameters
+        }
+        
+        return nil
     }
     
     func copyToClipboard() {
