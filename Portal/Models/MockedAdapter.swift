@@ -19,10 +19,10 @@ class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepos
         Just(()).eraseToAnyPublisher()
     }
     
-    var receiveAddress: String = "MockedAddress"
+    var receiveAddress: String = "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3"
     
     var transactionRecords: AnyPublisher<[TransactionRecord], Never> {
-        Just([]).eraseToAnyPublisher()
+        Just([TransactionRecord.mocked]).eraseToAnyPublisher()
     }
     
     var balance: Decimal = 1
