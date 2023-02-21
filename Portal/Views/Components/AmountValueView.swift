@@ -17,7 +17,6 @@ struct AmountValueView: View {
                 Text("Amount")
                     .font(.Main.fixed(.monoBold, size: 14))
                     .foregroundColor(Palette.grayScaleAA)
-                    .padding(.horizontal, 8)
                     .offset(y: -10)
                 Spacer()
                 
