@@ -28,6 +28,12 @@ extension String {
             }
     }
     
+    var turnicated: String {
+        let prefix = String(self.prefix(12)).groupedByThree
+        let suffix = String(self.suffix(12)).groupedByThree
+        return (prefix + "..." + suffix).uppercased()
+    }
+    
     var reversed: String {
         let inputStringReversed = String(self.reversed())
         let characters = Array(inputStringReversed)
