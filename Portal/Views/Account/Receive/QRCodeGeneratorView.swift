@@ -14,7 +14,7 @@ struct QRCodeGeneratorView: View {
     
     @Environment(\.presentationMode) private var presentationMode
     @EnvironmentObject private var navigation: NavigationStack
-    @ObservedObject var viewModel: ReceiveViewModel
+    @StateObject var viewModel: ReceiveViewModel
     
     var body: some View {
         GeometryReader { geo in
@@ -87,21 +87,65 @@ struct QRCodeGeneratorView: View {
                         .padding(.horizontal, 40)
                         .padding(.bottom, 16)
                         
+                        if viewModel.qrAddressType == .onChain {
+                            VStack(spacing: 16) {
+                                HStack {
+                                    Text("You’ll need to wait for 3 confirmation, to be able to use these funds.")
+                                        .multilineTextAlignment(.leading)
+                                        .font(.Main.fixed(.monoBold, size: 12))
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                }
+                                .background(
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Palette.grayScale4A, lineWidth: 1)
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .foregroundColor(Palette.grayScale2A)
+                                    }
+                                )
+                                .padding(.horizontal, 24)
+                                
+                                HStack {
+                                    Text("Send more than 0.00002 BTC and up to 0.039 BTC to this address. A setup fee of 0.4% will be applied for > 0.00086 BTC")
+                                        .multilineTextAlignment(.leading)
+                                        .font(.Main.fixed(.monoBold, size: 12))
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                }
+                                .background(
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Palette.grayScale4A, lineWidth: 1)
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .foregroundColor(Palette.grayScale2A)
+                                    }
+                                )
+                                .padding(.horizontal, 24)
+                            }
+                            .padding(.bottom, 16)
+                        }
+                        
                         if let qr = viewModel.qrCode {
                             Image(uiImage: qr)
                                 .interpolation(.none)
                                 .resizable()
                                 .cornerRadius(12)
-                                .frame(width: geo.size.width - 80)
-                                .frame(height: geo.size.width - 80)
+                                .frame(width: geo.size.width - 80, height: geo.size.width - 80)
                         } else {
                             ProgressView().progressViewStyle(.circular)
+                                .frame(width: geo.size.width - 80, height: geo.size.width - 80)
                         }
                         
                         VStack(spacing: 10) {
-                            Text(viewModel.receiveAddress)
-                                .font(.Main.fixed(.monoRegular, size: 14))
-                                .foregroundColor(Palette.grayScaleAA)
+                            Button {
+                                viewModel.showFullQRCodeString.toggle()
+                            } label: {
+                                Text(viewModel.displayedString)
+                                    .multilineTextAlignment(.leading)
+                                    .font(.Main.fixed(.monoRegular, size: 14))
+                                    .foregroundColor(Palette.grayScaleAA)
+                            }
                             
                             HStack(spacing: 10) {
                                 PButton(config: .labelAndIconLeft(label: "Copy", icon: Asset.copyIcon), style: .outline, size: .medium, color: Palette.grayScaleEA, enabled: true) {
@@ -128,6 +172,15 @@ struct QRCodeGeneratorView: View {
                             DescriptionView()
                             Divider()
                                 .frame(height: 1)
+                            
+                            switch viewModel.qrAddressType {
+                            case .lightning, .unified:
+                                ExpirationView()
+                                Divider()
+                                    .frame(height: 1)
+                            default:
+                                EmptyView()
+                            }
                         }
                         .padding(.horizontal, 24)
                     }
@@ -177,7 +230,7 @@ struct QRCodeGeneratorView: View {
                 EmptyView()
             }
         } customize: {
-            $0.type(.toast).position(.bottom).closeOnTapOutside(false)
+            $0.type(.toast).position(.bottom).closeOnTapOutside(false).backgroundColor(.black.opacity(0.5))
         }
         //Description field
         .popup(isPresented: $viewModel.editingDescription) {
@@ -197,13 +250,32 @@ struct QRCodeGeneratorView: View {
             .cornerRadius(20, corners: [.topLeft, .topRight])
             .padding(.bottom, 32)
         } customize: {
-            $0.type(.toast).position(.bottom).closeOnTapOutside(false)
+            $0.type(.toast).position(.bottom).closeOnTapOutside(false).backgroundColor(.black.opacity(0.5))
         }
         //Network Selector popup
         .popup(isPresented: $viewModel.showNetworkSelector) {
             QRCodeAddressTypeView(coin: .bitcoin(), addressType: $viewModel.qrAddressType, onDismiss: {
                 viewModel.showNetworkSelector.toggle()
             })
+        } customize: {
+            $0.type(.toast).position(.bottom).closeOnTapOutside(true).backgroundColor(.black.opacity(0.5))
+        }
+        //QRCodeFullStringView
+        .popup(isPresented: $viewModel.showFullQRCodeString) {
+            QRCodeFullStringView(
+                string: viewModel.receiveAddress,
+                addressType: viewModel.qrAddressType,
+                onCopy: {
+                    viewModel.showFullQRCodeString.toggle()
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        viewModel.copyToClipboard()
+                    }
+                },
+                onDismiss: {
+                    viewModel.showFullQRCodeString.toggle()
+                }
+            )
         } customize: {
             $0.type(.toast).position(.bottom).closeOnTapOutside(true).backgroundColor(.black.opacity(0.5))
         }
@@ -237,8 +309,37 @@ struct QRCodeGeneratorView: View {
                     }
                 } label: {
                     AmountValueView(exchanger: exchanger)
+                        .padding(.leading, 16)
+                        .padding(.trailing, 8)
                 }
             }
+        }
+    }
+    
+    private func ExpirationView() -> some View {
+        Button {
+            viewModel.editingAmount.toggle()
+        } label: {
+            ZStack(alignment: .trailing) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Expiration")
+                        .font(.Main.fixed(.monoBold, size: 14))
+                        .foregroundColor(Palette.grayScaleAA)
+                        .padding(.leading, 16)
+                        .padding(.trailing, 8)
+                    
+                    Spacer()
+                    
+                    Text("23:59:59")
+                        .font(.Main.fixed(.monoBold, size: 14))
+                        .foregroundColor(.white)
+                }
+                
+                Asset.chevronRightIcon
+                    .foregroundColor(Palette.grayScale4A)
+                    .offset(x: 20)
+            }
+            .frame(height: 62)
         }
     }
     
@@ -246,15 +347,11 @@ struct QRCodeGeneratorView: View {
         Group {
             if viewModel.description.isEmpty {
                 Button {
-                    withAnimation {
-                        viewModel.editingDescription.toggle()
-                    }
+                    viewModel.editingDescription.toggle()
                 } label: {
                     HStack {
                         PButton(config: .labelAndIconLeft(label: "Add Description", icon: Asset.pencilIcon), style: .free, size: .small, applyGradient: true, enabled: true) {
-                            withAnimation {
-                                viewModel.editingDescription.toggle()
-                            }
+                            viewModel.editingDescription.toggle()
                         }
                         .frame(width: 170)
                         
@@ -265,11 +362,11 @@ struct QRCodeGeneratorView: View {
                 }
             } else {
                 Button {
-                    withAnimation {
-                        viewModel.editingDescription.toggle()
-                    }
+                    viewModel.editingDescription.toggle()
                 } label: {
                     EditableTextFieldView(description: "Description", text: viewModel.description)
+                        .padding(.leading, 16)
+                        .padding(.trailing, 8)
                 }
             }
         }
