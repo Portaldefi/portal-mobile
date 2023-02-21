@@ -94,9 +94,10 @@ struct AssetDetailsView: View {
         }) { tx in
             TransactionDetailsView(coin: viewModel.coin, tx: tx)
         }
-        .sheet(isPresented: $viewState.goToReceive) {
-            let viewModel = ReceiveViewModel.config(items: viewModel.walletItems, selectedItem: viewModel.walletItems.first{ $0.coin == item.coin })
-            ReceiveRootView(viewModel: viewModel, withAssetPicker: false)
+        .sheet(isPresented: $viewState.goToReceive, onDismiss: {
+            viewModel.cleanup()
+        }) {
+            ReceiveRootView(viewModel: viewModel.receviewVM(), withAssetPicker: false)
         }
         .sheet(isPresented: $viewState.goToSendFromDetails) {
             SendRootView(withAssetPicker: false)
