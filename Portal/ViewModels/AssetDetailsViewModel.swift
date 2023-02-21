@@ -19,6 +19,8 @@ class AssetDetailsViewModel: ObservableObject {
     private let transactionAdapter: ITransactionsAdapter
     private var subscriptions = Set<AnyCancellable>()
     
+    private var receiveViewModel: ReceiveViewModel?
+    
     init(coin: Coin, transactionAdapter: ITransactionsAdapter, walletItems: [WalletItem]) {
         self.coin = coin
         self.transactionAdapter = transactionAdapter
@@ -36,6 +38,22 @@ class AssetDetailsViewModel: ObservableObject {
     
     func updateTransactions() {
         subscribe()
+    }
+    
+    func cleanup() {
+        receiveViewModel = nil
+    }
+    
+    func receviewVM() -> ReceiveViewModel {
+        guard let vm = receiveViewModel else {
+            receiveViewModel = ReceiveViewModel.config(items: walletItems, selectedItem: walletItems.first{ $0.coin == coin })
+            return receiveViewModel!
+        }
+        return vm
+    }
+    
+    deinit {
+        print("Asset details view model deinit")
     }
 }
 
