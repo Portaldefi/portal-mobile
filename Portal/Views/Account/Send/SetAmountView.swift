@@ -257,9 +257,15 @@ struct SetAmountView: View {
                 EmptyView()
             }
         } customize: {
-            $0.type(.toast).position(.bottom).animation(.spring()).closeOnTapOutside(true).dismissCallback {
-                focusedField = true
-            }
+            $0.type(.toast)
+              .position(.bottom)
+              .animation(.spring())
+              .closeOnTap(false)
+              .closeOnTapOutside(true)
+              .backgroundColor(.black.opacity(0.5))
+              .dismissCallback {
+                  focusedField = true
+              }
         }
         .onAppear {
             focusedField = true

@@ -299,14 +299,19 @@ struct ReviewTransactionView: View {
                 EmptyView()
             }
         } customize: {
-            $0.type(.toast).position(.bottom).animation(.spring()).closeOnTapOutside(false)
+            $0.type(.toast)
+              .position(.bottom)
+              .animation(.spring())
+              .closeOnTap(false)
+              .closeOnTapOutside(false)
+              .backgroundColor(.black.opacity(0.5))
         }
         //Amount view
         .popup(isPresented: $editingAmount) {
             if let exchanger = viewModel.exchanger {
                 AmountEditorView(title: "Edit Amount", exchanger: exchanger) {
                     editingAmount.toggle()
-                } onSaveAction: { amount in
+                } onSaveAction: { 
                     editingAmount.toggle()
                 }
                 .cornerRadius(20, corners: [.topLeft, .topRight])
@@ -315,7 +320,11 @@ struct ReviewTransactionView: View {
                 EmptyView()
             }
         } customize: {
-            $0.type(.toast).position(.bottom).closeOnTapOutside(false)
+            $0.type(.toast)
+              .position(.bottom)
+              .closeOnTap(false)
+              .closeOnTapOutside(false)
+              .backgroundColor(.black.opacity(0.5))
         }
     }
 }
