@@ -17,7 +17,6 @@ struct AmountView: View {
     
     @FocusState private var focusedField: Exchanger.Side?
     @ObservedObject private var exchanger: Exchanger
-    @ObservedObject private var viewState = Container.viewState()
     
     init(exchanger: Exchanger, isValid: Bool, validate: Bool = true) {
         self.exchanger = exchanger
@@ -132,18 +131,18 @@ struct AmountView: View {
                 focusedField = .quote
             }
         })
-        .onChange(of: viewState.showFeesPicker, perform: { newValue in
-            if newValue {
-                focusedField = nil
-            } else {
-                switch exchanger.side {
-                case .base:
-                    focusedField = .base
-                case .quote:
-                    focusedField = .quote
-                }
-            }
-        })
+//        .onChange(of: viewState.showFeesPicker, perform: { newValue in
+//            if newValue {
+//                focusedField = nil
+//            } else {
+//                switch exchanger.side {
+//                case .base:
+//                    focusedField = .base
+//                case .quote:
+//                    focusedField = .quote
+//                }
+//            }
+//        })
         .onAppear {
             focusedField = .base
         }

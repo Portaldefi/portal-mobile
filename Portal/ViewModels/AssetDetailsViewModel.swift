@@ -14,6 +14,14 @@ class AssetDetailsViewModel: ObservableObject {
     let coin: Coin
     let walletItems: [WalletItem]
     
+    @Published var goToReceive = false
+    @Published var goSend: Bool = false {
+        willSet {
+            if newValue != goSend && newValue == false {
+                Container.Scope.cached.reset()
+            }
+        }
+    }
     @Published private(set) var transactions: [TransactionRecord] = []
     
     private let transactionAdapter: ITransactionsAdapter

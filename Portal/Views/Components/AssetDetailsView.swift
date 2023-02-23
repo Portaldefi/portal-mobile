@@ -94,12 +94,12 @@ struct AssetDetailsView: View {
         }) { tx in
             TransactionDetailsView(coin: viewModel.coin, tx: tx)
         }
-        .sheet(isPresented: $viewState.goToReceive, onDismiss: {
+        .sheet(isPresented: $viewModel.goToReceive, onDismiss: {
             viewModel.cleanup()
         }) {
             ReceiveRootView(viewModel: viewModel.receviewVM(), withAssetPicker: false)
         }
-        .sheet(isPresented: $viewState.goToSendFromDetails) {
+        .sheet(isPresented: $viewModel.goSend) {
             SendRootView(withAssetPicker: false)
         }
     }
@@ -112,7 +112,7 @@ struct AssetDetailsView: View {
                 size: .medium,
                 enabled: true
             ) {
-                viewState.goToReceive = true
+                viewModel.goToReceive = true
             }
             
             PButton(
@@ -123,7 +123,7 @@ struct AssetDetailsView: View {
             ) {
                 let sendViewViewModel = Container.sendViewModel()
                 sendViewViewModel.coin = item.viewModel.coin
-                viewState.goToSendFromDetails = true
+                viewModel.goSend.toggle()
             }
         }
     }

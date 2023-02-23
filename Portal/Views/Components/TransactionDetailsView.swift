@@ -99,19 +99,7 @@ struct TransactionDetailsView: View {
         ZStack {
             HStack {
                 PButton(config: .onlyIcon(Asset.xIcon), style: .free, size: .medium, applyGradient: true, enabled: true) {
-                    withAnimation {
-                        if viewModel.viewState.goToSend {
-                            viewModel.viewState.goToSend = false
-                        } else if viewModel.viewState.goToSendFromDetails {
-                            viewModel.viewState.goToSendFromDetails = false
-                        } else if viewModel.viewState.showQRCodeScannerFromTabBar {
-                            viewModel.viewState.showQRCodeScannerFromTabBar = false
-                        } else if viewModel.viewState.showInContextScanner {
-                            viewModel.viewState.showInContextScanner = false
-                        } else {
-                            presentationMode.wrappedValue.dismiss()
-                        }
-                    }
+                    presentationMode.wrappedValue.dismiss()
                 }
                 .frame(width: 30, height: 30)
                 

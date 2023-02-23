@@ -21,33 +21,11 @@ class ViewState: ObservableObject {
                 Container.Scope.cached.reset()
             }
         }
-    }
-    @Published var goToSend: Bool = false {
-        willSet {
-            if newValue != goToSend && newValue == false {
-                Container.Scope.cached.reset()
-            }
-        }
-    }
-    @Published var goToSendFromDetails: Bool = false {
-        willSet {
-            if newValue != goToSendFromDetails && newValue == false {
-                Container.Scope.cached.reset()
-            }
-        }
-    }
-    @Published var showFeesPicker: Bool = false
-    
-    @Published var showInContextScanner = false
-    @Published var goToReceive = false
-    @Published var goToBackUp = false
-    
+    }    
     @Published private(set) var selectedTab: Tab = .wallet
     
     var onAssetBalancesUpdate = PassthroughSubject<Void, Never>()
-    
-    private var subscriptions = Set<AnyCancellable>()
-    
+        
     init() {}
     
     func openTab(_ tab: Tab) {

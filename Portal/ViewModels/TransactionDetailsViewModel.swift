@@ -26,9 +26,7 @@ class TransactionDetailsViewModel: ObservableObject {
     @Published var editingLabels = false
     @Published var showAddLabelInterface = false
     @Published var newLabelTitle: String?
-    
-    @LazyInjected(Container.viewState) var viewState: ViewState
-    
+        
     var title: String {
         transaction.type.description
     }
