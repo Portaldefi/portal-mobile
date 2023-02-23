@@ -55,42 +55,43 @@ public class Node {
         // (4) Initialize rpcInterface, which represents a series of chain methods that are necessary for chain sync.
         // interact with different types of block sources with just a different choice of a `RpcChainManager` instance.
         switch connectionType {
-        case .regtest(let bitcoinCoreRpcConfig):
-            rpcInterface = try BitcoinCoreChainManager(
-                rpcProtocol: .http,
-                host: bitcoinCoreRpcConfig.host,
-                port: bitcoinCoreRpcConfig.port,
-                username: bitcoinCoreRpcConfig.username,
-                password: bitcoinCoreRpcConfig.password
-            )
-        case .testnet:
-            fatalError("Not implemented!")
+        case .regtest:
+            fatalError("Not yet implemented")
+        case .testnet(let bitcoinTestNetConfig):
+            switch bitcoinTestNetConfig {
+            case .blockStream:
+                rpcInterface = try BlockStreamChainManager(rpcProtocol: .https)
+            }
         }
         
         guard let rpcInterface = rpcInterface else {
-            throw NodeError.noChainManager
+            throw NodeError.noRpcInterface
         }
         
         // (5) Initialized Broadcaster, primarily responsible for broadcasting requisite transaction on-chain.
         broadcaster = Broadcaster(rpcInterface: rpcInterface)
         
         // (6) Initialize a ChainMonitor. As the name describes, this is what we will use to watch on-chain activity
-        // related to our channels. You can think of Chain Sync as the nervous system of the Lightning node. Its mostly responsible
-        // for detecting stimuli that is relevant for its purposes, and feeds information back to the brain (`ChannelManager`)
+        // related to our channels.
         let chainMonitor = ChainMonitor(
             chainSource: filter,
-            broadcaster: broadcaster!, // Force unwrap since we definitely set it in L61
+            broadcaster: broadcaster!, // Force unwrap since we definitely set it in L72
             logger: logger,
             feeest: feeEstimator,
             persister: ChannelPersister()
         )
         
         // (7) Do requisite chain sync to start.
-        if case .regtest = connectionType,
-           let rpcInterface = rpcInterface as? BitcoinCoreChainManager {
-            // If we're using Bitcoin Core, we will tell the ChainMonitor to connect blocks up to the latest chain tip.
+        if case .regtest = connectionType, let rpcInterface = rpcInterface as? BitcoinCoreChainManager {
+            // If we're using Bitcoin Core
             try await rpcInterface.preloadMonitor(anchorHeight: .chaintip)
         }
+        
+        if case .testnet = connectionType, let rpcInterface = rpcInterface as? BlockStreamChainManager {
+            // If we're using BlockStream
+            try await rpcInterface.preloadMonitor(anchorHeight: .chaintip)
+        }
+        // we will tell the ChainMonitor to connect blocks up to the latest chain tip.
         
         // (8) Construct ChannelManager. The ChannelManager, as mentioned earlier, is like the brain of the node. It is responsible for
         // sending messages to appropriate channels, track HTLCs, forward onion packets, and also track a user's channels. It can also be
@@ -111,15 +112,19 @@ public class Node {
                 currentTipHeight: chaintipHeight,
                 keysInterface: keysInterface,
                 chainMonitor: chainMonitor,
-                broadcaster: broadcaster! // Force unwrap since we definitely set it in L61
+                broadcaster: broadcaster! // Force unwrap since we definitely set it in L78
             )
+        }
+        
+        guard let channelManagerConstructor = channelManagerConstructor else {
+            throw NodeError.noChannelManager
         }
         
         // Create shared instance reference to these objects, so we can use them for opening and managing channels and connecting to peers,
         // respectively.
-        channelManager = channelManagerConstructor!.channelManager // we just set ChannelManagerConstructor above
-        peerManager = channelManagerConstructor!.peerManager
-        tcpPeerHandler = channelManagerConstructor!.getTCPPeerHandler()
+        channelManager = channelManagerConstructor.channelManager
+        peerManager = channelManagerConstructor.peerManager
+        tcpPeerHandler = channelManagerConstructor.getTCPPeerHandler()
         
         // (9) Initialize Persister, which is primarily responsible for persisting `ChannelManager`, `Scorer`, and `NetworkGraph` to disk.
         persister = Persister(eventTracker: pendingEventTracker)
@@ -128,13 +133,14 @@ public class Node {
         }
         
         blockchainListener = ChainListener(channelManager: channelManager, chainMonitor: chainMonitor)
-        let isMonitoring = await rpcInterface.isMonitoring()
         
-        if !isMonitoring {
-            try subscribeToChainPublisher()
-        } else {
-            print("Monitor already running")
-        }
+//        let isMonitoring = await rpcInterface.isMonitoring()
+//
+//        if !isMonitoring {
+//            try subscribeToChainPublisher()
+//        } else {
+//            print("Monitor already running")
+//        }
      
         print("LDK is Running with key: \(channelManager.getOurNodeId().toHexString())")
     }
@@ -211,16 +217,6 @@ public class Node {
             fundingTransaction: fundingTransaction
         )
         
-        if case .regtest(_) = connectionType {
-            // Let's manually add 6 confirmations to confirm the channel open
-            let coreChainManager = rpcInterface as! BitcoinCoreChainManager
-            let fakeAddress = await coreChainManager.getBogusAddress()
-            _ = try! await coreChainManager.mineBlocks(
-                number: 6,
-                coinbaseDestinationAddress: fakeAddress
-            )
-        }
-        
         if fundingResult.isOk() {
             return true
         } else if let error = fundingResult.getError()?.getLDKError() {
@@ -228,6 +224,41 @@ public class Node {
         }
         
         throw NodeError.Channels.fundingFailure
+    }
+    
+    public func createInvoice(satAmount: UInt64?, description: String) -> String? {
+        guard let channelManager = channelManager, let keyInterface = keysManager?.asKeysInterface() else {
+            return nil
+        }
+        
+        var mSatAmount: UInt64?
+        if let satAmount = satAmount {
+            mSatAmount = satAmount * 1000
+        }
+        
+        let result = Bindings.swiftCreateInvoiceFromChannelmanager(
+            channelmanager: channelManager,
+            keysManager: keyInterface,
+            logger: logger,
+            network: .BitcoinTestnet,
+            amtMsat: mSatAmount,
+            description: description,
+            invoiceExpiryDeltaSecs: 1000
+        )
+        
+        if result.isOk(), let invoice = result.getValue() {
+            let invoiceString = invoice.toStr()
+            print("================================")
+            print("INVOICE: \(invoiceString)")
+            print("================================")
+            
+            return invoiceString
+        } else if let error = result.getError() {
+            print(error.toStr())
+            return nil
+        }
+        
+        return nil
     }
     
     public func getFundingTransactionScriptPubKey(outputScript: [UInt8]) async -> String? {
@@ -274,7 +305,7 @@ extension Node {
                 if let channelManagerConstructor = channelManagerConstructor,
                     let networkGraph = channelManagerConstructor.netGraph,
                     let persister = persister {
-                    
+                                        
                     let probabalisticScorer = ProbabilisticScorer(params: .initWithDefault(), networkGraph: networkGraph, logger: logger)
                     let score = probabalisticScorer.asScore()
                     
@@ -302,7 +333,7 @@ extension Node {
                     chainMonitor: chainMonitor,
                     filter: filter,
                     netGraphSerialized: networkGraph,
-                    txBroadcaster: broadcaster!, // Force unwrap since we definitely set it in L61
+                    txBroadcaster: broadcaster!, // Force unwrap since we definitely set it in L72
                     logger: logger,
                     enableP2PGossip: true
                 )
