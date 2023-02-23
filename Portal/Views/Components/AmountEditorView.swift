@@ -11,28 +11,21 @@ import Combine
 
 class AmontEditorViewModel: ObservableObject {
     let title: String
-    let onCancelAcion: () -> ()
-    let onSaveAcion: (String) -> ()
         
     @Published var saveButtonEnabled = false
     @Published var exchanger: Exchanger
     
     private let initialAmount: String
     
-    init(
-        title: String,
-        exchanger: Exchanger,
-        onCancelAction: @escaping () -> (),
-        onSaveAction: @escaping (String) -> ()
-    ) {
+    init(title: String, exchanger: Exchanger) {
         self.title = title
-        self.onCancelAcion = onCancelAction
-        self.onSaveAcion = onSaveAction
         self.exchanger = exchanger
-        
         self.initialAmount = exchanger.amount.string
-        
-        self.exchanger.amount.$string.flatMap{Just($0 != self.initialAmount)}.assign(to: &$saveButtonEnabled)
+        self.exchanger.amount.$string.flatMap{Just(!$0.isEmpty && $0 != self.initialAmount)}.assign(to: &$saveButtonEnabled)
+    }
+    
+    func onCancel() {
+        exchanger.amount.string = initialAmount
     }
 }
 
@@ -40,20 +33,20 @@ struct AmountEditorView: View {
     @FocusState private var firstResponder: Bool
     @StateObject private var viewModel: AmontEditorViewModel
     
+    let onCancelAcion: () -> ()
+    let onSaveAcion: () -> ()
+    
     init(
         title: String,
         exchanger: Exchanger,
         onCancelAction: @escaping () -> (),
-        onSaveAction: @escaping (String) -> ()
+        onSaveAction: @escaping () -> ()
     ) {
-        _viewModel = StateObject(
-            wrappedValue: AmontEditorViewModel(
-                title: title,
-                exchanger: exchanger,
-                onCancelAction: onCancelAction,
-                onSaveAction: onSaveAction
-            )
-        )
+        let vm = AmontEditorViewModel(title: title, exchanger: exchanger)
+        self._viewModel = StateObject(wrappedValue: vm)
+        
+        self.onCancelAcion = onCancelAction
+        self.onSaveAcion = onSaveAction
     }
     
     var body: some View {
@@ -65,14 +58,15 @@ struct AmountEditorView: View {
                 
                 HStack {
                     PButton(config: .onlyLabel("Cancel"), style: .free, size: .small, color: Color(red: 1, green: 0.349, blue: 0.349), applyGradient: false, enabled: true) {
-                        viewModel.onCancelAcion()
+                        viewModel.onCancel()
+                        onCancelAcion()
                     }
                     .frame(width: 58)
                     
                     Spacer()
                     
                     PButton(config: .onlyLabel("Save"), style: .free, size: .small, applyGradient: true, enabled: viewModel.saveButtonEnabled) {
-                        viewModel.onSaveAcion(viewModel.exchanger.amount.string)
+                        onSaveAcion()
                     }
                     .frame(width: 39)
                 }
@@ -101,7 +95,7 @@ struct AmountEditorView_Previews: PreviewProvider {
             exchanger: Exchanger.mocked(),
             onCancelAction: {
                 
-            }, onSaveAction: { amount in
+            }, onSaveAction: {
                 
             })
         .previewLayout(.sizeThatFits)
