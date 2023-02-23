@@ -27,6 +27,7 @@ class ReceiveViewModel: ObservableObject {
     @Published var showConfirmationOnCopy = false
     @Published var showNetworkSelector = false
     @Published var showFullQRCodeString = false
+    @Published var onAmountChange = false
     
     @Published private(set) var qrCode: UIImage?
     @Published private(set) var walletItems = [WalletItem]()
@@ -102,7 +103,7 @@ class ReceiveViewModel: ObservableObject {
         
         guard let exchanger = exchanger else { return }
         
-        Publishers.CombineLatest3(exchanger.amount.$fullString, $description, $qrAddressType)
+        Publishers.CombineLatest3($onAmountChange, $description, $qrAddressType)
             .flatMap { _ in Just(()) }
             .receive(on: RunLoop.main)
             .sink { [unowned self] _ in
@@ -163,7 +164,7 @@ class ReceiveViewModel: ObservableObject {
             qrCodeString = String()
         }
         
-        print("QR CODE STRING: \(qrCodeString)")
+        print("QR CODE STRING: \n\(qrCodeString)\n")
         
         let data = Data(qrCodeString.utf8)
         filter.setValue(data, forKey: "inputMessage")
