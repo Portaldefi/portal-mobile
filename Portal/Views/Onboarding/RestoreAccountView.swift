@@ -13,7 +13,6 @@ struct RestoreAccountView: View {
     @FocusState private var isFocused: Bool
     @StateObject private var viewModel = RestoreAccountViewModel()
     @EnvironmentObject private var navigation: NavigationStack
-    @ObservedObject private var viewState = Container.viewState()
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -86,13 +85,18 @@ struct RestoreAccountView: View {
                     .background(Color.black)
                     .cornerRadius(12)
                     
-                    PButton(
-                        config: .labelAndIconLeft(label: "Paste", icon: Asset.pasteIcon),
-                        style: .outline,
-                        size: .medium,
-                        enabled: true
-                    ) {
-                        viewModel.pasteFromClipboard()
+                    HStack {
+                        Spacer()
+                        
+                        PButton(
+                            config: .labelAndIconLeft(label: "Paste", icon: Asset.pasteIcon),
+                            style: .outline,
+                            size: .medium,
+                            enabled: true
+                        ) {
+                            viewModel.pasteFromClipboard()
+                        }
+                        .frame(width: 106, height: 40)
                     }
                 }
                 .padding(.horizontal)
@@ -152,18 +156,18 @@ struct RestoreAccountView: View {
         .alert(isPresented: $viewModel.clipboardIsEmpty) {
             Alert(title: Text("Empty Clipboard"), message: Text("You don't have anything in your device clipboard."), dismissButton: .default(Text("OK")))
         }
-        .sheet(isPresented: $viewState.showInContextScanner) {
-             QRCodeReaderView(config: .importing) { item in
-                switch item.type {
-                case .privKey(let key):
-                    viewModel.input = key
-                case .pubKey(let key):
-                    viewModel.input = key
-                default:
-                    break
-                }
-            }
-        }
+//        .sheet(isPresented: $viewState.showInContextScanner) {
+//             QRCodeReaderView(config: .importing) { item in
+//                switch item.type {
+//                case .privKey(let key):
+//                    viewModel.input = key
+//                case .pubKey(let key):
+//                    viewModel.input = key
+//                default:
+//                    break
+//                }
+//            }
+//        }
     }
 }
 
