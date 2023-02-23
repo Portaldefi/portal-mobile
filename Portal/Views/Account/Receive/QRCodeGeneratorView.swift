@@ -219,18 +219,24 @@ struct QRCodeGeneratorView: View {
         //Amount field
         .popup(isPresented: $viewModel.editingAmount) {
             if let exchanger = viewModel.exchanger {
-                AmountEditorView(title: "Add Amount", exchanger: exchanger) {
-                    viewModel.editingAmount.toggle()
-                } onSaveAction: { amount in
-                    viewModel.editingAmount.toggle()
-                }
+                AmountEditorView(
+                    title: "Add Amount",
+                    exchanger: exchanger,
+                    onCancelAction: {
+                        viewModel.editingAmount.toggle()
+                    },
+                    onSaveAction: {
+                        viewModel.editingAmount.toggle()
+                        viewModel.onAmountChange.toggle()
+                    }
+                )
                 .cornerRadius(20, corners: [.topLeft, .topRight])
                 .padding(.bottom, 32)
             } else {
                 EmptyView()
             }
         } customize: {
-            $0.type(.toast).position(.bottom).closeOnTapOutside(false).backgroundColor(.black.opacity(0.5))
+            $0.type(.toast).position(.bottom).closeOnTap(false).closeOnTapOutside(false).backgroundColor(.black.opacity(0.5))
         }
         //Description field
         .popup(isPresented: $viewModel.editingDescription) {
@@ -240,17 +246,16 @@ struct QRCodeGeneratorView: View {
                 initialText: viewModel.description,
                 onCancelAction: {
                     viewModel.editingDescription.toggle()
-                }, onSaveAction: { description in
-                    withAnimation {
-                        viewModel.description = description
-                    }
+                },
+                onSaveAction: { description in
+                    viewModel.description = description
                     viewModel.editingDescription.toggle()
                 }
             )
             .cornerRadius(20, corners: [.topLeft, .topRight])
             .padding(.bottom, 32)
         } customize: {
-            $0.type(.toast).position(.bottom).closeOnTapOutside(false).backgroundColor(.black.opacity(0.5))
+            $0.type(.toast).position(.bottom).closeOnTap(false).closeOnTapOutside(false).backgroundColor(.black.opacity(0.5))
         }
         //Network Selector popup
         .popup(isPresented: $viewModel.showNetworkSelector) {
@@ -258,7 +263,7 @@ struct QRCodeGeneratorView: View {
                 viewModel.showNetworkSelector.toggle()
             })
         } customize: {
-            $0.type(.toast).position(.bottom).closeOnTapOutside(true).backgroundColor(.black.opacity(0.5))
+            $0.type(.toast).position(.bottom).closeOnTap(false).closeOnTapOutside(true).backgroundColor(.black.opacity(0.5))
         }
         //QRCodeFullStringView
         .popup(isPresented: $viewModel.showFullQRCodeString) {
@@ -277,7 +282,7 @@ struct QRCodeGeneratorView: View {
                 }
             )
         } customize: {
-            $0.type(.toast).position(.bottom).closeOnTapOutside(true).backgroundColor(.black.opacity(0.5))
+            $0.type(.toast).position(.bottom).closeOnTap(false).closeOnTapOutside(true).backgroundColor(.black.opacity(0.5))
         }
     }
     
@@ -285,15 +290,11 @@ struct QRCodeGeneratorView: View {
         Group {
             if exchanger.baseAmountDecimal == 0 {
                 Button {
-                    withAnimation {
-                        viewModel.editingAmount.toggle()
-                    }
+                    viewModel.editingAmount.toggle()
                 } label: {
                     HStack {
                         PButton(config: .labelAndIconLeft(label: "Add Amount", icon: Asset.pencilIcon), style: .free, size: .small, applyGradient: true, enabled: true) {
-                            withAnimation {
-                                viewModel.editingAmount.toggle()
-                            }
+                            viewModel.editingAmount.toggle()
                         }
                         .frame(width: 125)
                         
@@ -304,9 +305,7 @@ struct QRCodeGeneratorView: View {
                 }
             } else {
                 Button {
-                    withAnimation {
-                        viewModel.editingAmount.toggle()
-                    }
+                    viewModel.editingAmount.toggle()
                 } label: {
                     AmountValueView(exchanger: exchanger)
                         .padding(.leading, 16)
@@ -318,7 +317,7 @@ struct QRCodeGeneratorView: View {
     
     private func ExpirationView() -> some View {
         Button {
-            viewModel.editingAmount.toggle()
+            
         } label: {
             ZStack(alignment: .trailing) {
                 HStack(alignment: .firstTextBaseline) {
