@@ -92,7 +92,6 @@ struct TransactionDetailsView: View {
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
-        .navigationBarHidden(true)
     }
     
     private func NavigationView() -> some View {

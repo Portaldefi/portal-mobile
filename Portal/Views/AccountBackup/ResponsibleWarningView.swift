@@ -12,7 +12,7 @@ import Factory
 struct ResponsibleWarningView: View {
     @EnvironmentObject private var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
-    @EnvironmentObject private var sharedState: AccountBackUpViewSharedState
+    @EnvironmentObject private var sharedState: AccountViewSharedState
     @ObservedObject private var viewModel: RecoveryPhraseViewModel
     
     init(viewModel: RecoveryPhraseViewModel) {
@@ -67,7 +67,6 @@ struct ResponsibleWarningView: View {
                 Palette.grayScale2A.edgesIgnoringSafeArea(.bottom)
             )
         }
-        .navigationBarHidden(true)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
     }
 }

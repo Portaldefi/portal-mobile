@@ -62,7 +62,6 @@ struct AccountView: View {
             }
             .background(Palette.grayScale20)
         }
-        .navigationBarHidden(true)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         .sheet(isPresented: $viewState.showQRCodeScannerFromTabBar) {
             QRCodeReaderRootView(config: .universal)

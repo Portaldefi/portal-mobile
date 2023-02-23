@@ -202,7 +202,6 @@ struct QRCodeScannerView: View {
             .frame(height: 84)
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
-        .navigationBarHidden(true)
         .alert(isPresented: $showAlertView) {
             switch scanState {
             case .detected, .detecting:
