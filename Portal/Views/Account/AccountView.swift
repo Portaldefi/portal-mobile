@@ -10,12 +10,10 @@ import PortalUI
 import Factory
 
 struct AccountView: View {
-    @State private var goToReceive = false
-    @State private var qrItem: QRCodeItem?
-    
     @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewModel: AccountViewModel = Container.accountViewModel()
     @ObservedObject private var viewState: ViewState = Container.viewState()
+    @ObservedObject private var sharedViewState = AccountViewSharedState()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -69,15 +67,15 @@ struct AccountView: View {
         .sheet(isPresented: $viewState.showQRCodeScannerFromTabBar) {
             QRCodeReaderRootView(config: .universal)
         }
-        .sheet(isPresented: $goToReceive) {
+        .sheet(isPresented: $viewModel.goToReceive) {
             let viewModel = ReceiveViewModel.config(items: viewModel.items, selectedItem: nil)
             ReceiveRootView(viewModel: viewModel, withAssetPicker: true)
         }
-        .sheet(isPresented: $viewState.goToSend) {
+        .sheet(isPresented: $viewModel.goToSend) {
             SendRootView(withAssetPicker: true)
         }
-        .fullScreenCover(isPresented: $viewState.goToBackUp) {
-            AccountBackupRootView()
+        .fullScreenCover(isPresented: $sharedViewState.showBackUpFlow) {
+            AccountBackupRootView().environmentObject(sharedViewState)
         }
     }
     
@@ -109,7 +107,7 @@ struct AccountView: View {
                 
                 if !viewModel.accountDataIsBackedUp {
                     PButton(config: .onlyIcon(Asset.warningIcon), style: .free, size: .medium, color: .yellow, enabled: true) {
-                        viewState.goToBackUp.toggle()
+                        sharedViewState.showBackUpFlow.toggle()
                     }
                     .frame(width: 30, height: 30)
                     .padding(.leading)
@@ -177,7 +175,7 @@ struct AccountView: View {
                 ),
                 enabled: true
             ) {
-                goToReceive.toggle()
+                viewModel.goToReceive.toggle()
             }
             
             PButton(
@@ -194,9 +192,7 @@ struct AccountView: View {
                 ),
                 enabled: true
             ) {
-                withAnimation {
-                    viewState.goToSend.toggle()
-                }
+                viewModel.goToSend.toggle()
             }
         }
     }

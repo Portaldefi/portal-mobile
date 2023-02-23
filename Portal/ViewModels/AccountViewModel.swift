@@ -29,6 +29,14 @@ class AccountViewModel: ObservableObject {
     }
     
     @Published var selectedItem: WalletItem?
+    @Published var goToSend = false {
+        willSet {
+            if newValue != goToSend && newValue == false {
+                Container.Scope.cached.reset()
+            }
+        }
+    }
+    @Published var goToReceive = false
     
     private let accountManager: IAccountManager
     private let walletManager: IWalletManager
