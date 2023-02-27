@@ -137,25 +137,42 @@ struct QRCodeGeneratorView: View {
                                 .frame(width: geo.size.width - 80, height: geo.size.width - 80)
                         }
                         
-                        VStack(spacing: 10) {
-                            Button {
-                                viewModel.showFullQRCodeString.toggle()
-                            } label: {
-                                Text(viewModel.displayedString)
-                                    .multilineTextAlignment(.leading)
-                                    .font(.Main.fixed(.monoRegular, size: 14))
-                                    .foregroundColor(Palette.grayScaleAA)
+                        HStack {
+                            VStack(alignment: .leading, spacing: 10) {
+                                ForEach(viewModel.sharedItems) { item in
+                                    VStack(alignment: .leading) {
+                                        HStack(spacing: 15) {
+                                            Text(item.name)
+                                                .font(.Main.fixed(.monoBold, size: 16))
+                                                .foregroundColor(Palette.grayScale6A)
+                                            
+                                            PButton(config: .onlyIcon(Asset.copyIcon), style: .free, size: .medium, applyGradient: true, enabled: true) {
+                                                viewModel.sharedItem = item
+                                                viewModel.copyToClipboard()
+                                            }
+                                            .frame(width: 26, height: 26)
+                                            
+                                            PButton(config: .onlyIcon(Asset.sendIcon), style: .free, size: .medium, applyGradient: true, enabled: true) {
+                                                viewModel.sharedItem = item
+                                                viewModel.share()
+                                            }
+                                            .frame(width: 26, height: 26)
+                                        }
+                                        
+                                        Button {
+                                            viewModel.sharedItem = item
+                                            viewModel.showFullQRCodeString.toggle()
+                                        } label: {
+                                            Text(item.displayedItem)
+                                                .multilineTextAlignment(.leading)
+                                                .font(.Main.fixed(.monoRegular, size: 14))
+                                                .foregroundColor(Palette.grayScaleAA)
+                                        }
+                                    }
+                                }
                             }
                             
-                            HStack(spacing: 10) {
-                                PButton(config: .labelAndIconLeft(label: "Copy", icon: Asset.copyIcon), style: .outline, size: .medium, color: Palette.grayScaleEA, enabled: true) {
-                                    viewModel.copyToClipboard()
-                                }
-                                
-                                PButton(config: .labelAndIconLeft(label: "Share", icon: Asset.arrowUprightIcon), style: .outline, size: .medium, color: Palette.grayScaleEA, enabled: true) {
-                                    viewModel.share()
-                                }
-                            }
+                            Spacer()
                         }
                         .padding(.horizontal, 40)
                         .padding(.top, 16)
@@ -267,20 +284,24 @@ struct QRCodeGeneratorView: View {
         }
         //QRCodeFullStringView
         .popup(isPresented: $viewModel.showFullQRCodeString) {
-            QRCodeFullStringView(
-                string: viewModel.receiveAddress,
-                addressType: viewModel.qrAddressType,
-                onCopy: {
-                    viewModel.showFullQRCodeString.toggle()
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                        viewModel.copyToClipboard()
+            if let sharedItem = viewModel.sharedItem {
+                QRCodeFullStringView(
+                    title: sharedItem.name,
+                    string: sharedItem.item,
+                    onCopy: {
+                        viewModel.showFullQRCodeString.toggle()
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                            viewModel.copyToClipboard()
+                        }
+                    },
+                    onDismiss: {
+                        viewModel.showFullQRCodeString.toggle()
                     }
-                },
-                onDismiss: {
-                    viewModel.showFullQRCodeString.toggle()
-                }
-            )
+                )
+            } else {
+                EmptyView()
+            }
         } customize: {
             $0.type(.toast).position(.bottom).closeOnTap(false).closeOnTapOutside(true).backgroundColor(.black.opacity(0.5))
         }
@@ -378,7 +399,8 @@ struct QRCodeGeneratorView_Previews: PreviewProvider {
     static var previews: some View {
         let _ = Container.walletManager.register { WalletManager.mocked }
         let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.lightningKitManager.register { MockedLightningKitManager() }
         
-        QRCodeGeneratorView(rootView: true, viewModel: ReceiveViewModel.mocked)
+        return QRCodeGeneratorView(rootView: true, viewModel: ReceiveViewModel.mocked)
     }
 }
