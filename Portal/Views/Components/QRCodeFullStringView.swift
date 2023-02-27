@@ -9,23 +9,12 @@ import SwiftUI
 import PortalUI
 
 struct QRCodeFullStringView: View {
+    let title: String
     let string: String
-    let addressType: BTCQRCodeAddressType
     
     var onCopy: () -> Void
     var onDismiss: () -> Void
-    
-    private var title: String {
-        switch addressType {
-        case .lightning:
-            return "Lightning Invoice"
-        case .onChain:
-            return "Bitcoin Address"
-        case .unified:
-            return "Unified"
-        }
-    }
-    
+        
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
@@ -66,8 +55,9 @@ struct QRCodeFullStringView: View {
 struct QRCodeFullStringView_Previews: PreviewProvider {
     static var previews: some View {
         QRCodeFullStringView(
-            string: "LNBC10U1P3PJ257PP5YZTKWJCZ5FTL5LAXKAV23ZMZEKAW37ZK6KMV80PK4XAEV5QHTZ7QDPDWD3XGER9WD5KWM36YPRX7U3QD36KUCMGYP282ETNV3SHJCQZPGXQYZ5VQSP5USYC4LK9CHSFP53KVCNVQ456GANH60D89REYKDNGSMTJ6YW3NHVQ9QYYSSQJCEWM5CJWZ4A6RFJX77C490YCED6PEMK0UPKXHY89CMM7SCT66K8GNEANWYKZGDRWRFJE69H9U5U0W57RRCSYSAS7GADWMZXC8C6T0SPJAZUP6",
-            addressType: .lightning) {
+            title: "Lightning Invoice",
+            string: "LNBC10U1P3PJ257PP5YZTKWJCZ5FTL5LAXKAV23ZMZEKAW37ZK6KMV80PK4XAEV5QHTZ7QDPDWD3XGER9WD5KWM36YPRX7U3QD36KUCMGYP282ETNV3SHJCQZPGXQYZ5VQSP5USYC4LK9CHSFP53KVCNVQ456GANH60D89REYKDNGSMTJ6YW3NHVQ9QYYSSQJCEWM5CJWZ4A6RFJX77C490YCED6PEMK0UPKXHY89CMM7SCT66K8GNEANWYKZGDRWRFJE69H9U5U0W57RRCSYSAS7GADWMZXC8C6T0SPJAZUP6"
+            ) {
             
         } onDismiss: {}
     }
