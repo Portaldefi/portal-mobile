@@ -15,12 +15,16 @@ public struct BlockInfo {
     public let headerHash: String
 }
 
-class LightningKitManager {
+class LightningKitManager: ILightningKitManager {
     private let instance: Node
     private let fileManager = LightningFileManager()
     
     private var started = false
     private var cancellabels = Set<AnyCancellable>()
+    
+    var activePeersPublisher: AnyPublisher<[String], Never> {
+        instance.connectedPeers
+    }
     
     init(connectionType: ConnectionType) {
         switch connectionType {
@@ -90,20 +94,19 @@ class LightningKitManager {
             throw ServiceError.cannotOpenChannel
         }
     }
-}
-
-// MARK: Helpers
-extension LightningKitManager {
-    func generateKeySeed() {
+    
+    func createInvoice(amount: String, description: String) async -> String? {
+        if let amountDouble = Double(amount), amountDouble > 0 {
+            let satAmountDouble = amountDouble * 100_000_000
+            let satAmountInt = UInt64(satAmountDouble)
+            return await instance.createInvoice(satAmount: satAmountInt, description: description)
+        }
+        return await instance.createInvoice(satAmount: nil, description: description)
+    }
+    
+    private func generateKeySeed() {
         let seed = AES.randomIV(32)
         _ = fileManager.persistKeySeed(keySeed: seed)
-    }
-}
-
-// MARK: Publishers
-extension LightningKitManager {
-    var activePeersPublisher: AnyPublisher<[String], Never> {
-        return instance.connectedPeers
     }
 }
 
