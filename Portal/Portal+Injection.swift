@@ -56,7 +56,7 @@ extension SharedContainer {
         return WalletManager(accountManager: accountManager, storage: walletStorage)
     }
     
-    static let lightningKitManager = Factory<LightningKitManager>(scope: .singleton) {
+    static let lightningKitManager = Factory<ILightningKitManager>(scope: .singleton) {
         LightningKitManager(connectionType: .testnet(.blockStream))
     }
     
