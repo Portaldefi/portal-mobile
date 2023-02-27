@@ -37,5 +37,6 @@ struct WordView: View {
 struct WordView_Previews: PreviewProvider {
     static var previews: some View {
         WordView(index: 1, word: "First")
+            .previewLayout(.sizeThatFits)
     }
 }

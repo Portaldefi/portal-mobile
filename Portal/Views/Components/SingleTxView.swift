@@ -124,5 +124,6 @@ struct SingleTxView_Previews: PreviewProvider {
     static var previews: some View {
         SingleTxView(coin: .bitcoin(), transaction: TransactionRecord.mocked)
             .padding(.horizontal)
+            .previewLayout(.sizeThatFits)
     }
 }
