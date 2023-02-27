@@ -226,7 +226,7 @@ public class Node {
         throw NodeError.Channels.fundingFailure
     }
     
-    public func createInvoice(satAmount: UInt64?, description: String) -> String? {
+    public func createInvoice(satAmount: UInt64?, description: String) async -> String? {
         guard let channelManager = channelManager, let keyInterface = keysManager?.asKeysInterface() else {
             return nil
         }
@@ -243,7 +243,7 @@ public class Node {
             network: .BitcoinTestnet,
             amtMsat: mSatAmount,
             description: description,
-            invoiceExpiryDeltaSecs: 1000
+            invoiceExpiryDeltaSecs: 86400 //24 hours
         )
         
         if result.isOk(), let invoice = result.getValue() {
