@@ -119,6 +119,7 @@
 		755C56E028EB09EC00A4B57B /* LabelManagerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56DF28EB09EC00A4B57B /* LabelManagerViewModel.swift */; };
 		755C56E228EB0A1900A4B57B /* SelectableTxLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56E128EB0A1900A4B57B /* SelectableTxLabelView.swift */; };
 		755FDD4C29AD009400D8A29C /* ILightningKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755FDD4B29AD009400D8A29C /* ILightningKitManager.swift */; };
+		755FDD4E29AD00D500D8A29C /* MockedLightningKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755FDD4D29AD00D500D8A29C /* MockedLightningKitManager.swift */; };
 		7564C65228CF3CF600ABA8CF /* SetRecipientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */; };
 		7564C65428CF3D3900ABA8CF /* SetAmountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65328CF3D3900ABA8CF /* SetAmountView.swift */; };
 		7564C65728CF6EC400ABA8CF /* SendFlowError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65628CF6EC400ABA8CF /* SendFlowError.swift */; };
@@ -308,6 +309,7 @@
 		755C56DF28EB09EC00A4B57B /* LabelManagerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelManagerViewModel.swift; sourceTree = "<group>"; };
 		755C56E128EB0A1900A4B57B /* SelectableTxLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableTxLabelView.swift; sourceTree = "<group>"; };
 		755FDD4B29AD009400D8A29C /* ILightningKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ILightningKitManager.swift; sourceTree = "<group>"; };
+		755FDD4D29AD00D500D8A29C /* MockedLightningKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedLightningKitManager.swift; sourceTree = "<group>"; };
 		7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetRecipientView.swift; sourceTree = "<group>"; };
 		7564C65328CF3D3900ABA8CF /* SetAmountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetAmountView.swift; sourceTree = "<group>"; };
 		7564C65628CF6EC400ABA8CF /* SendFlowError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendFlowError.swift; sourceTree = "<group>"; };
@@ -692,6 +694,7 @@
 				7564C66128D85AA800ABA8CF /* Exchanger.swift */,
 				755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */,
 				7542185729A3E01A0028D5DF /* MockedAdapter.swift */,
+				755FDD4D29AD00D500D8A29C /* MockedLightningKitManager.swift */,
 				756DDD9128A28C0A002EDC60 /* DB */,
 				755C56D228EACC9000A4B57B /* TxLabel.swift */,
 				755C56DB28EB096E00A4B57B /* TextFieldAlert.swift */,
@@ -1029,6 +1032,7 @@
 				7542185C29A7836C0028D5DF /* AccountViewSharedState.swift in Sources */,
 				750C05DF29641B97005519FF /* Publisher+Rx.swift in Sources */,
 				4774D72528B4FC2000B7988B /* StringFormatter.swift in Sources */,
+				755FDD4E29AD00D500D8A29C /* MockedLightningKitManager.swift in Sources */,
 				75772A682902D73E00BE80B7 /* TextLimitter.swift in Sources */,
 				756DDD6E28A272AB002EDC60 /* NoAccountView.swift in Sources */,
 				756A3118288821F3004978E2 /* AccountView.swift in Sources */,
