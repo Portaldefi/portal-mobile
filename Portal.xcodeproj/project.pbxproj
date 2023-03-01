@@ -120,6 +120,7 @@
 		755C56E228EB0A1900A4B57B /* SelectableTxLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56E128EB0A1900A4B57B /* SelectableTxLabelView.swift */; };
 		755FDD4C29AD009400D8A29C /* ILightningKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755FDD4B29AD009400D8A29C /* ILightningKitManager.swift */; };
 		755FDD4E29AD00D500D8A29C /* MockedLightningKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755FDD4D29AD00D500D8A29C /* MockedLightningKitManager.swift */; };
+		755FDD5129AFA30A00D8A29C /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 755FDD5029AFA30A00D8A29C /* Starscream */; };
 		7564C65228CF3CF600ABA8CF /* SetRecipientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */; };
 		7564C65428CF3D3900ABA8CF /* SetAmountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65328CF3D3900ABA8CF /* SetAmountView.swift */; };
 		7564C65728CF6EC400ABA8CF /* SendFlowError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65628CF6EC400ABA8CF /* SendFlowError.swift */; };
@@ -398,6 +399,7 @@
 				7502D68B289BD8EF00613323 /* PortalUI in Frameworks */,
 				75D8C5CA28E1B00800228298 /* Kingfisher in Frameworks */,
 				756A312A2888252D004978E2 /* BitcoinDevKit in Frameworks */,
+				755FDD5129AFA30A00D8A29C /* Starscream in Frameworks */,
 				479A7AC928B756DF0057E100 /* Factory in Frameworks */,
 				756DDD8C28A28858002EDC60 /* KeychainAccess in Frameworks */,
 				75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */,
@@ -876,6 +878,7 @@
 				752FA62429670DD900008796 /* FeeRateKit */,
 				75421840298BD2A80028D5DF /* Lightning */,
 				7542184E299BDE320028D5DF /* PopupView */,
+				755FDD5029AFA30A00D8A29C /* Starscream */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* Portal.app */;
@@ -918,6 +921,7 @@
 				755105F1294C6B4300525A16 /* XCRemoteSwiftPackageReference "EvmKit" */,
 				752FA62329670DD900008796 /* XCRemoteSwiftPackageReference "FeeRateKit.Swift" */,
 				7542184D299BDE310028D5DF /* XCRemoteSwiftPackageReference "PopupView" */,
+				755FDD4F29AFA30A00D8A29C /* XCRemoteSwiftPackageReference "Starscream" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -1392,6 +1396,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		755FDD4F29AFA30A00D8A29C /* XCRemoteSwiftPackageReference "Starscream" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/daltoniam/Starscream.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
 		7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/marcusrossel/data-field.git";
@@ -1476,6 +1488,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 755105F1294C6B4300525A16 /* XCRemoteSwiftPackageReference "EvmKit" */;
 			productName = EvmKit;
+		};
+		755FDD5029AFA30A00D8A29C /* Starscream */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 755FDD4F29AFA30A00D8A29C /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
 		};
 		7564C65D28D1F89E00ABA8CF /* DataField */ = {
 			isa = XCSwiftPackageProductDependency;
