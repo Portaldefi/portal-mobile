@@ -64,7 +64,7 @@
 		7545BC0D28C7948900ED92C3 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0C28C7948900ED92C3 /* String+Extension.swift */; };
 		7545BC3828C9E32A00ED92C3 /* FiatRatesResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3728C9E32A00ED92C3 /* FiatRatesResponse.swift */; };
 		7545BC3A28C9E3A200ED92C3 /* FiatSymbols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3928C9E3A200ED92C3 /* FiatSymbols.swift */; };
-		7545BC3C28C9E5B900ED92C3 /* MarketData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3B28C9E5B900ED92C3 /* MarketData.swift */; };
+		7545BC3C28C9E5B900ED92C3 /* MarketDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3B28C9E5B900ED92C3 /* MarketDataService.swift */; };
 		7545BC3E28C9E7AF00ED92C3 /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */; };
 		7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */ = {isa = PBXBuildFile; productRef = 7545BC4028CA107100ED92C3 /* Coinpaprika */; };
 		7545BC4328CA155100ED92C3 /* Decimal+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */; };
@@ -257,7 +257,7 @@
 		7545BC0C28C7948900ED92C3 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 		7545BC3728C9E32A00ED92C3 /* FiatRatesResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FiatRatesResponse.swift; sourceTree = "<group>"; };
 		7545BC3928C9E3A200ED92C3 /* FiatSymbols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FiatSymbols.swift; sourceTree = "<group>"; };
-		7545BC3B28C9E5B900ED92C3 /* MarketData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketData.swift; sourceTree = "<group>"; };
+		7545BC3B28C9E5B900ED92C3 /* MarketDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketDataService.swift; sourceTree = "<group>"; };
 		7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
 		7545BC4228CA155100ED92C3 /* Decimal+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+Extension.swift"; sourceTree = "<group>"; };
 		754F61C129815A480079621C /* LightningKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightningKitManager.swift; sourceTree = "<group>"; };
@@ -690,7 +690,7 @@
 				4774D71B28AF920100B7988B /* QRCodeParser.swift */,
 				4774D71F28B4B0C600B7988B /* ViewState.swift */,
 				7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */,
-				7545BC3B28C9E5B900ED92C3 /* MarketData.swift */,
+				7545BC3B28C9E5B900ED92C3 /* MarketDataService.swift */,
 				7545BC3D28C9E7AF00ED92C3 /* RepeatingTimer.swift */,
 				7564C65628CF6EC400ABA8CF /* SendFlowError.swift */,
 				7564C66128D85AA800ABA8CF /* Exchanger.swift */,
@@ -1124,7 +1124,7 @@
 				755C56AF28E5BDD600A4B57B /* WalletItemViewModel.swift in Sources */,
 				75D8C5A128D88D9C00228298 /* IAdapterManager.swift in Sources */,
 				75D8C5AB28D8907D00228298 /* AdapterFactory.swift in Sources */,
-				7545BC3C28C9E5B900ED92C3 /* MarketData.swift in Sources */,
+				7545BC3C28C9E5B900ED92C3 /* MarketDataService.swift in Sources */,
 				75421843298BD5720028D5DF /* Peer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
