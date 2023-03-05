@@ -10,17 +10,17 @@ import Combine
 import Coinpaprika
 import Starscream
 
-struct TickerModel : Decodable{
+struct TickerModel: Decodable {
+    enum MessageType: String, Codable {
+        case prev_close, quotes, sparkline
+    }
+    
     var ticker_id: String
     var prevClose: Double?
     var prev_Close: Double?
     var message_type: MessageType?
     var ts: String?
     var price: Double?
-}
-
-enum MessageType : String, Codable{
-    case prev_close, quotes, sparkline
 }
 
 final class MarketDataService {
@@ -40,13 +40,12 @@ final class MarketDataService {
     
     private var socketData: [String: Any] {
         let messageTypes = ["quotes"]
-        let btcTickerData = ["ticker_id": btcTickerID, "message_types": messageTypes]
-        let ethTickerData = ["ticker_id": ethTickerID, "message_types": messageTypes]
+        let tickers = [btcTickerID, ethTickerID].map{["ticker_id": $0, "message_types": messageTypes]}
         
         return [
             "action": "subscribe",
             "value" : [
-                "tickers": [btcTickerData, ethTickerData]
+                "tickers": tickers
             ]
         ]
     }
