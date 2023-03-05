@@ -132,7 +132,7 @@ extension AccountViewModel {
             walletManager: WalletManager.mocked,
             adapterManager: AdapterManager.mocked,
             localStorage: LocalStorage.mocked,
-            marketData: MarketData.mocked
+            marketData: MarketDataService.mocked
         )
         viewModel.accountName = "Mocked"
         viewModel.totalBalance = "0.00055"

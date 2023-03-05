@@ -93,7 +93,15 @@ extension SharedContainer {
         BiometricAuthentication()
     }
     
-    static let marketData = Factory<MarketData>(scope: .singleton) {
-        MarketData(interval: 120, fixerApiKey: "13af1e52c56117b6c7d513603fb7cee8")
+    static let marketData = Factory<MarketDataService>(scope: .singleton) {
+        do {
+            return try MarketDataService(url: "wss://api.rafa.ai/v1/data/feed/websocket", key: "PoZkIsMD7UupbWm3wB9POR==")
+        } catch {
+            if let errorMessage = error as? MarketDataService.MarketDataError {
+                fatalError(errorMessage.description)
+            } else {
+                fatalError("market data setup error")
+            }
+        }
     }
 }

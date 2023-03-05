@@ -75,7 +75,7 @@ extension WalletItemViewModel {
         WalletItemViewModel(
             coin: .bitcoin(),
             balanceAdapter: BalanceAdapterMocked(),
-            marketData: MarketData.mocked
+            marketData: MarketDataService.mocked
         )
     }
 }
