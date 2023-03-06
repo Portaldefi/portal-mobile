@@ -23,10 +23,10 @@ class WalletItemViewModel: ObservableObject {
     var valueString: String {
         switch coin.type {
         case .bitcoin:
-            let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
+            let btcPriceInUsd = Decimal(marketData.btcTicker?.price ?? 1)
             return (balance * btcPriceInUsd).double.usdFormatted()
         case .lightningBitcoin:
-            let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
+            let btcPriceInUsd = Decimal(marketData.btcTicker?.price ?? 1)
             return (balance * btcPriceInUsd).double.usdFormatted()
         case .ethereum, .erc20:
             return (balance * 1200).double.usdFormatted()

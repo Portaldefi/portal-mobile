@@ -82,9 +82,9 @@ class ReceiveViewModel: ObservableObject {
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            price = marketData.btcTicker?[.usd].price ?? 1
+            price = Decimal(marketData.btcTicker?.price ?? 1)
         case .ethereum, .erc20:
-            price = marketData.ethTicker?[.usd].price ?? 1
+            price = Decimal(marketData.ethTicker?.price ?? 1)
         }
         
         exchanger = Exchanger(

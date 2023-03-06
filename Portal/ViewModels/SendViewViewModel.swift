@@ -94,12 +94,12 @@ class SendViewViewModel: ObservableObject {
                 
                 switch coin.type {
                 case .bitcoin:
-                    let btcPriceInUsd = self.marketData.btcTicker?[.usd].price ?? 1
+                    let btcPriceInUsd = Decimal(self.marketData.btcTicker?.price ?? 1)
                     self.valueString = (sendService.balance * btcPriceInUsd).double.usdFormatted()
                 case .lightningBitcoin:
                     fatalError("not implemented")
                 case .ethereum, .erc20:
-                    let ethPriceInUsd = self.marketData.ethTicker?[.usd].price ?? 1
+                    let ethPriceInUsd = Decimal(self.marketData.ethTicker?.price ?? 1)
                     self.valueString = (sendService.balance * ethPriceInUsd).double.usdFormatted()
                 }
             }
@@ -117,9 +117,9 @@ class SendViewViewModel: ObservableObject {
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            price = marketData.btcTicker?[.usd].price ?? 1
+            price = Decimal(marketData.btcTicker?.price ?? 1)
         case .ethereum, .erc20:
-            price = marketData.ethTicker?[.usd].price ?? 1
+            price = Decimal(marketData.ethTicker?.price ?? 1)
         }
         
         exchanger = Exchanger(
@@ -166,7 +166,7 @@ class SendViewViewModel: ObservableObject {
             
             if let service = sendService {
                 balanceString = String(describing: service.spendable)
-                let btcPriceInUsd = marketData.btcTicker?[.usd].price ?? 1
+                let btcPriceInUsd = Decimal(marketData.btcTicker?.price ?? 1)
                 valueString = (service.balance * btcPriceInUsd).double.usdFormatted()
             }
         case .lightningBitcoin:
@@ -184,7 +184,7 @@ class SendViewViewModel: ObservableObject {
             
             if let service = sendService {
                 balanceString = String(describing: service.spendable)
-                let ethPriceInUsd = marketData.ethTicker?[.usd].price ?? 1
+                let ethPriceInUsd = Decimal(marketData.ethTicker?.price ?? 1)
                 valueString = (service.balance * ethPriceInUsd).double.usdFormatted()
             }
         }
