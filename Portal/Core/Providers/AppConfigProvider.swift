@@ -16,6 +16,8 @@ class AppConfigProvider: IAppConfigProvider {
     let fiatCurrenciesUpdateInterval = 3600
     let keychainStorageID: String = "com.portal.keychain.service"
     let testMode = true
+    let rafaSocketUrl: String = "wss://api.rafa.ai/v1/data/feed/websocket"
+    let forexUrl: String = "https://api.rafa.ai/v1/data/feed/forex"
 
     var infuraCredentials: (id: String, secret: String?) {
         let id = "7bffa4b191da4e9682d4351178c4736e"//(Bundle.main.object(forInfoDictionaryKey: "InfuraProjectId") as? String) ?? ""
@@ -42,6 +44,18 @@ class AppConfigProvider: IAppConfigProvider {
     
     var mixpanelToken: String {
         (Bundle.main.object(forInfoDictionaryKey: "MixpanelToken") as? String) ?? ""
+    }
+    
+    var rafaToken: String {
+        (Bundle.main.object(forInfoDictionaryKey: "RafaToken") as? String) ?? ""
+    }
+    
+    var rafaUser: String {
+        (Bundle.main.object(forInfoDictionaryKey: "RafaUsername") as? String) ?? ""
+    }
+    
+    var rafaPass: String {
+        (Bundle.main.object(forInfoDictionaryKey: "RafaPassword") as? String) ?? ""
     }
 
     let currencyCodes: [String] = ["USD", "EUR", "GBP", "JPY"]
