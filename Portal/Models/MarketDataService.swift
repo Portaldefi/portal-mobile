@@ -128,39 +128,7 @@ final class MarketDataService {
         
         task.resume()
     }
-    
-//    private func fetchTickers() {
-//        let url = URL(string: "https://api.rafa.ai/v1/quants/technicals/metrics?tickers=ETHUSD.G,BTCUSD.G")!
-//        let session = URLSession.shared
-//
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "GET"
-//
-//        //Headers
-//        let headers = [
-//            "Content-Type": "application/json",
-//            "X-RAFA-API-AUTHORIZATION": "token PoZkIsMD7UupbWm3wB9POR==",
-//            "Authorization" : "Bearer PoZkIsMD7UupbWm3wB9POR=="
-//        ]
-//        request.allHTTPHeaderFields = headers
-//
-//        let task = session.dataTask(with: request) { [weak self] (data, response, error) in
-//            guard let self = self, error == nil, let data = data else { return }
-//
-//            let json = String(data: data, encoding: .utf8)
-//            print(json)
-//
-//            do {
-//                let tickers = try self.jsonDecoder.decode([TickerModel].self, from: data)
-//                print(tickers)
-//            } catch {
-//                print(error)
-//            }
-//        }
-//
-//        task.resume()
-//    }
-        
+            
     deinit {
         disconnectSocket()
     }
