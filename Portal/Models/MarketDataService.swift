@@ -7,36 +7,23 @@
 
 import Foundation
 import Combine
-import Coinpaprika
 import Starscream
-
-struct TickerModel: Decodable {
-    enum MessageType: String, Codable {
-        case prev_close, quotes, sparkline
-    }
-    
-    var ticker_id: String
-    var prevClose: Double?
-    var prev_Close: Double?
-    var message_type: MessageType?
-    var ts: String?
-    var price: Double?
-}
 
 final class MarketDataService {
     private let btcTickerID: Any = "BTCUSD.G"
     private let ethTickerID: Any = "ETHUSD.G"
     
-    private(set) var btcTicker: Ticker?
-    private(set) var ethTicker: Ticker?
+    private(set) var btcTicker: TickerModel?
+    private(set) var ethTicker: TickerModel?
     private(set) var fiatCurrencies = [FiatCurrency]()
     
+    private let timer: RepeatingTimer
     private let jsonDecoder: JSONDecoder
-    
-    var onMarketDataUpdate = PassthroughSubject<Void, Never>()
+    private let configProvider: IAppConfigProvider
+    private var socket: WebSocket?
     private var subscriptions = Set<AnyCancellable>()
     
-    private var socket: WebSocket?
+    var onMarketDataUpdate = PassthroughSubject<Void, Never>()
     
     private var socketData: [String: Any] {
         let messageTypes = ["quotes"]
@@ -50,10 +37,20 @@ final class MarketDataService {
         ]
     }
     
-    init(jsonDecoder: JSONDecoder = JSONDecoder(), url: String, key: String) throws {
+    init(jsonDecoder: JSONDecoder = JSONDecoder(), configProvider: IAppConfigProvider) throws {
         self.jsonDecoder = jsonDecoder
-        try setupSocket(url: url, key: key)
+        self.configProvider = configProvider
+        
+        self.timer = RepeatingTimer(timeInterval: Double(configProvider.pricesUpdateInterval) * 3)
+        
+        self.timer.eventHandler = { [unowned self] in
+            self.onMarketDataUpdate.send(())
+        }
+        
+        try setupSocket(url: configProvider.rafaSocketUrl, key: configProvider.rafaToken)
         connectSocket()
+        
+        fetchFiatCurrencies()
     }
     
     private func setupSocket(url: String, key: String) throws {
@@ -86,12 +83,84 @@ final class MarketDataService {
         do {
             let results = try jsonDecoder.decode([TickerModel].self, from: dataFromSocketString)
             guard !results.isEmpty else  { return }
-            print("tickers array count: \(results.count)")
+            
+            if let updatedBtcTicker = results.first(where: { $0.ticker_id == btcTickerID as? String }) {
+                btcTicker = updatedBtcTicker
+            }
+            
+            if let updatedEthTicker = results.first(where: { $0.ticker_id == ethTickerID as? String }) {
+                ethTicker = updatedEthTicker
+            }
         } catch {
             print("ticker decoding error: \(error)")
         }
     }
     
+    private func fetchFiatCurrencies() {
+        let loginString = "\(configProvider.rafaUser):\(configProvider.rafaPass)"
+
+        guard let loginData = loginString.data(using: String.Encoding.utf8), let url = URL(string: configProvider.forexUrl) else { return }
+        
+        let base64LoginString = loginData.base64EncodedString()
+        let session = URLSession.shared
+        var request = URLRequest(url: url)
+
+        request.httpMethod = "GET"
+        request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
+        
+        let task = session.dataTask(with: request) { [weak self] (data, response, error) in
+            guard let self = self, error == nil, let data = data else { return }
+                        
+            do {
+                let fiatCurrenciesTickers = try self.jsonDecoder.decode([CurrencyTickerModel].self, from: data)
+                
+                self.fiatCurrencies = fiatCurrenciesTickers
+                    .filter{ $0.ticker.contains("/USD") }
+                    .compactMap{
+                        guard let range = $0.ticker.range(of: "/")?.lowerBound else { return nil }
+                        let code = String($0.ticker[...range].dropLast())
+                        return FiatCurrency(code: code, name: code, rate: Double($0.bid) ?? 1)
+                    }
+            } catch {
+                print(error)
+            }
+        }
+        
+        task.resume()
+    }
+    
+//    private func fetchTickers() {
+//        let url = URL(string: "https://api.rafa.ai/v1/quants/technicals/metrics?tickers=ETHUSD.G,BTCUSD.G")!
+//        let session = URLSession.shared
+//
+//        var request = URLRequest(url: url)
+//        request.httpMethod = "GET"
+//
+//        //Headers
+//        let headers = [
+//            "Content-Type": "application/json",
+//            "X-RAFA-API-AUTHORIZATION": "token PoZkIsMD7UupbWm3wB9POR==",
+//            "Authorization" : "Bearer PoZkIsMD7UupbWm3wB9POR=="
+//        ]
+//        request.allHTTPHeaderFields = headers
+//
+//        let task = session.dataTask(with: request) { [weak self] (data, response, error) in
+//            guard let self = self, error == nil, let data = data else { return }
+//
+//            let json = String(data: data, encoding: .utf8)
+//            print(json)
+//
+//            do {
+//                let tickers = try self.jsonDecoder.decode([TickerModel].self, from: data)
+//                print(tickers)
+//            } catch {
+//                print(error)
+//            }
+//        }
+//
+//        task.resume()
+//    }
+        
     deinit {
         disconnectSocket()
     }
@@ -99,11 +168,11 @@ final class MarketDataService {
 
 extension MarketDataService: IMarketDataRepository {
     func pause() {
-        //timer.suspend()
+        timer.suspend()
     }
     
     func resume() {
-        //timer.resume()
+        timer.resume()
     }
 }
 
@@ -135,7 +204,7 @@ extension MarketDataService: WebSocketDelegate {
 extension MarketDataService {
     private class MarketDataMocked: IMarketDataRepository {
         var onMarketDataUpdate = PassthroughSubject<Void, Never>()
-        var btcTicker: Ticker?
+        var btcTicker: TickerModel?
         var fiatCurrencies: [FiatCurrency] = []
         func pause() {}
         func resume() {}
