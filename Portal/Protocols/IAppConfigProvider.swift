@@ -24,4 +24,9 @@ protocol IAppConfigProvider {
     var currencyCodes: [String] { get }
     var testMode: Bool { get }
     var feeRateAdjustedForCurrencyCodes: [String] { get }
+    var rafaToken: String { get }
+    var rafaUser: String { get }
+    var rafaPass: String { get }
+    var rafaSocketUrl: String { get }
+    var forexUrl: String { get }
 }
