@@ -107,7 +107,7 @@ extension WalletManager {
     private class WalletManagerMocked: IWalletManager {
         var onWalletsUpdate = PassthroughSubject<[Wallet], Never>()
         
-        var activeWallets: [Wallet] = []
+        var activeWallets: [Wallet] = [.mocked()]
         
         var wallets: [Wallet] = []
         

@@ -92,7 +92,6 @@ struct CreateAccountView: View {
                 )
             }
         }
-        .navigationBarHidden(true)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .onAppear {
             isFocused = true

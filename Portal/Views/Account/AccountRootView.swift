@@ -24,3 +24,15 @@ struct AccountRootView: View {
         navigationStack.zIndex(1)
     }
 }
+
+import Factory
+
+struct AccountRootView_Previews: PreviewProvider {
+    static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        
+        AccountRootView()
+    }
+}
+

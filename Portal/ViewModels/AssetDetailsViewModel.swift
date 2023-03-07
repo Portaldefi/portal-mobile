@@ -12,16 +12,22 @@ import Factory
 
 class AssetDetailsViewModel: ObservableObject {
     let coin: Coin
-    private let walletItems: [WalletItem]
+    let walletItems: [WalletItem]
     
+    @Published var goToReceive = false
+    @Published var goSend: Bool = false {
+        willSet {
+            if newValue != goSend && newValue == false {
+                Container.Scope.cached.reset()
+            }
+        }
+    }
     @Published private(set) var transactions: [TransactionRecord] = []
     
     private let transactionAdapter: ITransactionsAdapter
     private var subscriptions = Set<AnyCancellable>()
     
-    lazy var receiveViewModel: ReceiveViewModel = {
-        ReceiveViewModel.config(items: walletItems, selectedItem: walletItems.first{ $0.coin == coin })
-    }()
+    private var receiveViewModel: ReceiveViewModel?
     
     init(coin: Coin, transactionAdapter: ITransactionsAdapter, walletItems: [WalletItem]) {
         self.coin = coin
@@ -41,6 +47,22 @@ class AssetDetailsViewModel: ObservableObject {
     func updateTransactions() {
         subscribe()
     }
+    
+    func cleanup() {
+        receiveViewModel = nil
+    }
+    
+    func receviewVM() -> ReceiveViewModel {
+        guard let vm = receiveViewModel else {
+            receiveViewModel = ReceiveViewModel.config(items: walletItems, selectedItem: walletItems.first{ $0.coin == coin })
+            return receiveViewModel!
+        }
+        return vm
+    }
+    
+    deinit {
+        print("Asset details view model deinit")
+    }
 }
 
 extension AssetDetailsViewModel {
@@ -56,5 +78,9 @@ extension AssetDetailsViewModel {
             fatalError("coudn't fetch dependencies")
         }
         return AssetDetailsViewModel(coin: coin, transactionAdapter: transactionsAdapter, walletItems: account.items)
+    }
+    
+    static var mocked: AssetDetailsViewModel {
+        AssetDetailsViewModel(coin: .bitcoin(), transactionAdapter: MockedAdapter(), walletItems: [WalletItem.mockedBtc])
     }
 }

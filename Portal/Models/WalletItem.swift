@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import PortalUI
 import Factory
+import Combine
 
 struct WalletItem: Identifiable {
     let id: UUID = UUID()
@@ -16,6 +17,10 @@ struct WalletItem: Identifiable {
     
     var coin: Coin {
         viewModel.coin
+    }
+    
+    var balanceUpdated: AnyPublisher<Void, Never> {
+        viewModel.balanceAdapter.balanceUpdated
     }
     
     init(coin: Coin) {

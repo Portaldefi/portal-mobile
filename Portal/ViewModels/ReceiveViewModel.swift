@@ -11,6 +11,13 @@ import Combine
 import CoreImage.CIFilterBuiltins
 import SwiftUI
 
+struct QRCodeSharedItem: Identifiable {
+    let id = UUID()
+    let name: String
+    let displayedItem: String
+    let item: String
+}
+
 class ReceiveViewModel: ObservableObject {
     enum RecieveStep {
         case selectAsset, generateQR
@@ -24,16 +31,24 @@ class ReceiveViewModel: ObservableObject {
     
     @Published var description = String()
     @Published var editingDescription = false
+    @Published var showConfirmationOnCopy = false
+    @Published var showNetworkSelector = false
+    @Published var showFullQRCodeString = false
+    @Published var onAmountChange = false
     
     @Published private(set) var qrCode: UIImage?
-    @Published private(set) var step: RecieveStep = .selectAsset
     @Published private(set) var walletItems = [WalletItem]()
     
     @Published var sharedAddress: IdentifiableString?
     @Published var selectedItem: WalletItem?
     @Published var exchanger: Exchanger?
+    @Published var qrAddressType: BTCQRCodeAddressType = .lightning
+    @Published var invoiceString = String()
+    @Published var sharedItems: [QRCodeSharedItem] = []
+    @Published var sharedItem: QRCodeSharedItem?
     
     @Injected(Container.marketData) private var marketData
+    @Injected(Container.lightningKitManager) private var lightningKit
     
     private var subscriptions = Set<AnyCancellable>()
     
@@ -46,19 +61,13 @@ class ReceiveViewModel: ObservableObject {
         self.selectedItem = selectedItem
         
         $selectedItem
+            .compactMap{ $0 }
             .receive(on: RunLoop.main)
             .sink { [unowned self] item in
-                self.updateExchanger(coin: item?.coin)
-                self.updateAdapter(coin: item?.coin)
+                self.updateExchanger(coin: item.coin)
+                self.updateAdapter(coin: item.coin)
 
-                if let item = item {
-                    withAnimation {
-                        self.step = .generateQR
-                    }
-                    self.generateQRCode(coin: item.coin)
-                } else {
-                    self.step = .selectAsset
-                }
+                self.generateQRCode(coin: item.coin)
         }
         .store(in: &subscriptions)
     }
@@ -73,9 +82,9 @@ class ReceiveViewModel: ObservableObject {
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            price = marketData.btcTicker?[.usd].price ?? 1
+            price = Decimal(marketData.btcTicker?.price ?? 1)
         case .ethereum, .erc20:
-            price = marketData.ethTicker?[.usd].price ?? 1
+            price = Decimal(marketData.ethTicker?.price ?? 1)
         }
         
         exchanger = Exchanger(
@@ -86,11 +95,47 @@ class ReceiveViewModel: ObservableObject {
         
         guard let exchanger = exchanger else { return }
         
-        Publishers.CombineLatest(exchanger.$baseAmountString, $description)
+        Publishers.CombineLatest3($onAmountChange, $description, $qrAddressType)
             .flatMap { _ in Just(()) }
             .receive(on: RunLoop.main)
             .sink { [unowned self] _ in
-                self.generateQRCode(coin: exchanger.base)
+                switch qrAddressType {
+                case .onChain:
+                    let addressString = adapter?.receiveAddress ?? "Unknown address"
+                    let displayedAddress = addressString.groupedByThree.uppercased()
+                    self.sharedItems = [QRCodeSharedItem(name: "On Chain Address", displayedItem: displayedAddress, item: addressString)]
+                    self.generateQRCode(coin: exchanger.base)
+                case .lightning:
+                    qrCode = nil
+                    
+                    Task {
+                        let invoice = await lightningKit.createInvoice(amount: exchanger.baseAmountString, description: description)
+                        
+                        DispatchQueue.main.async {
+                            self.invoiceString = invoice ?? String()
+                            self.generateQRCode(coin: exchanger.base)
+                            self.sharedItems = [QRCodeSharedItem(name: "Lightning Invoice", displayedItem: self.invoiceString.turnicated.uppercased(), item: self.invoiceString)]
+                        }
+                    }
+                case .unified:
+                    qrCode = nil
+                    
+                    Task {
+                        let invoice = await lightningKit.createInvoice(amount: exchanger.baseAmountString, description: description)
+                        
+                        DispatchQueue.main.async {
+                            self.invoiceString = invoice ?? String()
+                            self.generateQRCode(coin: exchanger.base)
+                            
+                            let addressString = self.adapter?.receiveAddress ?? "Unknown address"
+                            let displayedAddress = addressString.groupedByThree.uppercased()
+                            let addressItem = QRCodeSharedItem(name: "On Chain Address", displayedItem: displayedAddress, item: addressString)
+                            let invoiceItem = QRCodeSharedItem(name: "Lightning Invoice", displayedItem: self.invoiceString.turnicated.uppercased(), item: self.invoiceString)
+                            
+                            self.sharedItems = [addressItem, invoiceItem]
+                        }
+                    }
+                }
             }
             .store(in: &subscriptions)
     }
@@ -115,35 +160,39 @@ class ReceiveViewModel: ObservableObject {
     }
     
     private func generateQRCode(coin: Coin) {
-        guard let exchanger = exchanger else { return }
-        
         var qrCodeString: String
         
         switch coin.type {
         case .bitcoin:
-            qrCodeString = "bitcoin:\(receiveAddress)"
+            switch qrAddressType {
+            case .lightning:
+                qrCodeString = "lightning=\(invoiceString)"
+            case .onChain:
+                qrCodeString = "bitcoin:\(receiveAddress)"
+                
+                if let components = pathComponents() {
+                    qrCodeString += components
+                }
+            case .unified:
+                qrCodeString = "bitcoin:\(receiveAddress)"
+                
+                if let components = pathComponents() {
+                    qrCodeString += components
+                }
+                
+                qrCodeString += "&lightning=\(invoiceString)"
+            }
         case .ethereum:
             qrCodeString = "ethereum:\(receiveAddress)"
+            
+            if let components = pathComponents() {
+                qrCodeString += components
+            }
         default:
             qrCodeString = String()
         }
-                
-        var components = URLComponents()
-        components.queryItems = []
         
-        if exchanger.baseAmountDecimal > 0 {
-            components.queryItems?.append(URLQueryItem(name: "amount", value: exchanger.baseAmountString))
-        }
-
-        if !description.isEmpty {
-            components.queryItems?.append(URLQueryItem(name: "message", value: description))
-        }
-                
-        if let parameters = components.string, parameters != "?" {
-            qrCodeString += parameters
-        }
-        
-        print("QR CODE STRING: \(qrCodeString)")
+        print("QR CODE STRING: \n\(qrCodeString)\n")
         
         let data = Data(qrCodeString.utf8)
         filter.setValue(data, forKey: "inputMessage")
@@ -158,16 +207,32 @@ class ReceiveViewModel: ObservableObject {
         qrCode = UIImage(cgImage: cgimg)
     }
     
-    func clear() {
-        selectedItem = nil
-        qrCode = UIImage()
-        adapter = nil
-        exchanger?.amount.string = String()
-        description = String()
+    private func pathComponents() -> String? {
+        guard let exchanger = exchanger else { return nil }
+
+        var components = URLComponents()
+        components.queryItems = []
+        
+        if exchanger.baseAmountDecimal > 0 {
+            components.queryItems?.append(URLQueryItem(name: "amount", value: exchanger.baseAmountString))
+        }
+
+        if !description.isEmpty {
+            components.queryItems?.append(URLQueryItem(name: "message", value: description))
+        }
+                
+        if let parameters = components.string, parameters != "?" {
+            return parameters
+        }
+        
+        return nil
     }
     
     func copyToClipboard() {
-        UIPasteboard.general.string = receiveAddress
+        if let item = sharedItem?.item {
+            UIPasteboard.general.string = item
+            showConfirmationOnCopy.toggle()
+        }
     }
     
     func share() {
@@ -177,13 +242,25 @@ class ReceiveViewModel: ObservableObject {
         
         switch coin.type {
         case .bitcoin:
-            description = "\n\nThis is a bitcoin network address. Only send BTC to this address. Do not send lightning network assets to his address."
+            switch qrAddressType {
+            case .lightning:
+                description = "\n\nThis is a lightning invoice."
+                sharedAddress = IdentifiableString(text: receiveAddress + description)
+            case .onChain:
+                description = "\n\nThis is a bitcoin network address. Only send BTC to this address. Do not send lightning network assets to his address."
+                sharedAddress = IdentifiableString(text: receiveAddress + description)
+            case .unified:
+                description = "\n\nThis is a bitcoin network address. Only send BTC to this address. Do not send lightning network assets to his address."
+                let description2 = "\n\nThis is a lightning invoice."
+                sharedAddress = IdentifiableString(text: receiveAddress + description + description2)
+            }
         case .lightningBitcoin:
             description = "\n\nThis is a lightning invoice."
+            sharedAddress = IdentifiableString(text: receiveAddress + description)
         case .ethereum, .erc20:
             description = "\n\nThis is an ethereum network address."
+            sharedAddress = IdentifiableString(text: receiveAddress + description)
         }
-        sharedAddress = IdentifiableString(text: receiveAddress + description)
     }
     
     var isIPod: Bool {

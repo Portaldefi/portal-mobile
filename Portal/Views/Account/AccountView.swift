@@ -10,29 +10,29 @@ import PortalUI
 import Factory
 
 struct AccountView: View {
-    @State private var goToReceive = false
-    @State private var selectedItem: WalletItem?
-    @State private var qrItem: QRCodeItem?
-    
     @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewModel: AccountViewModel = Container.accountViewModel()
     @ObservedObject private var viewState: ViewState = Container.viewState()
+    @ObservedObject private var sharedViewState = AccountViewSharedState()
     
     var body: some View {
         VStack(spacing: 0) {
             Group {
                 AccountView()
                 Divider()
+                    .frame(height: 1)
                     .overlay(Palette.grayScale2A)
                 BalanceView(balance: viewModel.totalBalance, value: viewModel.totalValue)
                     .frame(height: 124)
                     .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                 ActionButtonsView
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 24)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 16)
             }
             
             Divider()
+                .frame(height: 1)
                 .overlay(Palette.grayScale10)
             
             ScrollView {
@@ -41,76 +41,90 @@ struct AccountView: View {
                         ZStack(alignment: .trailing) {
                             WalletItemView(viewModel: item.viewModel)
                                 .padding(.leading, 16)
-                                .padding(.trailing, 8)
+                                .padding(.trailing, 10)
                                 .contentShape(Rectangle())
                                 .onTapGesture {
                                     withAnimation {
                                         viewState.hideTabBar = true
                                     }
-                                    selectedItem = item
-                                    
                                     navigation.push(.assetDetails(item: item))
                                 }
                             Asset.chevronRightIcon
                                 .foregroundColor(Palette.grayScale4A)
+                                .offset(x: 5)
                         }
                         Divider()
+                            .frame(height: 1)
                             .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
                     }
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 8)
             }
             .background(Palette.grayScale20)
         }
-        .navigationBarHidden(true)
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         .sheet(isPresented: $viewState.showQRCodeScannerFromTabBar) {
-            QRCodeReaderView(config: .universal)
+            QRCodeReaderRootView(config: .universal)
         }
-        .sheet(isPresented: $goToReceive) {
+        .sheet(isPresented: $viewModel.goToReceive) {
             let viewModel = ReceiveViewModel.config(items: viewModel.items, selectedItem: nil)
-            
-            ReceiveRootView(viewModel: viewModel)
+            ReceiveRootView(viewModel: viewModel, withAssetPicker: true)
         }
-        .sheet(isPresented: $viewState.goToSend) {
-            SendRootView()
+        .sheet(isPresented: $viewModel.goToSend) {
+            SendRootView(withAssetPicker: true)
         }
-        .fullScreenCover(isPresented: $viewState.goToBackUp) {
-            AccountBackupRootView()
+        .fullScreenCover(isPresented: $sharedViewState.showBackUpFlow) {
+            AccountBackupRootView().environmentObject(sharedViewState)
         }
     }
     
     func AccountView() -> some View {
         HStack {
-            HStack {
-                Asset.walletIcon
-                    .foregroundColor(Palette.grayScale6A)
+            VStack(alignment: .leading, spacing: 4) {
                 Text(viewModel.accountName)
-                    .font(.Main.fixed(.bold, size: 16))
+                    .font(.Main.fixed(.bold, size: 24))
                     .foregroundColor(Palette.grayScaleF4)
+
+                HStack {
+                    RoundedRectangle(cornerRadius: 4)
+                        .frame(width: 16, height: 16)
+                    Text("All systems ok!")
+                        .font(.Main.fixed(.monoRegular, size: 14))
+
+                }
+                .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
             }
+            .padding(.bottom)
+            .padding(.leading, 20)
             
             Spacer()
             
-            if !viewModel.accountDataIsBackedUp {
-                PButton(config: .onlyIcon(Asset.warningIcon), style: .free, size: .medium, color: .yellow, enabled: true) {
-                    viewState.goToBackUp.toggle()
+            HStack(spacing: 0) {
+                Divider()
+                    .frame(width: 1, height: 70)
+                    .overlay(Palette.grayScale2A)
+                
+                if !viewModel.accountDataIsBackedUp {
+                    PButton(config: .onlyIcon(Asset.warningIcon), style: .free, size: .medium, color: .yellow, enabled: true) {
+                        sharedViewState.showBackUpFlow.toggle()
+                    }
+                    .frame(width: 30, height: 30)
+                    .padding(.leading)
                 }
-                .frame(width: 30, height: 30)
+                
+                Asset.gearIcon
+                    .foregroundColor(Palette.grayScale6A)
+                    .padding()
             }
-            
-            Asset.gearIcon
-                .foregroundColor(Palette.grayScale6A)
         }
-        .frame(height: 48)
-        .padding(.horizontal, 20)
+        .frame(height: 73)
     }
     
     func BalanceView(balance: String, value: String) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 10) {
                 VStack(spacing: 4) {
-                    HStack(alignment: .bottom, spacing: 6) {
+                    HStack(alignment: .lastTextBaseline, spacing: 6) {
                         Spacer()
                         Text(balance)
                             .font(.Main.fixed(.monoBold, size: 32))
@@ -145,25 +159,39 @@ struct AccountView: View {
     }
     
     var ActionButtonsView: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 16) {
             PButton(
                 config: .labelAndIconLeft(label: "Receive", icon: Asset.receiveButtonIcon),
-                style: .filled,
-                size: .medium,
+                style: .outline,
+                size: .custom(
+                    PButtonConfig(
+                        fontSize: 16,
+                        spacing: 8,
+                        height: 48,
+                        cornerRadius: 12,
+                        iconSize: 26
+                    )
+                ),
                 enabled: true
             ) {
-                goToReceive.toggle()
+                viewModel.goToReceive.toggle()
             }
             
             PButton(
                 config: .labelAndIconLeft(label: "Send", icon: Asset.sendButtonIcon),
-                style: .filled,
-                size: .medium,
+                style: .outline,
+                size: .custom(
+                    PButtonConfig(
+                        fontSize: 16,
+                        spacing: 8,
+                        height: 48,
+                        cornerRadius: 12,
+                        iconSize: 26
+                    )
+                ),
                 enabled: true
             ) {
-                withAnimation {
-                    viewState.goToSend.toggle()
-                }
+                viewModel.goToSend.toggle()
             }
         }
     }
@@ -172,6 +200,7 @@ struct AccountView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let _ = Container.accountViewModel.register { AccountViewModel.mocked }
+        
         AccountView()
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
             .preferredColorScheme(.dark)

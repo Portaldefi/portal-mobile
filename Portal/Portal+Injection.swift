@@ -9,6 +9,7 @@ import Foundation
 import Factory
 import KeychainAccess
 import CoreData
+import Lightning
 
 extension SharedContainer {
     static let accountManager = Factory<IAccountManager>(scope: .singleton) {
@@ -55,6 +56,10 @@ extension SharedContainer {
         return WalletManager(accountManager: accountManager, storage: walletStorage)
     }
     
+    static let lightningKitManager = Factory<ILightningKitManager>(scope: .singleton) {
+        LightningKitManager(connectionType: .testnet(.blockStream))
+    }
+    
     static let sendViewModel = Factory<SendViewViewModel>(scope: .cached) {
         SendViewViewModel()
     }
@@ -70,15 +75,13 @@ extension SharedContainer {
         let userDefaults = UserDefaults.standard
         let localStorage = LocalStorage(storage: userDefaults)
         let marketData = Container.marketData()
-        let viewState = Container.viewState()
         
         return AccountViewModel(
             accountManager: accountManager,
             walletManager: walletManager,
             adapterManager: adapterManager,
             localStorage: localStorage,
-            marketData: marketData,
-            viewState: viewState
+            marketData: marketData
         )
     }
     
@@ -90,7 +93,15 @@ extension SharedContainer {
         BiometricAuthentication()
     }
     
-    static let marketData = Factory<MarketData>(scope: .singleton) {
-        MarketData(interval: 120, fixerApiKey: "13af1e52c56117b6c7d513603fb7cee8")
+    static let marketData = Factory<MarketDataService>(scope: .singleton) {
+        do {
+            return try MarketDataService(configProvider: Container.configProvider())
+        } catch {
+            if let errorMessage = error as? MarketDataService.MarketDataError {
+                fatalError(errorMessage.description)
+            } else {
+                fatalError("market data setup error")
+            }
+        }
     }
 }

@@ -172,6 +172,15 @@
       }
     },
     {
+      "identity" : "ldk-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lightningdevkit/ldk-swift",
+      "state" : {
+        "revision" : "b71d1afd8b60d59b7cea6eb2dde46f10114419f0",
+        "version" : "0.0.113"
+      }
+    },
+    {
       "identity" : "objectmapper",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tristanhimmelman/ObjectMapper.git",
@@ -181,12 +190,21 @@
       }
     },
     {
+      "identity" : "popupview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/PopupView.git",
+      "state" : {
+        "revision" : "ee306aede532d941c05ff8c63b3b0f3b8cc208cc",
+        "version" : "2.0.1"
+      }
+    },
+    {
       "identity" : "portal-ui-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/FabricLabs/portal-ui-swift",
       "state" : {
         "branch" : "main",
-        "revision" : "6d99459ef17857df41f00b0451347de89f5ad283"
+        "revision" : "4f2a32b58108cff60c9e226b26d62acc72282dc7"
       }
     },
     {
@@ -205,6 +223,15 @@
       "state" : {
         "revision" : "cd187c632fb812fd93711a9f7e644adb7e5f97f0",
         "version" : "0.1.7"
+      }
+    },
+    {
+      "identity" : "starscream",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/daltoniam/Starscream.git",
+      "state" : {
+        "revision" : "df8d82047f6654d8e4b655d1b1525c64e1059d21",
+        "version" : "4.0.4"
       }
     },
     {

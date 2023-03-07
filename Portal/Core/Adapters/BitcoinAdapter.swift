@@ -155,7 +155,7 @@ extension BitcoinAdapter: ITransactionsAdapter {
 }
 
 extension BitcoinAdapter: ISendBitcoinAdapter {
-    func send(amount: Decimal, address: String, fee: Int?) -> Future<TransactionRecord, Error> {
+    func send(amount: Decimal, address: String, fee: Int?) -> Combine.Future<TransactionRecord, Error> {
         Future { [unowned self] promise in
             do {
                 let satsAmount = UInt64((amount * 100_000_000).double)
@@ -196,7 +196,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         }
     }
     
-    func sendMax(address: String, fee: Int?) -> Future<TransactionRecord, Error> {
+    func sendMax(address: String, fee: Int?) -> Combine.Future<TransactionRecord, Error> {
         Future { [unowned self] promise in
             do {
                 let txBuilderResult: TxBuilderResult

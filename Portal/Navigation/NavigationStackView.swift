@@ -26,6 +26,13 @@ enum Screen {
     case recoveryPhraseTest(viewModel: RecoveryPhraseViewModel)
     case recoveryWarning(viewModel: RecoveryPhraseViewModel)
     case transactionDetails(coin: Coin, tx: TransactionRecord)
+    
+    case sendSelectAsset(viewModel: SendViewViewModel)
+    case sendSetRecipient(viewModel: SendViewViewModel)
+    case sendSetAmount(viewModel: SendViewViewModel)
+    case sendReviewTxView(viewModel: SendViewViewModel)
+    
+    case receiveGenerateQRCode(viewModel: ReceiveViewModel)
 }
 
 extension Screen {
@@ -59,6 +66,16 @@ extension Screen {
             return "recovery_warning_ID"
         case .transactionDetails:
             return "transaction_details_ID"
+        case .sendSelectAsset:
+            return "send_select_asset_ID"
+        case .sendSetRecipient:
+            return "send_set_recipient_ID"
+        case .sendSetAmount:
+            return "send_set_amount_ID"
+        case .sendReviewTxView:
+            return "send_review_tx_ID"
+        case .receiveGenerateQRCode:
+            return "receive_generate_qr_code_ID"
         }
     }
 }
