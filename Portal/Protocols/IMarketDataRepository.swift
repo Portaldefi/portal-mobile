@@ -11,7 +11,7 @@ import Coinpaprika
 
 protocol IMarketDataRepository {
     var onMarketDataUpdate: PassthroughSubject<Void, Never> { get }
-    var btcTicker: Ticker? { get }
+    var btcTicker: TickerModel? { get }
     var fiatCurrencies: [FiatCurrency] { get }
     func pause()
     func resume()
