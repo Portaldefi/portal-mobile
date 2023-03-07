@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>RafaPassword</key>
+	<string>${rafa_pass}</string>
+	<key>RafaUsername</key>
+	<string>${rafa_user}</string>
+	<key>RafaToken</key>
+	<string>${rafa_token}</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>12.3</string>
 	<key>NSAppTransportSecurity</key>

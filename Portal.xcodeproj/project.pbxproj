@@ -1290,6 +1290,9 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
+				rafa_pass = "r@faportal";
+				rafa_token = "PoZkIsMD7UupbWm3wB9POR==";
+				rafa_user = "portaldefi@rafa.ai";
 			};
 			name = Debug;
 		};
@@ -1329,6 +1332,9 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
+				rafa_pass = "r@faportal";
+				rafa_token = "PoZkIsMD7UupbWm3wB9POR==";
+				rafa_user = "portaldefi@rafa.ai";
 			};
 			name = Release;
 		};
