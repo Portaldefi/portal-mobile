@@ -20,6 +20,7 @@ class AccountViewModel: ObservableObject {
         didSet {
             Publishers.Sequence(sequence: items)
                 .flatMap { $0.balanceUpdated }
+                .receive(on: RunLoop.main)
                 .sink { [weak self] _ in
                     self?.updateBalance()
                     self?.updateValue()
