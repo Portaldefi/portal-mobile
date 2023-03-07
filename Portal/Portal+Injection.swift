@@ -95,7 +95,7 @@ extension SharedContainer {
     
     static let marketData = Factory<MarketDataService>(scope: .singleton) {
         do {
-            return try MarketDataService(url: "wss://api.rafa.ai/v1/data/feed/websocket", key: "PoZkIsMD7UupbWm3wB9POR==")
+            return try MarketDataService(configProvider: Container.configProvider())
         } catch {
             if let errorMessage = error as? MarketDataService.MarketDataError {
                 fatalError(errorMessage.description)
