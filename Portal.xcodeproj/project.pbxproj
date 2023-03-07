@@ -121,6 +121,8 @@
 		755FDD4C29AD009400D8A29C /* ILightningKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755FDD4B29AD009400D8A29C /* ILightningKitManager.swift */; };
 		755FDD4E29AD00D500D8A29C /* MockedLightningKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755FDD4D29AD00D500D8A29C /* MockedLightningKitManager.swift */; };
 		755FDD5129AFA30A00D8A29C /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 755FDD5029AFA30A00D8A29C /* Starscream */; };
+		755FDD5329B7815C00D8A29C /* CurrencyTickerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755FDD5229B7815C00D8A29C /* CurrencyTickerModel.swift */; };
+		755FDD5529B7817900D8A29C /* TickerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755FDD5429B7817900D8A29C /* TickerModel.swift */; };
 		7564C65228CF3CF600ABA8CF /* SetRecipientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */; };
 		7564C65428CF3D3900ABA8CF /* SetAmountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65328CF3D3900ABA8CF /* SetAmountView.swift */; };
 		7564C65728CF6EC400ABA8CF /* SendFlowError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65628CF6EC400ABA8CF /* SendFlowError.swift */; };
@@ -311,6 +313,8 @@
 		755C56E128EB0A1900A4B57B /* SelectableTxLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableTxLabelView.swift; sourceTree = "<group>"; };
 		755FDD4B29AD009400D8A29C /* ILightningKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ILightningKitManager.swift; sourceTree = "<group>"; };
 		755FDD4D29AD00D500D8A29C /* MockedLightningKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedLightningKitManager.swift; sourceTree = "<group>"; };
+		755FDD5229B7815C00D8A29C /* CurrencyTickerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyTickerModel.swift; sourceTree = "<group>"; };
+		755FDD5429B7817900D8A29C /* TickerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerModel.swift; sourceTree = "<group>"; };
 		7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetRecipientView.swift; sourceTree = "<group>"; };
 		7564C65328CF3D3900ABA8CF /* SetAmountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetAmountView.swift; sourceTree = "<group>"; };
 		7564C65628CF6EC400ABA8CF /* SendFlowError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendFlowError.swift; sourceTree = "<group>"; };
@@ -709,6 +713,8 @@
 				752FA62E296C60C900008796 /* TxFees.swift */,
 				7542185529A3C3F10028D5DF /* BTCQRCodeAddressType.swift */,
 				7542185B29A7836C0028D5DF /* AccountViewSharedState.swift */,
+				755FDD5229B7815C00D8A29C /* CurrencyTickerModel.swift */,
+				755FDD5429B7817900D8A29C /* TickerModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1039,6 +1045,7 @@
 				755FDD4E29AD00D500D8A29C /* MockedLightningKitManager.swift in Sources */,
 				75772A682902D73E00BE80B7 /* TextLimitter.swift in Sources */,
 				756DDD6E28A272AB002EDC60 /* NoAccountView.swift in Sources */,
+				755FDD5329B7815C00D8A29C /* CurrencyTickerModel.swift in Sources */,
 				756A3118288821F3004978E2 /* AccountView.swift in Sources */,
 				755C56C928EAC99700A4B57B /* TextEditorViewModel.swift in Sources */,
 				75D8C5AE28D8939A00228298 /* BitcoinAdapter.swift in Sources */,
@@ -1101,6 +1108,7 @@
 				479A7AD028B7A92C0057E100 /* SendViewViewModel.swift in Sources */,
 				4774D72F28B4FD0D00B7988B /* Date+Extension.swift in Sources */,
 				75D8C59D28D88BFB00228298 /* IAdapter.swift in Sources */,
+				755FDD5529B7817900D8A29C /* TickerModel.swift in Sources */,
 				7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */,
 				752FA62929670E4500008796 /* FeeRateProvider.swift in Sources */,
 				756DDD7028A275AD002EDC60 /* CreateAccountView.swift in Sources */,
