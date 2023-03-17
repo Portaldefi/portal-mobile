@@ -17,7 +17,7 @@ let package = Package(
             targets: ["Lightning"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/lightningdevkit/ldk-swift/", exact: "0.0.113"),
+        .package(url: "https://github.com/lightningdevkit/ldk-swift/", exact: "0.0.110"),
         .package(url: "https://github.com/krzyzanowskim/CryptoSwift", .upToNextMajor(from: "1.0.0")),
     ],
     targets: [
