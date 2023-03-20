@@ -17,7 +17,7 @@ class Broadcaster: BroadcasterInterface {
         super.init()
     }
 
-    override func broadcastTransaction(tx: [UInt8]) {
+    override func broadcast_transaction(tx: [UInt8]) {
         print("Broadcasting Transaction")
 
         Task {

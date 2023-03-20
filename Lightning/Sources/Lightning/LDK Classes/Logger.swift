@@ -10,23 +10,23 @@ import LightningDevKit
 
 class Logger: LightningDevKit.Logger {
     override func log(record: Bindings.Record) {
-        let messageLevel = record.getLevel()
-        let arguments = record.getArgs()
+        let messageLevel = record.get_level()
+        let arguments = record.get_args()
         
         switch messageLevel {
-        case .Debug:
+        case LDKLevel_Debug:
             print("\nDebug Logger:\n>\(arguments)\n")
-        case .Info:
+        case LDKLevel_Info:
             print("\nInfo Logger:\n>\(arguments)\n")
-        case .Warn:
+        case LDKLevel_Warn:
             print("\nWarn Logger:\n>\(arguments)\n")
-        case .Error:
+        case LDKLevel_Error:
             print("\nError Logger:\n>\(arguments)\n")
-        case .Gossip:
-            print("\nGossip Logger:\n>\(arguments)\n")
-        case .Trace:
+        case LDKLevel_Gossip:
+            break //print("\nGossip Logger:\n>\(arguments)\n")
+        case LDKLevel_Trace:
             print("\nTrace Logger:\n>\(arguments)\n")
-        @unknown default:
+        default:
             print("\nUnknown Logger:\n>\(arguments)\n")
         }
     }

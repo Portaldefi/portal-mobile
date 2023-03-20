@@ -17,11 +17,12 @@ class ChainFilter: Filter {
     var watchedTransactions = [FilterTransaction]()
     var watchedOutputs = [WatchedOutput]()
     
-    override func registerTx(txid: [UInt8]?, scriptPubkey: [UInt8]) {
-        watchedTransactions.append((txid, scriptPubkey))
+    override func register_tx(txid: [UInt8]?, script_pubkey: [UInt8]) {
+        watchedTransactions.append((txid, script_pubkey))
     }
     
-    override func registerOutput(output: WatchedOutput) {
+    override func register_output(output: WatchedOutput) -> Option_C2Tuple_usizeTransactionZZ {
         self.watchedOutputs.append(output)
+        return Option_C2Tuple_usizeTransactionZZ.none()
     }
 }

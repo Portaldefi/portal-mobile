@@ -31,5 +31,6 @@ public enum NodeError: Error {
     public enum Invoice: Error {
         case notFound
         case invoicePaymentFailed
+        case decodingError
     }
 }

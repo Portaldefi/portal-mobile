@@ -10,11 +10,12 @@ import LightningDevKit
 
 extension APIError {
     func getLDKError() -> NodeError.Channels {
-        if let _ = self.getValueAsApiMisuseError() {
+        if let _ = self.getValueAsAPIMisuseError() {
             return .misuse
-        } else if let _ = self.getValueAsInvalidRoute() {
+        } else if let _ = self.getValueAsRouteError() {
             return .value
-        } else if let _ = self.getValueAsChannelUnavailable() {
+        } else if let error = self.getValueAsChannelUnavailable() {
+            print(error.getErr())
             return .unavailable
         } else if let _ = self.getValueAsFeeRateTooHigh() {
             return .feeTooHigh
