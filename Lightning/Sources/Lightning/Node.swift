@@ -32,6 +32,19 @@ public class Node {
     let feeEstimator = FeeEstimator()
     let filter = Filter()
     
+    // all user channels
+    public var allChannels: [ChannelDetails] {
+        channelManager?.list_channels() ?? []
+    }
+    // usable user channels
+    public var usableChannels: [ChannelDetails] {
+        channelManager?.list_usable_channels() ?? []
+    }
+
+    public var totalBalance: UInt64 {
+        usableChannels.map{ $0.get_balance_msat() }.reduce(0){ $0 + $1 }
+    }
+    
     public init(type: ConnectionType) {
         self.connectionType = type
     }
@@ -45,10 +58,10 @@ public class Node {
         let timestampInNanoseconds = UInt32(truncating: NSNumber(value: timestampInSeconds * 1000 * 1000))
         
         // (2) Setup KeysManager with `keySeed`. With add entropy using the current time. See this comment for more information: https://docs.rs/lightning/0.0.112/lightning/chain/keysinterface/struct.KeysManager.html#method.new
-        keysManager = KeysManager(seed: keySeed, startingTimeSecs: timestampInSeconds, startingTimeNanos: timestampInNanoseconds)
+        keysManager = KeysManager(seed: keySeed, starting_time_secs: timestampInSeconds, starting_time_nanos: timestampInNanoseconds)
         
         // (3) Grabs an instance of KeysInterface, we will need it later to construct a ChannelManager
-        guard let keysInterface = keysManager?.asKeysInterface() else {
+        guard let keysInterface = keysManager?.as_KeysInterface() else {
             throw NodeError.keyInterfaceFailure
         }
         
@@ -74,8 +87,8 @@ public class Node {
         // (6) Initialize a ChainMonitor. As the name describes, this is what we will use to watch on-chain activity
         // related to our channels.
         let chainMonitor = ChainMonitor(
-            chainSource: filter,
-            broadcaster: broadcaster!, // Force unwrap since we definitely set it in L72
+            chain_source: Option_FilterZ(value: filter),
+            broadcaster: broadcaster!, // Force unwrap since we definitely set it in L61
             logger: logger,
             feeest: feeEstimator,
             persister: ChannelPersister()
@@ -134,31 +147,30 @@ public class Node {
         
         blockchainListener = ChainListener(channelManager: channelManager, chainMonitor: chainMonitor)
         
-//        let isMonitoring = await rpcInterface.isMonitoring()
-//
-//        if !isMonitoring {
-//            try subscribeToChainPublisher()
-//        } else {
-//            print("Monitor already running")
-//        }
+        let isMonitoring = await rpcInterface.isMonitoring()
+
+        if !isMonitoring {
+            try subscribeToChainPublisher()
+        } else {
+            print("Monitor already running")
+        }
      
-        print("LDK is Running with key: \(channelManager.getOurNodeId().toHexString())")
+        print("LDK is Running with key: \(channelManager.get_our_node_id().toHexString())")
     }
     
-    /// Connect to a Peer on the Network.
+    //MARK: - Connect to peer
     public func connectPeer(pubKey: String, hostname: String, port: UInt16) async throws {
         print("Connecting to peer \(pubKey)")
-        guard let _ = peerManager else {
+        
+        guard let _ = peerManager, let tcpPeerHandler = tcpPeerHandler else {
             throw NodeError.connectPeer
         }
         
-        guard let _ = tcpPeerHandler?.connect(address: hostname, port: port, theirNodeId: pubKey.toByteArray()) else {
-            throw NodeError.connectPeer
-        }
+        let connected = tcpPeerHandler.connect(address: hostname, port: port, theirNodeId: pubKey.toByteArray())
         
-        print("peer connected \(pubKey)")
+        print("peer \(pubKey) is connected: \(connected)")
     }
-    
+    //MARK: - Open channel request
     public func requestChannelOpen(_ pubKeyHex: String, channelValue: UInt64, reserveAmount: UInt64) async throws -> ChannelOpenInfo {
         guard let channelManager = channelManager else {
             throw NodeError.Channels.channelManagerNotFound
@@ -166,30 +178,38 @@ public class Node {
         
         // open_channel
         let theirNodeId = pubKeyHex.toByteArray()
-        let channelOpenResult = channelManager.createChannel(
-            theirNetworkKey: theirNodeId,
-            channelValueSatoshis: channelValue,
-            pushMsat: reserveAmount,
-            userChannelId: [42],
-            overrideConfig: .initWithDefault()
+        let config = UserConfig()
+        let userChannelId = UInt64.random(in: 1...9999)
+        print("user channel id \(userChannelId)")
+
+        let channelOpenResult = channelManager.create_channel(
+            their_network_key: theirNodeId,
+            channel_value_satoshis: channelValue,
+            push_msat: reserveAmount,
+            user_channel_id: 42,
+            override_config: config
         )
         
         // See if peer has returned `accept_channel`
         if channelOpenResult.isOk() {
             let managerEvents = await getManagerEvents(expectedCount: 1)
             let managerEvent = managerEvents[0]
-            
-            // FIXME: Handle event where opening channel can fail (< min funding amount, wrong chain, etc.)
-            // The event takes on the following schema: https://docs.rs/lightning/0.0.112/lightning/util/events/enum.Event.html#variant.FundingGenerationReady
-            // In particular, `output_script` is the script we should be using in the transaction output. It basically
-            // looks something like: 2 <Alice_funding_pubkey> <Bob_funding_pubkey> 2 CHECKMULTISIG
-            let fundingReadyEvent = managerEvent.getValueAsFundingGenerationReady()!
-            
-            return ChannelOpenInfo(
-                fundingOutputScript: fundingReadyEvent.getOutputScript(),
-                temporaryChannelId: fundingReadyEvent.getTemporaryChannelId(),
-                counterpartyNodeId: pubKeyHex.toByteArray()
-            )
+            let eventValueType = managerEvent.getValueType()
+                        
+            switch eventValueType {
+            case .some(let wrapped):
+                switch wrapped {
+                case .FundingGenerationReady:
+                    let fundingReadyEvent = managerEvent.getValueAsFundingGenerationReady()!
+                    
+                    return ChannelOpenInfo(
+                        fundingEvent: fundingReadyEvent,
+                        counterpartyNodeId: pubKeyHex.toByteArray()
+                    )
+                default: throw NodeError.Channels.unknown
+                }
+            default: throw NodeError.Channels.unknown
+            }
         } else if let errorDetails = channelOpenResult.getError() {
             throw errorDetails.getLDKError()
         }
@@ -197,11 +217,12 @@ public class Node {
         throw NodeError.Channels.unknown
     }
     
-    public func getFundingTransaction(fundingTxid: String) async -> [UInt8] {
-        // FIXME: We can probably not force unwrap here if we can carefully intialize rpcInterface in the Node's initializer
-        return try! await rpcInterface!.getTransaction(with: fundingTxid)
-    }
+//    public func getFundingTransaction(fundingTxid: String) async -> [UInt8] {
+//        // FIXME: We can probably not force unwrap here if we can carefully intialize rpcInterface in the Node's initializer
+//        return try! await rpcInterface!.getTransaction(with: fundingTxid)
+//    }
     
+    //MARK: - Finishing Open channel
     // You will need channelOpenInfo from `requestChannelOpen`, and `fundingTransaction` from `getFundingTransaction`
     public func openChannel(channelOpenInfo: ChannelOpenInfo, fundingTransaction: [UInt8]) async throws -> Bool {
         guard let channelManager = channelManager else {
@@ -211,10 +232,10 @@ public class Node {
         // Create the funding transaction and do the `funding_created/funding_signed` dance with our counterparty.
         // After that, LDK will automatically broadcast it via the `BroadcasterInterface` we gave `ChannelManager`.
         var fundingResult: LightningDevKit.Result_NoneAPIErrorZ
-        fundingResult = channelManager.fundingTransactionGenerated(
-            temporaryChannelId: channelOpenInfo.temporaryChannelId,
-            counterpartyNodeId: channelOpenInfo.counterpartyNodeId,
-            fundingTransaction: fundingTransaction
+        fundingResult = channelManager.funding_transaction_generated(
+            temporary_channel_id: channelOpenInfo.temporaryChannelId,
+            counterparty_node_id: channelOpenInfo.counterpartyNodeId,
+            funding_transaction: fundingTransaction
         )
         
         if fundingResult.isOk() {
@@ -225,9 +246,9 @@ public class Node {
         
         throw NodeError.Channels.fundingFailure
     }
-    
+    //MARK: - Create invoice
     public func createInvoice(satAmount: UInt64?, description: String) async -> String? {
-        guard let channelManager = channelManager, let keyInterface = keysManager?.asKeysInterface() else {
+        guard let channelManager = channelManager, let keyInterface = keysManager?.as_KeysInterface() else {
             return nil
         }
         
@@ -236,41 +257,88 @@ public class Node {
             mSatAmount = satAmount * 1000
         }
         
-        let result = Bindings.swiftCreateInvoiceFromChannelmanager(
+        let result = Bindings.swift_create_invoice_from_channelmanager(
             channelmanager: channelManager,
-            keysManager: keyInterface,
-            logger: logger,
-            network: .BitcoinTestnet,
-            amtMsat: mSatAmount,
+            keys_manager: keyInterface,
+            network: LDKCurrency_BitcoinTestnet,
+            amt_msat: Option_u64Z(value: mSatAmount),
             description: description,
-            invoiceExpiryDeltaSecs: 86400 //24 hours
+            invoice_expiry_delta_secs: 86400 //24 hours
         )
         
         if result.isOk(), let invoice = result.getValue() {
-            let invoiceString = invoice.toStr()
+            let invoiceString = invoice.to_str()
             print("================================")
             print("INVOICE: \(invoiceString)")
             print("================================")
             
             return invoiceString
         } else if let error = result.getError() {
-            print(error.toStr())
+            print(error.to_str())
             return nil
         }
         
         return nil
     }
-    
-    public func getFundingTransactionScriptPubKey(outputScript: [UInt8]) async -> String? {
-        return "address"
+    //MARK: - Sends funding transaction generated message
+    public func fundingTransactionGenerated(temporaryChannelId: [UInt8], fundingTransaction: [UInt8]) -> Result_NoneAPIErrorZ {
+        guard let channelManager = channelManager else {
+            return Result_NoneAPIErrorZ.err(e: .apimisuse_error(err: "Channel Manager is nil"))
+        }
+        return channelManager.funding_transaction_generated(
+            temporary_channel_id: temporaryChannelId,
+            counterparty_node_id: [],
+            funding_transaction: fundingTransaction
+        )
+    }
+    //MARK: - Close channel
+    public func close(channel: ChannelDetails) async {
+        let channelId = channel.get_channel_id()
+        let counterpartyNodeId = channel.get_counterparty().get_node_id()
+        let result = channelManager!.close_channel(channel_id: channelId, counterparty_node_id: counterpartyNodeId)
+        
+        if result.isOk() {
+            print("closed")
+        } else if let channelCloseError = result.getError() {
+            print("error type: \(String(describing: channelCloseError.getValueType()))")
+            if let error = channelCloseError.getValueAsAPIMisuseError() {
+                print("API misuse error: \(error.getErr())")
+            } else if let error = channelCloseError.getValueAsChannelUnavailable() {
+                print("channel unavailable error: \(error.getErr())")
+            } else if let error = channelCloseError.getValueAsFeeRateTooHigh() {
+                print("excessive fee rate error: \(error.getErr())")
+            } else if let error = channelCloseError.getValueAsIncompatibleShutdownScript() {
+                print("incompatible shutdown script: \(error.getScript())")
+            } else if let error = channelCloseError.getValueAsRouteError() {
+                print("route error: \(error.getErr())")
+            }
+        }
+    }
+    //MARK: - Decode invoice
+    public func decode(invoice: String) throws -> Invoice? {
+        let decodedInvoice = Invoice.from_str(s: invoice)
+        guard decodedInvoice.isOk() else {
+            throw NodeError.Invoice.decodingError
+        }
+        return decodedInvoice.getValue()
     }
 }
 
 extension Node {
     public struct ChannelOpenInfo {
-        public let fundingOutputScript: [UInt8]
-        public let temporaryChannelId: [UInt8]
+        private let fundingEvent: Event.FundingGenerationReady
+        public var fundingOutputScript: [UInt8] {
+            fundingEvent.getOutput_script()
+        }
+        public var temporaryChannelId: [UInt8] {
+            fundingEvent.getTemporary_channel_id()
+        }
         public let counterpartyNodeId: [UInt8]
+        
+        init(fundingEvent: Event.FundingGenerationReady, counterpartyNodeId: [UInt8]) {
+            self.fundingEvent = fundingEvent
+            self.counterpartyNodeId = counterpartyNodeId
+        }
     }
 }
 
@@ -281,9 +349,9 @@ extension Node {
             .autoconnect()
             .filter { [weak self] _ in self?.peerManager != nil }
             .flatMap { [weak self] _ -> AnyPublisher<[String], Never> in
-                let peers = self?.peerManager!.getPeerNodeIds().compactMap { $0.toHexString() }
-                
-                return Just(peers ?? []).eraseToAnyPublisher()
+                let peers = self?.peerManager!.get_peer_node_ids().compactMap { $0.toHexString() }
+                return Just(peers ?? [])
+                    .eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
     }
@@ -303,13 +371,13 @@ extension Node {
                 print("CasaLDK: Error subscribing to blockchain monitor")
             }, receiveValue: { [unowned self] _ in
                 if let channelManagerConstructor = channelManagerConstructor,
-                    let networkGraph = channelManagerConstructor.netGraph,
+                    let networkGraph = channelManagerConstructor.net_graph,
                     let persister = persister {
-                                        
-                    let probabalisticScorer = ProbabilisticScorer(params: .initWithDefault(), networkGraph: networkGraph, logger: logger)
-                    let score = probabalisticScorer.asScore()
+                    let scoringParams = ProbabilisticScoringParameters()
+                    let probabalisticScorer = ProbabilisticScorer(params: scoringParams, network_graph: networkGraph, logger: logger)
+                    let score = probabalisticScorer.as_Score()
                     
-                    channelManagerConstructor.chainSyncCompleted(persister: persister, scorer: MultiThreadedLockableScore(score: score))
+                    channelManagerConstructor.chain_sync_completed(persister: persister, scorer: MultiThreadedLockableScore(score: score))
                     
                     print("Reconciled Chain Tip")
                 } else {
@@ -326,14 +394,14 @@ extension Node {
             let channelMonitors = fileManager.getSerializedChannelMonitors()
             do {
                 return try ChannelManagerConstructor(
-                    channelManagerSerialized: channelManager,
-                    channelMonitorsSerialized: channelMonitors,
-                    keysInterface: keysInterface,
-                    feeEstimator: feeEstimator,
-                    chainMonitor: chainMonitor,
+                    channel_manager_serialized: channelManager,
+                    channel_monitors_serialized: channelMonitors,
+                    keys_interface: keysInterface,
+                    fee_estimator: feeEstimator,
+                    chain_monitor: chainMonitor,
                     filter: filter,
-                    netGraphSerialized: networkGraph,
-                    txBroadcaster: broadcaster!, // Force unwrap since we definitely set it in L72
+                    net_graph_serialized: networkGraph,
+                    tx_broadcaster: broadcaster!, // Force unwrap since we definitely set it in L72
                     logger: logger,
                     enableP2PGossip: true
                 )
@@ -346,27 +414,27 @@ extension Node {
     }
     
     private func initializeChannelMaterialAndNetworkGraph(currentTipHash: [UInt8], currentTipHeight: UInt32, keysInterface: KeysInterface, chainMonitor: ChainMonitor, broadcaster: BroadcasterInterface) async throws -> ChannelManagerConstructor {
-        var network = Network.Regtest
+        var network = LDKNetwork_Regtest
         switch connectionType {
         case .testnet:
-            network = Network.Testnet
+            network = LDKNetwork_Testnet
         default:
-            network = Network.Regtest
+            network = LDKNetwork_Regtest
         }
         
         let genesisHash = [UInt8](repeating: 0, count: 32)
         
-        let graph = NetworkGraph(genesisHash: genesisHash, logger: logger)
+        let graph = NetworkGraph(genesis_hash: genesisHash, logger: logger)
         return ChannelManagerConstructor(
             network: network,
-            config: .initWithDefault(),
-            currentBlockchainTipHash: currentTipHash,
-            currentBlockchainTipHeight: currentTipHeight,
-            keysInterface: keysInterface,
-            feeEstimator: feeEstimator,
-            chainMonitor: chainMonitor,
-            netGraph: graph,
-            txBroadcaster: broadcaster,
+            config: UserConfig(),
+            current_blockchain_tip_hash: currentTipHash,
+            current_blockchain_tip_height: currentTipHeight,
+            keys_interface: keysInterface,
+            fee_estimator: feeEstimator,
+            chain_monitor: chainMonitor,
+            net_graph: graph,
+            tx_broadcaster: broadcaster,
             logger: logger,
             enableP2PGossip: true
         )
