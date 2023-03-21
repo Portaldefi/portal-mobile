@@ -13,7 +13,6 @@ struct AccountView: View {
     @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewModel: AccountViewModel = Container.accountViewModel()
     @ObservedObject private var viewState: ViewState = Container.viewState()
-    @ObservedObject private var sharedViewState = AccountViewSharedState()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -73,8 +72,8 @@ struct AccountView: View {
         .sheet(isPresented: $viewModel.goToSend) {
             SendRootView(withAssetPicker: true)
         }
-        .fullScreenCover(isPresented: $sharedViewState.showBackUpFlow) {
-            AccountBackupRootView().environmentObject(sharedViewState)
+        .fullScreenCover(isPresented: $viewState.showBackUpFlow) {
+            AccountBackupRootView().environmentObject(viewState)
         }
     }
     
@@ -106,7 +105,7 @@ struct AccountView: View {
                 
                 if !viewModel.accountDataIsBackedUp {
                     PButton(config: .onlyIcon(Asset.warningIcon), style: .free, size: .medium, color: .yellow, enabled: true) {
-                        sharedViewState.showBackUpFlow.toggle()
+                        viewState.showBackUpFlow.toggle()
                     }
                     .frame(width: 30, height: 30)
                     .padding(.leading)
