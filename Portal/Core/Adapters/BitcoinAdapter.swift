@@ -11,6 +11,7 @@ import BitcoinDevKit
 import BitcoinAddressValidator
 
 final class BitcoinAdapter {
+    private let electrumURL = "ssl://electrum.blockstream.info:60002"
     private let coinRate: Decimal = pow(10, 8)
     
     private let stateUpdatedSubject = PassthroughSubject<Void, Never>()
@@ -36,9 +37,17 @@ final class BitcoinAdapter {
         if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
             let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite" + "\(account.id)")
             let dbConfig = DatabaseConfig.sqlite(config: sqliteConfig)
-            let electrum = ElectrumConfig(url: "ssl://electrum.blockstream.info:60002", socks5: nil, retry: 5, timeout: nil, stopGap: 10, validateDomain: false)
-            let blockchainConfig = BlockchainConfig.electrum(config: electrum)
             
+            let electrum = ElectrumConfig(
+                url: electrumURL,
+                socks5: nil,
+                retry: 5,
+                timeout: nil,
+                stopGap: 10,
+                validateDomain: false
+            )
+            
+            let blockchainConfig = BlockchainConfig.electrum(config: electrum)
             blockchain = try Blockchain(config: blockchainConfig)
             
             self.wallet = try BitcoinDevKit.Wallet(
@@ -130,7 +139,7 @@ extension BitcoinAdapter: IBalanceAdapter {
     }
     
     var balance: Decimal {
-        Decimal(_balance.spendable)/coinRate
+        Decimal(_balance.spendable + _balance.untrustedPending)/coinRate
     }
     
     var balanceStateUpdated: AnyPublisher<Void, Never> {
@@ -155,6 +164,31 @@ extension BitcoinAdapter: ITransactionsAdapter {
 }
 
 extension BitcoinAdapter: ISendBitcoinAdapter {
+    func rawTransaction(amount: UInt64, address: String) throws -> [UInt8] {
+        let receiverAddress = try Address(address: address)
+        let receiverAddressScript = receiverAddress.scriptPubkey()
+        let txBuilderResult: TxBuilderResult
+        
+        txBuilderResult = try TxBuilder()
+            .addRecipient(script: receiverAddressScript, amount: amount)
+            .enableRbf()
+            .finish(wallet: wallet)
+        
+        let psbt = txBuilderResult.psbt
+        let txDetails = txBuilderResult.transactionDetails
+        print("txDetails: \(txDetails)")
+        
+        let finalized = try wallet.sign(psbt: psbt)
+        print("Tx id: \(psbt.txid())")
+        print("funding tx serialized: \(psbt.serialize())")
+        
+        if finalized {
+            return psbt.extractTx()
+        } else {
+            throw SendFlowError.error("Tx not finalized")
+        }
+    }
+    
     func send(amount: Decimal, address: String, fee: Int?) -> Combine.Future<TransactionRecord, Error> {
         Future { [unowned self] promise in
             do {
@@ -241,6 +275,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         do {
             let txBuilderResult: TxBuilderResult
             let receiverAddress = try Address(address: address)
+            print(balance)
             
             if max {
                 if let fee = fee {
