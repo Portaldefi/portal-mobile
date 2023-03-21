@@ -166,7 +166,7 @@ class ReceiveViewModel: ObservableObject {
         case .bitcoin:
             switch qrAddressType {
             case .lightning:
-                qrCodeString = "lightning=\(invoiceString)"
+                qrCodeString = "lightning:\(invoiceString)"
             case .onChain:
                 qrCodeString = "bitcoin:\(receiveAddress)"
                 
@@ -180,7 +180,7 @@ class ReceiveViewModel: ObservableObject {
                     qrCodeString += components
                 }
                 
-                qrCodeString += "&lightning=\(invoiceString)"
+                qrCodeString += "&lightning:\(invoiceString)"
             }
         case .ethereum:
             qrCodeString = "ethereum:\(receiveAddress)"
