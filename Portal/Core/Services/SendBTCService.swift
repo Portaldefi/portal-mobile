@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import BitcoinDevKit
+import Factory
 
 class SendBTCService: ISendAssetService {
     private var url: URL? = URL(string: "https://bitcoinfees.earn.com/api/v1/fees/recommended")
@@ -95,7 +96,29 @@ class SendBTCService: ISendAssetService {
     }
     
     func validateAddress() throws {
-        try sendAdapter.validate(address: receiverAddress.value)
+        let ldkManager = Container.lightningKitManager()
+        let inputString = receiverAddress.value
+        
+        let invoiceDecoded: Bool
+        let addressDecoded: Bool
+        
+        do {
+            _ = try ldkManager.decode(invoice: inputString)
+            invoiceDecoded = true
+        } catch {
+            invoiceDecoded = false
+        }
+        
+        do {
+            try sendAdapter.validate(address: inputString)
+            addressDecoded = true
+        } catch {
+            addressDecoded = false
+        }
+        
+        if !invoiceDecoded && !addressDecoded {
+            throw SendFlowError.addressIsntValid
+        }
     }
     
     func send() -> Future<TransactionRecord, Error> {
