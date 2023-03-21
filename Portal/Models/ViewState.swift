@@ -14,7 +14,8 @@ class ViewState: ObservableObject {
         case activity
     }
     
-    @Published var hideTabBar: Bool = false
+    @Published var showBackUpFlow = false
+    @Published var hideTabBar = false
     @Published var showQRCodeScannerFromTabBar: Bool = false {
         willSet {
             if newValue != showQRCodeScannerFromTabBar && newValue == false {
