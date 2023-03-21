@@ -57,7 +57,6 @@
 		7542185629A3C3F10028D5DF /* BTCQRCodeAddressType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7542185529A3C3F10028D5DF /* BTCQRCodeAddressType.swift */; };
 		7542185829A3E01A0028D5DF /* MockedAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7542185729A3E01A0028D5DF /* MockedAdapter.swift */; };
 		7542185A29A49EFA0028D5DF /* QRCodeFullStringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7542185929A49EFA0028D5DF /* QRCodeFullStringView.swift */; };
-		7542185C29A7836C0028D5DF /* AccountViewSharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7542185B29A7836C0028D5DF /* AccountViewSharedState.swift */; };
 		7543384C2927BE4700061E28 /* ConfirmImportAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */; };
 		7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */; };
 		7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7545BC0828C211DA00ED92C3 /* View+Extension.swift */; };
@@ -123,6 +122,7 @@
 		755FDD5129AFA30A00D8A29C /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 755FDD5029AFA30A00D8A29C /* Starscream */; };
 		755FDD5329B7815C00D8A29C /* CurrencyTickerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755FDD5229B7815C00D8A29C /* CurrencyTickerModel.swift */; };
 		755FDD5529B7817900D8A29C /* TickerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755FDD5429B7817900D8A29C /* TickerModel.swift */; };
+		75618FA029C34BCA005F2392 /* BitcoinCore in Frameworks */ = {isa = PBXBuildFile; productRef = 75618F9F29C34BCA005F2392 /* BitcoinCore */; };
 		7564C65228CF3CF600ABA8CF /* SetRecipientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */; };
 		7564C65428CF3D3900ABA8CF /* SetAmountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65328CF3D3900ABA8CF /* SetAmountView.swift */; };
 		7564C65728CF6EC400ABA8CF /* SendFlowError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65628CF6EC400ABA8CF /* SendFlowError.swift */; };
@@ -252,7 +252,6 @@
 		7542185529A3C3F10028D5DF /* BTCQRCodeAddressType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTCQRCodeAddressType.swift; sourceTree = "<group>"; };
 		7542185729A3E01A0028D5DF /* MockedAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedAdapter.swift; sourceTree = "<group>"; };
 		7542185929A49EFA0028D5DF /* QRCodeFullStringView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeFullStringView.swift; sourceTree = "<group>"; };
-		7542185B29A7836C0028D5DF /* AccountViewSharedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewSharedState.swift; sourceTree = "<group>"; };
 		7543384B2927BE4700061E28 /* ConfirmImportAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmImportAccountView.swift; sourceTree = "<group>"; };
 		7545BC0628C1F03A00ED92C3 /* BiometricAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthentication.swift; sourceTree = "<group>"; };
 		7545BC0828C211DA00ED92C3 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
@@ -407,6 +406,7 @@
 				479A7AC928B756DF0057E100 /* Factory in Frameworks */,
 				756DDD8C28A28858002EDC60 /* KeychainAccess in Frameworks */,
 				75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */,
+				75618FA029C34BCA005F2392 /* BitcoinCore in Frameworks */,
 				7564C65E28D1F89E00ABA8CF /* DataField in Frameworks */,
 				75772A5D28F8192F00BE80B7 /* CodeScanner in Frameworks */,
 				7542184F299BDE320028D5DF /* PopupView in Frameworks */,
@@ -712,7 +712,6 @@
 				752FA62C296C608C00008796 /* RecommendedFees.swift */,
 				752FA62E296C60C900008796 /* TxFees.swift */,
 				7542185529A3C3F10028D5DF /* BTCQRCodeAddressType.swift */,
-				7542185B29A7836C0028D5DF /* AccountViewSharedState.swift */,
 				755FDD5229B7815C00D8A29C /* CurrencyTickerModel.swift */,
 				755FDD5429B7817900D8A29C /* TickerModel.swift */,
 			);
@@ -885,6 +884,7 @@
 				75421840298BD2A80028D5DF /* Lightning */,
 				7542184E299BDE320028D5DF /* PopupView */,
 				755FDD5029AFA30A00D8A29C /* Starscream */,
+				75618F9F29C34BCA005F2392 /* BitcoinCore */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* Portal.app */;
@@ -928,6 +928,7 @@
 				752FA62329670DD900008796 /* XCRemoteSwiftPackageReference "FeeRateKit.Swift" */,
 				7542184D299BDE310028D5DF /* XCRemoteSwiftPackageReference "PopupView" */,
 				755FDD4F29AFA30A00D8A29C /* XCRemoteSwiftPackageReference "Starscream" */,
+				75618F9E29C34BCA005F2392 /* XCRemoteSwiftPackageReference "BitcoinCore.Swift" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -1039,7 +1040,6 @@
 				756A3137288AEAAD004978E2 /* AssetDetailsView.swift in Sources */,
 				4774D71A28AF916600B7988B /* QRCodeItem.swift in Sources */,
 				756DDD9328A28DE7002EDC60 /* RootView.swift in Sources */,
-				7542185C29A7836C0028D5DF /* AccountViewSharedState.swift in Sources */,
 				750C05DF29641B97005519FF /* Publisher+Rx.swift in Sources */,
 				4774D72528B4FC2000B7988B /* StringFormatter.swift in Sources */,
 				755FDD4E29AD00D500D8A29C /* MockedLightningKitManager.swift in Sources */,
@@ -1418,6 +1418,14 @@
 				minimumVersion = 4.0.0;
 			};
 		};
+		75618F9E29C34BCA005F2392 /* XCRemoteSwiftPackageReference "BitcoinCore.Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/horizontalsystems/BitcoinCore.Swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/marcusrossel/data-field.git";
@@ -1507,6 +1515,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 755FDD4F29AFA30A00D8A29C /* XCRemoteSwiftPackageReference "Starscream" */;
 			productName = Starscream;
+		};
+		75618F9F29C34BCA005F2392 /* BitcoinCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 75618F9E29C34BCA005F2392 /* XCRemoteSwiftPackageReference "BitcoinCore.Swift" */;
+			productName = BitcoinCore;
 		};
 		7564C65D28D1F89E00ABA8CF /* DataField */ = {
 			isa = XCSwiftPackageProductDependency;
