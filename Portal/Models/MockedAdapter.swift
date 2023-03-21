@@ -47,6 +47,10 @@ class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepos
         }
     }
     
+    func rawTransaction(amount: UInt64, address: String) throws -> [UInt8] {
+        []
+    }
+    
     func start() {
         
     }
