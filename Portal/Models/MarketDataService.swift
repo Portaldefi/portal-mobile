@@ -80,10 +80,7 @@ final class MarketDataService {
     private func decodeSocketString(_ string: String) {
         guard let dataFromSocketString = string.data(using: String.Encoding.utf8, allowLossyConversion: false) else { return }
         
-        do {
-            let results = try jsonDecoder.decode([TickerModel].self, from: dataFromSocketString)
-            guard !results.isEmpty else  { return }
-            
+        if let results = try? jsonDecoder.decode([TickerModel].self, from: dataFromSocketString), !results.isEmpty {
             if let updatedBtcTicker = results.first(where: { $0.ticker_id == btcTickerID as? String }) {
                 btcTicker = updatedBtcTicker
             }
@@ -91,8 +88,6 @@ final class MarketDataService {
             if let updatedEthTicker = results.first(where: { $0.ticker_id == ethTickerID as? String }) {
                 ethTicker = updatedEthTicker
             }
-        } catch {
-            print("ticker decoding error: \(error)")
         }
     }
     
