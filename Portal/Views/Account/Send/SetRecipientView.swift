@@ -16,7 +16,14 @@ struct SetRecipientView: View {
     @Environment(\.presentationMode) private var presentationMode
     
     let rootView: Bool
-            
+    
+    private var textEditorColor: Color {
+        guard viewModel.sendError == nil else {
+            return Color(red: 255/255, green: 82/255, blue: 82/255)
+        }
+        return Palette.grayScale3A
+    }
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
@@ -46,41 +53,29 @@ struct SetRecipientView: View {
                             .font(.Main.fixed(.bold, size: 24))
                             .foregroundColor(Palette.grayScaleCA)
                         
-                        ZStack {
-                            if viewModel.sendError == nil {
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Palette.grayScale3A, lineWidth: 1)
-                                    .allowsHitTesting(false)
-
-                            } else {
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(red: 255/255, green: 82/255, blue: 82/255), lineWidth: 1)
-                                    .allowsHitTesting(false)
-                            }
+                        ZStack(alignment: .leading) {
+                            TextEditor(text: $viewModel.receiverAddress)
+                                .hideBackground()
+                                .disableAutocorrection(true)
+                                .textInputAutocapitalization(.never)
+                                .font(.Main.fixed(.monoRegular, size: 16))
+                                .foregroundColor(textEditorColor)
+                                .padding(8)
+                                .fixedSize(horizontal: false, vertical: true)
                             
-                            ZStack(alignment: .leading) {
-                                TextEditor(text: $viewModel.receiverAddress)
-                                    .hideBackground()
-                                    .lineLimit(2)
-                                    .frame(height: viewModel.receiverAddress.count > 34 ? 60 : 40)
-                                    .disableAutocorrection(true)
-                                    .textInputAutocapitalization(.never)
+                            if viewModel.receiverAddress.isEmpty {
+                                Text("Enter address")
                                     .font(.Main.fixed(.monoRegular, size: 16))
-                                    .foregroundColor(viewModel.sendError == nil ? .white : Color(red: 1, green: 0.349, blue: 0.349))
-                                    .padding(8)
-
-                                if viewModel.receiverAddress.isEmpty {
-                                    Text("Enter address")
-                                        .font(.Main.fixed(.monoRegular, size: 16))
-                                        .foregroundColor(Palette.grayScale4A)
-                                        .padding(16)
-                                        .allowsHitTesting(false)
-                                }
+                                    .foregroundColor(Palette.grayScale4A)
+                                    .padding(16)
+                                    .allowsHitTesting(false)
                             }
-                            .frame(height: 58)
                         }
-                        .cornerRadius(12)
-                        .frame(height: 58)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(textEditorColor, lineWidth: 1)
+                                .allowsHitTesting(false)
+                        )
                     }
                     
                     HStack(spacing: 16) {
@@ -92,13 +87,24 @@ struct SetRecipientView: View {
                         ) {
                             showScanner.toggle()
                         }
+
+                        //Apparently SwiftUI button has an animation issue on TextField resizing. Recreating PButton view without wrapping into SwiftUI Button
                         
-                        PButton(
-                            config: .labelAndIconLeft(label: "Paste", icon: Asset.pasteIcon),
-                            style: .outline,
-                            size: .medium,
-                            enabled: true
-                        ) {
+                        HStack(spacing: 6) {
+                            Asset.pasteIcon
+                                .resizable()
+                                .frame(width: 26, height: 26)
+                            Text("Paste")
+                                .font(.Main.fixed(.monoBold, size: 16))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 40)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(RadialGradient.main, lineWidth: 2)
+                        )
+                        .containerShape(Rectangle())
+                        .onTapGesture {
                             viewModel.pasteFromClipboard()
                         }
                     }
@@ -143,7 +149,6 @@ struct SetRecipientView: View {
             )
             .transition(.move(edge: .bottom).combined(with: .opacity))
             .zIndex(1)
-
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .alert(isPresented: $viewModel.clipboardIsEmpty) {
