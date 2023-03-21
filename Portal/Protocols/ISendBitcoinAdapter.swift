@@ -13,5 +13,6 @@ protocol ISendBitcoinAdapter {
     func validate(address: String) throws
     func fee(max: Bool, address: String, amount: Decimal, fee: Int?) throws -> UInt64?
     func send(amount: Decimal, address: String, fee: Int?) -> Future<TransactionRecord, Error>
+    func rawTransaction(amount: UInt64, address: String) throws -> [UInt8]
     func sendMax(address: String, fee: Int?) -> Future<TransactionRecord, Error>
 }
