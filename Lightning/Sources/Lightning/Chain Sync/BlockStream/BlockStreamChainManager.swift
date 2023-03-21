@@ -57,7 +57,7 @@ class BlockStreamChainManager {
     private var chainListeners = [ChainListener]()
     
     var blockchainMonitorPublisher: AnyPublisher<Void, Error> {
-        Timer.publish(every: 5, on: RunLoop.main, in: .default)
+        Timer.publish(every: 15, on: RunLoop.main, in: .default)
             .autoconnect()
             .flatMap { [unowned self] _ in
                 Future { promise in
@@ -396,8 +396,8 @@ extension BlockStreamChainManager: RpcChainManager {
         let txHex = bytesToHexString(bytes: transaction)
         let response = try await self.callRpcMethod(method: .postRawTx(txHex))
         // returns the txid
-        let result = response["result"] as! String
-        return result
+        let result = response["txID"] as? String
+        return result ?? "unknown tx id"
     }
 }
 
