@@ -11,7 +11,7 @@ import BitcoinDevKit
 import Factory
 
 class SendBTCService: ISendAssetService {
-    private var url: URL? = URL(string: "https://bitcoinfees.earn.com/api/v1/fees/recommended")
+    private var url: URL? = URL(string: "https://api.blockcypher.com/v1/btc/test3")
     private var urlSession: URLSession
     private let sendAdapter: ISendBitcoinAdapter
     private var subscriptions = Set<AnyCancellable>()
