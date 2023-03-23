@@ -68,7 +68,7 @@ struct AssetDetailsView: View {
             
             ZStack {
                 ScrollView {
-                    ForEach(viewModel.transactions, id: \.self) { transaction in
+                    ForEach(viewModel.transactions.sorted(by: { $0.timestamp ?? 0 > $1.timestamp ?? 0 }), id: \.self) { transaction in
                         SingleTxView(coin: viewModel.coin, transaction: transaction)
                             .padding(.horizontal, 8)
                             .contentShape(Rectangle())
