@@ -18,13 +18,13 @@ class ChainListener {
     }
     
     func blockConnected(block: [UInt8], height: UInt32) {
-        print("block connected at height \(height): \(block)")
+        print("block connected at height \(height)")
         self.channelManager.as_Listen().block_connected(block: block, height: height)
         self.chainMonitor.as_Listen().block_connected(block: block, height: height)
     }
 
     func blockDisconnected(header: [UInt8]?, height: UInt32) {
-        print("block disconnected from height \(height): \(header)")
+        print("block disconnected from height \(height)")
         self.channelManager.as_Listen().block_disconnected(header: header, height: height)
         self.chainMonitor.as_Listen().block_disconnected(header: header, height: height)
     }
