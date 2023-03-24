@@ -22,9 +22,7 @@ public class Node {
     var persister: Persister?
     var peerManager: PeerManager?
     var tcpPeerHandler: TCPPeerHandler?
-    
-    var blockchainListener: ChainListener?
-    
+        
     var cancellables = Set<AnyCancellable>()
     
     // We declare this here because `ChannelManagerConstructor` and `ChainMonitor` will share a reference to them
@@ -94,19 +92,7 @@ public class Node {
             persister: ChannelPersister()
         )
         
-        // (7) Do requisite chain sync to start.
-        if case .regtest = connectionType, let rpcInterface = rpcInterface as? BitcoinCoreChainManager {
-            // If we're using Bitcoin Core
-            try await rpcInterface.preloadMonitor(anchorHeight: .chaintip)
-        }
-        
-        if case .testnet = connectionType, let rpcInterface = rpcInterface as? BlockStreamChainManager {
-            // If we're using BlockStream
-            try await rpcInterface.preloadMonitor(anchorHeight: .chaintip)
-        }
-        // we will tell the ChainMonitor to connect blocks up to the latest chain tip.
-        
-        // (8) Construct ChannelManager. The ChannelManager, as mentioned earlier, is like the brain of the node. It is responsible for
+        // (7) Construct ChannelManager. The ChannelManager, as mentioned earlier, is like the brain of the node. It is responsible for
         // sending messages to appropriate channels, track HTLCs, forward onion packets, and also track a user's channels. It can also be
         // persisted on disk, which is what you generally want to do as often as possible -- this is equivalent to a "node backup".
         // The general advice here is to make sure that your `ChannelManager` *is encrypted*, because you can certainly glean information
@@ -136,16 +122,35 @@ public class Node {
         // Create shared instance reference to these objects, so we can use them for opening and managing channels and connecting to peers,
         // respectively.
         channelManager = channelManagerConstructor.channelManager
-        peerManager = channelManagerConstructor.peerManager
-        tcpPeerHandler = channelManagerConstructor.getTCPPeerHandler()
         
-        // (9) Initialize Persister, which is primarily responsible for persisting `ChannelManager`, `Scorer`, and `NetworkGraph` to disk.
-        persister = Persister(eventTracker: pendingEventTracker)
         guard let channelManager = channelManager else {
             throw NodeError.noChannelManager
         }
         
-        blockchainListener = ChainListener(channelManager: channelManager, chainMonitor: chainMonitor)
+        peerManager = channelManagerConstructor.peerManager
+        tcpPeerHandler = channelManagerConstructor.getTCPPeerHandler()
+        
+        let blockchainListener = ChainListener(channelManager: channelManager, chainMonitor: chainMonitor)
+        rpcInterface.registerListener(blockchainListener)
+                
+        // (8) Do requisite chain sync to start.
+        
+        let bestBlockHeight = channelManager.current_best_block().height()
+        
+        if case .regtest = connectionType, let rpcInterface = rpcInterface as? BitcoinCoreChainManager {
+            // If we're using Bitcoin Core
+            try await rpcInterface.preloadMonitor(anchorHeight: .block(bestBlockHeight))
+        }
+        
+        if case .testnet = connectionType, let rpcInterface = rpcInterface as? BlockStreamChainManager {
+            // If we're using BlockStream
+            try await rpcInterface.preloadMonitor(anchorHeight: .block(bestBlockHeight))
+        }
+        
+        // we will tell the ChainMonitor to connect blocks up to the latest chain tip.
+        
+        // (9) Initialize Persister, which is primarily responsible for persisting `ChannelManager`, `Scorer`, and `NetworkGraph` to disk.
+        persister = Persister(eventTracker: pendingEventTracker)
         
         let isMonitoring = await rpcInterface.isMonitoring()
 
@@ -168,7 +173,9 @@ public class Node {
         
         let connected = tcpPeerHandler.connect(address: hostname, port: port, theirNodeId: pubKey.toByteArray())
         
-        print("peer \(pubKey) is connected: \(connected)")
+        if !connected {
+            print("failed to connect")
+        }
     }
     //MARK: - Open channel request
     public func requestChannelOpen(_ pubKeyHex: String, channelValue: UInt64, reserveAmount: UInt64) async throws -> ChannelOpenInfo {
@@ -186,7 +193,7 @@ public class Node {
             their_network_key: theirNodeId,
             channel_value_satoshis: channelValue,
             push_msat: reserveAmount,
-            user_channel_id: 42,
+            user_channel_id: userChannelId,
             override_config: config
         )
         
@@ -380,6 +387,12 @@ extension Node {
                     channelManagerConstructor.chain_sync_completed(persister: persister, scorer: MultiThreadedLockableScore(score: score))
                     
                     print("Reconciled Chain Tip")
+                    
+                    let bestBLockHeight = channelManagerConstructor
+                        .channelManager.current_best_block().height()
+                    print("best block: \(bestBLockHeight)")
+                    
+                    print("Usable channels: \(channelManager!.list_usable_channels().count)")
                 } else {
                     print("CasaLDK: Chain Tip Reconcilation Failed. ChannelManagerConstructor does not have a network graph!")
                 }
