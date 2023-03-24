@@ -11,6 +11,10 @@ import BitcoinDevKit
 import BitcoinAddressValidator
 
 final class BitcoinAdapter {
+    private enum DereviationPathBranch: Int {
+        case external = 0, `internal`
+    }
+    
     private let electrumURL = "ssl://electrum.blockstream.info:60002"
     private let coinRate: Decimal = pow(10, 8)
     
@@ -26,13 +30,30 @@ final class BitcoinAdapter {
     private var adapterState: AdapterState = .syncing(progress: 0, lastBlockDate: nil)
     private var _balance = Balance(immature: 0, trustedPending: 0, untrustedPending: 0, confirmed: 0, spendable: 0, total: 0)
     private var _receiveAddress = AddressInfo(index: 0, address: String())
+    
+    static private func descriptor(derivedKey: String, network: Network) throws -> Descriptor {
+        try Descriptor(descriptor: "wpkh(\(derivedKey))", network: network)
+    }
+    
+    static private func dereviationPath(index: Int, branch: DereviationPathBranch) throws -> DerivationPath {
+        try DerivationPath(path: "m/84h/0h/\(index)h/\(branch.rawValue)")
+    }
         
     init(wallet: Wallet) throws {
+        let network: Network = .testnet
+        
         let account = wallet.account
+        let accountIndex = account.index
+        
         let bip32RootKey = wallet.account.rootKey
-        let deriviationPath = try DerivationPath(path: "m/84h/0h/\(account.index)h/0")
+        
+        let deriviationPath = try Self.dereviationPath(index: accountIndex, branch: .external)
         let derivedKey = try bip32RootKey.derive(path: deriviationPath)
-        let descriptor = try Descriptor(descriptor: "wpkh(\(derivedKey.asString()))", network: .testnet)
+        let descriptor = try Self.descriptor(derivedKey: derivedKey.asString(), network: network)
+        
+        let changeDerivationPath = try Self.dereviationPath(index: accountIndex, branch: .internal)
+        let changeDerivedKey = try bip32RootKey.derive(path: changeDerivationPath)
+        let changeDescriptor = try Self.descriptor(derivedKey: changeDerivedKey.asString(), network: network)
         
         if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
             let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite" + "\(account.id)")
@@ -52,8 +73,8 @@ final class BitcoinAdapter {
             
             self.wallet = try BitcoinDevKit.Wallet(
                 descriptor: descriptor,
-                changeDescriptor: nil,
-                network: Network.testnet,
+                changeDescriptor: changeDescriptor,
+                network: network,
                 databaseConfig: dbConfig
             )
             
@@ -168,8 +189,11 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         let receiverAddress = try Address(address: address)
         let receiverAddressScript = receiverAddress.scriptPubkey()
         let txBuilderResult: TxBuilderResult
+        let utxos = try? wallet.listUnspent()
+        let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
         
         txBuilderResult = try TxBuilder()
+            .addUtxos(outpoints: outpoints)
             .addRecipient(script: receiverAddressScript, amount: amount)
             .enableRbf()
             .finish(wallet: wallet)
@@ -178,11 +202,11 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         let txDetails = txBuilderResult.transactionDetails
         print("txDetails: \(txDetails)")
         
-        let finalized = try wallet.sign(psbt: psbt)
+        let signed = try wallet.sign(psbt: psbt)
         print("Tx id: \(psbt.txid())")
         print("funding tx serialized: \(psbt.serialize())")
         
-        if finalized {
+        if signed {
             return psbt.extractTx()
         } else {
             throw SendFlowError.error("Tx not finalized")
@@ -196,15 +220,19 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                 let receiverAddress = try Address(address: address)
                 let receiverAddressScript = receiverAddress.scriptPubkey()
                 let txBuilderResult: TxBuilderResult
-                
+                let utxos = try? wallet.listUnspent()
+                let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
+
                 if let fee = fee {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .addRecipient(script: receiverAddressScript, amount: satsAmount)
                         .feeRate(satPerVbyte: Float(fee))
                         .enableRbf()
                         .finish(wallet: wallet)
                 } else {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .addRecipient(script: receiverAddressScript, amount: satsAmount)
                         .enableRbf()
                         .finish(wallet: wallet)
@@ -235,9 +263,12 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
             do {
                 let txBuilderResult: TxBuilderResult
                 let receiverAddress = try Address(address: address)
+                let utxos = try? wallet.listUnspent()
+                let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
 
                 if let fee = fee {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .drainWallet()
                         .drainTo(script: receiverAddress.scriptPubkey())
                         .feeRate(satPerVbyte: Float(fee))
@@ -245,6 +276,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                         .finish(wallet: wallet)
                 } else {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .drainWallet()
                         .drainTo(script: receiverAddress.scriptPubkey())
                         .enableRbf()
@@ -276,10 +308,17 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
             let txBuilderResult: TxBuilderResult
             let receiverAddress = try Address(address: address)
             print(balance)
-            
+//            print(try! wallet.listUnspent())
+            print(try! wallet.getBalance())
+//            print(try! wallet.listTransactions())
+            let utxos = try? wallet.listUnspent()
+            print(utxos)
+            let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
+
             if max {
                 if let fee = fee {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .drainWallet()
                         .drainTo(script: receiverAddress.scriptPubkey())
                         .feeRate(satPerVbyte: Float(fee))
@@ -287,6 +326,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                         .finish(wallet: wallet)
                 } else {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .drainWallet()
                         .drainTo(script: receiverAddress.scriptPubkey())
                         .enableRbf()
@@ -301,12 +341,14 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                 
                 if let fee = fee {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .addRecipient(script: recieverAddressScript, amount: satsAmount)
                         .feeRate(satPerVbyte: Float(fee))
                         .enableRbf()
                         .finish(wallet: wallet)
                 } else {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .addRecipient(script: recieverAddressScript, amount: satsAmount)
                         .enableRbf()
                         .finish(wallet: wallet)
