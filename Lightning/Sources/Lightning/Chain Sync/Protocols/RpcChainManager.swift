@@ -11,6 +11,7 @@ import Combine
 protocol RpcChainManager {
     var blockchainMonitorPublisher: AnyPublisher<Void, Error> { get }
     
+    func registerListener(_ listener: ChainListener)
     func submitTransaction(transaction: [UInt8]) async throws -> String
     func getChaintipHeight() async throws -> UInt32
     func getChaintipHash() async throws -> [UInt8]
