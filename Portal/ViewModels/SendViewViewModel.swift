@@ -12,6 +12,10 @@ import LocalAuthentication.LAError
 import SwiftUI
 import PortalUI
 
+enum UserInputResult {
+    case btcOnChain(address: String), lightningInvoice(amount: String), ethOnChain(address: String)
+}
+
 class SendViewViewModel: ObservableObject {
     private var sendService: ISendAssetService?
     private var subscriptions = Set<AnyCancellable>()
@@ -245,13 +249,15 @@ class SendViewViewModel: ObservableObject {
         }
     }
         
-    func validateReceiverAddress() {
-        do {
-            try sendService?.validateAddress()
-        } catch {
-            print("validation error: \(error)")
-            sendError = SendFlowError.addressIsntValid
+    func validateInput() throws -> UserInputResult {
+        guard let sendService = sendService else {
+            throw SendFlowError.addressIsntValid
         }
+        return try sendService.validateUserInput()
+    }
+    
+    func updateError() {
+        sendError = SendFlowError.addressIsntValid
     }
     
     func authenticateUser(completion: @escaping (Bool) -> Void) {
