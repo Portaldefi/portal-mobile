@@ -40,7 +40,7 @@ public class Node {
     }
 
     public var totalBalance: UInt64 {
-        usableChannels.map{ $0.get_balance_msat() }.reduce(0){ $0 + $1 }
+        allChannels.map{ $0.get_balance_msat() }.reduce(0){ $0 + $1 }
     }
     
     public init(type: ConnectionType) {
@@ -287,6 +287,64 @@ public class Node {
         
         return nil
     }
+    //MARK: - Pay invoice
+    public func pay(invoice: Invoice) async -> LightningPaymentResult? {
+        guard let payer = channelManagerConstructor?.payer else {
+            return nil
+        }
+        
+        let result = payer.pay_invoice(invoice: invoice)
+        
+        if result.isOk() {
+            let managerEvents = await getManagerEvents(expectedCount: 1)
+            let managerEvent = managerEvents[0]
+            let eventValueType = managerEvent.getValueType()
+                        
+            switch eventValueType {
+            case .some(let wrapped):
+                switch wrapped {
+                case .PaymentSent:                    
+                    let paymentSent = managerEvent.getValueAsPaymentSent()!
+                    let paymentID = paymentSent.getPayment_id().toHexString()
+                    let paymentHash = paymentSent.getPayment_hash().toHexString()
+                    let preimage = paymentSent.getPayment_preimage().toHexString()
+                    let fee = (paymentSent.getFee_paid_msat().getValue() ?? 0)/1000
+                                        
+                    return LightningPaymentResult(
+                        paymentID: paymentID,
+                        paymentHash: paymentHash,
+                        preimage: preimage,
+                        fee: fee
+                    )
+                default:
+                    print("Payment failed with event: \(wrapped)")
+                    return nil
+                }
+            case .none:
+                return nil
+            }
+        } else {
+            if let error = result.getError() {
+                print("INVOICE PAYER ERROR")
+                switch error.getValueType() {
+                case .Invoice:
+                    print("invocie error")
+                    print("\(error.getValueAsInvoice()!)")
+                case .Routing:
+                    print("routing error")
+                    print("\(error.getValueAsRouting()!)")
+                case .Sending:
+                    print("sending error")
+                    print("\(error.getValueAsSending()!)")
+                case .none:
+                    print("unknown error")
+                case .some(_):
+                    print("some error")
+                }
+            }
+            return nil
+        }
+    }
     //MARK: - Sends funding transaction generated message
     public func fundingTransactionGenerated(temporaryChannelId: [UInt8], fundingTransaction: [UInt8]) -> Result_NoneAPIErrorZ {
         guard let channelManager = channelManager else {
@@ -328,6 +386,18 @@ public class Node {
             throw NodeError.Invoice.decodingError
         }
         return decodedInvoice.getValue()
+    }
+    
+    public func claimFunds(preimage: [UInt8]) {
+        channelManager?.claim_funds(payment_preimage: preimage)
+    }
+    
+    public func processPendingHTLCForwards() {
+        channelManager?.process_pending_htlc_forwards()
+    }
+    
+    public func subscribeForNodeEvents() async -> AsyncStream<Event> {
+        await pendingEventTracker.subscribe()
     }
 }
 
