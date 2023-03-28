@@ -154,13 +154,17 @@ extension BitcoinAdapter: IAdapter {
     }
 }
 
+import Factory
+
 extension BitcoinAdapter: IBalanceAdapter {
     var state: AdapterState {
         adapterState
     }
     
     var balance: Decimal {
-        Decimal(_balance.spendable + _balance.untrustedPending)/coinRate
+        let manager = Container.lightningKitManager()
+        return manager.channelBalance/1000/coinRate
+        //return Decimal(_balance.spendable + _balance.untrustedPending)/coinRate
     }
     
     var balanceStateUpdated: AnyPublisher<Void, Never> {
