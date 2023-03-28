@@ -34,8 +34,8 @@ class SendAssetMockedService: ISendAssetService {
         
     }
     
-    func validateAddress() throws {
-        
+    func validateUserInput() throws -> UserInputResult {
+        throw SendFlowError.addressIsntValid
     }
     
     func send() -> Future<TransactionRecord, Error> {
