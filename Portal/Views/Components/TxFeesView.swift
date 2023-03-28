@@ -11,10 +11,22 @@ import PortalUI
 struct TxFeesView: View {
     let fees: String
     let coin: String
+    let source: TxSource
+    
+    var title: String {
+        switch source {
+        case .btcOnChain:
+            return "Fees"
+        case .ethOnChain:
+            return "Fees"
+        case .lightning:
+            return "Network Fees"
+        }
+    }
     
     var body: some View {
         HStack {
-            Text("Fees")
+            Text(title)
                 .font(.Main.fixed(.monoBold, size: 14))
                 .foregroundColor(Palette.grayScaleAA)
             Spacer()
@@ -32,7 +44,7 @@ struct TxFeesView: View {
 
 struct TxFeesView_Previews: PreviewProvider {
     static var previews: some View {
-        TxFeesView(fees: "0.000000134", coin: "btc")
+        TxFeesView(fees: "0.000000134", coin: "btc", source: .btcOnChain)
             .padding()
             .previewLayout(.sizeThatFits)
     }
