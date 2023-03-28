@@ -24,6 +24,13 @@ struct SetRecipientView: View {
         return Palette.grayScale3A
     }
     
+    private var textEditorInputColor: Color {
+        guard viewModel.sendError == nil else {
+            return Color(red: 255/255, green: 82/255, blue: 82/255)
+        }
+        return .white
+    }
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
@@ -59,7 +66,7 @@ struct SetRecipientView: View {
                                 .disableAutocorrection(true)
                                 .textInputAutocapitalization(.never)
                                 .font(.Main.fixed(.monoRegular, size: 16))
-                                .foregroundColor(textEditorColor)
+                                .foregroundColor(textEditorInputColor)
                                 .padding(8)
                                 .fixedSize(horizontal: false, vertical: true)
                             
@@ -133,12 +140,22 @@ struct SetRecipientView: View {
                         size: .big,
                         enabled: !viewModel.receiverAddress.isEmpty && viewModel.sendError == nil
                     ) {
-                        withAnimation {
-                            viewModel.validateReceiverAddress()
-                        }
-                        
-                        if viewModel.sendError == nil {
-                            navigation.push(.sendSetAmount(viewModel: viewModel))
+                        do {
+                            let result = try viewModel.validateInput()
+                            
+                            switch result {
+                            case .btcOnChain, .ethOnChain:
+                                navigation.push(.sendSetAmount(viewModel: viewModel))
+                            case .lightningInvoice(let amount):
+                                viewModel.exchanger?.amount.string = amount
+                                
+                                navigation.push(.sendSetAmount(viewModel: viewModel))
+                                navigation.push(.sendReviewTxView(viewModel: viewModel))
+                            }
+                        } catch {
+                            withAnimation {
+                                viewModel.updateError()
+                            }
                         }
                     }
                 }
