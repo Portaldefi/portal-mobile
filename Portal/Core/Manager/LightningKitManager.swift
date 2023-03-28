@@ -29,6 +29,10 @@ class LightningKitManager: ILightningKitManager {
         instance.connectedPeers
     }
     
+    var channelBalance: Decimal {
+        Decimal(instance.totalBalance)
+    }
+    
     private var arangurenPeer: Peer {
         let name = "aranguren.org"
         let pubKey = "038863cf8ab91046230f561cd5b386cbff8309fa02e3f0c3ed161a3aeb64a643b9"
@@ -99,12 +103,21 @@ class LightningKitManager: ILightningKitManager {
                             let nanoTime = end.uptimeNanoseconds - start.uptimeNanoseconds
                             let timeInterval = Double(nanoTime)/1_000_000_000
                             print("Peer \(peer.peerPubKey) connected in \(timeInterval) seconds")
+                            print("useful channels: \(self.instance.usableChannels.count)")
                         }
                     }
                 case .failure:
                     print("Error loading peers from disk.")
                 }
             }
+            
+            Task {
+                // subscribing on node events stream
+                for await event in await instance.subscribeForNodeEvents() {
+                    handleNode(event: event)
+                }
+            }
+            
         } catch {
             throw error
         }
@@ -131,8 +144,98 @@ class LightningKitManager: ILightningKitManager {
         return await instance.createInvoice(satAmount: nil, description: description)
     }
     
+    func pay(invoice: String) -> Future<TransactionRecord, Error> {
+        Future { promise in
+            do {
+                if let invoice = try self.decode(invoice: invoice) {
+                    print("Invoice decoded")
+                    Task {
+                        if let paymentResult = await self.instance.pay(invoice: invoice) {
+                            let transactionRecord = TransactionRecord(invoice: invoice, result: paymentResult)
+                            promise(.success(transactionRecord))
+                        } else {
+                            promise(.failure(ServiceError.invoicePaymentFailed))
+                        }
+                    }
+                }
+            } catch {
+                promise(.failure(error))
+            }
+        }
+    }
+    
     func decode(invoice: String) throws -> Invoice? {
         try instance.decode(invoice: invoice)
+    }
+    
+    private func handleNode(event: Event) {
+        print("Received node event: \(event)")
+        
+        if let type = event.getValueType() {
+            switch type {
+            case .PaymentPathSuccessful:
+                print("PaymentPathSuccessful")
+            case .FundingGenerationReady:
+                print("FundingGenerationReady")
+            case .PaymentReceived:
+                print("PaymentReceived:")
+                let value = event.getValueAsPaymentReceived()!
+                let amount = value.getAmount_msat()/1000
+                print("Amount: \(amount)")
+                let paymentId = value.getPayment_hash().toHexString()
+                print("Payment id: \(paymentId)")
+                    
+                let paymentPurpose = value.getPurpose()
+                let invoicePayment = paymentPurpose.getValueAsInvoicePayment()!
+                let preimage = invoicePayment.getPayment_preimage()
+                
+                instance.claimFunds(preimage: preimage)
+            case .PaymentClaimed:
+                print("PaymentClaimed")
+            case .PaymentSent:
+                print("PaymentSent")
+
+            case .PaymentFailed:
+                print("PaymentFailed")
+
+            case .PaymentPathFailed:
+                print("PaymentPathFailed")
+
+            case .ProbeSuccessful:
+                print("ProbeSuccessful")
+
+            case .ProbeFailed:
+                print("ProbeFailed")
+
+            case .PendingHTLCsForwardable:
+                print("PendingHTLCsForwardable")
+                
+                instance.processPendingHTLCForwards()
+            case .SpendableOutputs:
+                print("SpendableOutputs")
+
+            case .PaymentForwarded:
+                print("PaymentForwarded")
+
+            case .ChannelClosed:
+                print("ChannelClosed")
+
+            case .DiscardFunding:
+                print("DiscardFunding")
+
+            case .OpenChannelRequest:
+                print("OpenChannelRequest")
+
+            case .HTLCHandlingFailed:
+                print("HTLCHandlingFailed")
+
+            @unknown default:
+                print("default event")
+
+            }
+        } else {
+            print("event \(event) doesnt contain value type")
+        }
     }
     
     private func generateKeySeed() {
@@ -142,11 +245,12 @@ class LightningKitManager: ILightningKitManager {
     
     private func openChannel(peer: Peer) {
         print("opening channel with peer: \(peer.peerPubKey)")
+        
         Task {
             do {
                 let channelValue: UInt64 = 20000
                 let reserveAmount: UInt64 = 1000
-                
+                // send open channel request through channel manager
                 let channelInfo = try await instance.requestChannelOpen(
                     peer.peerPubKey,
                     channelValue: channelValue,
@@ -154,15 +258,16 @@ class LightningKitManager: ILightningKitManager {
                 )
                 
                 print("open channel requested")
-                
+                // decode output script
                 if let address = decodeAddress(script: channelInfo.fundingOutputScript) {
                     peer.addFundingTransactionPubkey(pubkey: address.stringValue)
                     update(peer: peer)
                     
                     print("decoded address: \(address.stringValue)")
-                    
+                    // create funding transaction
                     let fundingTransaction = try rawTx(amount: channelValue, address: address.stringValue)
                                         
+                    // finilaze opening channel by providing funding transaction to channel manager
                     if try await instance.openChannel(
                         channelOpenInfo: channelInfo,
                         fundingTransaction: fundingTransaction
@@ -212,5 +317,6 @@ extension LightningKitManager {
         case invalidHash
         case cannotOpenChannel
         case keySeedNotFound
+        case invoicePaymentFailed
     }
 }
