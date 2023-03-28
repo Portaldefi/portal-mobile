@@ -26,6 +26,7 @@ class TransactionDetailsViewModel: ObservableObject {
     @Published var editingLabels = false
     @Published var showAddLabelInterface = false
     @Published var newLabelTitle: String?
+    @Published var source: TxSource = .btcOnChain
         
     var title: String {
         transaction.type.description
@@ -56,7 +57,14 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     var recipientString: String? {
-        storage.object(forKey: transaction.id + "recipient") as? String
+        switch source {
+        case .btcOnChain:
+            return storage.object(forKey: transaction.id + "recipient") as? String
+        case .ethOnChain:
+            return storage.object(forKey: transaction.id + "recipient") as? String
+        case .lightning:
+            return transaction.to
+        }
     }
     
     var dateString: String {
@@ -99,6 +107,7 @@ class TransactionDetailsViewModel: ObservableObject {
         self.storage = UserDefaults.standard
         self.transaction = tx
         self.blockChainHeight = blockChainHeight
+        self.source = transaction.source
         
         if let notes = storage.string(forKey: transaction.id + "notes") {
             self.notes = notes
