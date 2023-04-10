@@ -6,24 +6,26 @@
 //
 
 import Foundation
+import LightningDevKit
 
 public struct LightningFileManager {
     let keysSeedPath = URL.keySeedDirectory
     let monitorPath = URL.channelMonitorsDirectory
     let managerPath = URL.channelManagerDirectory
     let networkGraphPath = URL.networkGraphDirectory
+    let paymentsPath = URL.paymentsDirectory
     
     public enum PersistenceError: Error {
         case cannotWrite
     }
     
     public static var hasPersistedChannelManager: Bool {
-        return FileManager.default.fileExists(atPath: URL.channelManagerDirectory.absoluteString)
+        FileManager.default.fileExists(atPath: URL.channelManagerDirectory.absoluteString)
     }
     
-    public static func clearDocumentsDirectory() {
+    public static func clearPaymentsDirectory() {
         do {
-            let fileURLs = try FileManager.default.contentsOfDirectory(at: URL.documentsDirectory,
+            let fileURLs = try FileManager.default.contentsOfDirectory(at: URL.paymentsDirectory,
                                                                        includingPropertiesForKeys: nil,
                                                                        options: .skipsHiddenFiles)
             for fileURL in fileURLs {
@@ -36,7 +38,7 @@ public struct LightningFileManager {
     
     // MARK: - Public Read Interface
     public func getSerializedChannelManager() -> [UInt8]? {
-        return readChannelManager()
+        readChannelManager()
     }
     
     public func getSerializedChannelMonitors() -> [[UInt8]] {
@@ -48,15 +50,23 @@ public struct LightningFileManager {
     }
     
     public func getSerializedNetworkGraph() -> [UInt8]? {
-        return readNetworkGraph()
+        readNetworkGraph()
     }
     
     public func getKeysSeed() -> [UInt8]? {
-        return readKeysSeed()
+        readKeysSeed()
+    }
+    
+    public func getPayments() -> [LightningPayment] {
+        guard let paymentsUrls = paymentsUrls else { return [] }
+        
+        return paymentsUrls.compactMap { url in
+            readPayment(with: url)
+        }
     }
     
     public var hasKeySeed: Bool {
-        return FileManager.default.fileExists(atPath: keysSeedPath.path)
+        FileManager.default.fileExists(atPath: keysSeedPath.path)
     }
     
     public var hasChannelMaterialAndNetworkGraph: Bool {
@@ -78,18 +88,37 @@ public struct LightningFileManager {
     
     public func persistChannelManager(manager: [UInt8]) -> Result<Void, PersistenceError> {
         do {
-            try Data(manager).write(to: managerPath)
+            try Data(manager).write(to: managerPath, options: [.atomic, .completeFileProtection])
             return .success(())
         } catch {
+            print("persistChannelManager FAILURE")
             return .failure(.cannotWrite)
         }
     }
     
     public func persistKeySeed(keySeed: [UInt8]) -> Result<Void, PersistenceError> {
         do {
-            try Data(keySeed).write(to: keysSeedPath)
+            try Data(keySeed).write(to: keysSeedPath, options: .completeFileProtection)
             return .success(())
         } catch {
+            return .failure(.cannotWrite)
+        }
+    }
+    
+    public func persist(payment: LightningPayment) -> Result<Void, PersistenceError> {
+        guard let pathToPersist = URL.pathForPersistingPayment(id: payment.paymentId) else {
+            print("failed path to persist")
+            return .failure(.cannotWrite)
+        }
+        
+        let encoder = JSONEncoder()
+
+        do {
+            let data = try encoder.encode(payment)
+            try data.write(to: pathToPersist, options: [.completeFileProtection])
+            return .success(())
+        } catch {
+            print("failed path to persist error: \(error.localizedDescription)")
             return .failure(.cannotWrite)
         }
     }
@@ -126,6 +155,17 @@ public struct LightningFileManager {
         }
     }
     
+    private func readPayment(with paymentURL: URL) -> LightningPayment? {
+        do {
+            let data = try Data(contentsOf: paymentURL)
+            let decoder = JSONDecoder()
+            let payment = try decoder.decode(LightningPayment.self, from: data)
+            return payment
+        } catch {
+            return nil
+        }
+    }
+    
     private func readNetworkGraph() -> [UInt8]? {
         do {
             let data = try Data(contentsOf: networkGraphPath)
@@ -143,6 +183,15 @@ public struct LightningFileManager {
     private var monitorUrls: [URL]? {
         do {
             let items = try FileManager.default.contentsOfDirectory(at: URL.channelMonitorsDirectory, includingPropertiesForKeys: nil)
+            return items
+        } catch {
+            return nil
+        }
+    }
+    
+    private var paymentsUrls: [URL]? {
+        do {
+            let items = try FileManager.default.contentsOfDirectory(at: URL.paymentsDirectory, includingPropertiesForKeys: nil)
             return items
         } catch {
             return nil
