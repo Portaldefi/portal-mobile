@@ -364,7 +364,7 @@ public class Node {
                 let timestamp = Int(Date().timeIntervalSince1970)
                 
                 let payment = LightningPayment(
-                    nodeId: id,
+                    nodeId: channelManager?.get_our_node_id().toHexString() ?? "-",
                     paymentId: paymentID,
                     amount: (invoice.amount_milli_satoshis().getValue() ?? 0)/1000,
                     preimage: preimage,
