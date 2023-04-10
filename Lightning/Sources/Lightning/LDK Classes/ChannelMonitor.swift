@@ -7,7 +7,9 @@
 
 import Foundation
 
-class ChannelMonitor: NSObject, NSCoding {
+class ChannelMonitor: NSObject, NSCoding, NSSecureCoding {
+    static var supportsSecureCoding: Bool = true
+    
     let idBytes: [UInt8]
     let monitorBytes: [UInt8]
     
