@@ -20,7 +20,7 @@ class TransactionDetailsViewModel: ObservableObject {
     
     let coin: Coin
     let transaction: TransactionRecord
-    let blockChainHeight: Int32
+    @Published var blockChainHeight: Int32 = 0
     
     @Published var editingNotes = false
     @Published var editingLabels = false
@@ -137,14 +137,14 @@ extension TransactionDetailsViewModel {
     static func config(coin: Coin, tx: TransactionRecord) -> TransactionDetailsViewModel {
         let adapterManager: IAdapterManager = Container.adapterManager()
         let walletManager: IWalletManager = Container.walletManager()
-                
+
         guard
             let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
             let adapter = adapterManager.adapter(for: wallet)
         else {
             fatalError("coudn't fetch dependencies")
         }
-        
+
         return TransactionDetailsViewModel(coin: coin, tx: tx, blockChainHeight: adapter.blockchainHeight)
     }
 }
