@@ -8,7 +8,23 @@
 import Combine
 import LightningDevKit
 
-class MockedLightningKitManager: ILightningKitManager {
+class MockedLightningKitManager: ILightningKitManager {    
+    func disconnectPeer(_ peer: Peer) throws {
+        
+    }
+    
+    var allChannels: [LightningDevKit.ChannelDetails] = []
+    
+    var usableChannels: [LightningDevKit.ChannelDetails] = []
+    
+    func openChannel(peer: Peer) async throws {
+        
+    }
+    
+    var transactionsPublisher: AnyPublisher<[TransactionRecord], Never> {
+        Just([.mocked]).eraseToAnyPublisher()
+    }
+    
     func pay(invoice: String) -> Future<TransactionRecord, Error> {
         Future { promise in
             promise(.success(.mocked))
