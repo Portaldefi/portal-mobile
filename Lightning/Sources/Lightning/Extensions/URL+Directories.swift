@@ -8,19 +8,23 @@ import Foundation
 
 extension URL {
     static var channelManagerDirectory: URL {
-        return documentsDirectory.appendingPathComponent("channelManager")
+        documentsDirectory.appendingPathComponent("channelManager")
     }
     
     static var channelMonitorsDirectory: URL {
-        return documentsDirectory.appendingPathComponent("channelMonitors", isDirectory: true)
+        documentsDirectory.appendingPathComponent("channelMonitors", isDirectory: true)
     }
     
     static var keySeedDirectory: URL {
-        return documentsDirectory.appendingPathComponent("keySeed")
+        documentsDirectory.appendingPathComponent("keySeed")
     }
     
     static var networkGraphDirectory: URL {
-        return documentsDirectory.appendingPathComponent("networkGraph")
+        documentsDirectory.appendingPathComponent("networkGraph")
+    }
+    
+    static var paymentsDirectory: URL {
+        documentsDirectory.appendingPathComponent("lightningPayments", isDirectory: true)
     }
     
     static var documentsDirectory: URL {
@@ -36,5 +40,15 @@ extension URL {
         
         let fileName = "chanmon_\(id)"
         return channelMonitorsDirectory.appendingPathComponent(fileName)
+    }
+    
+    static func pathForPersistingPayment(id: String) -> URL? {
+        let folderExists = (try? paymentsDirectory.checkResourceIsReachable()) ?? false
+        if !folderExists {
+            try? FileManager.default.createDirectory(at: paymentsDirectory, withIntermediateDirectories: false)
+        }
+        
+        let fileName = "payment_\(id)"
+        return paymentsDirectory.appendingPathComponent(fileName)
     }
 }
