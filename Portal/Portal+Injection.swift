@@ -32,12 +32,12 @@ extension SharedContainer {
         
         return AccountStorage(localStorage: localStorage, secureStorage: secureStorage, accountStorage: dbStorage)
     }
-    
+        
     static let adapterManager = Factory<IAdapterManager>(scope: .singleton) {
         let appConfigProvider = Container.configProvider()
         let ethereumKitManager = Container.ethereumKitManager()
-        let adapterFactory = AdapterFactory(appConfigProvider: appConfigProvider, ethereumKitManager: ethereumKitManager)
         let walletManager = Container.walletManager()
+        let adapterFactory = AdapterFactory(appConfigProvider: appConfigProvider, ethereumKitManager: ethereumKitManager)
         return AdapterManager(adapterFactory: adapterFactory, walletManager: walletManager)
     }
     
@@ -57,7 +57,9 @@ extension SharedContainer {
     }
     
     static let lightningKitManager = Factory<ILightningKitManager>(scope: .singleton) {
-        LightningKitManager(connectionType: .testnet(.blockStream))
+        let config = BitcoinCoreRpcConfig(username: "polaruser", password: "polarpass", port: 18454, host: "localhost")
+        let connectionType: ConnectionType = .regtest(config)
+        return LightningKitManager(connectionType: connectionType)
     }
     
     static let sendViewModel = Factory<SendViewViewModel>(scope: .cached) {
