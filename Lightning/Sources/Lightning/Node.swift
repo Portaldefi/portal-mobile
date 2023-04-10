@@ -24,7 +24,7 @@ public class Node {
     var tcpPeerHandler: TCPPeerHandler?
         
     var cancellables = Set<AnyCancellable>()
-    
+        
     // We declare this here because `ChannelManagerConstructor` and `ChainMonitor` will share a reference to them
     let logger = Logger()
     let feeEstimator = FeeEstimator()
@@ -38,7 +38,7 @@ public class Node {
     public var usableChannels: [ChannelDetails] {
         channelManager?.list_usable_channels() ?? []
     }
-
+    
     public var totalBalance: UInt64 {
         allChannels.map{ $0.get_balance_msat() }.reduce(0){ $0 + $1 }
     }
@@ -165,17 +165,33 @@ public class Node {
     
     //MARK: - Connect to peer
     public func connectPeer(pubKey: String, hostname: String, port: UInt16) async throws {
-        print("Connecting to peer \(pubKey)")
+        print("Connecting to peer \(pubKey), host: \(hostname), port: \(port)")
         
         guard let _ = peerManager, let tcpPeerHandler = tcpPeerHandler else {
             throw NodeError.connectPeer
         }
         
+        let start = DispatchTime.now()
         let connected = tcpPeerHandler.connect(address: hostname, port: port, theirNodeId: pubKey.toByteArray())
+        let end = DispatchTime.now()
         
         if !connected {
             print("failed to connect")
+        } else {
+            let nanoTime = end.uptimeNanoseconds - start.uptimeNanoseconds
+            let timeInterval = Double(nanoTime)/1_000_000_000
+            print("Peer \(pubKey) connected in \(timeInterval) seconds")
         }
+    }
+    //MARK: - Disconnect from peer
+    public func disconnectPeer(pubKey: String) throws {
+        print("Connecting to peer \(pubKey)")
+        
+        guard let peerManager = peerManager else {
+            throw NodeError.disconectPeer
+        }
+        
+        peerManager.disconnect_by_node_id(node_id: pubKey.toByteArray(), no_connection_possible: false)
     }
     //MARK: - Open channel request
     public func requestChannelOpen(_ pubKeyHex: String, channelValue: UInt64, reserveAmount: UInt64) async throws -> ChannelOpenInfo {
@@ -186,7 +202,7 @@ public class Node {
         // open_channel
         let theirNodeId = pubKeyHex.toByteArray()
         let config = UserConfig()
-        let userChannelId = UInt64.random(in: 1...9999)
+        let userChannelId: UInt64 = UInt64.random(in: 1...9999)
         print("user channel id \(userChannelId)")
 
         let channelOpenResult = channelManager.create_channel(
@@ -199,23 +215,40 @@ public class Node {
         
         // See if peer has returned `accept_channel`
         if channelOpenResult.isOk() {
-            let managerEvents = await getManagerEvents(expectedCount: 1)
-            let managerEvent = managerEvents[0]
-            let eventValueType = managerEvent.getValueType()
-                        
-            switch eventValueType {
-            case .some(let wrapped):
-                switch wrapped {
-                case .FundingGenerationReady:
-                    let fundingReadyEvent = managerEvent.getValueAsFundingGenerationReady()!
-                    
-                    return ChannelOpenInfo(
-                        fundingEvent: fundingReadyEvent,
-                        counterpartyNodeId: pubKeyHex.toByteArray()
-                    )
-                default: throw NodeError.Channels.unknown
+            guard let event = await pendingEventTracker.await(events: [.fundingGenerationReady, .channelClosed], timeout: 3) else {
+                throw NodeError.error("Not received funding or close event. Timeout error")
+            }
+            guard let eventType = event.getValueType() else {
+                throw NodeError.error("Event has no type")
+            }
+            
+            switch eventType {
+            case .FundingGenerationReady:
+                guard let fundingReadyEvent = event.getValueAsFundingGenerationReady() else {
+                    throw NodeError.error("getValueAsFundingGenerationReady is nil")
                 }
-            default: throw NodeError.Channels.unknown
+
+                return ChannelOpenInfo(
+                    fundingEvent: fundingReadyEvent,
+                    counterpartyNodeId: pubKeyHex.toByteArray()
+                )
+            case .ChannelClosed:
+                guard let channelClosedEvent = event.getValueAsChannelClosed() else {
+                    throw NodeError.error("getValueAsChannelClosed is nil")
+                }
+                
+                let reason = channelClosedEvent.getReason()
+                
+                if let _ = reason.getValueAsCounterpartyForceClosed() {
+                    throw NodeError.Channels.forceClosed
+                } else if let _ = reason.getValueAsProcessingError() {
+                    throw NodeError.Channels.closedWithError
+                } else {
+                    throw NodeError.Channels.unknown
+                }
+            default:
+                print(eventType)
+                throw NodeError.Channels.wrongLDKEvent
             }
         } else if let errorDetails = channelOpenResult.getError() {
             throw errorDetails.getLDKError()
@@ -288,63 +321,128 @@ public class Node {
         return nil
     }
     //MARK: - Pay invoice
-    public func pay(invoice: Invoice) async -> LightningPaymentResult? {
+    public func pay(invoice: Invoice) async throws -> LightningPayment {
         guard let payer = channelManagerConstructor?.payer else {
-            return nil
+            throw NodeError.noPayer
         }
         
         let result = payer.pay_invoice(invoice: invoice)
         
         if result.isOk() {
-            let managerEvents = await getManagerEvents(expectedCount: 1)
-            let managerEvent = managerEvents[0]
-            let eventValueType = managerEvent.getValueType()
+            guard let event = await pendingEventTracker.await(events: [.paymentFailed, .paymentSent], timeout: 5) else {
+                throw NodeError.error("Not received paymentFailed or paymentSent event. Timeout error")
+            }
                         
-            switch eventValueType {
-            case .some(let wrapped):
-                switch wrapped {
-                case .PaymentSent:                    
-                    let paymentSent = managerEvent.getValueAsPaymentSent()!
-                    let paymentID = paymentSent.getPayment_id().toHexString()
-                    let paymentHash = paymentSent.getPayment_hash().toHexString()
-                    let preimage = paymentSent.getPayment_preimage().toHexString()
-                    let fee = (paymentSent.getFee_paid_msat().getValue() ?? 0)/1000
-                                        
-                    return LightningPaymentResult(
-                        paymentID: paymentID,
-                        paymentHash: paymentHash,
-                        preimage: preimage,
-                        fee: fee
-                    )
-                default:
-                    print("Payment failed with event: \(wrapped)")
-                    return nil
+            guard let eventType = event.getValueType() else {
+                throw NodeError.error("Event has no type")
+            }
+            
+            print("Pay invoice expected event: \(eventType)")
+            
+            switch eventType {
+            case .PaymentSent:
+                guard let paymentSent = event.getValueAsPaymentSent() else {
+                    throw NodeError.error("getValueAsPaymentSent is nil")
                 }
-            case .none:
-                return nil
+                
+                let paymentID = paymentSent.getPayment_id().toHexString()
+                let preimage = paymentSent.getPayment_preimage().toHexString()
+                let fee = (paymentSent.getFee_paid_msat().getValue() ?? 0)/1000
+                let timestamp = Int(Date().timeIntervalSince1970)
+                
+                let payment = LightningPayment(
+                    nodeId: id,
+                    paymentId: paymentID,
+                    amount: (invoice.amount_milli_satoshis().getValue() ?? 0)/1000,
+                    preimage: preimage,
+                    type: .sent,
+                    timestamp: timestamp,
+                    fee: fee
+                )
+                                
+                switch fileManager.persist(payment: payment) {
+                case .success:
+                    print("payment \(paymentID) persisted")
+                case .failure(let error):
+                    print("Unable to persist payment \(paymentID): \(error.localizedDescription)")
+                }
+                
+                return payment
+            case .PaymentFailed:
+                guard let paymentFailed = event.getValueAsPaymentFailed() else {
+                    throw NodeError.error("getValueAsPaymentFailed is nil")
+                }
+                
+                let errorMessage = "Payment failed:\nid: \(paymentFailed.getPayment_id().toHexString())\nhash: \(paymentFailed.getPayment_hash().toHexString())"
+                print(errorMessage)
+                
+                throw NodeError.error(errorMessage)
+            default:
+                print(eventType)
+                throw NodeError.Channels.wrongLDKEvent
+            }
+        } else if let invoicePayError = result.getError() {
+            if let error = invoicePayError.getValueAsInvoice() {
+                print("Invoice error: \(error)")
+                throw NodeError.error("Invoice error: \(error)")
+            } else if let error = invoicePayError.getValueAsRouting() {
+                print("Routing error: \(error.get_err())")
+                throw NodeError.error("Routing error: \(error.get_err())")
+            } else if let error = invoicePayError.getValueAsSending() {
+                print("Sending error")
+                if let _ = error.getValueAsPartialFailure() {
+                    print("partialFailError")
+                    throw NodeError.error("PartialFailure")
+                } else if let parametersError = error.getValueAsParameterError() {
+                    if let error = parametersError.getValueAsAPIMisuseError() {
+                        print("API misuse error: \(error.getErr())")
+                        throw NodeError.error("API misuse error: \(error.getErr())")
+                    } else if let error = parametersError.getValueAsChannelUnavailable() {
+                        print("channel unavailable error: \(error.getErr())")
+                        throw NodeError.error("channel unavailable error: \(error.getErr())")
+                    } else if let error = parametersError.getValueAsFeeRateTooHigh() {
+                        print("excessive fee rate error: \(error.getErr())")
+                        throw NodeError.error("excessive fee rate error: \(error.getErr())")
+                    } else if let error = parametersError.getValueAsIncompatibleShutdownScript() {
+                        print("incompatible shutdown script: \(error.getScript())")
+                        throw NodeError.error("incompatible shutdown script: \(error.getScript())")
+                    } else if let error = parametersError.getValueAsRouteError() {
+                        print("route error: \(error.getErr())")
+                        throw NodeError.error("route error: \(error.getErr())")
+                    } else {
+                        print("Unknown error")
+                        throw NodeError.error("Unknow error")
+                    }
+                } else if let _ = error.getValueAsPathParameterError() {
+                    print("path parameters error")
+                    throw NodeError.error("path parameters error")
+                } else if let _ = error.getValueAsAllFailedRetrySafe() {
+                    print("getValueAsAllFailedRetrySafe")
+                    throw NodeError.error("getValueAsAllFailedRetrySafe")
+                } else {
+                    print("Unknown error")
+                    throw NodeError.error("unknown error")
+                }
+            } else {
+                print("Unknown error")
+                throw NodeError.error("unknown error")
             }
         } else {
-            if let error = result.getError() {
-                print("INVOICE PAYER ERROR")
-                switch error.getValueType() {
-                case .Invoice:
-                    print("invocie error")
-                    print("\(error.getValueAsInvoice()!)")
-                case .Routing:
-                    print("routing error")
-                    print("\(error.getValueAsRouting()!)")
-                case .Sending:
-                    print("sending error")
-                    print("\(error.getValueAsSending()!)")
-                case .none:
-                    print("unknown error")
-                case .some(_):
-                    print("some error")
-                }
-            }
-            return nil
+            print("Unknown error")
+            throw NodeError.error("Unknow error")
         }
     }
+    
+    public func getFundingTransactionScriptPubKey(outputScript: [UInt8]) async -> String? {
+        guard let rpcInterface = rpcInterface,
+              let decodedScript = try? await rpcInterface.decodeScript(script: outputScript),
+              let address = decodedScript["address"] as? String else {
+            return nil
+        }
+
+        return address
+    }
+    
     //MARK: - Sends funding transaction generated message
     public func fundingTransactionGenerated(temporaryChannelId: [UInt8], fundingTransaction: [UInt8]) -> Result_NoneAPIErrorZ {
         guard let channelManager = channelManager else {
@@ -422,13 +520,13 @@ extension Node {
 // MARK: Publishers
 extension Node {
     public var connectedPeers: AnyPublisher<[String], Never> {
-        Timer.publish(every: 5, on: .main, in: .default)
+        Timer.publish(every: 1, on: .main, in: .default)
             .autoconnect()
+            .prepend(Date())
             .filter { [weak self] _ in self?.peerManager != nil }
             .flatMap { [weak self] _ -> AnyPublisher<[String], Never> in
                 let peers = self?.peerManager!.get_peer_node_ids().compactMap { $0.toHexString() }
-                return Just(peers ?? [])
-                    .eraseToAnyPublisher()
+                return Just(peers ?? []).eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
     }
@@ -455,16 +553,12 @@ extension Node {
                     let score = probabalisticScorer.as_Score()
                     
                     channelManagerConstructor.chain_sync_completed(persister: persister, scorer: MultiThreadedLockableScore(score: score))
-                    
-                    print("Reconciled Chain Tip")
-                    
+                                        
                     let bestBLockHeight = channelManagerConstructor
                         .channelManager.current_best_block().height()
-                    print("best block: \(bestBLockHeight)")
-                    
-                    print("Usable channels: \(channelManager!.list_usable_channels().count)")
+                    print("LDK CHANNEL MANAGER BEST BLOCK: \(bestBLockHeight)\n")
                 } else {
-                    print("CasaLDK: Chain Tip Reconcilation Failed. ChannelManagerConstructor does not have a network graph!")
+                    print("Chain Tip Reconcilation Failed. ChannelManagerConstructor does not have a network graph!")
                 }
             })
             .store(in: &cancellables)
@@ -522,16 +616,4 @@ extension Node {
             enableP2PGossip: true
         )
     }
-    
-    private func getManagerEvents(expectedCount: UInt) async -> [Event] {
-       if let _ = channelManagerConstructor {
-           while true {
-               if await self.pendingEventTracker.getCount() >= expectedCount {
-                   return await self.pendingEventTracker.getAndClearEvents()
-               }
-               await self.pendingEventTracker.awaitAddition()
-           }
-       }
-       return []
-   }
 }
