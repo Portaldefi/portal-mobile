@@ -14,7 +14,6 @@ struct AssetDetailsView: View {
     @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewState: ViewState = Container.viewState()
     @ObservedObject private var viewModel: AssetDetailsViewModel
-    @ObservedObject private var accountViewModel: AccountViewModel = Container.accountViewModel()
     
     @State private var showTxDetails = false
     @State private var selectedTx: TransactionRecord?
@@ -56,11 +55,13 @@ struct AssetDetailsView: View {
                     WalletItemView(viewModel: walletItem.viewModel)
                         .padding(.leading, 16)
                         .padding(.vertical, 8)
+                        .padding(.horizontal, 14)
                 }
                 
                 ActionButtonsView
                     .padding(.horizontal, 12)
                     .padding(.bottom, 16)
+                    .padding(.horizontal, 8)
             }
             
             Divider()
@@ -68,9 +69,10 @@ struct AssetDetailsView: View {
             
             ZStack {
                 ScrollView {
-                    ForEach(viewModel.transactions.sorted(by: { $0.timestamp ?? 0 > $1.timestamp ?? 0 }), id: \.self) { transaction in
+                    ForEach(viewModel.transactions, id: \.self) { transaction in
                         SingleTxView(coin: viewModel.coin, transaction: transaction)
-                            .padding(.horizontal, 8)
+                            .padding(.leading, 10)
+                            .padding(.trailing, 6)
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 selectedTx = transaction
@@ -95,11 +97,17 @@ struct AssetDetailsView: View {
             TransactionDetailsView(coin: viewModel.coin, tx: tx)
         }
         .sheet(isPresented: $viewModel.goToReceive, onDismiss: {
-            viewModel.cleanup()
+            viewModel.updateTransactions()
         }) {
-            ReceiveRootView(viewModel: viewModel.receviewVM(), withAssetPicker: false)
+            let account = Container.accountViewModel()
+            let item = account.items.first{ $0.coin == viewModel.coin }
+            let receiveViewModel = ReceiveViewModel.config(items: account.items, selectedItem: item)
+            
+            ReceiveRootView(viewModel: receiveViewModel, withAssetPicker: false)
         }
-        .sheet(isPresented: $viewModel.goSend) {
+        .sheet(isPresented: $viewModel.goSend, onDismiss: {
+            viewModel.updateTransactions()
+        }) {
             SendRootView(withAssetPicker: false)
         }
     }
