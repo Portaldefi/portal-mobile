@@ -16,7 +16,8 @@ struct Mainview: View {
     init() {
         views = [
             AnyView(AccountRootView()),
-            AnyView(ActivityView())
+            AnyView(EmptyView()),
+            AnyView(LightningStatstView())
         ]
     }
         
@@ -72,6 +73,34 @@ struct Mainview: View {
             .frame(width: 85)
             .opacity(0.65)
             .disabled(true)
+            
+            Spacer()
+            
+            Button {
+                viewState.openTab(.lightning)
+            } label: {
+                if viewState.selectedTab == .lightning {
+                    RadialGradient.main
+                        .mask(
+                            VStack(spacing: 4) {
+                                Asset.lightningIcon
+                                Text("Lightning")
+                                    .font(.Main.fixed(.bold, size: 14))
+                            }
+                        )
+                } else {
+                    VStack(spacing: 4) {
+                        Asset.lightningIcon
+                        Text("Lightning")
+                            .font(.Main.fixed(.bold, size: 14))
+                    }
+                    .padding(6)
+                    .foregroundColor(Color.gray)
+                }
+            }
+            .frame(width: 85)
+            .opacity(0.65)
+            .disabled(false)
             
             Spacer()
             
