@@ -15,14 +15,14 @@ class Account {
 
     private(set) var name: String
     
-    private let btcNetwork: Int
+    let btcNetwork: Network
     private let ethNetwork: Int
 
     init(id: String, index: Int, name: String, key: DescriptorSecretKey) {
         self.id = id
         self.index = index
         self.name = name
-        self.btcNetwork = 1 //testNet
+        self.btcNetwork = .regtest
         self.ethNetwork = 1 //ropsten
         self.rootKey = key
     }
@@ -31,7 +31,7 @@ class Account {
         self.id = record.id
         self.index = Int(record.index)
         self.name = record.name
-        self.btcNetwork = 1 //testNet
+        self.btcNetwork = .regtest
         self.ethNetwork = 1 //ropsten
         self.rootKey = key
     }
@@ -53,7 +53,7 @@ extension Account {
         let index = 0
         let name = "Mocked"
         let mnemonic = Mnemonic(wordCount: .words12)
-        let key = DescriptorSecretKey(network: .testnet, mnemonic: mnemonic, password: nil)
+        let key = DescriptorSecretKey(network: .regtest, mnemonic: mnemonic, password: nil)
         
         return Account(
             id: id,

@@ -27,7 +27,7 @@ class CreateAccountViewModel: ObservableObject {
             fatalError("Mnemonic creating error: \(error)")
         }
         print("\(mnemonic.asString())")
-        extendedKey = DescriptorSecretKey(network: .testnet, mnemonic: mnemonic, password: nil)
+        extendedKey = DescriptorSecretKey(network: .regtest, mnemonic: mnemonic, password: nil)
     }
     
     func createAccount() {

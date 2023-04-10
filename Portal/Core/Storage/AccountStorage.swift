@@ -22,7 +22,7 @@ class AccountStorage {
     private func createAccount(record: AccountRecord) -> Account? {
         guard let recoveryData = recoveryData(recordId: record.id) else { return nil }
         let mnemonic = try! Mnemonic.fromString(mnemonic: recoveryData.recoveryString)
-        let key = DescriptorSecretKey(network: .testnet, mnemonic: mnemonic, password: recoveryData.salt)
+        let key = DescriptorSecretKey(network: .regtest, mnemonic: mnemonic, password: recoveryData.salt)
         return Account(record: record, key: key)
     }
     
