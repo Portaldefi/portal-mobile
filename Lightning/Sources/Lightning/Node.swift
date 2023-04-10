@@ -9,6 +9,12 @@ import Foundation
 import Combine
 import LightningDevKit
 
+extension Bool {
+    var string: String {
+        self ? "yes" : "no"
+    }
+}
+
 public class Node {
     let fileManager = LightningFileManager()
     let pendingEventTracker = PendingEventTracker()
@@ -66,8 +72,15 @@ public class Node {
         // (4) Initialize rpcInterface, which represents a series of chain methods that are necessary for chain sync.
         // interact with different types of block sources with just a different choice of a `RpcChainManager` instance.
         switch connectionType {
-        case .regtest:
-            fatalError("Not yet implemented")
+        case .regtest(let config):
+            let regtestBlockchainManager = try RegtestBlockchainManager(
+                rpcProtocol: .http,
+                host: config.host,
+                port: config.port,
+                username: config.username,
+                password: config.password
+            )
+            rpcInterface = regtestBlockchainManager
         case .testnet(let bitcoinTestNetConfig):
             switch bitcoinTestNetConfig {
             case .blockStream:
@@ -137,7 +150,7 @@ public class Node {
         
         let bestBlockHeight = channelManager.current_best_block().height()
         
-        if case .regtest = connectionType, let rpcInterface = rpcInterface as? BitcoinCoreChainManager {
+        if case .regtest = connectionType, let rpcInterface = rpcInterface as? RegtestBlockchainManager {
             // If we're using Bitcoin Core
             try await rpcInterface.preloadMonitor(anchorHeight: .block(bestBlockHeight))
         }
@@ -300,7 +313,7 @@ public class Node {
         let result = Bindings.swift_create_invoice_from_channelmanager(
             channelmanager: channelManager,
             keys_manager: keyInterface,
-            network: LDKCurrency_BitcoinTestnet,
+            network: LDKCurrency_Regtest,
             amt_msat: Option_u64Z(value: mSatAmount),
             description: description,
             invoice_expiry_delta_secs: 86400 //24 hours
