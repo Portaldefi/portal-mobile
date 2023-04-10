@@ -10,11 +10,9 @@ import Factory
 
 @main
 struct Portal: App {
-    let lightningKit: ILightningKitManager
     let persistenceController: PersistenceController
     
     init() {
-        lightningKit = Container.lightningKitManager()
         persistenceController = PersistenceController.shared
     }
 
@@ -22,11 +20,6 @@ struct Portal: App {
         WindowGroup {
             RootView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .onAppear {
-                    Task {
-                        try await lightningKit.start()
-                    }
-                }
         }
     }
 }
