@@ -8,14 +8,18 @@
 import Foundation
 import Combine
 import BitcoinDevKit
-import BitcoinAddressValidator
 
 final class BitcoinAdapter {
+    private let ldkManager = Container.lightningKitManager()
+    
     private enum DereviationPathBranch: Int {
         case external = 0, `internal`
     }
     
-    private let electrumURL = "ssl://electrum.blockstream.info:60002"
+    private let electrumTestNetURL = "ssl://electrum.blockstream.info:60002"
+    private let espolaRegTestURL = "http://localhost:3002"
+    var blockChainHeight: Int32 = 0
+    
     private let coinRate: Decimal = pow(10, 8)
     
     private let stateUpdatedSubject = PassthroughSubject<Void, Never>()
@@ -24,12 +28,13 @@ final class BitcoinAdapter {
     
     private let wallet: BitcoinDevKit.Wallet
     private let blockchain: BitcoinDevKit.Blockchain
-    private let updateTimer = RepeatingTimer(timeInterval: 180)
+    private let updateTimer = RepeatingTimer(timeInterval: 5)
     private let networkQueue = DispatchQueue(label: "com.portal.network.layer.queue", qos: .userInitiated)
     
-    private var adapterState: AdapterState = .syncing(progress: 0, lastBlockDate: nil)
+    private var adapterState: AdapterState = .synced
     private var _balance = Balance(immature: 0, trustedPending: 0, untrustedPending: 0, confirmed: 0, spendable: 0, total: 0)
     private var _receiveAddress = AddressInfo(index: 0, address: String())
+    private var _transactions = [TransactionDetails]()
     
     static private func descriptor(derivedKey: String, network: Network) throws -> Descriptor {
         try Descriptor(descriptor: "wpkh(\(derivedKey))", network: network)
@@ -40,7 +45,7 @@ final class BitcoinAdapter {
     }
         
     init(wallet: Wallet) throws {
-        let network: Network = .testnet
+        let network = wallet.account.btcNetwork
         
         let account = wallet.account
         let accountIndex = account.index
@@ -58,17 +63,42 @@ final class BitcoinAdapter {
         if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
             let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite" + "\(account.id)")
             let dbConfig = DatabaseConfig.sqlite(config: sqliteConfig)
+            let blockchainConfig: BlockchainConfig
             
-            let electrum = ElectrumConfig(
-                url: electrumURL,
-                socks5: nil,
-                retry: 5,
-                timeout: nil,
-                stopGap: 10,
-                validateDomain: false
-            )
-            
-            let blockchainConfig = BlockchainConfig.electrum(config: electrum)
+            switch network {
+            case .bitcoin, .signet:
+                fatalError("not implemented")
+            case .testnet:
+                let electrumConfig = ElectrumConfig(
+                    url: electrumTestNetURL,
+                    socks5: nil,
+                    retry: 5,
+                    timeout: nil,
+                    stopGap: 10,
+                    validateDomain: false
+                )
+                blockchainConfig = BlockchainConfig.electrum(config: electrumConfig)
+            case .regtest:
+                let espolaConfig = EsploraConfig(
+                    baseUrl: espolaRegTestURL,
+                    proxy: nil,
+                    concurrency: nil,
+                    stopGap: 10,
+                    timeout: nil
+                )
+                blockchainConfig = BlockchainConfig.esplora(config: espolaConfig)
+                
+//                let rpcConfig = RpcConfig(
+//                    url: "localhost:18454",
+//                    auth: .userPass(username: "polaruser", password: "polarpass"),
+//                    network: .regtest,
+//                    walletName: "portal.regtest",
+//                    syncParams: nil
+//                )
+//
+//                blockchainConfig = BlockchainConfig.rpc(config: rpcConfig)
+            }
+                        
             blockchain = try Blockchain(config: blockchainConfig)
             
             self.wallet = try BitcoinDevKit.Wallet(
@@ -83,33 +113,43 @@ final class BitcoinAdapter {
             updateTimer.eventHandler = { [unowned self] in
                 self.syncData()
             }
+            
+            Task {
+                try await ldkManager.start()
+            }
         } else {
             throw BtcAdapterError.dbNotFound
         }
     }
     
     private func syncData() {
+        if case .syncing = adapterState { return }
+        
         update(state: .syncing(progress: 0, lastBlockDate: nil))
         
-        do {
-            print("SYNCING WITH BITCOIN NETWORK...")
-            try wallet.sync(blockchain: blockchain, progress: nil)
-            print("BITCOIN NETWORK SYNCED")
-            try update()
-            print("BITCOIN DATA UPDATED")
-            update(state: .synced)
-        } catch {
-            print("BITCOIN NETWORK SYNC ERROR: \(error)")
-            update(state: .notSynced(error: error))
+        networkQueue.async {
+            do {
+                print("SYNCING WITH BITCOIN NETWORK...")
+                let start = DispatchTime.now()
+                try self.wallet.sync(blockchain: self.blockchain, progress: nil)
+                let end = DispatchTime.now()
+                let nanoTime = end.uptimeNanoseconds - start.uptimeNanoseconds
+                let timeInterval = Double(nanoTime)/1_000_000_000
+                print("SYNCED in \(timeInterval) seconds")
+                try self.update()
+                self.update(state: .synced)
+            } catch {
+                print("BITCOIN NETWORK SYNC ERROR: \(error)")
+                self.update(state: .notSynced(error: error))
+            }
         }
     }
     
     private func update() throws {
         try updateAddress()
         try updateBalance()
-        print("BITCOIN BALANCE UPDATED")
         try updateTransactions()
-        print("BITCOIN TRANSACTIONS UPDATED")
+        try updateBlockHeight()
     }
     
     private func update(state: AdapterState) {
@@ -118,18 +158,27 @@ final class BitcoinAdapter {
     }
     
     private func updateBalance() throws {
+        let oldValue = _balance
         _balance = try wallet.getBalance()
-        balanceUpdatedSubject.send()
+        if _balance != oldValue {
+            balanceUpdatedSubject.send()
+        }
     }
     
     private func updateAddress() throws {
-        let addressInfo = try wallet.getAddress(addressIndex: AddressIndex.lastUnused)
-        _receiveAddress = addressInfo
+        _receiveAddress = try wallet.getAddress(addressIndex: AddressIndex.lastUnused)
     }
     
     private func updateTransactions() throws {
-        let transactions = try wallet.listTransactions().map{ TransactionRecord(transaction: $0) }
-        transactionsSubject.send(transactions)
+        let transactions = try wallet.listTransactions()
+        guard transactions != _transactions else { return }
+        _transactions = transactions
+        let txRecords = transactions.map{ TransactionRecord(transaction: $0) }
+        transactionsSubject.send(txRecords)
+    }
+    
+    private func updateBlockHeight() throws {
+        blockChainHeight = Int32(try blockchain.getHeight())
     }
 }
 
@@ -147,10 +196,7 @@ extension BitcoinAdapter: IAdapter {
     }
     
     var blockchainHeight: Int32 {
-        if let height = try? blockchain.getHeight() {
-            return Int32(height)
-        }
-        return 0
+        blockChainHeight
     }
 }
 
@@ -162,8 +208,7 @@ extension BitcoinAdapter: IBalanceAdapter {
     }
     
     var balance: Decimal {
-        let manager = Container.lightningKitManager()
-        return manager.channelBalance/1000/coinRate
+        ldkManager.channelBalance/1000/coinRate
         //return Decimal(_balance.spendable + _balance.untrustedPending)/coinRate
     }
     
@@ -184,7 +229,11 @@ extension BitcoinAdapter: IDepositAdapter {
 
 extension BitcoinAdapter: ITransactionsAdapter {
     var transactionRecords: AnyPublisher<[TransactionRecord], Never> {
-        transactionsSubject.eraseToAnyPublisher()
+        transactionsSubject
+            .combineLatest(ldkManager.transactionsPublisher) { btcTxs, lightningTxs in
+                (btcTxs + lightningTxs).sorted(by: { $0.timestamp ?? 1 > $1.timestamp ?? 0 })
+            }
+            .eraseToAnyPublisher()
     }
 }
 
@@ -311,12 +360,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         do {
             let txBuilderResult: TxBuilderResult
             let receiverAddress = try Address(address: address)
-            print(balance)
-//            print(try! wallet.listUnspent())
-            print(try! wallet.getBalance())
-//            print(try! wallet.listTransactions())
             let utxos = try? wallet.listUnspent()
-            print(utxos)
             let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
 
             if max {
@@ -366,9 +410,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
     }
     
     func validate(address: String) throws {
-        if !BitcoinAddressValidator.isValid(address: address) {
-            throw SendFlowError.addressIsntValid
-        }
+        _ = try Address(address: address)
     }
 }
 
