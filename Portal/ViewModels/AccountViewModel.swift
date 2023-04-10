@@ -18,12 +18,13 @@ class AccountViewModel: ObservableObject {
     
     @Published private(set) var items: [WalletItem] = [] {
         didSet {
+            updateValues()
+            
             Publishers.Sequence(sequence: items)
                 .flatMap { $0.balanceUpdated }
                 .receive(on: RunLoop.main)
-                .sink { [weak self] _ in
-                    self?.updateBalance()
-                    self?.updateValue()
+                .sink { [unowned self] _ in
+                    self.updateValues()
                 }
                 .store(in: &subscriptions)
         }
@@ -96,18 +97,14 @@ class AccountViewModel: ObservableObject {
                 self?.accountName = account.name
             }
             .store(in: &subscriptions)
-        
-        $items
-            .filter{ !$0.isEmpty }
-            .delay(for: .seconds(0.1), scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.updateBalance()
-                self?.updateValue()
-            }
-            .store(in: &subscriptions)
     }
     
-    private func updateBalance() {
+    func updateValues() {
+        updateBalance()
+        updateValue()
+    }
+    
+    private func updateBalance() {        
         let balance = items.map{ $0.viewModel.balance }.reduce(0){ $0 + $1 }
         
         if totalBalance != "\(balance)" {
@@ -116,8 +113,12 @@ class AccountViewModel: ObservableObject {
     }
     
     private func updateValue() {
-        if let value = items.first?.viewModel.valueString, totalValue != value {
-            totalValue = value
+        let value = items.map{ $0.viewModel.value * $0.viewModel.balance }.reduce(0, { $0 + $1 }).double.usdFormatted()
+        
+        if totalValue != value {
+            DispatchQueue.main.async {
+                self.totalValue = value
+            }
         }
     }
     
