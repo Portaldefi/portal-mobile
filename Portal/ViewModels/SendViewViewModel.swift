@@ -272,7 +272,7 @@ class SendViewViewModel: ObservableObject {
     }
     
     func send(_ completionHandler: @escaping (Bool) -> ()) {
-        if useAllFundsEnabled {
+        if !useAllFundsEnabled {
             sendService?
                 .sendMax()
                 .receive(on: RunLoop.main)
