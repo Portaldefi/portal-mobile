@@ -28,15 +28,6 @@
       }
     },
     {
-      "identity" : "bitcoin-address-validator-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/cuhte3/bitcoin-address-validator-swift",
-      "state" : {
-        "branch" : "main",
-        "revision" : "c8738fea95bb403b49ff3e1457265d4b5b64838f"
-      }
-    },
-    {
       "identity" : "bluesocket",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Kitura/BlueSocket.git",

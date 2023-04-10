@@ -173,7 +173,6 @@
 		75772A6C2906B57200BE80B7 /* AmountValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A6B2906B57200BE80B7 /* AmountValueView.swift */; };
 		758DFC7E294B65BA00AB35CC /* EthereumAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758DFC7D294B65BA00AB35CC /* EthereumAdapter.swift */; };
 		758DFC85294B6A7600AB35CC /* TransactionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758DFC84294B6A7600AB35CC /* TransactionRecord.swift */; };
-		75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */ = {isa = PBXBuildFile; productRef = 75AA211028A668A400DD2E89 /* BitcoinAddressValidator */; };
 		75CC43AF2913CBC300B15008 /* SingleTxViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CC43AE2913CBC300B15008 /* SingleTxViewModel.swift */; };
 		75D8C59228D8867600228298 /* IAccountStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59128D8867600228298 /* IAccountStorage.swift */; };
 		75D8C59628D88A1100228298 /* IAppConfigProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59528D88A1100228298 /* IAppConfigProvider.swift */; };
@@ -404,7 +403,6 @@
 				755FDD5129AFA30A00D8A29C /* Starscream in Frameworks */,
 				479A7AC928B756DF0057E100 /* Factory in Frameworks */,
 				756DDD8C28A28858002EDC60 /* KeychainAccess in Frameworks */,
-				75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */,
 				7564C65E28D1F89E00ABA8CF /* DataField in Frameworks */,
 				75772A5D28F8192F00BE80B7 /* CodeScanner in Frameworks */,
 				7542184F299BDE320028D5DF /* PopupView in Frameworks */,
@@ -871,7 +869,6 @@
 				756A31292888252D004978E2 /* BitcoinDevKit */,
 				7502D68A289BD8EF00613323 /* PortalUI */,
 				756DDD8B28A28858002EDC60 /* KeychainAccess */,
-				75AA211028A668A400DD2E89 /* BitcoinAddressValidator */,
 				479A7AC828B756DF0057E100 /* Factory */,
 				7545BC4028CA107100ED92C3 /* Coinpaprika */,
 				7564C65D28D1F89E00ABA8CF /* DataField */,
@@ -915,7 +912,6 @@
 				756A31282888252D004978E2 /* XCRemoteSwiftPackageReference "bdk-swift" */,
 				7502D689289BD8EF00613323 /* XCRemoteSwiftPackageReference "portal-ui-swift" */,
 				756DDD8A28A28858002EDC60 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
-				75AA210F28A668A400DD2E89 /* XCRemoteSwiftPackageReference "bitcoin-address-validator-swift" */,
 				479A7AC728B756DF0057E100 /* XCRemoteSwiftPackageReference "Factory" */,
 				7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */,
 				7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field" */,
@@ -1448,14 +1444,6 @@
 				kind = branch;
 			};
 		};
-		75AA210F28A668A400DD2E89 /* XCRemoteSwiftPackageReference "bitcoin-address-validator-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/cuhte3/bitcoin-address-validator-swift";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 		75D8C5C828E1B00800228298 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher";
@@ -1525,11 +1513,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 75772A5B28F8192F00BE80B7 /* XCRemoteSwiftPackageReference "CodeScanner" */;
 			productName = CodeScanner;
-		};
-		75AA211028A668A400DD2E89 /* BitcoinAddressValidator */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 75AA210F28A668A400DD2E89 /* XCRemoteSwiftPackageReference "bitcoin-address-validator-swift" */;
-			productName = BitcoinAddressValidator;
 		};
 		75D8C5C928E1B00800228298 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
