@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class BitcoinCoreChainManager {
+class RegtestBlockchainManager {
     let rpcUrl: URL
     
     private var anchorBlock: BlockDetails?
@@ -40,7 +40,7 @@ class BitcoinCoreChainManager {
     }
     
     func registerListener(_ listener: ChainListener) {
-        self.chainListeners.append(listener)
+        chainListeners.append(listener)
     }
     
     /// This method takes in an `anchorHeight` and provides us with a way to make the requisite calls needed to Bitcoin Core in order to
@@ -91,7 +91,7 @@ class BitcoinCoreChainManager {
 }
 
 // MARK: Helper Functions
-extension BitcoinCoreChainManager {
+extension RegtestBlockchainManager {
     // Trigger a check of what's the latest
     private func reconcileChaintips() async throws {
         let currentChaintipHeight = try await self.getChaintipHeight()
@@ -218,7 +218,7 @@ extension BitcoinCoreChainManager {
 }
 
 // MARK: Common ChainManager Functions
-extension BitcoinCoreChainManager: RpcChainManager {
+extension RegtestBlockchainManager: RpcChainManager {
     func submitTransaction(transaction: [UInt8]) async throws -> String {
         let txHex = bytesToHexString(bytes: transaction)
         let response = try await self.callRpcMethod(method: "sendrawtransaction", params: [txHex])
@@ -229,7 +229,7 @@ extension BitcoinCoreChainManager: RpcChainManager {
 }
 
 // MARK: RPC Calls
-extension BitcoinCoreChainManager {
+extension RegtestBlockchainManager {
     func getChaintipHeight() async throws -> UInt32 {
         let response = try await self.callRpcMethod(method: "getblockcount", params: [])
         let result = response["result"] as! UInt32
@@ -319,7 +319,7 @@ extension BitcoinCoreChainManager {
 }
 
 // MARK: Supporting Data Structures
-extension BitcoinCoreChainManager {
+extension RegtestBlockchainManager {
     struct BlockDetails: Codable {
         let hash: String
         let version: Int64
