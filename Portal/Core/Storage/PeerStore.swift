@@ -7,7 +7,21 @@
 
 import Foundation
 
-class PeerStore: ObservableObject {    
+class PeerStore: ObservableObject {
+    static func clearPeersDocumentsDirectory() {
+        do {
+            let fileURL = try fileUrl()
+            guard let _ = try? FileHandle(forReadingFrom: fileURL) else {
+                return
+            }
+            
+            
+            try FileManager.default.removeItem(at: fileURL)
+        } catch  {
+            print(error)
+        }
+    }
+    
     static func load(completion: @escaping (Result<[String:Peer], Error>) -> Void) {
         DispatchQueue.global(qos: .background).async {
             do {
@@ -56,6 +70,8 @@ class PeerStore: ObservableObject {
             switch result {
             case .success(var peers):
                 peers.updateValue(peer, forKey: peer.peerPubKey)
+                peers.updateValue(peer, forKey: peer.connectionInformation.hostname)
+                peers.updateValue(peer, forKey: String(peer.connectionInformation.port))
                 PeerStore.save(peers: Array(peers.values)) { result in
                     switch result {
                     case .success(_):
@@ -75,6 +91,6 @@ class PeerStore: ObservableObject {
                                     in: .userDomainMask,
                                     appropriateFor: nil,
                                     create: false)
-            .appendingPathComponent("peers.data")
+            .appendingPathComponent("peersData")
     }
 }
