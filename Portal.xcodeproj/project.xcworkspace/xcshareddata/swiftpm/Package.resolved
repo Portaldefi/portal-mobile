@@ -37,30 +37,12 @@
       }
     },
     {
-      "identity" : "bitcoincore.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/horizontalsystems/BitcoinCore.Swift.git",
-      "state" : {
-        "revision" : "19e1d6e113fdeff5227275b4810dbf3e56bdf161",
-        "version" : "1.0.4"
-      }
-    },
-    {
       "identity" : "bluesocket",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Kitura/BlueSocket.git",
       "state" : {
         "revision" : "7b23a867008e0027bfd6f4d398d44720707bc8ca",
         "version" : "2.0.4"
-      }
-    },
-    {
-      "identity" : "checkpoints",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/horizontalsystems/Checkpoints.git",
-      "state" : {
-        "revision" : "f3a10c2f5d39e7ce8df8191d003856e49be98723",
-        "version" : "1.0.6"
       }
     },
     {

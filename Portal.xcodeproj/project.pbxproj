@@ -122,7 +122,6 @@
 		755FDD5129AFA30A00D8A29C /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 755FDD5029AFA30A00D8A29C /* Starscream */; };
 		755FDD5329B7815C00D8A29C /* CurrencyTickerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755FDD5229B7815C00D8A29C /* CurrencyTickerModel.swift */; };
 		755FDD5529B7817900D8A29C /* TickerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755FDD5429B7817900D8A29C /* TickerModel.swift */; };
-		75618FA029C34BCA005F2392 /* BitcoinCore in Frameworks */ = {isa = PBXBuildFile; productRef = 75618F9F29C34BCA005F2392 /* BitcoinCore */; };
 		7564C65228CF3CF600ABA8CF /* SetRecipientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65128CF3CF600ABA8CF /* SetRecipientView.swift */; };
 		7564C65428CF3D3900ABA8CF /* SetAmountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65328CF3D3900ABA8CF /* SetAmountView.swift */; };
 		7564C65728CF6EC400ABA8CF /* SendFlowError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7564C65628CF6EC400ABA8CF /* SendFlowError.swift */; };
@@ -406,7 +405,6 @@
 				479A7AC928B756DF0057E100 /* Factory in Frameworks */,
 				756DDD8C28A28858002EDC60 /* KeychainAccess in Frameworks */,
 				75AA211128A668A400DD2E89 /* BitcoinAddressValidator in Frameworks */,
-				75618FA029C34BCA005F2392 /* BitcoinCore in Frameworks */,
 				7564C65E28D1F89E00ABA8CF /* DataField in Frameworks */,
 				75772A5D28F8192F00BE80B7 /* CodeScanner in Frameworks */,
 				7542184F299BDE320028D5DF /* PopupView in Frameworks */,
@@ -1418,14 +1416,6 @@
 				minimumVersion = 4.0.0;
 			};
 		};
-		75618F9E29C34BCA005F2392 /* XCRemoteSwiftPackageReference "BitcoinCore.Swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/horizontalsystems/BitcoinCore.Swift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
 		7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/marcusrossel/data-field.git";
@@ -1515,11 +1505,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 755FDD4F29AFA30A00D8A29C /* XCRemoteSwiftPackageReference "Starscream" */;
 			productName = Starscream;
-		};
-		75618F9F29C34BCA005F2392 /* BitcoinCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 75618F9E29C34BCA005F2392 /* XCRemoteSwiftPackageReference "BitcoinCore.Swift" */;
-			productName = BitcoinCore;
 		};
 		7564C65D28D1F89E00ABA8CF /* DataField */ = {
 			isa = XCSwiftPackageProductDependency;

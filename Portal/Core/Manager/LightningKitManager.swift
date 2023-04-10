@@ -10,7 +10,6 @@ import Combine
 import Lightning
 import CryptoSwift
 import LightningDevKit
-import BitcoinCore
 import Factory
 
 public struct BlockInfo {
