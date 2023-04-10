@@ -64,7 +64,7 @@ struct TransactionDetailsView: View {
                                     .foregroundColor(Palette.grayScaleAA)
                                 Spacer()
                                 VStack(alignment: .trailing, spacing: 8) {
-                                    Text(viewModel.transaction.nodeId!.turnicated.lowercased())
+                                    Text(viewModel.transaction.nodeId?.turnicated.lowercased() ?? "-")
                                         .font(.Main.fixed(.monoRegular, size: 16))
                                         .foregroundColor(Palette.grayScaleF4)
                                 }

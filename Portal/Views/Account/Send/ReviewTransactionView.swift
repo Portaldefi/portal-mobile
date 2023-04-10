@@ -10,6 +10,7 @@ import PortalUI
 import Factory
 import BitcoinDevKit
 import PopupView
+import Lightning
 
 struct ReviewTransactionView: View {
     @FocusState private var isFocused: Bool
@@ -147,59 +148,64 @@ struct ReviewTransactionView: View {
                 Divider()
                     .frame(height: 1)
                 
-                HStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Transaction Fees")
-                            .font(.Main.fixed(.monoBold, size: 14))
-                            .foregroundColor(Palette.grayScaleAA)
-                        Text(viewModel.feeRate.description)
-                            .font(.Main.fixed(.monoRegular, size: 14))
-                            .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
-                    }
-                    
-                    Spacer()
-                    
-                    if let coin = viewModel.coin {
-                        VStack {
-                            HStack(spacing: 6) {
-                                Text(viewModel.fee)
-                                    .font(.Main.fixed(.monoBold, size: 16))
-                                    .foregroundColor(Palette.grayScaleEA)
-                                
-                                switch coin.type {
-                                case .bitcoin, .lightningBitcoin:
-                                    Text("btc")
-                                        .font(.Main.fixed(.monoMedium, size: 11))
-                                        .foregroundColor(Palette.grayScale6A)
-                                        .frame(width: 34)
-                                case .ethereum, .erc20:
-                                    Text("eth")
-                                        .font(.Main.fixed(.monoMedium, size: 11))
-                                        .foregroundColor(Palette.grayScale6A)
-                                        .frame(width: 34)
-                                }
-                            }
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                switch try? viewModel.validateInput() {
+                case .btcOnChain, .ethOnChain:
+                    HStack(spacing: 0) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Transaction Fees")
+                                .font(.Main.fixed(.monoBold, size: 14))
+                                .foregroundColor(Palette.grayScaleAA)
+                            Text(viewModel.feeRate.description)
+                                .font(.Main.fixed(.monoRegular, size: 14))
+                                .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
                         }
-                    } else {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
-                    }                    
-                }
-                .padding(.vertical, 16)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    if editingAmount {
-                        editingAmount.toggle()
+                        
+                        Spacer()
+                        
+                        if let coin = viewModel.coin {
+                            VStack {
+                                HStack(spacing: 6) {
+                                    Text(viewModel.fee)
+                                        .font(.Main.fixed(.monoBold, size: 16))
+                                        .foregroundColor(Palette.grayScaleEA)
+                                    
+                                    switch coin.type {
+                                    case .bitcoin, .lightningBitcoin:
+                                        Text("btc")
+                                            .font(.Main.fixed(.monoMedium, size: 11))
+                                            .foregroundColor(Palette.grayScale6A)
+                                            .frame(width: 34)
+                                    case .ethereum, .erc20:
+                                        Text("eth")
+                                            .font(.Main.fixed(.monoMedium, size: 11))
+                                            .foregroundColor(Palette.grayScale6A)
+                                            .frame(width: 34)
+                                    }
+                                }
+                                .transition(.move(edge: .bottom).combined(with: .opacity))
+                            }
+                        } else {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                        }
+                    }
+                    .padding(.vertical, 16)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        if editingAmount {
+                            editingAmount.toggle()
+                        }
+                        
+                        if let coin = viewModel.coin, coin == .bitcoin() {
+                            viewModel.showFeesPicker.toggle()
+                        }
                     }
                     
-                    if let coin = viewModel.coin, coin == .bitcoin() {
-                        viewModel.showFeesPicker.toggle()
-                    }
+                    Divider()
+                        .frame(height: 1)
+                case .lightningInvoice, .none:
+                    EmptyView()
                 }
-                
-                Divider()
-                    .frame(height: 1)
                 
                 Spacer()
             }
@@ -221,6 +227,13 @@ struct ReviewTransactionView: View {
                         }
                         
                         if let errorMessage = viewModel.sendError as? SendFlowError {
+                            Text(errorMessage.description)
+                                .font(.Main.fixed(.monoRegular, size: 16))
+                                .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
+                                .transition(.move(edge: .bottom).combined(with: .opacity))
+                        }
+                        
+                        if let errorMessage = viewModel.sendError as? NodeError {
                             Text(errorMessage.description)
                                 .font(.Main.fixed(.monoRegular, size: 16))
                                 .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))

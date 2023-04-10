@@ -35,7 +35,7 @@ struct SingleTxView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         Text(viewModel.tx.type.description)
                             .font(.Main.fixed(.monoMedium, size: 16))
-                            .foregroundColor(Palette.grayScaleCA)
+                            .foregroundColor(Palette.grayScaleEA)
                         if let confirmatioDate = viewModel.tx.confirmationTimeString {
                             Text(confirmatioDate)
                                 .font(.Main.fixed(.monoRegular, size: 14))
@@ -57,7 +57,7 @@ struct SingleTxView: View {
                                 Text("\(viewModel.tx.type == .received ? "+" : "-")")
                                     .font(.Main.fixed(.monoMedium, size: 16))
                                     .foregroundColor(viewModel.tx.type == .received ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA)
-                                Text(viewModel.value)
+                                Text(viewModel.amount)
                                     .font(.Main.fixed(.monoMedium, size: 16))
                                     .foregroundColor(viewModel.tx.type == .received ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA)
                             }
@@ -65,7 +65,7 @@ struct SingleTxView: View {
                                 Text("\(viewModel.tx.type == .received ? "+" : "-")")
                                     .font(.Main.fixed(.monoBold, size: 16))
                                     .foregroundColor(Palette.grayScale6A)
-                                Text("4.55")
+                                Text(viewModel.value)
                                     .font(.Main.fixed(.monoRegular, size: 16))
                                     .foregroundColor(Palette.grayScale6A)
                                     .offset(x: 1)

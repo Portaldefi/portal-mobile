@@ -25,8 +25,11 @@ struct AccountView: View {
                     .frame(height: 124)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
+                    .onAppear {
+                        viewModel.updateValues()
+                    }
                 ActionButtonsView
-                    .padding(.horizontal, 12)
+                    .padding(.horizontal, 20)
                     .padding(.bottom, 16)
             }
             
@@ -69,7 +72,9 @@ struct AccountView: View {
             let viewModel = ReceiveViewModel.config(items: viewModel.items, selectedItem: nil)
             ReceiveRootView(viewModel: viewModel, withAssetPicker: true)
         }
-        .sheet(isPresented: $viewModel.goToSend) {
+        .sheet(isPresented: $viewModel.goToSend, onDismiss: {
+            viewModel.updateValues()
+        }) {
             SendRootView(withAssetPicker: true)
         }
         .fullScreenCover(isPresented: $viewState.showBackUpFlow) {
@@ -117,6 +122,7 @@ struct AccountView: View {
             }
         }
         .frame(height: 73)
+        .padding(.horizontal, 6)
     }
     
     func BalanceView(balance: String, value: String) -> some View {
