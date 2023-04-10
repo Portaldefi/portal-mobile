@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		4774D71A28AF916600B7988B /* QRCodeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D71928AF916600B7988B /* QRCodeItem.swift */; };
 		4774D71C28AF920100B7988B /* QRCodeParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D71B28AF920100B7988B /* QRCodeParser.swift */; };
-		4774D71E28B4B06200B7988B /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D71D28B4B06200B7988B /* ActivityView.swift */; };
+		4774D71E28B4B06200B7988B /* LightningStatstView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D71D28B4B06200B7988B /* LightningStatstView.swift */; };
 		4774D72028B4B0C600B7988B /* ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D71F28B4B0C600B7988B /* ViewState.swift */; };
 		4774D72528B4FC2000B7988B /* StringFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72428B4FC2000B7988B /* StringFormatter.swift */; };
 		4774D72728B4FC5300B7988B /* Double+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4774D72628B4FC5300B7988B /* Double+Extension.swift */; };
@@ -206,7 +206,7 @@
 /* Begin PBXFileReference section */
 		4774D71928AF916600B7988B /* QRCodeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeItem.swift; sourceTree = "<group>"; };
 		4774D71B28AF920100B7988B /* QRCodeParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeParser.swift; sourceTree = "<group>"; };
-		4774D71D28B4B06200B7988B /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
+		4774D71D28B4B06200B7988B /* LightningStatstView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightningStatstView.swift; sourceTree = "<group>"; };
 		4774D71F28B4B0C600B7988B /* ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewState.swift; sourceTree = "<group>"; };
 		4774D72328B4F62500B7988B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4774D72428B4FC2000B7988B /* StringFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringFormatter.swift; sourceTree = "<group>"; };
@@ -516,7 +516,7 @@
 				756A3136288AEAAD004978E2 /* AssetDetailsView.swift */,
 				75772A6B2906B57200BE80B7 /* AmountValueView.swift */,
 				756A313228898C73004978E2 /* SingleTxView.swift */,
-				4774D71D28B4B06200B7988B /* ActivityView.swift */,
+				4774D71D28B4B06200B7988B /* LightningStatstView.swift */,
 				479A7ACC28B778CA0057E100 /* WalletItemView.swift */,
 				75D8C5CB28E1B40300228298 /* AsyncImageView.swift */,
 				75D8C5CC28E1B40300228298 /* CoinImageView.swift */,
@@ -882,7 +882,6 @@
 				75421840298BD2A80028D5DF /* Lightning */,
 				7542184E299BDE320028D5DF /* PopupView */,
 				755FDD5029AFA30A00D8A29C /* Starscream */,
-				75618F9F29C34BCA005F2392 /* BitcoinCore */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* Portal.app */;
@@ -926,7 +925,6 @@
 				752FA62329670DD900008796 /* XCRemoteSwiftPackageReference "FeeRateKit.Swift" */,
 				7542184D299BDE310028D5DF /* XCRemoteSwiftPackageReference "PopupView" */,
 				755FDD4F29AFA30A00D8A29C /* XCRemoteSwiftPackageReference "Starscream" */,
-				75618F9E29C34BCA005F2392 /* XCRemoteSwiftPackageReference "BitcoinCore.Swift" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -1115,7 +1113,7 @@
 				75D8C5C728DC89DB00228298 /* ReceiveViewModel.swift in Sources */,
 				7545BC0D28C7948900ED92C3 /* String+Extension.swift in Sources */,
 				7551708C2948C1F500CC84D7 /* AccountViewNavigationConfig.swift in Sources */,
-				4774D71E28B4B06200B7988B /* ActivityView.swift in Sources */,
+				4774D71E28B4B06200B7988B /* LightningStatstView.swift in Sources */,
 				756DDD8428A2879E002EDC60 /* IAccountRecordStorage.swift in Sources */,
 				7564C65B28D08F6F00ABA8CF /* AmountView.swift in Sources */,
 				75D8C5C128DC711F00228298 /* CoinManager.swift in Sources */,
@@ -1280,6 +1278,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.tides.portal.client;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1322,6 +1321,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.tides.portal.client;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
