@@ -390,6 +390,10 @@ extension BlockStreamChainManager {
 
 // MARK: Common ChainManager Functions
 extension BlockStreamChainManager: RpcChainManager {
+    func decodeScript(script: [UInt8]) async throws -> [String : Any] {
+        [:]
+    }
+    
     func submitTransaction(transaction: [UInt8]) async throws -> String {
         let txHex = bytesToHexString(bytes: transaction)
         let response = try? await self.callRpcMethod(method: .postRawTx(txHex))
