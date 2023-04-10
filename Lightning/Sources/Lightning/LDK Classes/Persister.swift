@@ -43,6 +43,7 @@ class Persister: LightningDevKit.Persister, ExtendedChannelManagerPersister {
         case .success():
             return Result_NoneErrorZ.ok()
         case .failure(_):
+            print("persistChannelManager FAILURE")
             return Result_NoneErrorZ.err(e: LDKIOError_WriteZero)
         }
     }

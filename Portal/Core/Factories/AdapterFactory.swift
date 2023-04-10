@@ -22,7 +22,7 @@ class AdapterFactory: IAdapterFactory {
             do {
                 return try BitcoinAdapter(wallet: wallet)
             } catch {
-                print(error.localizedDescription)
+                print(error)
                 fatalError(error.localizedDescription)
             }
         case .ethereum:

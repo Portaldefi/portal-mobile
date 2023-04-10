@@ -8,6 +8,7 @@
 import Foundation
 
 struct RecomendedFees: Codable {
+    // FIXME: The actual values suppose to be Ints, however string formattesrs we use for UI need Int extensions
     let fastestFee: Decimal
     let halfHourFee: Decimal
     let hourFee: Decimal
