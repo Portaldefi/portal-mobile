@@ -48,11 +48,12 @@ class ChannelPersister: Persist {
         do {
            let data = try NSKeyedArchiver.archivedData(
                withRootObject: channelMonitor,
-               requiringSecureCoding: false
+               requiringSecureCoding: true
            )
-           try data.write(to: pathToPersist)
+            try data.write(to: pathToPersist, options: [.atomic, .completeFileProtection])
         } catch {
-           throw error
+            print("failed to persist channel monitor")
+            throw error
         }
     }
 }
