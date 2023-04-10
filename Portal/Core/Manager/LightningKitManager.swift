@@ -30,30 +30,13 @@ class LightningKitManager: ILightningKitManager {
         instance.usableChannels
     }
     
-    private var arangurenPeer: Peer {
-        let name = "aranguren.org"
-        let pubKey = "038863cf8ab91046230f561cd5b386cbff8309fa02e3f0c3ed161a3aeb64a643b9"
-        let host = "203.132.94.196"
-        let port: UInt16 = 9735
-                
-        return Peer(
-            peerPubKey: pubKey,
-            name: name,
-            connectionInformation: .init(hostname: host, port: port)
-        )
+    var activePeersPublisher: AnyPublisher<[String], Never> {
+        instance.connectedPeers
     }
     
-    private var strangeironPeer: Peer {
-        let name = "STRANGEIRON"
-        let pubKey = "0225ff2ae6a3d9722b625072503c2f64f6eddb78d739379d2ee55a16b3b0ed0a17"
-        let host = "203.132.94.196"
-        let port: UInt16 = 19735
-                
-        return Peer(
-            peerPubKey: pubKey,
-            name: name,
-            connectionInformation: .init(hostname: host, port: port)
-        )
+    var transactionsPublisher: AnyPublisher<[TransactionRecord], Never> {
+        let payments = fileManager.getPayments().map{ TransactionRecord(payment: $0)}
+        return Just(payments).eraseToAnyPublisher()
     }
     
     var channelBalance: Decimal {
