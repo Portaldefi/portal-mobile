@@ -9,6 +9,25 @@ import Foundation
 import LightningDevKit
 
 actor PendingEventTracker {
+    enum NodeEvent {
+        case paymentReceived
+        case paymentClaimed
+        case paymentSent
+        case paymentFailed
+        case paymentPathSuccessful
+        case paymentPathFailed
+        case probeSuccessful
+        case probeFailed
+        case pendingHTLCsForwardable
+        case spendableOutputs
+        case paymentForwarded
+        case channelClosed
+        case discardFunding
+        case openChannelRequest
+        case htlcHandlingFailed
+        case fundingGenerationReady
+    }
+    
     private(set) var pendingManagerEvents: [Event] = []
     private(set) var continuations: [CheckedContinuation<Void, Never>] = []
     private(set) var eventContinuations: [AsyncStream<Event>.Continuation] = []
@@ -23,7 +42,7 @@ actor PendingEventTracker {
         self.eventContinuations.append(continuation)
     }
     
-    private func triggerContinuations(){
+    private func triggerContinuations() {
         let continuations = self.continuations
         self.continuations.removeAll()
         for currentContinuation in continuations {
@@ -49,27 +68,69 @@ actor PendingEventTracker {
         }
     }
     
-    func getCount() -> Int {
-        return self.pendingManagerEvents.count
-    }
-    
-    func getEvents() -> [Event] {
-        return self.pendingManagerEvents
-    }
-    
-    func getAndClearEvents() -> [Event]{
-        let events = self.pendingManagerEvents
+    private func getEventAndClear() -> Event {
+        let event = self.pendingManagerEvents[0]
         self.pendingManagerEvents.removeAll()
-        return events
+        return event
     }
     
-    func awaitAddition() async {
+    private func waitForNextEvent() {
+        pendingManagerEvents.removeAll()
+    }
+    
+    private func awaitAddition() async {
         await withCheckedContinuation({ continuation in
-            self.continuations.append(continuation)
+            continuations.append(continuation)
         })
+    }
+    
+    func await(events: [NodeEvent], timeout: TimeInterval) async -> Event? {
+        let timeoutDate = Date(timeIntervalSinceNow: timeout)
+        
+        while timeoutDate >= Date() {
+            if !pendingManagerEvents.isEmpty {
+                let event = pendingManagerEvents[0]
+                
+                if let eventType = event.getValueType() {
+                    print("Received event in await: \(eventType)")
+                }
+                
+                let eventType: PendingEventTracker.NodeEvent?
+                
+                if event.getValueAsPaymentPathSuccessful() != nil { eventType = .paymentPathSuccessful }
+                else if event.getValueAsPaymentPathFailed() != nil { eventType = .paymentPathFailed }
+                else if event.getValueAsPaymentFailed() != nil { eventType = .paymentFailed }
+                else if event.getValueAsPaymentClaimed() != nil { eventType = .paymentClaimed }
+                else if event.getValueAsPaymentReceived() != nil { eventType = .paymentReceived }
+                else if event.getValueAsPaymentSent() != nil { eventType = .paymentSent }
+                else if event.getValueAsProbeSuccessful() != nil { eventType = .probeSuccessful }
+                else if event.getValueAsProbeFailed() != nil { eventType = .probeFailed }
+                else if event.getValueAsPendingHTLCsForwardable() != nil { eventType = .pendingHTLCsForwardable }
+                else if event.getValueAsHTLCHandlingFailed() != nil { eventType = .htlcHandlingFailed }
+                else if event.getValueAsSpendableOutputs() != nil { eventType = .spendableOutputs }
+                else if event.getValueAsPaymentForwarded() != nil { eventType = .paymentForwarded }
+                else if event.getValueAsChannelClosed() != nil { eventType = .channelClosed }
+                else if event.getValueAsDiscardFunding() != nil { eventType = .discardFunding }
+                else if event.getValueAsOpenChannelRequest() != nil { eventType = .openChannelRequest }
+                else if event.getValueAsFundingGenerationReady() != nil { eventType = .fundingGenerationReady }
+                else { eventType = nil }
+                
+                if let eventType = eventType, events.contains(eventType) {
+                    return getEventAndClear()
+                } else {
+                    waitForNextEvent()
+                }
+            }
+            await awaitAddition()
+        }
+        // in case of timeout
+        print("Timeout ")
+        return nil
     }
     
     func subscribe() -> AsyncStream<Event> {
         eventPublisher
     }
 }
+
+
