@@ -43,7 +43,7 @@ class WalletItemViewModel: ObservableObject {
         self.balanceString = "\(balanceAdapter.balance)"
         self.valueString = 0.usdFormatted()
                 
-        self.updateBalanceTimer.eventHandler = { [unowned self] in
+        self.updateBalanceTimer.eventHandler = {
             DispatchQueue.main.async {
                 self.updateBalance()
             }

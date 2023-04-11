@@ -20,6 +20,8 @@ class TransactionDetailsViewModel: ObservableObject {
     
     let coin: Coin
     let transaction: TransactionRecord
+    let ticker: TickerModel?
+    
     @Published var blockChainHeight: Int32 = 0
     
     @Published var editingNotes = false
@@ -53,7 +55,14 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     var currencyAmountString: String {
-        "1.29"
+        guard let amount = transaction.amount else { return "0" }
+        
+        switch coin.type {
+        case .bitcoin, .lightningBitcoin:
+            return (Decimal(ticker?.price ?? 1) * (amount/100_000_000)).double.usdFormatted()
+        case .ethereum, .erc20:
+            return (Decimal(ticker?.price ?? 1) * amount).double.usdFormatted()
+        }
     }
     
     var recipientString: String? {
@@ -102,8 +111,9 @@ class TransactionDetailsViewModel: ObservableObject {
     
     private var subscriptions = Set<AnyCancellable>()
     
-    init(coin: Coin, tx: TransactionRecord, blockChainHeight: Int32) {
+    init(coin: Coin, ticker: TickerModel?, tx: TransactionRecord, blockChainHeight: Int32) {
         self.coin = coin
+        self.ticker = ticker
         self.storage = UserDefaults.standard
         self.transaction = tx
         self.blockChainHeight = blockChainHeight
@@ -137,6 +147,15 @@ extension TransactionDetailsViewModel {
     static func config(coin: Coin, tx: TransactionRecord) -> TransactionDetailsViewModel {
         let adapterManager: IAdapterManager = Container.adapterManager()
         let walletManager: IWalletManager = Container.walletManager()
+        let marketData = Container.marketData()
+        let ticker: TickerModel?
+        
+        switch coin.type {
+        case .bitcoin, .lightningBitcoin:
+            ticker = marketData.btcTicker
+        case .ethereum, .erc20:
+            ticker = marketData.ethTicker
+        }
 
         guard
             let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
@@ -145,7 +164,7 @@ extension TransactionDetailsViewModel {
             fatalError("coudn't fetch dependencies")
         }
 
-        return TransactionDetailsViewModel(coin: coin, tx: tx, blockChainHeight: adapter.blockchainHeight)
+        return TransactionDetailsViewModel(coin: coin, ticker: ticker, tx: tx, blockChainHeight: adapter.blockchainHeight)
     }
 }
 
