@@ -8,9 +8,16 @@
 import SwiftUI
 import PortalUI
 
+struct ViewHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat { 0 }
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value = value + nextValue()
+    }
+}
+
 struct SetRecipientView: View {
-    @State private var textHeight: CGFloat = 60
     @State private var showScanner = false
+    @State var textEditorHeight : CGFloat = 0
     @ObservedObject var viewModel: SendViewViewModel
     @EnvironmentObject private var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
@@ -61,14 +68,30 @@ struct SetRecipientView: View {
                             .foregroundColor(Palette.grayScaleCA)
                         
                         ZStack(alignment: .leading) {
+                            // Workaround issue with TextEditor being resized wrong on going back in navigation stack
+                            // .fixedSize(horizontal: false, vertical: true)
+                            Text(viewModel.receiverAddress)
+                                .font(.Main.fixed(.monoRegular, size: 16))
+                                .foregroundColor(.clear)
+                                .padding(10)
+                                .background(
+                                    GeometryReader {
+                                        Color.clear.preference(
+                                            key: ViewHeightKey.self,
+                                            value: $0.frame(in: .local).size.height + 4
+                                        )
+                                    }
+                                )
+                            //
+                            
                             TextEditor(text: $viewModel.receiverAddress)
                                 .hideBackground()
                                 .disableAutocorrection(true)
                                 .textInputAutocapitalization(.never)
                                 .font(.Main.fixed(.monoRegular, size: 16))
                                 .foregroundColor(textEditorInputColor)
+                                .frame(height: max(40, textEditorHeight))
                                 .padding(8)
-                                .fixedSize(horizontal: false, vertical: true)
                             
                             if viewModel.receiverAddress.isEmpty {
                                 Text("Enter address")
@@ -77,6 +100,9 @@ struct SetRecipientView: View {
                                     .padding(16)
                                     .allowsHitTesting(false)
                             }
+                        }
+                        .onPreferenceChange(ViewHeightKey.self) {
+                            textEditorHeight = $0
                         }
                         .background(
                             RoundedRectangle(cornerRadius: 12)
