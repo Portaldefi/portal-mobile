@@ -17,10 +17,11 @@ final class MarketDataService {
     private(set) var ethTicker: TickerModel?
     private(set) var fiatCurrencies = [FiatCurrency]()
     
-    private let timer: RepeatingTimer
     private let jsonDecoder: JSONDecoder
     private let configProvider: IAppConfigProvider
     private var socket: WebSocket?
+    private let updateThreshold: TimeInterval = 60
+    private var lastUpdated = Date(timeIntervalSinceNow: -3)
     private var subscriptions = Set<AnyCancellable>()
     
     var onMarketDataUpdate = PassthroughSubject<Void, Never>()
@@ -40,12 +41,6 @@ final class MarketDataService {
     init(jsonDecoder: JSONDecoder = JSONDecoder(), configProvider: IAppConfigProvider) throws {
         self.jsonDecoder = jsonDecoder
         self.configProvider = configProvider
-        
-        self.timer = RepeatingTimer(timeInterval: Double(configProvider.pricesUpdateInterval) * 3)
-        
-        self.timer.eventHandler = { [unowned self] in
-            self.onMarketDataUpdate.send(())
-        }
         
         try setupSocket(url: configProvider.rafaSocketUrl, key: configProvider.rafaToken)
         connectSocket()
@@ -81,12 +76,25 @@ final class MarketDataService {
         guard let dataFromSocketString = string.data(using: String.Encoding.utf8, allowLossyConversion: false) else { return }
         
         if let results = try? jsonDecoder.decode([TickerModel].self, from: dataFromSocketString), !results.isEmpty {
-            if let updatedBtcTicker = results.first(where: { $0.ticker_id == btcTickerID as? String }) {
-                btcTicker = updatedBtcTicker
-            }
-            
-            if let updatedEthTicker = results.first(where: { $0.ticker_id == ethTickerID as? String }) {
-                ethTicker = updatedEthTicker
+            if btcTicker == nil || ethTicker == nil {
+                if let updatedBtcTicker = results.first(where: { $0.ticker_id == btcTickerID as? String }) {
+                    btcTicker = updatedBtcTicker
+                }
+                
+                if let updatedEthTicker = results.first(where: { $0.ticker_id == ethTickerID as? String }) {
+                    ethTicker = updatedEthTicker
+                }
+            } else if Date() > lastUpdated {
+                if let updatedBtcTicker = results.first(where: { $0.ticker_id == btcTickerID as? String }) {
+                    btcTicker = updatedBtcTicker
+                }
+                
+                if let updatedEthTicker = results.first(where: { $0.ticker_id == ethTickerID as? String }) {
+                    ethTicker = updatedEthTicker
+                }
+                
+                lastUpdated = Date(timeIntervalSinceNow: updateThreshold)
+                onMarketDataUpdate.send(())
             }
         }
     }
@@ -131,11 +139,11 @@ final class MarketDataService {
 
 extension MarketDataService: IMarketDataRepository {
     func pause() {
-        timer.suspend()
+        
     }
     
     func resume() {
-        timer.resume()
+        
     }
 }
 
@@ -166,6 +174,7 @@ extension MarketDataService: WebSocketDelegate {
 
 extension MarketDataService {
     private class MarketDataMocked: IMarketDataRepository {
+        var ethTicker: TickerModel?
         var onMarketDataUpdate = PassthroughSubject<Void, Never>()
         var btcTicker: TickerModel?
         var fiatCurrencies: [FiatCurrency] = []
