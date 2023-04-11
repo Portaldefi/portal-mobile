@@ -85,7 +85,8 @@ class AccountViewModel: ObservableObject {
         marketData
             .onMarketDataUpdate
             .receive(on: RunLoop.main)
-            .sink { _ in
+            .sink { [unowned self] _ in
+                guard !self.goToSend && !self.goToReceive else { return }
                 self.updateValue()
             }
             .store(in: &subscriptions)
