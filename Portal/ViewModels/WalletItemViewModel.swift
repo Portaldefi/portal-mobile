@@ -16,21 +16,12 @@ class WalletItemViewModel: ObservableObject {
     
     private var subscriptions = Set<AnyCancellable>()
     private var marketData: IMarketDataRepository
-    private let timer = RepeatingTimer(timeInterval: 1)
+    private let updateBalanceTimer = RepeatingTimer(timeInterval: 1)
         
-    @Published var balance: Decimal
-    @Published var balanceString: String
+    private(set) var balance: Decimal
     
-    var valueString: String {
-        switch coin.type {
-        case .bitcoin:
-            return (value*balance).double.usdFormatted()
-        case .lightningBitcoin:
-            return value.double.usdFormatted()
-        case .ethereum, .erc20:
-            return value.double.usdFormatted()
-        }
-    }
+    @Published var balanceString: String
+    @Published var valueString: String
     
     var value: Decimal {
         switch coin.type {
@@ -50,17 +41,49 @@ class WalletItemViewModel: ObservableObject {
         
         self.balance = balanceAdapter.balance
         self.balanceString = "\(balanceAdapter.balance)"
+        self.valueString = 0.usdFormatted()
                 
-        timer.eventHandler = { [unowned self] in
-            if self.balance != self.balanceAdapter.balance {
-                DispatchQueue.main.async {
-                    self.balance = self.balanceAdapter.balance
-                    self.balanceString = "\(self.balanceAdapter.balance)"
-                }
+        self.updateBalanceTimer.eventHandler = { [unowned self] in
+            DispatchQueue.main.async {
+                self.updateBalance()
             }
         }
         
-        timer.resume()
+        self.updateBalanceTimer.resume()
+        
+        self
+            .marketData
+            .onMarketDataUpdate
+            .receive(on: RunLoop.main)
+            .sink { [unowned self] _ in
+                self.updateValue()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    private func updateBalance() {
+        if balance != balanceAdapter.balance {
+            balance = balanceAdapter.balance
+            balanceString = "\(balanceAdapter.balance)"
+            updateValue()
+        }
+    }
+    
+    private func updateValue() {
+        guard let btcUSDPrice = marketData.btcTicker?.price else { return }
+
+        let _valueString: String
+        
+        switch coin.type {
+        case .bitcoin, .lightningBitcoin:
+            _valueString = (Decimal(btcUSDPrice) * balance).double.usdFormatted()
+        case .ethereum, .erc20:
+            _valueString = (Decimal(marketData.ethTicker?.price ?? 1) * balance).double.usdFormatted()
+        }
+        
+        if valueString != _valueString {
+            valueString = _valueString
+        }
     }
 }
 
