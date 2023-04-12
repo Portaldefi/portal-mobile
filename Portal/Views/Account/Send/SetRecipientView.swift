@@ -205,7 +205,13 @@ struct SetRecipientView: View {
                         return
                     }
                     guard !viewModel.receiverAddress.isEmpty else { return }
-                    navigation.push(.sendSetAmount(viewModel: viewModel))
+                    
+                    switch item.type {
+                    case .bip21, .eth:
+                        navigation.push(.sendSetAmount(viewModel: viewModel))
+                    default: break
+                    }
+                    
                     navigation.push(.sendReviewTxView(viewModel: viewModel))
                 }
             }

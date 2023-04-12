@@ -37,14 +37,22 @@ struct QRCodeReaderView: View {
                 }
                 
                 guard viewModel.hasAmount(item: item) else {
-                    navigation.push(.sendSetRecipient(viewModel: viewModel), animated: false)
+                    switch item.type {
+                    case .bip21, .eth:
+                        navigation.push(.sendSetRecipient(viewModel: viewModel), animated: false)
+                    default: break
+                    }
                     navigation.push(.sendSetAmount(viewModel: viewModel))
                     return
                 }
                                     
                 guard !viewModel.receiverAddress.isEmpty else { return }
                 navigation.push(.sendSetRecipient(viewModel: viewModel), animated: false)
-                navigation.push(.sendSetAmount(viewModel: viewModel), animated: false)
+                switch item.type {
+                case .bip21, .eth:
+                    navigation.push(.sendSetAmount(viewModel: viewModel), animated: false)
+                default: break
+                }
                 navigation.push(.sendReviewTxView(viewModel: viewModel))
             case .send:
                 completion(item)
