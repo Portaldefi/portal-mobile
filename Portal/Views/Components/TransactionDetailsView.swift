@@ -29,7 +29,7 @@ struct TransactionDetailsView: View {
 
                     VStack(spacing: 0) {
                         if let recipient = viewModel.recipientString {
-                            TxRecipientView(recipient: recipient.turnicated.lowercased())
+                            TxRecipientView(recipient: recipient.turnicated(grouppedBy: 4))
                         }
                         
                         Divider()
@@ -49,12 +49,12 @@ struct TransactionDetailsView: View {
                                     .foregroundColor(Palette.grayScaleAA)
                                 Spacer()
                                 VStack(alignment: .trailing, spacing: 8) {
-                                    Text(viewModel.transaction.preimage!.turnicated.lowercased())
+                                    Text(viewModel.transaction.preimage!.turnicated(grouppedBy: 4))
                                         .font(.Main.fixed(.monoRegular, size: 16))
                                         .foregroundColor(Palette.grayScaleF4)
                                 }
                             }
-                            .frame(height: 79)
+                            .frame(height: 52)
                             
                             Divider()
                             
@@ -64,12 +64,12 @@ struct TransactionDetailsView: View {
                                     .foregroundColor(Palette.grayScaleAA)
                                 Spacer()
                                 VStack(alignment: .trailing, spacing: 8) {
-                                    Text(viewModel.transaction.nodeId?.turnicated.lowercased() ?? "-")
+                                    Text(viewModel.transaction.nodeId?.turnicated(grouppedBy: 4) ?? "-")
                                         .font(.Main.fixed(.monoRegular, size: 16))
                                         .foregroundColor(Palette.grayScaleF4)
                                 }
                             }
-                            .frame(height: 79)
+                            .frame(height: 52)
                             
                             Divider()
                         }

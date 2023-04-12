@@ -21,7 +21,7 @@ struct TxRecipientView: View {
                 .font(.Main.fixed(.monoRegular, size: 16))
                 .foregroundColor(Palette.grayScaleF4)
         }
-        .frame(height: 72)
+        .frame(height: 52)
     }
 }
 

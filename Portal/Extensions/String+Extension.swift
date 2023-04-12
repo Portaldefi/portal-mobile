@@ -51,6 +51,10 @@ extension String {
         return output
     }
     
+    func turnicated(grouppedBy: Int) -> String {
+        "\(self.prefix(grouppedBy)) ... \(self.suffix(grouppedBy))"
+    }
+    
     func hexStringToBytes() -> [UInt8]? {
         let hexStr = self.dropFirst(self.hasPrefix("0x") ? 2 : 0)
 

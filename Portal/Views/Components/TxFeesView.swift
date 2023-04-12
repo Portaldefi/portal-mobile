@@ -38,7 +38,7 @@ struct TxFeesView: View {
             }
             .foregroundColor(Palette.grayScaleF4)
         }
-        .frame(height: 72)
+        .frame(height: 52)
     }
 }
 
