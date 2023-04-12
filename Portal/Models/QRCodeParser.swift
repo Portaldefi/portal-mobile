@@ -32,10 +32,6 @@ struct QRCodeParser {
     }
         
     static func parse(code: String) -> [QRCodeItem] {
-        guard let _ = try? Address(address: code) else {
-            return [QRCodeItem.bip21(address: code)]
-        }
-
         guard
             let url = URL(string: code),
             let components = URLComponents(url: url, resolvingAgainstBaseURL: false)

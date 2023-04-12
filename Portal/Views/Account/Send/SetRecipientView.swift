@@ -200,30 +200,11 @@ struct SetRecipientView: View {
         .sheet(isPresented: $showScanner) {
             if let coin = viewModel.coin {
                 QRCodeReaderView(config: .send(coin)) { item in
-                    let address: String
-                    let amount: String?
-                    
-                    switch item.type {
-                    case .bip21(let adr, let amt, _):
-                        address = adr
-                        amount = amt
-                    case .eth(let adr, let amt, _):
-                        address = adr
-                        amount = amt
-                    default:
-                        address = String()
-                        amount = nil
-                    }
-                    
-                    viewModel.receiverAddress = address
-                    
-                    guard let amt = amount else {
+                    guard viewModel.hasAmount(item: item) else {
                         navigation.push(.sendSetAmount(viewModel: viewModel))
                         return
                     }
-                    
-                    viewModel.exchanger?.amount.string = amt
-                    
+                    guard !viewModel.receiverAddress.isEmpty else { return }
                     navigation.push(.sendSetAmount(viewModel: viewModel))
                     navigation.push(.sendReviewTxView(viewModel: viewModel))
                 }

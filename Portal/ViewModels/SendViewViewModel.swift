@@ -358,6 +358,41 @@ class SendViewViewModel: ObservableObject {
             }
         }
     }
+    
+    func hasAmount(item: QRCodeItem) -> Bool {
+        switch item.type {
+        case .bip21(let address, let amount, _):
+            receiverAddress = address
+            if let amount = amount {
+                exchanger?.amount.string = amount
+                return true
+            }
+            return false
+        case .eth(let address, let amount, _):
+            receiverAddress = address
+            if let amount = amount {
+                exchanger?.amount.string = amount
+                return true
+            }
+            return false
+        case .bolt11(let invoice):
+            receiverAddress = invoice
+            do {
+                let result = try validateInput()
+                switch result {
+                case .lightningInvoice(let amount):
+                    exchanger?.amount.string = amount
+                    return true
+                default:
+                    return false
+                }
+            } catch {
+                return false
+            }
+        default:
+            return false
+        }
+    }
 }
 
 extension SendViewViewModel {

@@ -28,39 +28,24 @@ struct QRCodeReaderView: View {
         QRCodeScannerView(config: config) { item in
             switch config {
             case .universal:
-                let vm = Container.sendViewModel()
-                vm.qrCodeItem = item
-            
-                let address: String
-                let amount: String?
+                let viewModel = Container.sendViewModel()
                 
-                switch item.type {
-                case .bip21(let adr, let amt, _):
-                    address = adr
-                    amount = amt
-                    vm.coin = .bitcoin()
-                case .eth(let adr, let amt, _):
-                    address = adr
-                    amount = amt
-                    vm.coin = .ethereum()
-                default:
-                    address = String()
-                    amount = nil
+                if case .eth = item.type {
+                    viewModel.coin = .ethereum()
+                } else {
+                    viewModel.coin = .bitcoin()
                 }
                 
-                vm.receiverAddress = address
-                
-                guard let amt = amount else {
-                    navigation.push(.sendSetRecipient(viewModel: vm), animated: false)
-                    navigation.push(.sendSetAmount(viewModel: vm))
+                guard viewModel.hasAmount(item: item) else {
+                    navigation.push(.sendSetRecipient(viewModel: viewModel), animated: false)
+                    navigation.push(.sendSetAmount(viewModel: viewModel))
                     return
                 }
-                
-                vm.exchanger?.amount.string = amt
-                
-                navigation.push(.sendSetRecipient(viewModel: vm), animated: false)
-                navigation.push(.sendSetAmount(viewModel: vm), animated: false)
-                navigation.push(.sendReviewTxView(viewModel: vm))
+                                    
+                guard !viewModel.receiverAddress.isEmpty else { return }
+                navigation.push(.sendSetRecipient(viewModel: viewModel), animated: false)
+                navigation.push(.sendSetAmount(viewModel: viewModel), animated: false)
+                navigation.push(.sendReviewTxView(viewModel: viewModel))
             case .send:
                 completion(item)
                 presentation.wrappedValue.dismiss()
