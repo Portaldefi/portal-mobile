@@ -10,7 +10,7 @@ import LightningDevKit
 
 actor PendingEventTracker {
     enum NodeEvent {
-        case paymentReceived
+        case paymentClaimable
         case paymentClaimed
         case paymentSent
         case paymentFailed
@@ -90,23 +90,18 @@ actor PendingEventTracker {
         while timeoutDate >= Date() {
             if !pendingManagerEvents.isEmpty {
                 let event = pendingManagerEvents[0]
-                
-                if let eventType = event.getValueType() {
-                    print("Received event in await: \(eventType)")
-                }
-                
                 let eventType: PendingEventTracker.NodeEvent?
                 
                 if event.getValueAsPaymentPathSuccessful() != nil { eventType = .paymentPathSuccessful }
                 else if event.getValueAsPaymentPathFailed() != nil { eventType = .paymentPathFailed }
                 else if event.getValueAsPaymentFailed() != nil { eventType = .paymentFailed }
                 else if event.getValueAsPaymentClaimed() != nil { eventType = .paymentClaimed }
-                else if event.getValueAsPaymentReceived() != nil { eventType = .paymentReceived }
+                else if event.getValueAsPaymentClaimable() != nil { eventType = .paymentClaimable }
                 else if event.getValueAsPaymentSent() != nil { eventType = .paymentSent }
                 else if event.getValueAsProbeSuccessful() != nil { eventType = .probeSuccessful }
                 else if event.getValueAsProbeFailed() != nil { eventType = .probeFailed }
-                else if event.getValueAsPendingHTLCsForwardable() != nil { eventType = .pendingHTLCsForwardable }
-                else if event.getValueAsHTLCHandlingFailed() != nil { eventType = .htlcHandlingFailed }
+                else if event.getValueAsPendingHtlcsForwardable() != nil { eventType = .pendingHTLCsForwardable }
+                else if event.getValueAsHtlcHandlingFailed() != nil { eventType = .htlcHandlingFailed }
                 else if event.getValueAsSpendableOutputs() != nil { eventType = .spendableOutputs }
                 else if event.getValueAsPaymentForwarded() != nil { eventType = .paymentForwarded }
                 else if event.getValueAsChannelClosed() != nil { eventType = .channelClosed }

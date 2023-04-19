@@ -333,6 +333,42 @@ public class Node {
         
         return nil
     }
+    
+    //MARK: - Create invoice
+    public func createInvoice(paymentHash: String, satAmount: UInt64) async -> String? {
+        guard let channelManager = channelManager, let keyInterface = keysManager else {
+            return nil
+        }
+        
+        let mSatAmount: UInt64 = satAmount * 1000
+                
+        let result = Bindings.createInvoiceFromChannelmanagerAndDurationSinceEpochWithPaymentHash(
+            channelmanager: channelManager,
+            nodeSigner: keyInterface.asNodeSigner(),
+            logger: logger,
+            network: .Regtest,
+            amtMsat: mSatAmount,
+            description: String(),
+            durationSinceEpoch: UInt64(Date().timeIntervalSince1970),
+            invoiceExpiryDeltaSecs: 86400,
+            paymentHash: paymentHash.toByteArray(),
+            minFinalCltvExpiryDelta: nil
+        )
+        
+        if result.isOk(), let invoice = result.getValue() {
+            let invoiceString = invoice.toStr()
+            print("================================")
+            print("INVOICE: \(invoiceString), paymentHash: \(invoice.paymentHash()?.toHexString()), secret: \(invoice.paymentSecret()?.toHexString())")
+            print("================================")
+            
+            return invoiceString
+        } else if let error = result.getError() {
+            print(error.toStr())
+            return nil
+        }
+        
+        return nil
+    }
     //MARK: - Pay invoice
     public func pay(invoice: Invoice) async throws -> LightningPayment {
         guard let payer = channelManagerConstructor?.payer else {
