@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/horizontalsystems/EvmKit.Swift",
       "state" : {
-        "revision" : "a62292574eaca3e5c7826b6a42d8ca6809ecf83d",
-        "version" : "1.1.1"
+        "revision" : "b1f2ff596800c1da79bfa4708cfc0f07d9c5189f",
+        "version" : "1.1.5"
       }
     },
     {
@@ -86,8 +86,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hmlongco/Factory",
       "state" : {
-        "revision" : "ca5788b8621b185a0fbe6ef05bb9a73b3ef2833f",
-        "version" : "1.2.9"
+        "revision" : "39ff6a675cd0272d833d184d35add0f8fddd63de",
+        "version" : "1.3.7"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/horizontalsystems/HdWalletKit.Swift.git",
       "state" : {
-        "revision" : "55cdcf63662b49fe25f261d4e864dfd2e458ea8f",
-        "version" : "1.1.0"
+        "revision" : "7bb79460aaf88128d1fc05c5a0f5e546c0076942",
+        "version" : "1.2.1"
       }
     },
     {
@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/horizontalsystems/HsCryptoKit.Swift.git",
       "state" : {
-        "revision" : "52ef372b9c094cb202e317fba9516bca87a88c08",
-        "version" : "1.1.0"
+        "revision" : "cb8ea740733e96e6d70b84373a49656ef82b6ce7",
+        "version" : "1.2.1"
       }
     },
     {
@@ -131,8 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/horizontalsystems/HsExtensions.Swift.git",
       "state" : {
-        "revision" : "360db9624dcf720452ccf11c421cd0fb4f5be6b2",
-        "version" : "1.0.0"
+        "revision" : "0012014f98ae81ffb89b0d3a2e9c204559e1c278",
+        "version" : "1.0.6"
       }
     },
     {
@@ -140,8 +140,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/horizontalsystems/HsToolKit.Swift.git",
       "state" : {
-        "revision" : "79aa4968b2436b0b4735bd9278c351c1142f7035",
-        "version" : "1.0.0"
+        "revision" : "3888ed1304bed03c2f93e531935a268296555690",
+        "version" : "1.0.6"
       }
     },
     {
@@ -150,7 +150,7 @@
       "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
       "state" : {
         "branch" : "master",
-        "revision" : "6299daec1d74be12164fec090faf9ed14d0da9d6"
+        "revision" : "ecb18d8ce4d88277cc4fb103973352d91e18c535"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/onevcat/Kingfisher",
       "state" : {
-        "revision" : "44e891bdb61426a95e31492a67c7c0dfad1f87c5",
-        "version" : "7.4.1"
+        "revision" : "af4be924ad984cf4d16f4ae4df424e79a443d435",
+        "version" : "7.6.2"
       }
     },
     {
@@ -185,8 +185,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/PopupView.git",
       "state" : {
-        "revision" : "ee306aede532d941c05ff8c63b3b0f3b8cc208cc",
-        "version" : "2.0.1"
+        "revision" : "1ee6f91fe06ed2c1bdc7ebdae5073a2a8da73807",
+        "version" : "2.1.3"
       }
     },
     {
@@ -210,10 +210,10 @@
     {
       "identity" : "secp256k1.swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Boilertalk/secp256k1.swift.git",
+      "location" : "https://github.com/GigaBitcoin/secp256k1.swift.git",
       "state" : {
-        "revision" : "cd187c632fb812fd93711a9f7e644adb7e5f97f0",
-        "version" : "0.1.7"
+        "revision" : "48fb20fce4ca3aad89180448a127d5bc16f0e44c",
+        "version" : "0.10.0"
       }
     },
     {
@@ -230,8 +230,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-atomics.git",
       "state" : {
-        "revision" : "ff3d2212b6b093db7f177d0855adbc4ef9c5f036",
-        "version" : "1.0.3"
+        "revision" : "6c89474e62719ddcc1e9614989fff2f68208fe10",
+        "version" : "1.1.0"
       }
     },
     {
@@ -248,8 +248,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-crypto.git",
       "state" : {
-        "revision" : "92a04c10fc5ce0504f8396aac7392126033e547c",
-        "version" : "2.2.2"
+        "revision" : "33a20e650c33f6d72d822d558333f2085effa3dc",
+        "version" : "2.5.0"
       }
     },
     {
@@ -257,8 +257,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-nio.git",
       "state" : {
-        "revision" : "e855380cb5234e96b760d93e0bfdc403e381e928",
-        "version" : "2.45.0"
+        "revision" : "e0cc6dd6ffa8e6a6f565938acd858b24e47902d0",
+        "version" : "2.50.0"
       }
     },
     {
@@ -266,8 +266,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-nio-ssl.git",
       "state" : {
-        "revision" : "4fb7ead803e38949eb1d6fabb849206a72c580f3",
-        "version" : "2.23.0"
+        "revision" : "9d0d5d8798a576fbf674a823734e65e15ca5f2ec",
+        "version" : "2.23.1"
       }
     }
   ],
