@@ -76,7 +76,7 @@ final class MarketDataService {
         guard let dataFromSocketString = string.data(using: String.Encoding.utf8, allowLossyConversion: false) else { return }
         
         if let results = try? jsonDecoder.decode([TickerModel].self, from: dataFromSocketString), !results.isEmpty {
-            if btcTicker == nil || ethTicker == nil {
+            if btcTicker == nil || ethTicker == nil || btcTicker?.price == nil || ethTicker?.price == nil {
                 if let updatedBtcTicker = results.first(where: { $0.ticker_id == btcTickerID as? String }) {
                     btcTicker = updatedBtcTicker
                 }
@@ -94,6 +94,7 @@ final class MarketDataService {
                 }
                 
                 lastUpdated = Date(timeIntervalSinceNow: updateThreshold)
+                print("Send on market data update")
                 onMarketDataUpdate.send(())
             }
         }
