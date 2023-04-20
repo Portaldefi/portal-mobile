@@ -165,10 +165,10 @@
     {
       "identity" : "ldk-swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/lightningdevkit/ldk-swift",
+      "location" : "https://github.com/lightningdevkit/ldk-swift/",
       "state" : {
-        "revision" : "60e47c7d2e01a4324707f8f86d9d213619cf10e6",
-        "version" : "0.0.110"
+        "revision" : "3eea818577a52e379edf7af102eb85f6aa654d41",
+        "version" : "0.0.114"
       }
     },
     {
@@ -185,8 +185,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/PopupView.git",
       "state" : {
-        "revision" : "ee306aede532d941c05ff8c63b3b0f3b8cc208cc",
-        "version" : "2.0.1"
+        "revision" : "d786b3c93f4af79c501250c8c4ead875a600ee89",
+        "version" : "2.1.4"
       }
     },
     {
