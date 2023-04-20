@@ -174,6 +174,8 @@
 		758DFC7E294B65BA00AB35CC /* EthereumAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758DFC7D294B65BA00AB35CC /* EthereumAdapter.swift */; };
 		758DFC85294B6A7600AB35CC /* TransactionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758DFC84294B6A7600AB35CC /* TransactionRecord.swift */; };
 		75CC43AF2913CBC300B15008 /* SingleTxViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CC43AE2913CBC300B15008 /* SingleTxViewModel.swift */; };
+		75D2ED0329717F21005C8CF1 /* SwapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D2ED0229717F21005C8CF1 /* SwapView.swift */; };
+		75D2ED052971B293005C8CF1 /* SwapReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D2ED042971B293005C8CF1 /* SwapReviewView.swift */; };
 		75D8C59228D8867600228298 /* IAccountStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59128D8867600228298 /* IAccountStorage.swift */; };
 		75D8C59628D88A1100228298 /* IAppConfigProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59528D88A1100228298 /* IAppConfigProvider.swift */; };
 		75D8C59828D88A5600228298 /* AppConfigProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C59728D88A5600228298 /* AppConfigProvider.swift */; };
@@ -361,6 +363,8 @@
 		758DFC7D294B65BA00AB35CC /* EthereumAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EthereumAdapter.swift; sourceTree = "<group>"; };
 		758DFC84294B6A7600AB35CC /* TransactionRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionRecord.swift; sourceTree = "<group>"; };
 		75CC43AE2913CBC300B15008 /* SingleTxViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleTxViewModel.swift; sourceTree = "<group>"; };
+		75D2ED0229717F21005C8CF1 /* SwapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapView.swift; sourceTree = "<group>"; };
+		75D2ED042971B293005C8CF1 /* SwapReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapReviewView.swift; sourceTree = "<group>"; };
 		75D8C59128D8867600228298 /* IAccountStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAccountStorage.swift; sourceTree = "<group>"; };
 		75D8C59528D88A1100228298 /* IAppConfigProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAppConfigProvider.swift; sourceTree = "<group>"; };
 		75D8C59728D88A5600228298 /* AppConfigProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConfigProvider.swift; sourceTree = "<group>"; };
@@ -744,6 +748,36 @@
 				755170962948CEEE00CC84D7 /* AccountBackup */,
 				754218492992733B0028D5DF /* QRCodeReader */,
 				7542185229A39DEC0028D5DF /* Components */,
+				755170702935C81900CC84D7 /* RoundedCornerShape.swift */,
+				755C56D928EB090B00A4B57B /* TextFieldWrapper.swift */,
+				7551706E2935C76C00CC84D7 /* ClickableWordView.swift */,
+				7551707829364C5E00CC84D7 /* WordView.swift */,
+				756A3136288AEAAD004978E2 /* AssetDetailsView.swift */,
+				75772A6B2906B57200BE80B7 /* AmountValueView.swift */,
+				756A313228898C73004978E2 /* SingleTxView.swift */,
+				752A2D4F28A503B200BC6BE2 /* QRCodeScannerView.swift */,
+				75DFA55728BD010400F23E02 /* QRCodeReaderView.swift */,
+				4774D71D28B4B06200B7988B /* ActivityView.swift */,
+				479A7ACC28B778CA0057E100 /* WalletItemView.swift */,
+				75D8C5CB28E1B40300228298 /* AsyncImageView.swift */,
+				75D8C5CC28E1B40300228298 /* CoinImageView.swift */,
+				755C56B428E5D12900A4B57B /* TransactionDetailsView.swift */,
+				755C56CE28EACBC800A4B57B /* TxLabelsView.swift */,
+				755C56D028EACC4700A4B57B /* TxLabelView.swift */,
+				755C56CC28EACAC700A4B57B /* EditableTextFieldView.swift */,
+				755C56B628E5D46500A4B57B /* ConfirmationCounterView.swift */,
+				755C56B928E9B03000A4B57B /* TxAmountView.swift */,
+				755C56BB28E9B07E00A4B57B /* TxRecipientView.swift */,
+				755C56BD28E9B0B700A4B57B /* TxFeesView.swift */,
+				755C56BF28E9B0F600A4B57B /* TxIDView.swift */,
+				755C56C528EAAD7C00A4B57B /* TextEditorView.swift */,
+				75772A6128FEC0AD00BE80B7 /* AmountEditorView.swift */,
+				755C56CA28EACA9100A4B57B /* WrappedHStack.swift */,
+				755C56D628EACFD700A4B57B /* LabelsManagerView.swift */,
+				755C56E128EB0A1900A4B57B /* SelectableTxLabelView.swift */,
+				75772A652901795C00BE80B7 /* ActivityShareView.swift */,
+				75D2ED0229717F21005C8CF1 /* SwapView.swift */,
+				75D2ED042971B293005C8CF1 /* SwapReviewView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -976,6 +1010,7 @@
 				750C05DC29641B97005519FF /* RxSubscription.swift in Sources */,
 				75772A642901793300BE80B7 /* IdentifiableString.swift in Sources */,
 				758DFC85294B6A7600AB35CC /* TransactionRecord.swift in Sources */,
+				75D2ED052971B293005C8CF1 /* SwapReviewView.swift in Sources */,
 				750C05E329646803005519FF /* SendETHService.swift in Sources */,
 				755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */,
 				7545BC0928C211DA00ED92C3 /* View+Extension.swift in Sources */,
@@ -1024,6 +1059,7 @@
 				755C56D328EACC9000A4B57B /* TxLabel.swift in Sources */,
 				755C56C628EAAD7C00A4B57B /* TextEditorView.swift in Sources */,
 				755105F6294CA4AB00525A16 /* EthereumKitManager.swift in Sources */,
+				75D2ED0329717F21005C8CF1 /* SwapView.swift in Sources */,
 				750C05D629641B97005519FF /* Relays+Combine.swift in Sources */,
 				755170902948C7CD00CC84D7 /* SendRootView.swift in Sources */,
 				755170732935C96400CC84D7 /* RecoverPhraseViewModel.swift in Sources */,

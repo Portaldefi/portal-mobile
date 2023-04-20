@@ -17,7 +17,9 @@ struct Mainview: View {
         views = [
             AnyView(AccountRootView()),
             AnyView(EmptyView()),
-            AnyView(LightningStatstView())
+            AnyView(LightningStatstView()),
+//            AnyView(SwapView()),
+            AnyView(ActivityView())
         ]
     }
         
@@ -47,6 +49,31 @@ struct Mainview: View {
             .frame(width: 65)
             
             Spacer()
+            
+//            Button {
+//                viewState.openTab(.swap)
+//            } label: {
+//                if viewState.selectedTab == .swap {
+//                    RadialGradient.main
+//                        .mask(
+//                            VStack(spacing: 4) {
+//                                Asset.swapIcon
+//                                Text("Swap")
+//                                    .font(.Main.fixed(.bold, size: 14))
+//                            }
+//                        )
+//                } else {
+//                    VStack(spacing: 4) {
+//                        Asset.swapIcon
+//                        Text("Swap")
+//                            .font(.Main.fixed(.bold, size: 14))
+//                    }
+//                    .foregroundColor(Color.gray)
+//                }
+//            }
+//            .frame(width: 65)
+            
+//            Spacer()
             
             Button {
                 viewState.openTab(.activity)
