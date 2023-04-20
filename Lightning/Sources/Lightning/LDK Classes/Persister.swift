@@ -26,7 +26,7 @@ class Persister: LightningDevKit.Persister, ExtendedChannelManagerPersister {
     }
         
     override func persistGraph(networkGraph: Bindings.NetworkGraph) -> Bindings.Result_NoneErrorZ {
-        print("Persisting network graph from persister")
+        print("[PERSISTER] Persisting net graph")
         // do something to persist the graph
         let persistGraphResult = fileManager.persistGraph(graph: networkGraph.write())
 
@@ -34,25 +34,36 @@ class Persister: LightningDevKit.Persister, ExtendedChannelManagerPersister {
         case .success():
             return Result_NoneErrorZ.initWithOk()
         case .failure(_):
+            print("[PERSISTER] Persisting net graph FAILURE")
             return Result_NoneErrorZ.initWithErr(e: .WriteZero)
         }
     }
     
     override func persistManager(channelManager: Bindings.ChannelManager) -> Bindings.Result_NoneErrorZ {
+        print("[PERSISTER] Persisting channel manager")
         let persistChannelManagerResult = fileManager.persistChannelManager(manager: channelManager.write())
 
         switch persistChannelManagerResult {
         case .success():
             return Result_NoneErrorZ.initWithOk()
         case .failure(_):
-            print("persistChannelManager FAILURE")
+            print("[PERSISTER] Persisting channel manager FAILURE")
             return Result_NoneErrorZ.initWithErr(e: .WriteZero)
         }
     }
     
     override func persistScorer(scorer: LightningDevKit.Bindings.WriteableScore) -> LightningDevKit.Bindings.Result_NoneErrorZ {
-        let writtenScorrer = scorer.write()
-        return Result_NoneErrorZ.initWithOk()
+        print("[PERSISTER] Persisting scorer")
+
+        let persistScorerResult = fileManager.persistScorer(scorer: scorer.write())
+
+        switch persistScorerResult {
+        case .success():
+            return Result_NoneErrorZ.initWithOk()
+        case .failure(_):
+            print("[PERSISTER] Persisting scorer FAILURE")
+            return Result_NoneErrorZ.initWithErr(e: .WriteZero)
+        }
     }
     
 }
