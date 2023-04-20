@@ -28,7 +28,7 @@ final class BitcoinAdapter {
     
     private let wallet: BitcoinDevKit.Wallet
     private let blockchain: BitcoinDevKit.Blockchain
-    private let updateTimer = RepeatingTimer(timeInterval: 5)
+    private let updateTimer = RepeatingTimer(timeInterval: 10)
     private let networkQueue = DispatchQueue(label: "com.portal.network.layer.queue", qos: .userInitiated)
     
     private var adapterState: AdapterState = .synced
@@ -50,7 +50,7 @@ final class BitcoinAdapter {
         let account = wallet.account
         let accountIndex = account.index
         
-        let bip32RootKey = wallet.account.rootKey
+        let bip32RootKey = try DescriptorSecretKey.fromString(secretKey: wallet.account.rootKey)
         
         let deriviationPath = try Self.dereviationPath(index: accountIndex, branch: .external)
         let derivedKey = try bip32RootKey.derive(path: deriviationPath)
@@ -170,7 +170,7 @@ final class BitcoinAdapter {
     }
     
     private func updateTransactions() throws {
-        let transactions = try wallet.listTransactions()
+        let transactions = try wallet.listTransactions(includeRaw: true)
         guard transactions != _transactions else { return }
         _transactions = transactions
         let txRecords = transactions.map{ TransactionRecord(transaction: $0) }
@@ -238,7 +238,7 @@ extension BitcoinAdapter: ITransactionsAdapter {
 }
 
 extension BitcoinAdapter: ISendBitcoinAdapter {
-    func rawTransaction(amount: UInt64, address: String) throws -> [UInt8] {
+    func rawTransaction(amount: UInt64, address: String) throws -> Transaction {
         let receiverAddress = try Address(address: address)
         let receiverAddressScript = receiverAddress.scriptPubkey()
         let txBuilderResult: TxBuilderResult
@@ -255,7 +255,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         let txDetails = txBuilderResult.transactionDetails
         print("txDetails: \(txDetails)")
         
-        let signed = try wallet.sign(psbt: psbt)
+        let signed = try wallet.sign(psbt: psbt, signOptions: .none)
         print("Tx id: \(psbt.txid())")
         print("funding tx serialized: \(psbt.serialize())")
         
@@ -295,11 +295,11 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                 let txDetails = txBuilderResult.transactionDetails
                 print("txDetails: \(txDetails)")
                 
-                let finalized = try wallet.sign(psbt: psbt)
+                let finalized = try wallet.sign(psbt: psbt, signOptions: .none)
                 print("Tx id: \(psbt.txid())")
                 
                 if finalized {
-                    try blockchain.broadcast(psbt: psbt)
+                    try blockchain.broadcast(transaction: psbt.extractTx())
                     let record = TransactionRecord(transaction: txDetails)
                     promise(.success(record))
                 } else {
@@ -340,11 +340,11 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                 let txDetails = txBuilderResult.transactionDetails
                 print("txDetails: \(txDetails)")
 
-                let finalized = try wallet.sign(psbt: psbt)
+                let finalized = try wallet.sign(psbt: psbt, signOptions: .none)
                 print("Tx id: \(psbt.txid())")
 
                 if finalized {
-                    try blockchain.broadcast(psbt: psbt)
+                    try blockchain.broadcast(transaction: psbt.extractTx())
                     let record = TransactionRecord(transaction: txDetails)
                     promise(.success(record))
                 } else {
