@@ -11,7 +11,7 @@ import Factory
 
 class CreateAccountViewModel: ObservableObject {
     @Published var accountName = String()
-    @Published var extendedKey: DescriptorSecretKey
+    @Published var extendedKey: String
     private let mnemonic: Mnemonic
     
     @Injected(Container.accountManager) private var manager
@@ -27,7 +27,7 @@ class CreateAccountViewModel: ObservableObject {
             fatalError("Mnemonic creating error: \(error)")
         }
         print("\(mnemonic.asString())")
-        extendedKey = DescriptorSecretKey(network: .regtest, mnemonic: mnemonic, password: nil)
+        extendedKey = DescriptorSecretKey(network: .regtest, mnemonic: mnemonic, password: nil).asString()
     }
     
     func createAccount() {

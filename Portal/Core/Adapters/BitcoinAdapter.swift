@@ -17,7 +17,7 @@ final class BitcoinAdapter {
     }
     
     private let electrumTestNetURL = "ssl://electrum.blockstream.info:60002"
-    private let espolaRegTestURL = "http://localhost:3002"
+    private let espolaRegTestURL = "http://192.168.1.8:3002"
     var blockChainHeight: Int32 = 0
     
     private let coinRate: Decimal = pow(10, 8)
