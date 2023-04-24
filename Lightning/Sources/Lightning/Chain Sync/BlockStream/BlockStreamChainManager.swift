@@ -390,6 +390,18 @@ extension BlockStreamChainManager {
 
 // MARK: Common ChainManager Functions
 extension BlockStreamChainManager: RpcChainManager {
+    func mineBlocks(number: Int, coinbaseDestinationAddress: String) async throws -> [String] {
+        []
+    }
+    
+    func scanTxOutSet(descriptor: String) async throws -> [String : Any] {
+        [:]
+    }
+    
+    func getDescriptorInfo(descriptor: String) async throws -> String {
+        String()
+    }
+    
     func decodeScript(script: [UInt8]) async throws -> [String : Any] {
         [:]
     }
