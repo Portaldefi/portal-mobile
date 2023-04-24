@@ -11,7 +11,7 @@ import Factory
 class ViewState: ObservableObject {
     enum Tab: Int {
         case wallet = 0
-        case activity
+        case swap
         case lightning
     }
     
