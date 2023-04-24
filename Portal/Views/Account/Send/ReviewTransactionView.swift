@@ -30,7 +30,7 @@ struct ReviewTransactionView: View {
         case .reviewing:
             return "Review Transaction"
         case .signing:
-            return "Singing..."
+            return "Signing..."
         case .sent:
             return "Sent"
         }
