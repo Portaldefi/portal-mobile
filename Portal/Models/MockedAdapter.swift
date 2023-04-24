@@ -10,6 +10,12 @@ import Combine
 import BitcoinDevKit
 
 class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepositAdapter, IBalanceAdapter {
+    var L1Balance: Decimal { 0.003 }
+    
+    func send(amount: Decimal, address: String) throws -> TransactionRecord {
+        TransactionRecord.mocked
+    }
+    
     var state: AdapterState = .synced
     
     var balanceStateUpdated: AnyPublisher<Void, Never> {
