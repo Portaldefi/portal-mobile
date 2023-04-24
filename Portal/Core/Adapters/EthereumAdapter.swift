@@ -161,6 +161,10 @@ extension EthereumAdapter {
 
 //MARK: - IBalanceAdapter
 extension EthereumAdapter: IBalanceAdapter {
+    var L1Balance: Decimal {
+        balance
+    }
+    
     var state: AdapterState {
         convertToAdapterState(evmSyncState: syncState)
     }
