@@ -7,6 +7,11 @@
 
 import Foundation
 
+enum SwapSide {
+    case secretHolder, secretSeeker
+}
+
+
 class SubmarineSwap {
     var data: SwapInfo?
     private let swap: ISubmarineSwap
