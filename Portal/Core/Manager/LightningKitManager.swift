@@ -11,6 +11,8 @@ import Lightning
 import CryptoSwift
 import LightningDevKit
 import Factory
+import HsCryptoKit
+import BitcoinDevKit
 
 public struct BlockInfo {
     public let height: Int
@@ -43,7 +45,7 @@ class LightningKitManager: ILightningKitManager {
         Decimal(instance.totalBalance)
     }
         
-    init(connectionType: ConnectionType) {        
+    init(connectionType: ConnectionType) {
         switch connectionType {
         case .regtest(let config):
             instance = Node(type: .regtest(config))
@@ -51,6 +53,19 @@ class LightningKitManager: ILightningKitManager {
             instance = Node(type: .testnet(config))
         }
     }
+    
+//    func generateRandomBytes() -> String? {
+//        var keyData = Data(count: 32)
+//        let result = keyData.withUnsafeMutableBytes {
+//            SecRandomCopyBytes(kSecRandomDefault, 32, $0.baseAddress!)
+//        }
+//        if result == errSecSuccess {
+//            return keyData.base64EncodedString()
+//        } else {
+//            print("Problem generating random bytes")
+//            return nil
+//        }
+//    }
     
     func start() async throws {
         guard !started else { throw ServiceError.alreadyRunning }
@@ -97,7 +112,15 @@ class LightningKitManager: ILightningKitManager {
         return await instance.createInvoice(satAmount: nil, description: description)
     }
     
-    func pay(invoice: String) -> Future<TransactionRecord, Error> {
+    func createInvoice(paymentHash: String, satAmount: UInt64) async -> String? {
+        await instance.createInvoice(paymentHash: paymentHash, satAmount: satAmount)
+    }
+    
+    func broadcastTransaction(tx: [UInt8]) {
+        instance.broacastTransaction(tx: tx)
+    }
+    
+    func pay(invoice: String) -> Combine.Future<TransactionRecord, Error> {
         Future { [unowned self] promise in
             Task {
                 do {
@@ -113,6 +136,10 @@ class LightningKitManager: ILightningKitManager {
                 }
             }
         }
+    }
+    
+    func pay(invoice: Invoice) async throws -> TransactionRecord {
+        TransactionRecord(payment: try await self.instance.pay(invoice: invoice))
     }
     
     func decode(invoice: String) throws -> Invoice? {
@@ -140,7 +167,7 @@ class LightningKitManager: ILightningKitManager {
             // finilaze opening channel by providing funding transaction to channel manager
             if try await instance.openChannel(
                 channelOpenInfo: channelInfo,
-                fundingTransaction: fundingTransaction
+                fundingTransaction: fundingTransaction.serialize()
             ) {
                 print("Channel \(channelInfo.temporaryChannelId) is opened")
             } else {
@@ -149,117 +176,126 @@ class LightningKitManager: ILightningKitManager {
         }
     }
     
+    func decodeAddress(outputScript: [UInt8]) async -> String? {
+        await instance.decodeAddress(outputScript: outputScript)
+    }
+    
+    func getDescriptorInfo(descriptor: String) async throws -> String? {
+        try await instance.getDescriptorInfo(descriptor: descriptor)
+    }
+    
+    func scanTxOutSet(descriptor: String) async throws -> [String: Any] {
+        try await instance.scanTxOutSet(descriptor: descriptor)
+    }
+    
+    func generate(blocks: Int, toAddress: String) async throws -> [String] {
+        try await instance.generate(blocks: blocks, toAddress: toAddress)
+    }
+    
     private func handleNodeEvent(_ event: Event) {
-        if let eventType = event.getValueType() {
-            print("Received node event: \(eventType)")
-        }
+        print("Received node event: \(event.getValueType())")
         
-        if let type = event.getValueType() {
-            switch type {
-            case .PaymentPathSuccessful:
-                print("PaymentPathSuccessful")                
-            case .FundingGenerationReady:
-                print("FundingGenerationReady")
-            case .PaymentReceived:
-                print("PaymentReceived:")
-                let value = event.getValueAsPaymentReceived()!
-                let amount = value.getAmount_msat()/1000
-                print("Amount: \(amount)")
-                let paymentId = value.getPayment_hash().toHexString()
-                print("Payment \(paymentId) received ")
-                    
-                let paymentPurpose = value.getPurpose()
-                let invoicePayment = paymentPurpose.getValueAsInvoicePayment()!
-                let preimage = invoicePayment.getPayment_preimage()
+        switch event.getValueType() {
+        case .PaymentPathSuccessful:
+            print("PaymentPathSuccessful")
+        case .FundingGenerationReady:
+            print("FundingGenerationReady")
+        case .PaymentClaimable:
+            print("PaymentClaimable:")
+            let value = event.getValueAsPaymentClaimable()!
+            let amount = value.getAmountMsat()/1000
+            print("Amount: \(amount)")
+            let paymentId = value.getPaymentHash().toHexString()
+            print("Payment \(paymentId) received ")
                 
-                instance.claimFunds(preimage: preimage)
+            let paymentPurpose = value.getPurpose()
+            let invoicePayment = paymentPurpose.getValueAsInvoicePayment()!
+            let preimage = invoicePayment.getPaymentPreimage()
+            
+            instance.claimFunds(preimage: preimage)
+            
+        case .PaymentClaimed:
+            print("PaymentClaimed:")
+            
+            let value = event.getValueAsPaymentClaimed()!
+            let amount = value.getAmountMsat()/1000
+            print("Amount: \(amount)")
+            let paymentId = value.getPaymentHash().toHexString()
+            print("Payment \(paymentId) claimed")
                 
-            case .PaymentClaimed:
-                print("PaymentClaimed:")
-                
-                let value = event.getValueAsPaymentClaimed()!
-                let amount = value.getAmount_msat()/1000
-                print("Amount: \(amount)")
-                let paymentId = value.getPayment_hash().toHexString()
-                print("Payment \(paymentId) claimed")
-                    
-                let paymentPurpose = value.getPurpose()
-                let invoicePayment = paymentPurpose.getValueAsInvoicePayment()!
-                let preimage = invoicePayment.getPayment_preimage()
-                let timestamp = Int(Date().timeIntervalSince1970)
-                
-                let payment = LightningPayment(
-                    nodeId: nil,
-                    paymentId: paymentId,
-                    amount: amount,
-                    preimage: preimage.toHexString(),
-                    type: .received,
-                    timestamp: timestamp,
-                    fee: nil
-                )
-                                
-                switch fileManager.persist(payment: payment) {
-                case .success:
-                    print("payment \(paymentId) persisted")
-                case .failure(let error):
-                    print("Unable to persist payment \(paymentId)")
-                    print("ERROR: \(error.localizedDescription)")
-                }
-                
-            case .PaymentSent:
-                print("PaymentSent")
-            case .PaymentFailed:
-                print("PaymentFailed")
-                
-                let value = event.getValueAsPaymentFailed()!
-                
-                print("payment ID: \(value.getPayment_id().toHexString())")
-                print("payment hash: \(value.getPayment_hash().toHexString())")
-
-            case .PaymentPathFailed:
-                print("PaymentPathFailed")
-                
-                let value = event.getValueAsPaymentPathFailed()!
-                print("all paths failed - \(value.getAll_paths_failed() ? "yes" : "no")")
-                for path in value.getPath() {
-                    print("hop:")
-                    print("node pubkey \(path.get_pubkey())")
-                }
-                print("is regected by destination: \(value.getRejected_by_dest() ? "yes" : "no")")
-            case .ProbeSuccessful:
-                print("ProbeSuccessful")
-
-            case .ProbeFailed:
-                print("ProbeFailed")
-
-            case .PendingHTLCsForwardable:
-                print("PendingHTLCsForwardable")
-                
-                instance.processPendingHTLCForwards()
-            case .SpendableOutputs:
-                print("SpendableOutputs")
-
-            case .PaymentForwarded:
-                print("PaymentForwarded")
-
-            case .ChannelClosed:
-                print("ChannelClosed")
-
-            case .DiscardFunding:
-                print("DiscardFunding")
-
-            case .OpenChannelRequest:
-                print("OpenChannelRequest")
-
-            case .HTLCHandlingFailed:
-                print("HTLCHandlingFailed")
-
-            @unknown default:
-                print("default event")
-
+            let paymentPurpose = value.getPurpose()
+            let invoicePayment = paymentPurpose.getValueAsInvoicePayment()!
+            let preimage = invoicePayment.getPaymentPreimage()
+            let timestamp = Int(Date().timeIntervalSince1970)
+            
+            let payment = LightningPayment(
+                nodeId: nil,
+                paymentId: paymentId,
+                amount: amount,
+                preimage: preimage.toHexString(),
+                type: .received,
+                timestamp: timestamp,
+                fee: nil
+            )
+                            
+            switch fileManager.persist(payment: payment) {
+            case .success:
+                print("payment \(paymentId) persisted")
+            case .failure(let error):
+                print("Unable to persist payment \(paymentId)")
+                print("ERROR: \(error.localizedDescription)")
             }
-        } else {
-            print("event \(event) doesnt contain value type")
+            
+        case .PaymentSent:
+            print("PaymentSent")
+        case .PaymentFailed:
+            print("PaymentFailed")
+            
+            let value = event.getValueAsPaymentFailed()!
+            
+            print("payment ID: \(value.getPaymentId().toHexString())")
+            print("payment hash: \(value.getPaymentHash().toHexString())")
+
+        case .PaymentPathFailed:
+            print("PaymentPathFailed")
+            
+            let value = event.getValueAsPaymentPathFailed()!
+            print("all paths failed - \(value.getPaymentFailedPermanently() ? "yes" : "no")")
+            for path in value.getPath() {
+                print("hop:")
+                print("node pubkey \(path.getPubkey())")
+            }
+        case .ProbeSuccessful:
+            print("ProbeSuccessful")
+
+        case .ProbeFailed:
+            print("ProbeFailed")
+
+        case .PendingHTLCsForwardable:
+            print("PendingHTLCsForwardable")
+            
+            instance.processPendingHTLCForwards()
+        case .SpendableOutputs:
+            print("SpendableOutputs")
+
+        case .PaymentForwarded:
+            print("PaymentForwarded")
+
+        case .ChannelClosed:
+            print("ChannelClosed")
+
+        case .DiscardFunding:
+            print("DiscardFunding")
+
+        case .OpenChannelRequest:
+            print("OpenChannelRequest")
+
+        case .HTLCHandlingFailed:
+            print("HTLCHandlingFailed")
+
+        @unknown default:
+            print("default event")
+
         }
     }
     
@@ -280,7 +316,7 @@ class LightningKitManager: ILightningKitManager {
         }
     }
     
-    private func rawTx(amount: UInt64, address: String) throws -> [UInt8] {
+    private func rawTx(amount: UInt64, address: String) throws -> Transaction {
         let adapterManager = Container.adapterManager()
         guard let adapter = adapterManager.adapter(for: .bitcoin()) as? ISendBitcoinAdapter else {
             throw ServiceError.keySeedNotFound

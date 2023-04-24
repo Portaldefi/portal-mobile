@@ -8,7 +8,35 @@
 import Combine
 import LightningDevKit
 
-class MockedLightningKitManager: ILightningKitManager {    
+class MockedLightningKitManager: ILightningKitManager {
+    func broadcastTransaction(tx: [UInt8]) {
+        
+    }
+    
+    func generate(blocks: Int, toAddress: String) async throws -> [String] {
+        []
+    }
+    
+    func pay(invoice: LightningDevKit.Invoice) async throws -> TransactionRecord {
+        TransactionRecord.mocked
+    }
+    
+    func createInvoice(paymentHash: String, satAmount: UInt64) async -> String? {
+        nil
+    }
+    
+    func scanTxOutSet(descriptor: String) async throws -> [String : Any] {
+        [:]
+    }
+    
+    func getDescriptorInfo(descriptor: String) async throws -> String? {
+        nil
+    }
+    
+    func decodeAddress(outputScript: [UInt8]) async -> String? {
+        nil
+    }
+    
     func disconnectPeer(_ peer: Peer) throws {
         
     }
