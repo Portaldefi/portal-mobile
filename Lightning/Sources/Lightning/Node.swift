@@ -38,15 +38,15 @@ public class Node {
     
     // all user channels
     public var allChannels: [ChannelDetails] {
-        channelManager?.list_channels() ?? []
+        channelManager?.listChannels() ?? []
     }
     // usable user channels
     public var usableChannels: [ChannelDetails] {
-        channelManager?.list_usable_channels() ?? []
+        channelManager?.listUsableChannels() ?? []
     }
     
     public var totalBalance: UInt64 {
-        allChannels.map{ $0.get_balance_msat() }.reduce(0){ $0 + $1 }
+        allChannels.map{ $0.getBalanceMsat() }.reduce(0){ $0 + $1 }
     }
     
     public init(type: ConnectionType) {
@@ -58,14 +58,16 @@ public class Node {
         // (1) Retrieve our key's 32-byte seed
         guard let keySeed = fileManager.getKeysSeed() else { throw NodeError.keySeedNotFound }
         
+//        Bindings.setLogThreshold(severity: .DEBUG)
+        
         let timestampInSeconds = UInt64(Date().timeIntervalSince1970)
         let timestampInNanoseconds = UInt32(truncating: NSNumber(value: timestampInSeconds * 1000 * 1000))
         
         // (2) Setup KeysManager with `keySeed`. With add entropy using the current time. See this comment for more information: https://docs.rs/lightning/0.0.112/lightning/chain/keysinterface/struct.KeysManager.html#method.new
-        keysManager = KeysManager(seed: keySeed, starting_time_secs: timestampInSeconds, starting_time_nanos: timestampInNanoseconds)
+        keysManager = KeysManager(seed: keySeed, startingTimeSecs: timestampInSeconds, startingTimeNanos: timestampInNanoseconds)
         
         // (3) Grabs an instance of KeysInterface, we will need it later to construct a ChannelManager
-        guard let keysInterface = keysManager?.as_KeysInterface() else {
+        guard let keysInterface = keysManager else {
             throw NodeError.keyInterfaceFailure
         }
         
@@ -98,33 +100,56 @@ public class Node {
         // (6) Initialize a ChainMonitor. As the name describes, this is what we will use to watch on-chain activity
         // related to our channels.
         let chainMonitor = ChainMonitor(
-            chain_source: Option_FilterZ(value: filter),
-            broadcaster: broadcaster!, // Force unwrap since we definitely set it in L61
+            chainSource: filter,
+            broadcaster: broadcaster!,
             logger: logger,
             feeest: feeEstimator,
             persister: ChannelPersister()
         )
         
-        // (7) Construct ChannelManager. The ChannelManager, as mentioned earlier, is like the brain of the node. It is responsible for
+        // (7) Read network graph and probalistic scorer from storage or create new object
+        
+        let networkGraph = initNetworkGraph()
+        let probabalisticScorer = initProbabilisticScorer(networkGraph: networkGraph, logger: logger)
+        let score = probabalisticScorer.asScore()
+        let multiThreadedScorer = MultiThreadedLockableScore(score: score)
+        let userConfig = UserConfig.initWithDefault()
+        
+        // ChannelManagerConstructionParameters
+        
+        let channelManagerConstructorParameters = ChannelManagerConstructionParameters(
+            config: userConfig,
+            entropySource: keysInterface.asEntropySource(),
+            nodeSigner: keysInterface.asNodeSigner(),
+            signerProvider: keysInterface.asSignerProvider(),
+            feeEstimator: feeEstimator,
+            chainMonitor: chainMonitor,
+            txBroadcaster: broadcaster!,
+            logger: logger,
+            enableP2PGossip: true,
+            scorer: multiThreadedScorer
+        )
+        
+        // (8) Construct ChannelManager. The ChannelManager, as mentioned earlier, is like the brain of the node. It is responsible for
         // sending messages to appropriate channels, track HTLCs, forward onion packets, and also track a user's channels. It can also be
         // persisted on disk, which is what you generally want to do as often as possible -- this is equivalent to a "node backup".
         // The general advice here is to make sure that your `ChannelManager` *is encrypted*, because you can certainly glean information
         // about a user's payment history if they get leaked out in the clear.
+        
         if fileManager.hasChannelMaterialAndNetworkGraph {
             // Load our channel manager from disk
-            channelManagerConstructor = try await loadChannelManagerConstructor(keysInterface: keysInterface, chainMonitor: chainMonitor)
+            channelManagerConstructor = try await loadChannelManagerConstructor(params: channelManagerConstructorParameters)
         } else {
             // An existing ChannelManager does not exist on disk, create new channel material and network graph
             let chaintipHeight = try await rpcInterface.getChaintipHeight()
             let chaintipHash = try await rpcInterface.getChaintipHash()
             let reversedChaintipHash = [UInt8](chaintipHash.reversed())
-            
+                        
             channelManagerConstructor = try await initializeChannelMaterialAndNetworkGraph(
                 currentTipHash: reversedChaintipHash,
                 currentTipHeight: chaintipHeight,
-                keysInterface: keysInterface,
-                chainMonitor: chainMonitor,
-                broadcaster: broadcaster! // Force unwrap since we definitely set it in L78
+                networkGraph: networkGraph,
+                params: channelManagerConstructorParameters
             )
         }
         
@@ -146,9 +171,9 @@ public class Node {
         let blockchainListener = ChainListener(channelManager: channelManager, chainMonitor: chainMonitor)
         rpcInterface.registerListener(blockchainListener)
                 
-        // (8) Do requisite chain sync to start.
+        // (9) Do requisite chain sync to start.
         
-        let bestBlockHeight = channelManager.current_best_block().height()
+        let bestBlockHeight = channelManager.currentBestBlock().height()
         
         if case .regtest = connectionType, let rpcInterface = rpcInterface as? RegtestBlockchainManager {
             // If we're using Bitcoin Core
@@ -162,7 +187,7 @@ public class Node {
         
         // we will tell the ChainMonitor to connect blocks up to the latest chain tip.
         
-        // (9) Initialize Persister, which is primarily responsible for persisting `ChannelManager`, `Scorer`, and `NetworkGraph` to disk.
+        // (10) Initialize Persister, which is primarily responsible for persisting `ChannelManager`, `Scorer`, and `NetworkGraph` to disk.
         persister = Persister(eventTracker: pendingEventTracker)
         
         let isMonitoring = await rpcInterface.isMonitoring()
@@ -173,7 +198,7 @@ public class Node {
             print("Monitor already running")
         }
      
-        print("LDK is Running with key: \(channelManager.get_our_node_id().toHexString())")
+        print("LDK is Running with key: \(channelManager.getOurNodeId().toHexString())")
     }
     
     //MARK: - Connect to peer
@@ -204,8 +229,9 @@ public class Node {
             throw NodeError.disconectPeer
         }
         
-        peerManager.disconnect_by_node_id(node_id: pubKey.toByteArray(), no_connection_possible: false)
+        peerManager.disconnectByNodeId(nodeId: pubKey.toByteArray())
     }
+    
     //MARK: - Open channel request
     public func requestChannelOpen(_ pubKeyHex: String, channelValue: UInt64, reserveAmount: UInt64) async throws -> ChannelOpenInfo {
         guard let channelManager = channelManager else {
@@ -214,16 +240,18 @@ public class Node {
         
         // open_channel
         let theirNodeId = pubKeyHex.toByteArray()
-        let config = UserConfig()
-        let userChannelId: UInt64 = UInt64.random(in: 1...9999)
-        print("user channel id \(userChannelId)")
+        let config = UserConfig.initWithDefault()
+        
+        let userChannelId: [UInt8] = (0..<16).map { _ in UInt8.random(in: 0...UInt8.max) } //[UInt8](repeating: 42, count: 16)//
+        
+        print("user channel id \(userChannelId.toHexString())")
 
-        let channelOpenResult = channelManager.create_channel(
-            their_network_key: theirNodeId,
-            channel_value_satoshis: channelValue,
-            push_msat: reserveAmount,
-            user_channel_id: userChannelId,
-            override_config: config
+        let channelOpenResult = channelManager.createChannel(
+            theirNetworkKey: theirNodeId,
+            channelValueSatoshis: channelValue,
+            pushMsat: reserveAmount,
+            userChannelId: userChannelId,
+            overrideConfig: config
         )
         
         // See if peer has returned `accept_channel`
@@ -231,11 +259,8 @@ public class Node {
             guard let event = await pendingEventTracker.await(events: [.fundingGenerationReady, .channelClosed], timeout: 3) else {
                 throw NodeError.error("Not received funding or close event. Timeout error")
             }
-            guard let eventType = event.getValueType() else {
-                throw NodeError.error("Event has no type")
-            }
             
-            switch eventType {
+            switch event.getValueType() {
             case .FundingGenerationReady:
                 guard let fundingReadyEvent = event.getValueAsFundingGenerationReady() else {
                     throw NodeError.error("getValueAsFundingGenerationReady is nil")
@@ -243,7 +268,7 @@ public class Node {
 
                 return ChannelOpenInfo(
                     fundingEvent: fundingReadyEvent,
-                    counterpartyNodeId: pubKeyHex.toByteArray()
+                    counterpartyNodeId: theirNodeId
                 )
             case .ChannelClosed:
                 guard let channelClosedEvent = event.getValueAsChannelClosed() else {
@@ -260,7 +285,7 @@ public class Node {
                     throw NodeError.Channels.unknown
                 }
             default:
-                print(eventType)
+                print(event.getValueType())
                 throw NodeError.Channels.wrongLDKEvent
             }
         } else if let errorDetails = channelOpenResult.getError() {
@@ -285,10 +310,11 @@ public class Node {
         // Create the funding transaction and do the `funding_created/funding_signed` dance with our counterparty.
         // After that, LDK will automatically broadcast it via the `BroadcasterInterface` we gave `ChannelManager`.
         var fundingResult: LightningDevKit.Result_NoneAPIErrorZ
-        fundingResult = channelManager.funding_transaction_generated(
-            temporary_channel_id: channelOpenInfo.temporaryChannelId,
-            counterparty_node_id: channelOpenInfo.counterpartyNodeId,
-            funding_transaction: fundingTransaction
+        
+        fundingResult = channelManager.fundingTransactionGenerated(
+            temporaryChannelId: channelOpenInfo.temporaryChannelId,
+            counterpartyNodeId: channelOpenInfo.counterpartyNodeId,
+            fundingTransaction: fundingTransaction
         )
         
         if fundingResult.isOk() {
@@ -301,7 +327,7 @@ public class Node {
     }
     //MARK: - Create invoice
     public func createInvoice(satAmount: UInt64?, description: String) async -> String? {
-        guard let channelManager = channelManager, let keyInterface = keysManager?.as_KeysInterface() else {
+        guard let channelManager = channelManager, let keyInterface = keysManager else {
             return nil
         }
         
@@ -309,25 +335,27 @@ public class Node {
         if let satAmount = satAmount {
             mSatAmount = satAmount * 1000
         }
-        
-        let result = Bindings.swift_create_invoice_from_channelmanager(
+
+        let result = Bindings.createInvoiceFromChannelmanager(
             channelmanager: channelManager,
-            keys_manager: keyInterface,
-            network: LDKCurrency_Regtest,
-            amt_msat: Option_u64Z(value: mSatAmount),
+            nodeSigner: keyInterface.asNodeSigner(),
+            logger: logger,
+            network: .Regtest,
+            amtMsat: mSatAmount,
             description: description,
-            invoice_expiry_delta_secs: 86400 //24 hours
+            invoiceExpiryDeltaSecs: 86400,
+            minFinalCltvExpiryDelta: nil
         )
         
         if result.isOk(), let invoice = result.getValue() {
-            let invoiceString = invoice.to_str()
+            let invoiceString = invoice.toStr()
             print("================================")
             print("INVOICE: \(invoiceString)")
             print("================================")
             
             return invoiceString
         } else if let error = result.getError() {
-            print(error.to_str())
+            print(error.toStr())
             return nil
         }
         
@@ -357,10 +385,6 @@ public class Node {
         
         if result.isOk(), let invoice = result.getValue() {
             let invoiceString = invoice.toStr()
-            print("================================")
-            print("INVOICE: \(invoiceString), paymentHash: \(invoice.paymentHash()?.toHexString()), secret: \(invoice.paymentSecret()?.toHexString())")
-            print("================================")
-            
             return invoiceString
         } else if let error = result.getError() {
             print(error.toStr())
@@ -369,40 +393,37 @@ public class Node {
         
         return nil
     }
+    
     //MARK: - Pay invoice
     public func pay(invoice: Invoice) async throws -> LightningPayment {
-        guard let payer = channelManagerConstructor?.payer else {
+        guard let manager = channelManager else {
             throw NodeError.noPayer
         }
         
-        let result = payer.pay_invoice(invoice: invoice)
+        let result = Bindings.payInvoice(invoice: invoice, retryStrategy: .initWithAttempts(a: 3), channelmanager: manager)
         
         if result.isOk() {
             guard let event = await pendingEventTracker.await(events: [.paymentFailed, .paymentSent], timeout: 5) else {
                 throw NodeError.error("Not received paymentFailed or paymentSent event. Timeout error")
             }
-                        
-            guard let eventType = event.getValueType() else {
-                throw NodeError.error("Event has no type")
-            }
             
-            print("Pay invoice expected event: \(eventType)")
+            print("Pay invoice expected event: \(event.getValueType())")
             
-            switch eventType {
+            switch event.getValueType() {
             case .PaymentSent:
                 guard let paymentSent = event.getValueAsPaymentSent() else {
                     throw NodeError.error("getValueAsPaymentSent is nil")
                 }
                 
-                let paymentID = paymentSent.getPayment_id().toHexString()
-                let preimage = paymentSent.getPayment_preimage().toHexString()
-                let fee = (paymentSent.getFee_paid_msat().getValue() ?? 0)/1000
+                let paymentID = paymentSent.getPaymentId().toHexString()
+                let preimage = paymentSent.getPaymentPreimage().toHexString()
+                let fee = (paymentSent.getFeePaidMsat() ?? 0)/1000
                 let timestamp = Int(Date().timeIntervalSince1970)
                 
                 let payment = LightningPayment(
-                    nodeId: channelManager?.get_our_node_id().toHexString() ?? "-",
+                    nodeId: channelManager?.getOurNodeId().toHexString() ?? "-",
                     paymentId: paymentID,
-                    amount: (invoice.amount_milli_satoshis().getValue() ?? 0)/1000,
+                    amount: (invoice.amountMilliSatoshis() ?? 0)/1000,
                     preimage: preimage,
                     type: .sent,
                     timestamp: timestamp,
@@ -422,55 +443,33 @@ public class Node {
                     throw NodeError.error("getValueAsPaymentFailed is nil")
                 }
                 
-                let errorMessage = "Payment failed:\nid: \(paymentFailed.getPayment_id().toHexString())\nhash: \(paymentFailed.getPayment_hash().toHexString())"
+                let errorMessage = "Payment failed:\nid: \(paymentFailed.getPaymentId().toHexString())\nhash: \(paymentFailed.getPaymentHash().toHexString())"
                 print(errorMessage)
                 
                 throw NodeError.error(errorMessage)
             default:
-                print(eventType)
+                print(event.getValueType())
                 throw NodeError.Channels.wrongLDKEvent
             }
         } else if let invoicePayError = result.getError() {
             if let error = invoicePayError.getValueAsInvoice() {
                 print("Invoice error: \(error)")
                 throw NodeError.error("Invoice error: \(error)")
-            } else if let error = invoicePayError.getValueAsRouting() {
-                print("Routing error: \(error.get_err())")
-                throw NodeError.error("Routing error: \(error.get_err())")
             } else if let error = invoicePayError.getValueAsSending() {
                 print("Sending error")
-                if let _ = error.getValueAsPartialFailure() {
-                    print("partialFailError")
-                    throw NodeError.error("PartialFailure")
-                } else if let parametersError = error.getValueAsParameterError() {
-                    if let error = parametersError.getValueAsAPIMisuseError() {
-                        print("API misuse error: \(error.getErr())")
-                        throw NodeError.error("API misuse error: \(error.getErr())")
-                    } else if let error = parametersError.getValueAsChannelUnavailable() {
-                        print("channel unavailable error: \(error.getErr())")
-                        throw NodeError.error("channel unavailable error: \(error.getErr())")
-                    } else if let error = parametersError.getValueAsFeeRateTooHigh() {
-                        print("excessive fee rate error: \(error.getErr())")
-                        throw NodeError.error("excessive fee rate error: \(error.getErr())")
-                    } else if let error = parametersError.getValueAsIncompatibleShutdownScript() {
-                        print("incompatible shutdown script: \(error.getScript())")
-                        throw NodeError.error("incompatible shutdown script: \(error.getScript())")
-                    } else if let error = parametersError.getValueAsRouteError() {
-                        print("route error: \(error.getErr())")
-                        throw NodeError.error("route error: \(error.getErr())")
-                    } else {
-                        print("Unknown error")
-                        throw NodeError.error("Unknow error")
-                    }
-                } else if let _ = error.getValueAsPathParameterError() {
-                    print("path parameters error")
-                    throw NodeError.error("path parameters error")
-                } else if let _ = error.getValueAsAllFailedRetrySafe() {
-                    print("getValueAsAllFailedRetrySafe")
-                    throw NodeError.error("getValueAsAllFailedRetrySafe")
-                } else {
-                    print("Unknown error")
-                    throw NodeError.error("unknown error")
+                switch error {
+                case .RouteNotFound:
+                    print("RouteNotFound")
+                    throw NodeError.error("RouteNotFound")
+                case .DuplicatePayment:
+                    print("DuplicatePayment")
+                    throw NodeError.error("DuplicatePayment")
+                case .PaymentExpired:
+                    print("PaymentExpired")
+                    throw NodeError.error("PaymentExpired")
+                @unknown default:
+                    print("Unknown invoice paer error")
+                    throw NodeError.error("Unknown invoice paer error")
                 }
             } else {
                 print("Unknown error")
@@ -480,6 +479,10 @@ public class Node {
             print("Unknown error")
             throw NodeError.error("Unknow error")
         }
+    }
+    
+    public func broacastTransaction(tx: [UInt8]) {
+        broadcaster?.broadcastTransaction(tx: tx)
     }
     
     public func getFundingTransactionScriptPubKey(outputScript: [UInt8]) async -> String? {
@@ -492,28 +495,53 @@ public class Node {
         return address
     }
     
+    public func decodeAddress(outputScript: [UInt8]) async -> String? {
+        guard let rpcInterface = rpcInterface,
+              let decodedScript = try? await rpcInterface.decodeScript(script: outputScript),
+              let segwitData = decodedScript["segwit"] as? [String: Any] else {
+            return nil
+        }
+
+        return segwitData["address"] as? String
+    }
+    
+    public func getDescriptorInfo(descriptor: String) async throws -> String? {
+        guard let rpcInterface = rpcInterface else { return nil }
+        return try await rpcInterface.getDescriptorInfo(descriptor: descriptor)
+    }
+    
+    public func scanTxOutSet(descriptor: String) async throws -> [String: Any] {
+        guard let rpcInterface = rpcInterface else { return [:] }
+        return try await rpcInterface.scanTxOutSet(descriptor: descriptor)
+    }
+    
+    public func generate(blocks: Int, toAddress: String) async throws -> [String] {
+        guard let rpcInterface = rpcInterface else { return [] }
+        return try await rpcInterface.mineBlocks(number: blocks, coinbaseDestinationAddress: toAddress)
+    }
+    
     //MARK: - Sends funding transaction generated message
     public func fundingTransactionGenerated(temporaryChannelId: [UInt8], fundingTransaction: [UInt8]) -> Result_NoneAPIErrorZ {
         guard let channelManager = channelManager else {
-            return Result_NoneAPIErrorZ.err(e: .apimisuse_error(err: "Channel Manager is nil"))
+            return .initWithErr(e: .initWithApimisuseError(err: "Channel Manager is nil"))
         }
-        return channelManager.funding_transaction_generated(
-            temporary_channel_id: temporaryChannelId,
-            counterparty_node_id: [],
-            funding_transaction: fundingTransaction
+        return channelManager.fundingTransactionGenerated(
+            temporaryChannelId: temporaryChannelId,
+            counterpartyNodeId: [],
+            fundingTransaction: fundingTransaction
         )
     }
     //MARK: - Close channel
     public func close(channel: ChannelDetails) async {
-        let channelId = channel.get_channel_id()
-        let counterpartyNodeId = channel.get_counterparty().get_node_id()
-        let result = channelManager!.close_channel(channel_id: channelId, counterparty_node_id: counterpartyNodeId)
+        guard let channelId = channel.getChannelId() else { return }
+        let counterpartyNodeId = channel.getCounterparty().getNodeId()
+        let result = channelManager!.closeChannel(channelId: channelId, counterpartyNodeId: counterpartyNodeId)
         
         if result.isOk() {
             print("closed")
         } else if let channelCloseError = result.getError() {
             print("error type: \(String(describing: channelCloseError.getValueType()))")
-            if let error = channelCloseError.getValueAsAPIMisuseError() {
+            if let error = channelCloseError.getValueAsApiMisuseError() {
                 print("API misuse error: \(error.getErr())")
             } else if let error = channelCloseError.getValueAsChannelUnavailable() {
                 print("channel unavailable error: \(error.getErr())")
@@ -521,14 +549,14 @@ public class Node {
                 print("excessive fee rate error: \(error.getErr())")
             } else if let error = channelCloseError.getValueAsIncompatibleShutdownScript() {
                 print("incompatible shutdown script: \(error.getScript())")
-            } else if let error = channelCloseError.getValueAsRouteError() {
+            } else if let error = channelCloseError.getValueAsInvalidRoute() {
                 print("route error: \(error.getErr())")
             }
         }
     }
     //MARK: - Decode invoice
     public func decode(invoice: String) throws -> Invoice? {
-        let decodedInvoice = Invoice.from_str(s: invoice)
+        let decodedInvoice = Invoice.fromStr(s: invoice)
         guard decodedInvoice.isOk() else {
             throw NodeError.Invoice.decodingError
         }
@@ -536,11 +564,11 @@ public class Node {
     }
     
     public func claimFunds(preimage: [UInt8]) {
-        channelManager?.claim_funds(payment_preimage: preimage)
+        channelManager?.claimFunds(paymentPreimage: preimage)
     }
     
     public func processPendingHTLCForwards() {
-        channelManager?.process_pending_htlc_forwards()
+        channelManager?.processPendingHtlcForwards()
     }
     
     public func subscribeForNodeEvents() async -> AsyncStream<Event> {
@@ -552,10 +580,10 @@ extension Node {
     public struct ChannelOpenInfo {
         private let fundingEvent: Event.FundingGenerationReady
         public var fundingOutputScript: [UInt8] {
-            fundingEvent.getOutput_script()
+            fundingEvent.getOutputScript()
         }
         public var temporaryChannelId: [UInt8] {
-            fundingEvent.getTemporary_channel_id()
+            fundingEvent.getTemporaryChannelId()
         }
         public let counterpartyNodeId: [UInt8]
         
@@ -574,7 +602,7 @@ extension Node {
             .prepend(Date())
             .filter { [weak self] _ in self?.peerManager != nil }
             .flatMap { [weak self] _ -> AnyPublisher<[String], Never> in
-                let peers = self?.peerManager!.get_peer_node_ids().compactMap { $0.toHexString() }
+                let peers = self?.peerManager!.getPeerNodeIds().compactMap { $0.0.toHexString() }
                 return Just(peers ?? []).eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
@@ -594,42 +622,69 @@ extension Node {
             .sink(receiveCompletion: { error in
                 print("CasaLDK: Error subscribing to blockchain monitor")
             }, receiveValue: { [unowned self] _ in
-                if let channelManagerConstructor = channelManagerConstructor,
-                    let networkGraph = channelManagerConstructor.net_graph,
-                    let persister = persister {
-                    let scoringParams = ProbabilisticScoringParameters()
-                    let probabalisticScorer = ProbabilisticScorer(params: scoringParams, network_graph: networkGraph, logger: logger)
-                    let score = probabalisticScorer.as_Score()
-                    
-                    channelManagerConstructor.chain_sync_completed(persister: persister, scorer: MultiThreadedLockableScore(score: score))
-                                        
-                    let bestBLockHeight = channelManagerConstructor
-                        .channelManager.current_best_block().height()
+                if let channelManagerConstructor = channelManagerConstructor, let persister = persister {
+                    channelManagerConstructor.chainSyncCompleted(persister: persister)
+                    let bestBLockHeight = channelManagerConstructor.channelManager.currentBestBlock().height()
                     print("LDK CHANNEL MANAGER BEST BLOCK: \(bestBLockHeight)\n")
                 } else {
-                    print("Chain Tip Reconcilation Failed. ChannelManagerConstructor does not have a network graph!")
+                    print("Chain Tip Reconcilation Failed.")
                 }
             })
             .store(in: &cancellables)
     }
     
+    private func initNetworkGraph() -> NetworkGraph {
+        guard let serializedGraph = fileManager.getSerializedNetworkGraph() else {
+            return NetworkGraph(network: .Regtest, logger: logger)
+        }
+        
+        let read = NetworkGraph.read(ser: serializedGraph, arg: logger)
+        
+        guard read.isOk() else {
+            return NetworkGraph(network: .Regtest, logger: logger)
+        }
+        
+        guard let networkGraph = read.getValue() else {
+            return NetworkGraph(network: .Regtest, logger: logger)
+        }
+        
+        return networkGraph
+    }
+    
+    private func initProbabilisticScorer(networkGraph: NetworkGraph, logger: Logger) -> ProbabilisticScorer {
+        let scoringParams = ProbabilisticScoringParameters.initWithDefault()
+        
+        // commented out unil https://github.com/lightningdevkit/ldk-swift/pull/103 merged to fix the crash of the scorer
+        
+//        guard let serializedScorer = fileManager.getSerializedScorer() else {
+//            return ProbabilisticScorer(params: scoringParams, networkGraph: networkGraph, logger: logger)
+//        }
+//
+//        let read = ProbabilisticScorer.read(ser: serializedScorer, argA: scoringParams, argB: networkGraph, argC: logger)
+//
+//        guard read.isOk() else {
+//            return ProbabilisticScorer(params: scoringParams, networkGraph: networkGraph, logger: logger)
+//        }
+//
+//        guard let scorer = read.getValue() else {
+            return ProbabilisticScorer(params: scoringParams, networkGraph: networkGraph, logger: logger)
+//        }
+//
+//        return scorer
+    }
+    
     /// Used for loading a channel manager from the Documents directory.
-    private func loadChannelManagerConstructor(keysInterface: KeysInterface, chainMonitor: ChainMonitor) async throws -> ChannelManagerConstructor {
+    private func loadChannelManagerConstructor(params: ChannelManagerConstructionParameters) async throws -> ChannelManagerConstructor {
         if let channelManager = fileManager.getSerializedChannelManager(),
            let networkGraph = fileManager.getSerializedNetworkGraph() {
             let channelMonitors = fileManager.getSerializedChannelMonitors()
             do {
                 return try ChannelManagerConstructor(
-                    channel_manager_serialized: channelManager,
-                    channel_monitors_serialized: channelMonitors,
-                    keys_interface: keysInterface,
-                    fee_estimator: feeEstimator,
-                    chain_monitor: chainMonitor,
+                    channelManagerSerialized: channelManager,
+                    channelMonitorsSerialized: channelMonitors,
+                    netGraphSerialized: networkGraph,
                     filter: filter,
-                    net_graph_serialized: networkGraph,
-                    tx_broadcaster: broadcaster!, // Force unwrap since we definitely set it in L72
-                    logger: logger,
-                    enableP2PGossip: true
+                    params: params
                 )
             } catch {
                 throw NodeError.noChannelManager
@@ -639,30 +694,22 @@ extension Node {
         }
     }
     
-    private func initializeChannelMaterialAndNetworkGraph(currentTipHash: [UInt8], currentTipHeight: UInt32, keysInterface: KeysInterface, chainMonitor: ChainMonitor, broadcaster: BroadcasterInterface) async throws -> ChannelManagerConstructor {
-        var network = LDKNetwork_Regtest
+    private func initializeChannelMaterialAndNetworkGraph(currentTipHash: [UInt8], currentTipHeight: UInt32, networkGraph: NetworkGraph, params: ChannelManagerConstructionParameters) async throws -> ChannelManagerConstructor {
+        let network: Bindings.Network
+        
         switch connectionType {
         case .testnet:
-            network = LDKNetwork_Testnet
+            network = .Testnet
         default:
-            network = LDKNetwork_Regtest
+            network = .Regtest
         }
-        
-        let genesisHash = [UInt8](repeating: 0, count: 32)
-        
-        let graph = NetworkGraph(genesis_hash: genesisHash, logger: logger)
+                        
         return ChannelManagerConstructor(
             network: network,
-            config: UserConfig(),
-            current_blockchain_tip_hash: currentTipHash,
-            current_blockchain_tip_height: currentTipHeight,
-            keys_interface: keysInterface,
-            fee_estimator: feeEstimator,
-            chain_monitor: chainMonitor,
-            net_graph: graph,
-            tx_broadcaster: broadcaster,
-            logger: logger,
-            enableP2PGossip: true
+            currentBlockchainTipHash: currentTipHash,
+            currentBlockchainTipHeight: currentTipHeight,
+            netGraph: networkGraph,
+            params: params
         )
     }
 }
