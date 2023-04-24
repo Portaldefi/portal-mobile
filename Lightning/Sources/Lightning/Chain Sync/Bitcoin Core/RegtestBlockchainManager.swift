@@ -287,6 +287,18 @@ extension RegtestBlockchainManager {
         return transaction
     }
     
+    public func getDescriptorInfo(descriptor: String) async throws -> String {
+        let response = try await self.callRpcMethod(method: "getdescriptorinfo", params: [descriptor])
+        let result = response["result"] as! [String: Any]
+        return result["checksum"] as! String
+    }
+    
+    public func scanTxOutSet(descriptor: String) async throws -> [String: Any] {
+        let response = try await self.callRpcMethod(method: "scantxoutset", params: ["start", [["desc": "\(descriptor)"]]])
+        let result = response["result"] as! [String: Any]
+        return result
+    }
+    
     /**
      Decode an arbitary script. Can be an output script, a redeem script, or anything else
      - Parameter script: byte array serialization of script

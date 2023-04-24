@@ -17,39 +17,53 @@ class Persister: LightningDevKit.Persister, ExtendedChannelManagerPersister {
         super.init()
     }
 
-    func handle_event(event: LightningDevKit.Event) {
+    func handleEvent(event: LightningDevKit.Event) {
         guard let tracker = tracker else { return }
         
         Task {
             await tracker.addEvent(event: event)
         }
     }
-    
-    override func persist_graph(network_graph: NetworkGraph) -> Result_NoneErrorZ {
-        let persistGraphResult = fileManager.persistGraph(graph: network_graph.write())
+        
+    override func persistGraph(networkGraph: Bindings.NetworkGraph) -> Bindings.Result_NoneErrorZ {
+        print("[PERSISTER] Persisting net graph")
+        // do something to persist the graph
+        let persistGraphResult = fileManager.persistGraph(graph: networkGraph.write())
 
         switch persistGraphResult {
         case .success():
-            return Result_NoneErrorZ.ok()
+            return Result_NoneErrorZ.initWithOk()
         case .failure(_):
-            return Result_NoneErrorZ.err(e: LDKIOError_WriteZero)
+            print("[PERSISTER] Persisting net graph FAILURE")
+            return Result_NoneErrorZ.initWithErr(e: .WriteZero)
         }
     }
     
-    override func persist_manager(channel_manager: ChannelManager) -> Result_NoneErrorZ {
-        let persistChannelManagerResult = fileManager.persistChannelManager(manager: channel_manager.write())
+    override func persistManager(channelManager: Bindings.ChannelManager) -> Bindings.Result_NoneErrorZ {
+        print("[PERSISTER] Persisting channel manager")
+        let persistChannelManagerResult = fileManager.persistChannelManager(manager: channelManager.write())
 
         switch persistChannelManagerResult {
         case .success():
-            return Result_NoneErrorZ.ok()
+            return Result_NoneErrorZ.initWithOk()
         case .failure(_):
-            print("persistChannelManager FAILURE")
-            return Result_NoneErrorZ.err(e: LDKIOError_WriteZero)
+            print("[PERSISTER] Persisting channel manager FAILURE")
+            return Result_NoneErrorZ.initWithErr(e: .WriteZero)
         }
     }
     
-    override func persist_scorer(scorer: LightningDevKit.Bindings.MultiThreadedLockableScore) -> LightningDevKit.Bindings.Result_NoneErrorZ {
-        Result_NoneErrorZ.ok()
+    override func persistScorer(scorer: LightningDevKit.Bindings.WriteableScore) -> LightningDevKit.Bindings.Result_NoneErrorZ {
+        print("[PERSISTER] Persisting scorer")
+
+        let persistScorerResult = fileManager.persistScorer(scorer: scorer.write())
+
+        switch persistScorerResult {
+        case .success():
+            return Result_NoneErrorZ.initWithOk()
+        case .failure(_):
+            print("[PERSISTER] Persisting scorer FAILURE")
+            return Result_NoneErrorZ.initWithErr(e: .WriteZero)
+        }
     }
     
 }

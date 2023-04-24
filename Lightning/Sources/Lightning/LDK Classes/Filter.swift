@@ -9,22 +9,20 @@ import Foundation
 import LightningDevKit
 
 class Filter: LightningDevKit.Filter {
-    override func register_tx(txid: [UInt8]?, script_pubkey: [UInt8]) {
+    override func registerTx(txid: [UInt8]?, scriptPubkey: [UInt8]) {
         print("filter register txID: \(String(describing: txid?.toHexString()))")
-        print("filter register script_pubkey: \(String(describing: script_pubkey.toHexString()))")
+        print("filter register script_pubkey: \(String(describing: scriptPubkey.toHexString()))")
     }
     
-    override func register_output(output: Bindings.WatchedOutput) -> Bindings.Option_C2Tuple_usizeTransactionZZ {
-        let scriptPubkeyBytes = output.get_script_pubkey()
-        let outpoint = output.get_outpoint()!
-        let txid = outpoint.get_txid()
-        let outputIndex = outpoint.get_index()
+    override func registerOutput(output: Bindings.WatchedOutput) {
+        let scriptPubkeyBytes = output.getScriptPubkey()
+        let outpoint = output.getOutpoint()
+        let txid = outpoint.getTxid()
+        let outputIndex = outpoint.getIndex()
 
         // watch for any transactions that spend this output on-chain
 
-        let blockHashBytes = output.get_block_hash()
+        let blockHashBytes = output.getBlockHash()
         // if block hash bytes are not null, return any transaction spending the output that is found in the corresponding block along with its index
-        
-        return Option_C2Tuple_usizeTransactionZZ.none()
     }
 }

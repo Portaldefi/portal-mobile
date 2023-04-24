@@ -79,7 +79,7 @@ class RestoreAccountViewModel: ObservableObject {
     private func restoreAccount(words: [String]) {
         do {
             let mnemonic = try Mnemonic.fromString(mnemonic: words.joined(separator:" "))
-            let restoredKey = DescriptorSecretKey(network: .regtest, mnemonic: mnemonic, password: nil)
+            let restoredKey = DescriptorSecretKey(network: .regtest, mnemonic: mnemonic, password: nil).asString()
             let account = Account(id: UUID().uuidString, index: 0, name: accountName, key: restoredKey)
             manager.save(account: account, mnemonic: words.joined(separator:" "), salt: nil)
         } catch {

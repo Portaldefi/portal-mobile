@@ -94,32 +94,32 @@ struct LightningStatstView: View {
             
             VStack {
                 HStack {
-                    Text(peers.first{ $0.peerPubKey == channel.get_counterparty().get_node_id().toHexString() }!.name)
+                    Text(peers.first{ $0.peerPubKey == channel.getCounterparty().getNodeId().toHexString() }!.name)
                     Spacer()
-                    Text(channel.get_counterparty().get_node_id().toHexString().turnicated)
+                    Text(channel.getCounterparty().getNodeId().toHexString().turnicated)
                         .font(.system(size: 14))
                 }
                 
                 HStack {
                     Text("Channel id:")
                     Spacer()
-                    Text(channel.get_channel_id().toHexString().turnicated)
+                    Text(channel.getChannelId()!.toHexString().turnicated)
                         .font(.system(size: 14))
                 }
                 
                 HStack {
                     Text("VALUE:")
                     Spacer()
-                    Text("\(channel.get_channel_value_satoshis()) sats")
+                    Text("\(channel.getChannelValueSatoshis()) sats")
                 }
                 
                 HStack {
                     Text("BALANCE:")
                     Spacer()
-                    Text("\(channel.get_balance_msat()/1000) sats")
+                    Text("\(channel.getBalanceMsat()/1000) sats")
                 }
                 
-                if let inboundhtlcMin = channel.get_inbound_htlc_minimum_msat().getValue() {
+                if let inboundhtlcMin = channel.getInboundHtlcMinimumMsat() {
                     HStack {
                         Text("INBOUND HTLC MIN:")
                         Spacer()
@@ -127,7 +127,7 @@ struct LightningStatstView: View {
                     }
                 }
                 
-                if let inboundhtlcMax = channel.get_inbound_htlc_maximum_msat().getValue() {
+                if let inboundhtlcMax = channel.getInboundHtlcMaximumMsat() {
                     HStack {
                         Text("INBOUND HTLC MAX:")
                         Spacer()
@@ -138,13 +138,13 @@ struct LightningStatstView: View {
                 HStack {
                     Text("INBOUND CAPACITY:")
                     Spacer()
-                    Text("\(channel.get_inbound_capacity_msat()/1000) sats")
+                    Text("\(channel.getInboundCapacityMsat()/1000) sats")
                 }
                 
                 HStack {
                     Text("OUTBOUND CAPACITY:")
                     Spacer()
-                    Text("\(channel.get_outbound_capacity_msat()/1000) sats")
+                    Text("\(channel.getOutboundCapacityMsat()/1000) sats")
                 }
             }
             .font(.system(size: 18))

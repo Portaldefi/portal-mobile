@@ -20,5 +20,12 @@ protocol ILightningKitManager {
     func disconnectPeer(_ peer: Peer) throws
     func createInvoice(amount: String, description: String) async -> String?
     func decode(invoice: String) throws -> Invoice?
-    func pay(invoice: String) -> Future<TransactionRecord, Error>
+    func decodeAddress(outputScript: [UInt8]) async -> String?
+    func getDescriptorInfo(descriptor: String) async throws -> String?
+    func pay(invoice: String) -> Combine.Future<TransactionRecord, Error>
+    func pay(invoice: Invoice) async throws -> TransactionRecord
+    func scanTxOutSet(descriptor: String) async throws -> [String: Any]
+    func createInvoice(paymentHash: String, satAmount: UInt64) async -> String?
+    func generate(blocks: Int, toAddress: String) async throws -> [String]
+    func broadcastTransaction(tx: [UInt8])
 }

@@ -7,8 +7,15 @@
 
 import Foundation
 import Combine
+import BitcoinDevKit
 
 class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepositAdapter, IBalanceAdapter {
+    var L1Balance: Decimal { 0.003 }
+    
+    func send(amount: Decimal, address: String) throws -> TransactionRecord {
+        TransactionRecord.mocked
+    }
+    
     var state: AdapterState = .synced
     
     var balanceStateUpdated: AnyPublisher<Void, Never> {
@@ -47,8 +54,8 @@ class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepos
         }
     }
     
-    func rawTransaction(amount: UInt64, address: String) throws -> [UInt8] {
-        []
+    func rawTransaction(amount: UInt64, address: String) throws -> Transaction {
+        try! Transaction(transactionBytes: [])
     }
     
     func start() {

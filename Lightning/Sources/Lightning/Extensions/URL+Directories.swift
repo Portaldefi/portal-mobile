@@ -11,6 +11,10 @@ extension URL {
         documentsDirectory.appendingPathComponent("channelManager")
     }
     
+    static var scorerDirectory: URL {
+        documentsDirectory.appendingPathComponent("scorer")
+    }
+    
     static var channelMonitorsDirectory: URL {
         documentsDirectory.appendingPathComponent("channelMonitors", isDirectory: true)
     }

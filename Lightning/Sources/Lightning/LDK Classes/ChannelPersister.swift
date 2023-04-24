@@ -8,25 +8,25 @@
 import Foundation
 import LightningDevKit
 
-class ChannelPersister: Persist {
-    override func persist_new_channel(channel_id: Bindings.OutPoint, data: Bindings.ChannelMonitor, update_id: Bindings.MonitorUpdateId) -> Bindings.Result_NoneChannelMonitorUpdateErrZ {
-        let idBytes: [UInt8] = channel_id.write()
+class ChannelPersister: Persist {    
+    override func persistNewChannel(channelId: Bindings.OutPoint, data: Bindings.ChannelMonitor, updateId: Bindings.MonitorUpdateId) -> Bindings.ChannelMonitorUpdateStatus {
+        let idBytes: [UInt8] = channelId.write()
         let monitorBytes: [UInt8] = data.write()
         
         let channelMonitor = ChannelMonitor(idBytes: idBytes, monitorBytes: monitorBytes)
         
         do {
-            try persistChannelMonitor(channelMonitor, for: channel_id.write().toHexString())
+            try persistChannelMonitor(channelMonitor, for: channelId.write().toHexString())
         } catch {
             print("\(#function) error: \(error)")
-            return Result_NoneChannelMonitorUpdateErrZ.ok()
+            return .PermanentFailure
         }
         
-        return Result_NoneChannelMonitorUpdateErrZ.ok()
+        return .Completed
     }
     
-    override func update_persisted_channel(channel_id: Bindings.OutPoint, update: Bindings.ChannelMonitorUpdate, data: Bindings.ChannelMonitor, update_id: Bindings.MonitorUpdateId) -> Bindings.Result_NoneChannelMonitorUpdateErrZ {
-        let idBytes: [UInt8] = channel_id.write()
+    override func updatePersistedChannel(channelId: Bindings.OutPoint, update: Bindings.ChannelMonitorUpdate, data: Bindings.ChannelMonitor, updateId: Bindings.MonitorUpdateId) -> Bindings.ChannelMonitorUpdateStatus {
+        let idBytes: [UInt8] = channelId.write()
         let monitorBytes: [UInt8] = data.write()
         
         let channelMonitor = ChannelMonitor(idBytes: idBytes, monitorBytes: monitorBytes)
@@ -34,10 +34,10 @@ class ChannelPersister: Persist {
             try persistChannelMonitor(channelMonitor, for: idBytes.toHexString())
         } catch {
             print("\(#function) error: \(error)")
-            return Result_NoneChannelMonitorUpdateErrZ.ok()
+            return .PermanentFailure
         }
         
-        return Result_NoneChannelMonitorUpdateErrZ.ok()
+        return .Completed
     }
     
     func persistChannelMonitor(_ channelMonitor: ChannelMonitor, for channelId: String) throws {
@@ -50,10 +50,9 @@ class ChannelPersister: Persist {
                withRootObject: channelMonitor,
                requiringSecureCoding: true
            )
-            try data.write(to: pathToPersist, options: [.atomic, .completeFileProtection])
+           try data.write(to: pathToPersist, options: [.atomic, .completeFileProtection])
         } catch {
-            print("failed to persist channel monitor")
-            throw error
+           throw error
         }
     }
 }

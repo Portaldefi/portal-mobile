@@ -16,7 +16,7 @@ struct Mainview: View {
     init() {
         views = [
             AnyView(AccountRootView()),
-            AnyView(EmptyView()),
+            AnyView(SwapView()),
             AnyView(LightningStatstView())
         ]
     }
@@ -49,33 +49,30 @@ struct Mainview: View {
             Spacer()
             
             Button {
-                viewState.openTab(.activity)
+                viewState.openTab(.swap)
             } label: {
-                if viewState.selectedTab == .activity {
+                if viewState.selectedTab == .swap {
                     RadialGradient.main
                         .mask(
                             VStack(spacing: 4) {
-                                Asset.activityIcon
-                                Text("Activity")
+                                Asset.swapIcon
+                                Text("Swap")
                                     .font(.Main.fixed(.bold, size: 14))
                             }
                         )
                 } else {
                     VStack(spacing: 4) {
-                        Asset.activityIcon
-                        Text("Activity")
+                        Asset.swapIcon
+                        Text("Swap")
                             .font(.Main.fixed(.bold, size: 14))
                     }
-                    .padding(6)
                     .foregroundColor(Color.gray)
                 }
             }
             .frame(width: 85)
-            .opacity(0.65)
-            .disabled(true)
             
             Spacer()
-            
+                        
             Button {
                 viewState.openTab(.lightning)
             } label: {
@@ -99,7 +96,6 @@ struct Mainview: View {
                 }
             }
             .frame(width: 85)
-            .opacity(0.65)
             .disabled(false)
             
             Spacer()

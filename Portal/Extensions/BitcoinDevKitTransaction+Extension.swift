@@ -23,10 +23,15 @@ enum TxType: Equatable {
     }
 }
 
-extension BitcoinDevKit.TransactionDetails {
+extension BitcoinDevKit.TransactionDetails: Equatable {
+    public static func == (lhs: BitcoinDevKit.TransactionDetails, rhs: BitcoinDevKit.TransactionDetails) -> Bool {
+        lhs.txid == rhs.txid
+    }
+    
     static var mockedConfirmed: BitcoinDevKit.TransactionDetails {
         let blockTime = BlockTime(height: 2345912, timestamp: 1662707961)
         return TransactionDetails(
+            transaction: nil,
             fee: 141,
             received: 55000,
             sent: 0,
@@ -40,7 +45,7 @@ extension BitcoinDevKit.TransactionDetails {
         let satAmountInt = UInt64(satAmountDouble)
         let defaults = UserDefaults.standard
         defaults.set("\(recipient.prefix(4))...\(recipient.suffix(4))", forKey: id + "recipient")
-        return TransactionDetails(fee: nil, received: 0, sent: satAmountInt, txid: id, confirmationTime: nil)
+        return TransactionDetails(transaction: nil, fee: nil, received: 0, sent: satAmountInt, txid: id, confirmationTime: nil)
     }
     
     var type: TxType {

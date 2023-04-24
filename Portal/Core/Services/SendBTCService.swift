@@ -106,7 +106,7 @@ class SendBTCService: ISendAssetService {
         
         do {
             if let invoice = try ldkManager.decode(invoice: inputString) {
-                if let value = invoice.amount_milli_satoshis().getValue() {
+                if let value = invoice.amountMilliSatoshis() {
                     return .lightningInvoice(amount: String(describing: Decimal(value)/1000/100_000_000))
                 } else {
                     return .lightningInvoice(amount: String())

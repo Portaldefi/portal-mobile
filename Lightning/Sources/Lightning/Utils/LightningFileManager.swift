@@ -12,6 +12,7 @@ public struct LightningFileManager {
     let keysSeedPath = URL.keySeedDirectory
     let monitorPath = URL.channelMonitorsDirectory
     let managerPath = URL.channelManagerDirectory
+    let scorerPath = URL.scorerDirectory
     let networkGraphPath = URL.networkGraphDirectory
     let paymentsPath = URL.paymentsDirectory
     
@@ -53,6 +54,10 @@ public struct LightningFileManager {
         readNetworkGraph()
     }
     
+    public func getSerializedScorer() -> [UInt8]? {
+        readScorer()
+    }
+    
     public func getKeysSeed() -> [UInt8]? {
         readKeysSeed()
     }
@@ -82,6 +87,7 @@ public struct LightningFileManager {
             try Data(graph).write(to: networkGraphPath)
             return .success(())
         } catch {
+            print("Cannot persist net graph: \(error)")
             return .failure(.cannotWrite)
         }
     }
@@ -89,6 +95,16 @@ public struct LightningFileManager {
     public func persistChannelManager(manager: [UInt8]) -> Result<Void, PersistenceError> {
         do {
             try Data(manager).write(to: managerPath, options: [.atomic, .completeFileProtection])
+            return .success(())
+        } catch {
+            print("persistChannelManager FAILURE")
+            return .failure(.cannotWrite)
+        }
+    }
+    
+    public func persistScorer(scorer: [UInt8]) -> Result<Void, PersistenceError> {
+        do {
+            try Data(scorer).write(to: scorerPath, options: [.atomic, .completeFileProtection])
             return .success(())
         } catch {
             print("persistChannelManager FAILURE")
@@ -169,6 +185,15 @@ public struct LightningFileManager {
     private func readNetworkGraph() -> [UInt8]? {
         do {
             let data = try Data(contentsOf: networkGraphPath)
+            return Array(data)
+        } catch {
+            return nil
+        }
+    }
+    
+    private func readScorer() -> [UInt8]? {
+        do {
+            let data = try Data(contentsOf: scorerPath)
             return Array(data)
         } catch {
             return nil
