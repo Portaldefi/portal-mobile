@@ -23,28 +23,12 @@ class LightningKitManager: ILightningKitManager {
     private let instance: Node
     private let fileManager = LightningFileManager()
     private var started = false
-    
-    var allChannels: [ChannelDetails] {
-        instance.allChannels
-    }
-    
-    var usableChannels: [ChannelDetails] {
-        instance.usableChannels
-    }
-    
-    var activePeersPublisher: AnyPublisher<[String], Never> {
-        instance.connectedPeers
-    }
-    
+        
     var transactionsPublisher: AnyPublisher<[TransactionRecord], Never> {
         let payments = fileManager.getPayments().map{ TransactionRecord(payment: $0)}
         return Just(payments).eraseToAnyPublisher()
     }
-    
-    var channelBalance: Decimal {
-        Decimal(instance.totalBalance)
-    }
-        
+            
     init(connectionType: ConnectionType) {
         switch connectionType {
         case .regtest(let config):
@@ -53,19 +37,6 @@ class LightningKitManager: ILightningKitManager {
             instance = Node(type: .testnet(config))
         }
     }
-    
-//    func generateRandomBytes() -> String? {
-//        var keyData = Data(count: 32)
-//        let result = keyData.withUnsafeMutableBytes {
-//            SecRandomCopyBytes(kSecRandomDefault, 32, $0.baseAddress!)
-//        }
-//        if result == errSecSuccess {
-//            return keyData.base64EncodedString()
-//        } else {
-//            print("Problem generating random bytes")
-//            return nil
-//        }
-//    }
     
     func start() async throws {
         guard !started else { throw ServiceError.alreadyRunning }
@@ -89,107 +60,6 @@ class LightningKitManager: ILightningKitManager {
         for await event in await instance.subscribeForNodeEvents() {
             handleNodeEvent(event)
         }
-    }
-    
-    func connectPeer(_ peer: Peer) async throws {
-        try await instance.connectPeer(
-            pubKey: peer.peerPubKey,
-            hostname: peer.connectionInformation.hostname,
-            port: peer.connectionInformation.port
-        )
-    }
-    
-    func disconnectPeer(_ peer: Peer) throws {
-        try instance.disconnectPeer(pubKey: peer.peerPubKey)
-    }
-    
-    func createInvoice(amount: String, description: String) async -> String? {
-        if let amountDouble = Double(amount), amountDouble > 0 {
-            let satAmountDouble = amountDouble * 100_000_000
-            let satAmountInt = UInt64(satAmountDouble)
-            return await instance.createInvoice(satAmount: satAmountInt, description: description)
-        }
-        return await instance.createInvoice(satAmount: nil, description: description)
-    }
-    
-    func createInvoice(paymentHash: String, satAmount: UInt64) async -> String? {
-        await instance.createInvoice(paymentHash: paymentHash, satAmount: satAmount)
-    }
-    
-    func broadcastTransaction(tx: [UInt8]) {
-        instance.broacastTransaction(tx: tx)
-    }
-    
-    func pay(invoice: String) -> Combine.Future<TransactionRecord, Error> {
-        Future { [unowned self] promise in
-            Task {
-                do {
-                    if let invoice = try self.decode(invoice: invoice) {
-                        print("Invoice decoded")
-                        
-                        let paymentResult = try await self.instance.pay(invoice: invoice)
-                        let transactionRecord = TransactionRecord(payment: paymentResult)
-                        promise(.success(transactionRecord))
-                    }
-                } catch {
-                    promise(.failure(error))
-                }
-            }
-        }
-    }
-    
-    func pay(invoice: Invoice) async throws -> TransactionRecord {
-        TransactionRecord(payment: try await self.instance.pay(invoice: invoice))
-    }
-    
-    func decode(invoice: String) throws -> Invoice? {
-        try instance.decode(invoice: invoice)
-    }
-    
-    func openChannel(peer: Peer) async throws {
-        print("opening channel with peer: \(peer.peerPubKey)")
-        
-        let channelValue: UInt64 = 2500000
-        let reserveAmount: UInt64 = 1000
-        // send open channel request through channel manager
-        let channelInfo = try await instance.requestChannelOpen(
-            peer.peerPubKey,
-            channelValue: channelValue,
-            reserveAmount: reserveAmount
-        )
-        
-        print("open channel requested")
-        // decode output script
-        if let address = await instance.getFundingTransactionScriptPubKey(outputScript: channelInfo.fundingOutputScript) {
-            print("decoded address: \(address)")
-            // create funding transaction
-            let fundingTransaction = try rawTx(amount: channelValue, address: address)
-            // finilaze opening channel by providing funding transaction to channel manager
-            if try await instance.openChannel(
-                channelOpenInfo: channelInfo,
-                fundingTransaction: fundingTransaction.serialize()
-            ) {
-                print("Channel \(channelInfo.temporaryChannelId) is opened")
-            } else {
-                throw ServiceError.cannotOpenChannel
-            }
-        }
-    }
-    
-    func decodeAddress(outputScript: [UInt8]) async -> String? {
-        await instance.decodeAddress(outputScript: outputScript)
-    }
-    
-    func getDescriptorInfo(descriptor: String) async throws -> String? {
-        try await instance.getDescriptorInfo(descriptor: descriptor)
-    }
-    
-    func scanTxOutSet(descriptor: String) async throws -> [String: Any] {
-        try await instance.scanTxOutSet(descriptor: descriptor)
-    }
-    
-    func generate(blocks: Int, toAddress: String) async throws -> [String] {
-        try await instance.generate(blocks: blocks, toAddress: toAddress)
     }
     
     private func handleNodeEvent(_ event: Event) {
@@ -322,6 +192,131 @@ class LightningKitManager: ILightningKitManager {
             throw ServiceError.keySeedNotFound
         }
         return try adapter.rawTransaction(amount: amount, address: address)
+    }
+}
+
+extension LightningKitManager: IBitcoinCore {
+    func broadcastTransaction(tx: [UInt8]) {
+        instance.broacastTransaction(tx: tx)
+    }
+        
+    func decodeAddress(outputScript: [UInt8]) async -> String? {
+        await instance.decodeAddress(outputScript: outputScript)
+    }
+    
+    func getDescriptorInfo(descriptor: String) async throws -> String? {
+        try await instance.getDescriptorInfo(descriptor: descriptor)
+    }
+    
+    func scanTxOutSet(descriptor: String) async throws -> [String: Any] {
+        try await instance.scanTxOutSet(descriptor: descriptor)
+    }
+    
+    func generate(blocks: Int, toAddress: String) async throws -> [String] {
+        try await instance.generate(blocks: blocks, toAddress: toAddress)
+    }
+}
+
+extension LightningKitManager: ILightningPeerHandler {
+    func connectPeer(_ peer: Peer) async throws {
+        try await instance.connectPeer(
+            pubKey: peer.peerPubKey,
+            hostname: peer.connectionInformation.hostname,
+            port: peer.connectionInformation.port
+        )
+    }
+    
+    func disconnectPeer(_ peer: Peer) throws {
+        try instance.disconnectPeer(pubKey: peer.peerPubKey)
+    }
+}
+
+extension LightningKitManager: ILightningInvoiceHandler {
+    func createInvoice(amount: String, description: String) async -> String? {
+        if let amountDouble = Double(amount), amountDouble > 0 {
+            let satAmountDouble = amountDouble * 100_000_000
+            let satAmountInt = UInt64(satAmountDouble)
+            return await instance.createInvoice(satAmount: satAmountInt, description: description)
+        }
+        return await instance.createInvoice(satAmount: nil, description: description)
+    }
+    
+    func createInvoice(paymentHash: String, satAmount: UInt64) async -> String? {
+        await instance.createInvoice(paymentHash: paymentHash, satAmount: satAmount)
+    }
+    
+    func pay(invoice: String) -> Combine.Future<TransactionRecord, Error> {
+        Future { [unowned self] promise in
+            Task {
+                do {
+                    if let invoice = try self.decode(invoice: invoice) {
+                        print("Invoice decoded")
+                        
+                        let paymentResult = try await self.instance.pay(invoice: invoice)
+                        let transactionRecord = TransactionRecord(payment: paymentResult)
+                        promise(.success(transactionRecord))
+                    }
+                } catch {
+                    promise(.failure(error))
+                }
+            }
+        }
+    }
+    
+    func pay(invoice: Invoice) async throws -> TransactionRecord {
+        TransactionRecord(payment: try await self.instance.pay(invoice: invoice))
+    }
+    
+    func decode(invoice: String) throws -> Invoice? {
+        try instance.decode(invoice: invoice)
+    }
+}
+
+extension LightningKitManager: ILightningChannels {
+    var allChannels: [ChannelDetails] {
+        instance.allChannels
+    }
+    
+    var usableChannels: [ChannelDetails] {
+        instance.usableChannels
+    }
+    
+    var activePeersPublisher: AnyPublisher<[String], Never> {
+        instance.connectedPeers
+    }
+    
+    var channelBalance: Decimal {
+        Decimal(instance.totalBalance)
+    }
+    
+    func openChannel(peer: Peer) async throws {
+        print("opening channel with peer: \(peer.peerPubKey)")
+        
+        let channelValue: UInt64 = 2500000
+        let reserveAmount: UInt64 = 1000
+        // send open channel request through channel manager
+        let channelInfo = try await instance.requestChannelOpen(
+            peer.peerPubKey,
+            channelValue: channelValue,
+            reserveAmount: reserveAmount
+        )
+        
+        print("open channel requested")
+        // decode output script
+        if let address = await instance.getFundingTransactionScriptPubKey(outputScript: channelInfo.fundingOutputScript) {
+            print("decoded address: \(address)")
+            // create funding transaction
+            let fundingTransaction = try rawTx(amount: channelValue, address: address)
+            // finilaze opening channel by providing funding transaction to channel manager
+            if try await instance.openChannel(
+                channelOpenInfo: channelInfo,
+                fundingTransaction: fundingTransaction.serialize()
+            ) {
+                print("Channel \(channelInfo.temporaryChannelId) is opened")
+            } else {
+                throw ServiceError.cannotOpenChannel
+            }
+        }
     }
 }
 
