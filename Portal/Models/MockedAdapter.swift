@@ -10,6 +10,10 @@ import Combine
 import BitcoinDevKit
 
 class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepositAdapter, IBalanceAdapter {
+    var pubKey: String {
+        "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3"
+    }
+    
     var L1Balance: Decimal { 0.003 }
     
     func send(amount: Decimal, address: String) throws -> TransactionRecord {

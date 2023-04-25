@@ -10,6 +10,7 @@ import Combine
 import BitcoinDevKit
 
 protocol ISendBitcoinAdapter {
+    var pubKey: String { get }
     var balance: Decimal { get }
     func validate(address: String) throws
     func fee(max: Bool, address: String, amount: Decimal, fee: Int?) throws -> UInt64?
