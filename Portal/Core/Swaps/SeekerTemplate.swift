@@ -15,8 +15,8 @@ class SeekerTemplate: ISubmarineSwap {
     private let REQUIRED_CONFIRMATIONS: Int32 = 3
     private let DEFAULT_MINER_FEE = 200
     
-    private let bitcoinKit: IBitcoinKitManager
-    private let lightningKit: ILightningKitManager
+    private let bitcoinKit: IAdapter & ISendBitcoinAdapter
+    private let lightningKit: ILightningInvoiceHandler & IBitcoinCore
     
     private var payDescriptor: String?
     
@@ -28,7 +28,7 @@ class SeekerTemplate: ISubmarineSwap {
         let wallet = Container.walletManager().activeWallets.first!
         let adapter = Container.adapterManager().adapter(for: wallet)!
         
-        bitcoinKit = adapter as! IBitcoinKitManager
+        bitcoinKit = adapter as! IAdapter & ISendBitcoinAdapter
         lightningKit = Container.lightningKitManager()
     }
     

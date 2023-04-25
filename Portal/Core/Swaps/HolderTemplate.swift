@@ -9,8 +9,8 @@ import Foundation
 import Factory
 
 class HolderTemplate: ISubmarineSwap {
-    private let bitcoinKit: IBitcoinKitManager
-    private let lightningKit: ILightningKitManager
+    private let bitcoinKit: ISendBitcoinAdapter
+    private let lightningKit: ILightningInvoiceHandler
     
     var data: SwapInfo?
     
@@ -20,7 +20,7 @@ class HolderTemplate: ISubmarineSwap {
         let wallet = Container.walletManager().activeWallets.first!
         let adapter = Container.adapterManager().adapter(for: wallet)!
         
-        bitcoinKit = adapter as! IBitcoinKitManager
+        bitcoinKit = adapter as! ISendBitcoinAdapter
         lightningKit = Container.lightningKitManager()
     }
     

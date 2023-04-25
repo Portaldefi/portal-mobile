@@ -29,8 +29,8 @@ class SwapViewViewModel: ObservableObject {
     
     @ObservedObject var viewState = Container.viewState()
     
-    private let bitcoinKit: IBitcoinKitManager
-    private let lightningKit: ILightningKitManager
+    private let bitcoinKit: IBalanceAdapter & ISendBitcoinAdapter
+    private let lightningKit: ILightningChannels
     private let marketData: MarketDataService
     
     private let swap: SubmarineSwap
@@ -60,7 +60,7 @@ class SwapViewViewModel: ObservableObject {
     init() {
         self.marketData = Container.marketData()
         let wallet = Container.walletManager().wallets.first!
-        bitcoinKit = Container.adapterManager().adapter(for: wallet) as! IBitcoinKitManager
+        bitcoinKit = Container.adapterManager().adapter(for: wallet) as! IBalanceAdapter & ISendBitcoinAdapter
         lightningKit = Container.lightningKitManager()
         
         let swapInfo = SwapInfo.mocked
