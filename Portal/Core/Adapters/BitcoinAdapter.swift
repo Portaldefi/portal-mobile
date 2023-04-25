@@ -9,9 +9,10 @@ import Foundation
 import Combine
 import BitcoinDevKit
 import HsCryptoKit
+import Factory
 
-final class BitcoinAdapter: IBitcoinKitManager {
-    let pubKey: String
+final class BitcoinAdapter {
+    private let publicKey: String
     private let ldkManager = Container.lightningKitManager()
     
     private enum DereviationPathBranch: Int {
@@ -20,7 +21,7 @@ final class BitcoinAdapter: IBitcoinKitManager {
     
     private let electrumTestNetURL = "ssl://electrum.blockstream.info:60002"
     private let espolaRegTestURL = "http:/localhost:3002"
-    var blockChainHeight: Int32 = 0
+    private var blockChainHeight: Int32 = 0
     
     private let coinRate: Decimal = pow(10, 8)
     
@@ -67,7 +68,7 @@ final class BitcoinAdapter: IBitcoinKitManager {
         let keyData = Data(keyBytes)
         
         let compressedKey = Crypto.publicKey(privateKey: keyData, compressed: true)
-        self.pubKey = compressedKey.toHexString()
+        self.publicKey = compressedKey.toHexString()
 
         
         if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
@@ -210,8 +211,6 @@ extension BitcoinAdapter: IAdapter {
     }
 }
 
-import Factory
-
 extension BitcoinAdapter: IBalanceAdapter {
     var state: AdapterState {
         adapterState
@@ -251,6 +250,10 @@ extension BitcoinAdapter: ITransactionsAdapter {
 }
 
 extension BitcoinAdapter: ISendBitcoinAdapter {
+    var pubKey: String {
+        publicKey
+    }
+    
     func rawTransaction(amount: UInt64, address: String) throws -> Transaction {
         let receiverAddress = try Address(address: address)
         let receiverAddressScript = receiverAddress.scriptPubkey()
