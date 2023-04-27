@@ -32,6 +32,16 @@ extension SharedContainer {
         
         return AccountStorage(localStorage: localStorage, secureStorage: secureStorage, accountStorage: dbStorage)
     }
+    
+    static let txDataStorage = Factory<ITxDataStorage>(scope: .singleton) {
+        let dbContext: NSManagedObjectContext = {
+            let backgroundContext = PersistenceController.shared.container.newBackgroundContext()
+            backgroundContext.automaticallyMergesChangesFromParent = true
+            return backgroundContext
+        }()
+        
+        return TxDataStorage(context: dbContext)
+    }
         
     static let adapterManager = Factory<IAdapterManager>(scope: .singleton) {
         let appConfigProvider = Container.configProvider()
