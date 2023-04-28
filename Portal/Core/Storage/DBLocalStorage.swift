@@ -16,69 +16,6 @@ final class DBlocalStorage {
         self.context = context
     }
 }
- 
-protocol ITxDataStorage {
-    var context: NSManagedObjectContext { get }
-    func fetchTxData(txID: String) -> TxData?
-    func update(id: String, notes: String)
-    func update(id: String, labels: [TxLabel])
-    func update(id: String, price: Decimal)
-    func clear()
-}
-
-class TxDataStorage: ITxDataStorage {
-    let context: NSManagedObjectContext
-    
-    init(context: NSManagedObjectContext) {
-        self.context = context
-    }
-    
-    func update(id: String, notes: String) {
-        let tx = fetchOrCreateNew(id: id)
-        tx.notes = notes
-        try? context.save()
-    }
-    
-    func update(id: String, labels: [TxLabel]) {
-        let tx = fetchOrCreateNew(id: id)
-        tx.labelsJson = labels.map{ $0.label }.joined(separator: ",")
-        try? context.save()
-    }
-    
-    func update(id: String, price: Decimal) {
-        let tx = fetchOrCreateNew(id: id)
-        tx.txUSDPrice = price as NSDecimalNumber
-        try? context.save()
-    }
-    
-    private func fetchOrCreateNew(id: String) -> TxData {
-        if let tx = fetchTxData(txID: id) {
-            return tx
-        } else {
-            return TxData(context: context)
-        }
-    }
-    
-    func fetchTxData(txID: String) -> TxData? {
-        var txData: TxData? = nil
-        
-        context.performAndWait {
-            let fetchRequest: NSFetchRequest<TxData> = TxData.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "txID == %@", txID)
-            do {
-                let transactionInfos = try context.fetch(fetchRequest)
-                txData = transactionInfos.first
-            } catch {
-                print("Error fetching TransactionInfo: \(error)")
-            }
-        }
-        
-        return txData
-    }
-    func clear() {
-        
-    }
-}
 
 extension DBlocalStorage: IAccountRecordStorage {
     var accountRecords: [AccountRecord] {
