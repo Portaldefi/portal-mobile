@@ -31,7 +31,7 @@ class SwapViewViewModel: ObservableObject {
     
     private let bitcoinKit: IBitcoinKitManager
     private let lightningKit: ILightningKitManager
-    private let marketData: MarketDataService
+    private let marketData: IMarketDataRepository
     
     private let swap: SubmarineSwap
     
