@@ -16,7 +16,7 @@ class SingleTxViewModel: ObservableObject {
     let tx: TransactionRecord
     
     @Published private(set) var notes: String?
-    @Published private(set) var labels: [TxLable]
+    @Published private(set) var labels: [TxLabel]
     
     var amount: String {
         guard let amount = tx.amount else { return "0" }

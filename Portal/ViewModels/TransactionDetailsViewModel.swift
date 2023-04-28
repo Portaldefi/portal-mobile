@@ -96,7 +96,7 @@ class TransactionDetailsViewModel: ObservableObject {
     @Published var confirmations: Int32 = 0
     
     @Published var notes = String()
-    @Published var labels: [TxLable] = []
+    @Published var labels: [TxLabel] = []
     
     var explorerUrl: URL? {
         switch coin.type {
@@ -124,7 +124,7 @@ class TransactionDetailsViewModel: ObservableObject {
         }
         
         if let tags = storage.object(forKey: transaction.id + "labels") as? [String] {
-            self.labels = tags.map{ TxLable(label: $0 )}
+            self.labels = tags.map{ TxLabel(label: $0 )}
         }
         
         if let blockHeight = tx.blockHeight {

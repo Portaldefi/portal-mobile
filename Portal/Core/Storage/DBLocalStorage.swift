@@ -21,7 +21,7 @@ protocol ITxDataStorage {
     var context: NSManagedObjectContext { get }
     func fetchTxData(txID: String) -> TxData?
     func update(id: String, notes: String)
-    func update(id: String, labels: [TxLable])
+    func update(id: String, labels: [TxLabel])
     func update(id: String, price: Decimal)
     func clear()
 }
@@ -39,9 +39,9 @@ class TxDataStorage: ITxDataStorage {
         try? context.save()
     }
     
-    func update(id: String, labels: [TxLable]) {
+    func update(id: String, labels: [TxLabel]) {
         let tx = fetchOrCreateNew(id: id)
-        tx.labelsJson = "notes"
+        tx.labelsJson = labels.map{ $0.label }.joined(separator: ",")
         try? context.save()
     }
     

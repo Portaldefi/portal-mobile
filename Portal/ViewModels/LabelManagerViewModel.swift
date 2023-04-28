@@ -10,8 +10,8 @@ import Foundation
 
 class LabelsManagerViewModel: ObservableObject {
     let title = "Select labels"
-    @Published var labels: [TxLable]
-    @Published var selectedLabels: [TxLable]
+    @Published var labels: [TxLabel]
+    @Published var selectedLabels: [TxLabel]
     private let selectionStateHash: Int
     private let initialStateHash: Int
     
@@ -21,16 +21,16 @@ class LabelsManagerViewModel: ObservableObject {
     @Published var showEditLabelInterface = false
 
     @Published var newLabelTitle: String?
-    @Published var editItem: TxLable?
+    @Published var editItem: TxLabel?
     
     let storage: UserDefaults
     let storageKey = "TxLabelsStorage"
     
-    init(selectedLabels: [TxLable]) {
+    init(selectedLabels: [TxLabel]) {
         self.storage = UserDefaults.standard
         
         let allLabels = storage.object(forKey: storageKey) as? [String] ?? []
-        self.labels = allLabels.map{ TxLable(label: $0) }
+        self.labels = allLabels.map{ TxLabel(label: $0) }
         self.selectedLabels = selectedLabels
         
         self.initialStateHash = allLabels.hashValue
@@ -55,7 +55,7 @@ class LabelsManagerViewModel: ObservableObject {
         .eraseToAnyPublisher()
     }
     
-    func update(item: TxLable) {
+    func update(item: TxLabel) {
         if let index = selectedLabels.firstIndex(where: { $0.label == item.label }) {
             selectedLabels.remove(at: index)
         } else {
@@ -63,7 +63,7 @@ class LabelsManagerViewModel: ObservableObject {
         }
     }
     
-    func remove(item: TxLable) {
+    func remove(item: TxLabel) {
         if let index = labels.firstIndex(where: { $0.label == item.label }) {
             labels.remove(at: index)
         }
@@ -73,7 +73,7 @@ class LabelsManagerViewModel: ObservableObject {
         storage.set(labels.map{ $0.label }, forKey: storageKey)
     }
     
-    func isSelected(item: TxLable) -> Bool {
+    func isSelected(item: TxLabel) -> Bool {
         selectedLabels.contains(where: { $0.label == item.label })
     }
     
@@ -82,14 +82,14 @@ class LabelsManagerViewModel: ObservableObject {
             return
         }
 
-        let label = TxLable(label: newLabelTitle)
+        let label = TxLabel(label: newLabelTitle)
         labels.append(label)
         
         self.newLabelTitle = nil
         storage.set(labels.map{ $0.label }, forKey: storageKey)
     }
     
-    func edit(item: TxLable) {
+    func edit(item: TxLabel) {
         editItem = item
         newLabelTitle = item.label
         showEditLabelInterface.toggle()

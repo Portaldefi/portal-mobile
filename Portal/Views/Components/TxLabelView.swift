@@ -9,7 +9,7 @@ import SwiftUI
 import PortalUI
 
 struct TxLabelView: View {
-    let label: TxLable
+    let label: TxLabel
     
     var body: some View {
         Text(label.label)
@@ -24,7 +24,7 @@ struct TxLabelView: View {
 
 struct TxLabelView_Previews: PreviewProvider {
     static var previews: some View {
-        TxLabelView(label: TxLable(label: "Preview"))
+        TxLabelView(label: TxLabel(label: "Preview"))
             .padding()
             .previewLayout(.sizeThatFits)
     }
