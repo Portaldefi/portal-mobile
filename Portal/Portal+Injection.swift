@@ -33,14 +33,16 @@ extension SharedContainer {
         return AccountStorage(localStorage: localStorage, secureStorage: secureStorage, accountStorage: dbStorage)
     }
     
-    static let txDataStorage = Factory<ITxDataStorage>(scope: .singleton) {
+    static let txDataStorage = Factory<ITxUserDataStorage>(scope: .singleton) {
         let dbContext: NSManagedObjectContext = {
             let backgroundContext = PersistenceController.shared.container.newBackgroundContext()
             backgroundContext.automaticallyMergesChangesFromParent = true
             return backgroundContext
         }()
         
-        return TxDataStorage(context: dbContext)
+        let marketDataRepo = Container.marketData()
+        
+        return TxDataStorage(context: dbContext, marketData: marketDataRepo)
     }
         
     static let adapterManager = Factory<IAdapterManager>(scope: .singleton) {
@@ -105,7 +107,7 @@ extension SharedContainer {
         BiometricAuthentication()
     }
     
-    static let marketData = Factory<MarketDataService>(scope: .singleton) {
+    static let marketData = Factory<IMarketDataRepository>(scope: .singleton) {
         do {
             return try MarketDataService(configProvider: Container.configProvider())
         } catch {
