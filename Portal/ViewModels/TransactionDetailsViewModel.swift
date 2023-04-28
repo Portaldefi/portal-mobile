@@ -11,16 +11,15 @@ import BitcoinDevKit
 import Factory
 import BigInt
 
-class TransactionDetailsViewModel: ObservableObject {
-    let storage: UserDefaults
-    
+class TransactionDetailsViewModel: ObservableObject {    
     struct TestNetDataResponse: Codable {
         let height: Int
     }
     
     let coin: Coin
     let transaction: TransactionRecord
-    let ticker: TickerModel?
+    
+    private let storage: ITxUserDataStorage
     
     @Published var blockChainHeight: Int32 = 0
     
@@ -59,18 +58,18 @@ class TransactionDetailsViewModel: ObservableObject {
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            return (Decimal(ticker?.price ?? 1) * (amount/100_000_000)).double.usdFormatted()
+            return (transaction.userData.price * (amount/100_000_000)).double.usdFormatted()
         case .ethereum, .erc20:
-            return (Decimal(ticker?.price ?? 1) * amount).double.usdFormatted()
+            return (transaction.userData.price * amount).double.usdFormatted()
         }
     }
     
     var recipientString: String? {
         switch source {
         case .btcOnChain:
-            return storage.object(forKey: transaction.id + "recipient") as? String
+            return ""//storage.object(forKey: transaction.id + "recipient") as? String
         case .ethOnChain:
-            return storage.object(forKey: transaction.id + "recipient") as? String
+            return ""//storage.object(forKey: transaction.id + "recipient") as? String
         case .lightning:
             return transaction.to
         }
@@ -111,33 +110,31 @@ class TransactionDetailsViewModel: ObservableObject {
     
     private var subscriptions = Set<AnyCancellable>()
     
-    init(coin: Coin, ticker: TickerModel?, tx: TransactionRecord, blockChainHeight: Int32) {
+    init(coin: Coin, tx: TransactionRecord, blockChainHeight: Int32) {
+        self.storage = Container.txDataStorage()
+
         self.coin = coin
-        self.ticker = ticker
-        self.storage = UserDefaults.standard
         self.transaction = tx
         self.blockChainHeight = blockChainHeight
         self.source = transaction.source
         
-        if let notes = storage.string(forKey: transaction.id + "notes") {
-            self.notes = notes
-        }
-        
-        if let tags = storage.object(forKey: transaction.id + "labels") as? [String] {
-            self.labels = tags.map{ TxLabel(label: $0 )}
-        }
-        
         if let blockHeight = tx.blockHeight {
             confirmations = blockChainHeight - Int32(blockHeight) + 1
         }
+                
+        if let notes = tx.userData.notes, !notes.isEmpty {
+            self.notes = notes
+        }
         
-        $labels.sink { [unowned self] labels in
-            self.storage.set(labels.map{ $0.label }, forKey: self.transaction.id + "labels")
+        self.labels = tx.userData.labels
+        
+        $labels.removeDuplicates().dropFirst().sink { [unowned self] labels in
+            self.storage.update(source: tx.source, id: tx.id, labels: labels)
         }
         .store(in: &subscriptions)
         
-        $notes.sink { [unowned self] notes in
-            self.storage.set(notes, forKey: self.transaction.id + "notes")
+        $notes.removeDuplicates().dropFirst().sink { [unowned self] notes in
+            self.storage.update(source: tx.source, id: tx.id, notes: notes)
         }
         .store(in: &subscriptions)
     }
@@ -147,15 +144,6 @@ extension TransactionDetailsViewModel {
     static func config(coin: Coin, tx: TransactionRecord) -> TransactionDetailsViewModel {
         let adapterManager: IAdapterManager = Container.adapterManager()
         let walletManager: IWalletManager = Container.walletManager()
-        let marketData = Container.marketData()
-        let ticker: TickerModel?
-        
-        switch coin.type {
-        case .bitcoin, .lightningBitcoin:
-            ticker = marketData.btcTicker
-        case .ethereum, .erc20:
-            ticker = marketData.ethTicker
-        }
 
         guard
             let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
@@ -164,7 +152,7 @@ extension TransactionDetailsViewModel {
             fatalError("coudn't fetch dependencies")
         }
 
-        return TransactionDetailsViewModel(coin: coin, ticker: ticker, tx: tx, blockChainHeight: adapter.blockchainHeight)
+        return TransactionDetailsViewModel(coin: coin, tx: tx, blockChainHeight: adapter.blockchainHeight)
     }
 }
 
