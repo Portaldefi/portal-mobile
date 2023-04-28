@@ -53,8 +53,7 @@ class SwapViewViewModel: ObservableObject {
     }
     
     var amountValue: String {
-        guard let btcUSDPrice = marketData.btcTicker?.price else { return "" }
-        return (Decimal(btcUSDPrice) * 0.0005).double.usdFormatted()
+        return (marketData.lastSeenBtcPrice * 0.0005).double.usdFormatted()
     }
     
     init() {

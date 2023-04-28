@@ -98,13 +98,11 @@ class SendViewViewModel: ObservableObject {
                 
                 switch coin.type {
                 case .bitcoin:
-                    let btcPriceInUsd = Decimal(self.marketData.btcTicker?.price ?? 1)
-                    self.valueString = (sendService.balance * btcPriceInUsd).double.usdFormatted()
+                    self.valueString = (sendService.balance * self.marketData.lastSeenBtcPrice).double.usdFormatted()
                 case .lightningBitcoin:
                     fatalError("not implemented")
                 case .ethereum, .erc20:
-                    let ethPriceInUsd = Decimal(self.marketData.ethTicker?.price ?? 1)
-                    self.valueString = (sendService.balance * ethPriceInUsd).double.usdFormatted()
+                    self.valueString = (sendService.balance * self.marketData.lastSeenEthPrice).double.usdFormatted()
                 }
             }
             .store(in: &subscriptions)
@@ -121,9 +119,9 @@ class SendViewViewModel: ObservableObject {
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            price = Decimal(marketData.btcTicker?.price ?? 1)
+            price = marketData.lastSeenBtcPrice
         case .ethereum, .erc20:
-            price = Decimal(marketData.ethTicker?.price ?? 1)
+            price = marketData.lastSeenEthPrice
         }
         
         exchanger = Exchanger(
@@ -170,8 +168,7 @@ class SendViewViewModel: ObservableObject {
             
             if let service = sendService {
                 balanceString = String(describing: service.spendable)
-                let btcPriceInUsd = Decimal(marketData.btcTicker?.price ?? 1)
-                valueString = (service.balance * btcPriceInUsd).double.usdFormatted()
+                valueString = (service.balance * marketData.lastSeenBtcPrice).double.usdFormatted()
             }
         case .lightningBitcoin:
             fatalError("not implemented yet")
@@ -188,8 +185,7 @@ class SendViewViewModel: ObservableObject {
             
             if let service = sendService {
                 balanceString = String(describing: service.spendable)
-                let ethPriceInUsd = Decimal(marketData.ethTicker?.price ?? 1)
-                valueString = (service.balance * ethPriceInUsd).double.usdFormatted()
+                valueString = (service.balance * marketData.lastSeenEthPrice).double.usdFormatted()
             }
         }
         

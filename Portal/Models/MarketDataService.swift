@@ -13,8 +13,8 @@ final class MarketDataService {
     private let btcTickerID: Any = "BTCUSD.G"
     private let ethTickerID: Any = "ETHUSD.G"
     
-    private(set) var btcTicker: TickerModel?
-    private(set) var ethTicker: TickerModel?
+    private var btcTicker: TickerModel?
+    private var ethTicker: TickerModel?
     private(set) var fiatCurrencies = [FiatCurrency]()
     
     private let jsonDecoder: JSONDecoder
