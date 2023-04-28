@@ -31,10 +31,10 @@ struct AssetDetailsView: View {
                 HStack {
                     HStack(spacing: 8) {
                         PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
+                            navigation.pop()
                             withAnimation {
                                 viewState.hideTabBar = false
                             }
-                            navigation.pop()
                         }
                         .frame(width: 20)
                         

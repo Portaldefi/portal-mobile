@@ -8,6 +8,8 @@ enum TxSource {
     case btcOnChain, ethOnChain, lightning
 }
 
+import Factory
+
 struct TransactionRecord: Identifiable {
     let id: String
     let type: TxType
@@ -20,21 +22,19 @@ struct TransactionRecord: Identifiable {
     let source: TxSource
     let preimage: String?
     let nodeId: String?
-    
+    let userData: TxUserData
+        
     var confirmationTimeString: String? {
         guard let confirmationTime = self.timestamp else { return nil }
         return Date(timeIntervalSince1970: TimeInterval(confirmationTime)).formatted()
     }
     
     var notes: String?  {
-        UserDefaults.standard.string(forKey: self.id + "notes")
+        userData.notes
     }
     
-    var labels: [TxLable] {
-        guard let tags = UserDefaults.standard.object(forKey: self.id + "labels") as? [String] else {
-            return []
-        }
-        return tags.map{ TxLable(label: $0 )}
+    var labels: [TxLabel] {
+        userData.labels
     }
     
     init(transaction: BitcoinDevKit.TransactionDetails) {
@@ -84,6 +84,10 @@ struct TransactionRecord: Identifiable {
         }
         preimage = nil
         nodeId = nil
+        
+        let storage = Container.txDataStorage()
+        let data = storage.fetch(source: source, id: id)
+        self.userData = TxUserData(data: data)
     }
     
     init(coin: Coin, transaction: EvmKit.Transaction, amount: Decimal?, type: TxType) {
@@ -105,6 +109,10 @@ struct TransactionRecord: Identifiable {
         
         preimage = nil
         nodeId = nil
+        
+        let storage = Container.txDataStorage()
+        let data = storage.fetch(source: source, id: id)
+        self.userData = TxUserData(data: data)
     }
         
     init(payment: LightningPayment) {
@@ -133,6 +141,10 @@ struct TransactionRecord: Identifiable {
         self.preimage = payment.preimage
         self.nodeId = payment.nodeId
         self.blockHeight = nil
+        
+        let storage = Container.txDataStorage()
+        let data = storage.fetch(source: source, id: id)
+        self.userData = TxUserData(data: data)
     }
 }
 

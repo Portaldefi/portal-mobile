@@ -107,6 +107,7 @@ struct Mainview: View {
             }
             .frame(width: 65)
         }
+        .opacity(viewState.hideTabBar ? 0.25 : 1)
         .padding(.horizontal, 25.5)
         .frame(height: 65)
         .background(Palette.grayScale0A)

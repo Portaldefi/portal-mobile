@@ -65,11 +65,11 @@ extension BitcoinDevKit.TransactionDetails: Equatable {
         UserDefaults.standard.string(forKey: self.txid + "notes")
     }
     
-    var labels: [TxLable] {
+    var labels: [TxLabel] {
         guard let tags = UserDefaults.standard.object(forKey: self.txid + "labels") as? [String] else {
             return []
         }
-        return tags.map{ TxLable(label: $0 )}
+        return tags.map{ TxLabel(label: $0 )}
     }
     
     var value: String {

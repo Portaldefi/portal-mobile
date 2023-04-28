@@ -55,7 +55,7 @@ struct QRCodeAddressTypeView: View {
                                             .font(.Main.fixed(.monoBold, size: 18))
                                             .foregroundColor(Palette.grayScaleF4)
                                         
-                                        TxLabelView(label: TxLable(label: "Recommended"))
+                                        TxLabelView(label: TxLabel(label: "Recommended"))
                                     }
                                     
                                     Text(type.description)

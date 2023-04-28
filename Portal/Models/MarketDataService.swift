@@ -79,18 +79,22 @@ final class MarketDataService {
             if btcTicker == nil || ethTicker == nil || btcTicker?.price == nil || ethTicker?.price == nil {
                 if let updatedBtcTicker = results.first(where: { $0.ticker_id == btcTickerID as? String }) {
                     btcTicker = updatedBtcTicker
+                    UserDefaults.standard.set(updatedBtcTicker.price, forKey: "lastSeenBtcPrice")
                 }
                 
                 if let updatedEthTicker = results.first(where: { $0.ticker_id == ethTickerID as? String }) {
                     ethTicker = updatedEthTicker
+                    UserDefaults.standard.set(updatedEthTicker.price, forKey: "lastSeenEthPrice")
                 }
             } else if Date() > lastUpdated {
                 if let updatedBtcTicker = results.first(where: { $0.ticker_id == btcTickerID as? String }) {
                     btcTicker = updatedBtcTicker
+                    UserDefaults.standard.set(updatedBtcTicker.price, forKey: "lastSeenBtcPrice")
                 }
                 
                 if let updatedEthTicker = results.first(where: { $0.ticker_id == ethTickerID as? String }) {
                     ethTicker = updatedEthTicker
+                    UserDefaults.standard.set(updatedEthTicker.price, forKey: "lastSeenEthPrice")
                 }
                 
                 lastUpdated = Date(timeIntervalSinceNow: updateThreshold)
@@ -139,6 +143,14 @@ final class MarketDataService {
 }
 
 extension MarketDataService: IMarketDataRepository {
+    var lastSeenBtcPrice: Decimal {
+        Decimal(UserDefaults.standard.double(forKey: "lastSeenBtcPrice"))
+    }
+    
+    var lastSeenEthPrice: Decimal {
+        Decimal(UserDefaults.standard.double(forKey: "lastSeenEthPrice"))
+    }
+    
     func pause() {
         
     }
@@ -175,6 +187,14 @@ extension MarketDataService: WebSocketDelegate {
 
 extension MarketDataService {
     private class MarketDataMocked: IMarketDataRepository {
+        var lastSeenBtcPrice: Decimal {
+            2000
+        }
+        
+        var lastSeenEthPrice: Decimal {
+            1000
+        }
+        
         var ethTicker: TickerModel?
         var onMarketDataUpdate = PassthroughSubject<Void, Never>()
         var btcTicker: TickerModel?

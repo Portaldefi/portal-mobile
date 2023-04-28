@@ -9,7 +9,7 @@ import SwiftUI
 import PortalUI
 
 struct SelectableTxLabelView: View {
-    let item: TxLable
+    let item: TxLabel
     let isSelected: Bool
     
     var body: some View {
@@ -55,9 +55,9 @@ struct SelectableTxLabelView: View {
 struct SelectableTxLabelView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            SelectableTxLabelView(item: TxLable(label: "Buisness"), isSelected: false)
+            SelectableTxLabelView(item: TxLabel(label: "Buisness"), isSelected: false)
                 .padding()
-            SelectableTxLabelView(item: TxLable(label: "Dev"), isSelected: true)
+            SelectableTxLabelView(item: TxLabel(label: "Dev"), isSelected: true)
                 .padding()
         }
             .previewLayout(.sizeThatFits)

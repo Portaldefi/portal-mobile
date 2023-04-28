@@ -9,7 +9,7 @@ import SwiftUI
 import PortalUI
 
 struct TxLabelsView: View {
-    let labels: [TxLable]
+    let labels: [TxLabel]
     
     var body: some View {
         ZStack(alignment: .trailing) {
@@ -38,12 +38,12 @@ struct TxLabelsView: View {
 struct TxLabelsView_Previews: PreviewProvider {
     static var previews: some View {
         TxLabelsView(labels: [
-            TxLable(label: "Taxes"),
-            TxLable(label: "Buisness"),
-            TxLable(label: "Friend"),
-            TxLable(label: "Do Not Spend"),
-            TxLable(label: "Savings"),
-            TxLable(label: "Food")
+            TxLabel(label: "Taxes"),
+            TxLabel(label: "Buisness"),
+            TxLabel(label: "Friend"),
+            TxLabel(label: "Do Not Spend"),
+            TxLabel(label: "Savings"),
+            TxLabel(label: "Food")
         ])
         .padding()
         .previewLayout(.sizeThatFits)
