@@ -56,10 +56,12 @@ class LabelsManagerViewModel: ObservableObject {
     }
     
     func update(item: TxLabel) {
-        if let index = selectedLabels.firstIndex(where: { $0.label == item.label }) {
-            selectedLabels.remove(at: index)
-        } else {
-            selectedLabels.append(item)
+        DispatchQueue.main.async {
+            if let index = self.selectedLabels.firstIndex(where: { $0.label == item.label }) {
+                self.selectedLabels.remove(at: index)
+            } else {
+                self.selectedLabels.append(item)
+            }
         }
     }
     
