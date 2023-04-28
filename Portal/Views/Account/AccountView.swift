@@ -46,10 +46,10 @@ struct AccountView: View {
                                 .padding(.trailing, 10)
                                 .contentShape(Rectangle())
                                 .onTapGesture {
+                                    navigation.push(.assetDetails(item: item))
                                     withAnimation {
                                         viewState.hideTabBar = true
                                     }
-                                    navigation.push(.assetDetails(item: item))
                                 }
                             Asset.chevronRightIcon
                                 .foregroundColor(Palette.grayScale4A)
