@@ -20,17 +20,15 @@ class WalletItemViewModel: ObservableObject {
         
     private(set) var balance: Decimal
     
-    @Published var balanceString: String
-    @Published var valueString: String
+    @Published var balanceString = String()
+    @Published var valueString = String()
     
     var value: Decimal {
         switch coin.type {
-        case .bitcoin:
-            return Decimal(marketData.btcTicker?.price ?? 1)
-        case .lightningBitcoin:
-            return Decimal(marketData.btcTicker?.price ?? 1)
+        case .bitcoin, .lightningBitcoin:
+            return marketData.lastSeenBtcPrice
         case .ethereum, .erc20:
-            return (balance * 1200)
+            return balance * marketData.lastSeenEthPrice
         }
     }
     
@@ -41,7 +39,6 @@ class WalletItemViewModel: ObservableObject {
         
         self.balance = balanceAdapter.balance
         self.balanceString = "\(balanceAdapter.balance)"
-        self.valueString = 0.usdFormatted()
                 
         self.updateBalanceTimer.eventHandler = {
             DispatchQueue.main.async {
@@ -59,6 +56,8 @@ class WalletItemViewModel: ObservableObject {
                 self.updateValue()
             }
             .store(in: &subscriptions)
+        
+        updateValue()
     }
     
     private func updateBalance() {
@@ -70,15 +69,13 @@ class WalletItemViewModel: ObservableObject {
     }
     
     private func updateValue() {
-        guard let btcUSDPrice = marketData.btcTicker?.price else { return }
-
         let _valueString: String
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            _valueString = (Decimal(btcUSDPrice) * balance).double.usdFormatted()
+            _valueString = (marketData.lastSeenBtcPrice * balance).double.usdFormatted()
         case .ethereum, .erc20:
-            _valueString = (Decimal(marketData.ethTicker?.price ?? 1) * balance).double.usdFormatted()
+            _valueString = (marketData.lastSeenEthPrice * balance).double.usdFormatted()
         }
         
         if valueString != _valueString {
