@@ -85,6 +85,7 @@ class ReceiveViewModel: ObservableObject {
             price = marketData.lastSeenBtcPrice
         case .ethereum, .erc20:
             price = marketData.lastSeenEthPrice
+            qrAddressType = .onChain
         }
         
         exchanger = Exchanger(
