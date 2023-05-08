@@ -58,9 +58,7 @@ extension TxDataStorage: ITxUserDataStorage {
     }
     
     func fetch(source: TxSource, id: String) -> TxData {
-        if let tx = fetchTxData(txID: id) {
-            return tx
-        } else {
+        guard let data = fetchTxData(txID: id) else {
             //Creating new instance
             let data = TxData(context: context)
             data.txID = id
@@ -78,7 +76,9 @@ extension TxDataStorage: ITxUserDataStorage {
             }
             return data
         }
+        return data
     }
+    
     func clear() {
         context.perform {
             let fetchRequest: NSFetchRequest<NSFetchRequestResult> = TxData.fetchRequest()
