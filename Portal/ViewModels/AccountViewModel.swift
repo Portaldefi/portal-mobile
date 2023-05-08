@@ -105,8 +105,20 @@ class AccountViewModel: ObservableObject {
         updateValue()
     }
     
+    private func convertToBtcBalance(item: WalletItem) -> Decimal {
+        switch item.coin.type {
+        case .bitcoin, .lightningBitcoin:
+            return item.viewModel.balance
+        case .ethereum:
+            return (item.viewModel.balance * marketData.lastSeenEthPrice) / marketData.lastSeenBtcPrice
+        case .erc20:
+            //FIX ME
+            return (item.viewModel.balance * marketData.lastSeenEthPrice) / marketData.lastSeenBtcPrice
+        }
+    }
+        
     private func updateBalance() {        
-        let balance = items.map{ $0.viewModel.balance }.reduce(0){ $0 + $1 }
+        let balance = items.map{ convertToBtcBalance(item: $0) }.reduce(0){ $0 + $1 }.double.rounded(toPlaces: 12)
         
         if totalBalance != "\(balance)" {
             totalBalance = "\(balance)"
@@ -114,7 +126,7 @@ class AccountViewModel: ObservableObject {
     }
     
     private func updateValue() {
-        let value = items.map{ $0.viewModel.value * $0.viewModel.balance }.reduce(0, { $0 + $1 }).double.usdFormatted()
+        let value = items.map{ convertToBtcBalance(item: $0) * marketData.lastSeenBtcPrice }.reduce(0, { $0 + $1 }).double.usdFormatted()
         
         if totalValue != value {
             DispatchQueue.main.async {
