@@ -56,8 +56,10 @@ extension KeyboardReadable {
 }
 
 struct SwapView: View, KeyboardReadable {
-    @FocusState private var focusedField: SwapSide?
-    @StateObject private var viewModel = SwapViewViewModel()
+    @FocusState private var focusedField: Exchanger.Side?
+    @StateObject private var viewModel = AtomicSwapViewModel()
+    
+    var starters = ["Ask", "Bid"]
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -72,8 +74,15 @@ struct SwapView: View, KeyboardReadable {
                     Text(viewModel.description)
                         .font(.Main.fixed(.bold, size: 16))
                         .foregroundColor(.yellow)
+                        .opacity(0)
                     
                     Spacer()
+                    
+                    Picker("Order side", selection: $viewModel.orderSide) {
+                        Text("ask").tag(Order.OrderSide.ask)
+                        Text("bid").tag(Order.OrderSide.bid)
+                    }
+                    .pickerStyle(.segmented)
                 }
                 .frame(height: 49)
                 .padding(.horizontal, 16)
@@ -84,37 +93,72 @@ struct SwapView: View, KeyboardReadable {
                     .frame(height: 178)
                     .padding(16)
                 
-                switch viewModel.swapState {
-                case .opened, .canceled:
-                    if viewModel.actionButtonEnabled {
-                        HStack {
-                            Text("1 btc")
-                                .font(.Main.fixed(.monoMedium, size: 12))
-                                .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
-                            Text("=")
-                                .font(.Main.fixed(.monoMedium, size: 16))
-                                .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                            Text("1 btc")
-                                .font(.Main.fixed(.monoMedium, size: 16))
-                                .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
-                            Text("Fees")
-                                .font(.Main.fixed(.monoMedium, size: 12))
-                                .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                            Text("1000")
-                            Text("Sats")
-                                .font(.Main.fixed(.monoMedium, size: 12))
-                                .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                if let order = viewModel.order {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8)
+                            .foregroundColor(.black.opacity(0.5))
+                        
+                        VStack {
+                            HStack {
+                                Text("order id:")
+                                    .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
+                                Spacer()
+                                Text(order.id)
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                            }
+                            
+                            HStack {
+                                Text("uid:")
+                                    .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
+                                Spacer()
+                                Text(order.uid)
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                            }
+                            
+                            HStack {
+                                Text("hash:")
+                                    .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
+                                Spacer()
+                                Text(order.hash)
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                            }
+                            
+                            HStack {
+                                Text("base:")
+                                    .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
+                                Spacer()
+                                Text(order.baseAsset)
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                            }
+                            
+                            HStack {
+                                Text("quote:")
+                                    .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
+                                Spacer()
+                                Text(order.quoteAsset)
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                            }
+                            
+                            HStack {
+                                Text("status:")
+                                    .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
+                                Spacer()
+                                Text(order.status.rawValue)
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                            }
                         }
+                        .font(.Main.fixed(.monoMedium, size: 12))
+                        .padding(10)
                     }
-                    
-                    Rectangle()
-                        .foregroundColor(Color(red: 0.118, green: 0.118, blue: 0.118))
-                        .onTapGesture {
-                            focusedField = .none
-                        }
-                case .swapping, .swapped, .commiting:
-                    Spacer()
+                    .padding(20)
                 }
+                
+                Rectangle()
+                    .foregroundColor(Color(red: 0.118, green: 0.118, blue: 0.118))
+                    .onTapGesture {
+                        focusedField = .none
+                    }
+
             }
                         
             VStack(spacing: 0) {
@@ -123,17 +167,71 @@ struct SwapView: View, KeyboardReadable {
                     .overlay(Palette.grayScale4A)
                 
                 switch viewModel.swapState {
-                case .opened, .canceled:
+                case .create, .canceled:
                     VStack(alignment: .leading, spacing: 16) {
-                        PButton(config: .onlyLabel("Swap"), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
+                        PButton(config: .onlyLabel("Submit"), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
                             Task {
-                                await viewModel.openSwap()
+                                try await viewModel.submitLimitOrder()
                             }
                         }
-                        
                     }
                     .padding(16)
-                case .swapping:
+                case .matching:
+                    VStack {
+                        HStack(spacing: 16) {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                            Text("Waiting for Match...")
+                                .font(.Main.fixed(.monoBold, size: 16))
+                                .foregroundColor(Palette.grayScaleF4)
+                        }
+                        .frame(height: 60)
+                        
+//                        VStack(alignment: .leading, spacing: 16) {
+//                            PButton(config: .onlyLabel("Commit"), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
+//                                Task {
+//                                    await viewModel.commitSwap()
+//                                }
+//                            }
+//
+//                        }
+                    }
+                    .padding(16)
+                case .matched:
+                    HStack(spacing: 12) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .resizable()
+                            .frame(width: 28, height: 28)
+                            .foregroundColor(Color.green)
+                        Text("Order Matched")
+                            .font(.Main.fixed(.monoBold, size: 16))
+                            .foregroundColor(Palette.grayScaleF4)
+                    }
+                    .frame(height: 60)
+                    .padding(16)
+                case .open:
+                    VStack {
+//                        HStack(spacing: 16) {
+//                            ProgressView()
+//                                .progressViewStyle(CircularProgressViewStyle())
+//                            Text("Waiting for Match...")
+//                                .font(.Main.fixed(.monoBold, size: 16))
+//                                .foregroundColor(Palette.grayScaleF4)
+//                        }
+//                        .frame(height: 60)
+                        
+                        VStack(alignment: .leading, spacing: 16) {
+                            PButton(config: .onlyLabel("Open"), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
+                                Task {
+                                    await viewModel.openSwap()
+                                }
+                            }
+
+                        }
+                    }
+                    .padding(16)
+
+                case .commit:
                     VStack {
                         HStack(spacing: 16) {
                             ProgressView()
@@ -145,12 +243,12 @@ struct SwapView: View, KeyboardReadable {
                         .frame(height: 60)
                         
                         VStack(alignment: .leading, spacing: 16) {
-                            PButton(config: .onlyLabel("Commit"), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
+                            PButton(config: .onlyLabel("Commit"), style: .filled, size: .big, enabled: false) {
                                 Task {
                                     await viewModel.commitSwap()
                                 }
                             }
-                            
+
                         }
                     }
                     .padding(16)
@@ -164,7 +262,7 @@ struct SwapView: View, KeyboardReadable {
                     }
                     .frame(height: 60)
                     .padding(16)
-                case .swapped:
+                case .commited:
                     HStack(spacing: 12) {
                         Image(systemName: "checkmark.circle.fill")
                             .resizable()
@@ -192,20 +290,20 @@ struct SwapView: View, KeyboardReadable {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(red: 0.118, green: 0.118, blue: 0.118))
         .onReceive(keyboardPublisher) { newIsKeyboardVisible in
-            if newIsKeyboardVisible {
-                viewModel.viewState.hideTabBar.toggle()
-                viewModel.bottomOffset = 0
-            } else {
-                viewModel.viewState.hideTabBar.toggle()
-                viewModel.bottomOffset = 65
-            }
+//            if newIsKeyboardVisible {
+//                viewModel.viewState.hideTabBar.toggle()
+//                viewModel.bottomOffset = 0
+//            } else {
+//                viewModel.viewState.hideTabBar.toggle()
+//                viewModel.bottomOffset = 65
+//            }
         }
     }
     
     func AssetSelectorView() -> some View {
         ZStack {
-            switch viewModel.swapState {
-            case .opened, .canceled:
+//            switch viewModel.swapState {
+//            case .create, .canceled, .commited:
                 RoundedRectangle(cornerRadius: 8)
                     .foregroundColor(.black)
                     .background {
@@ -214,13 +312,13 @@ struct SwapView: View, KeyboardReadable {
                     }
                 
                 VStack(spacing: 0) {
-                    switch viewModel.swapSide {
-                    case .secretHolder:
+                    switch viewModel.exchangerSide {
+                    case .base:
                         VStack(spacing: 8) {
                             HStack(spacing: 0) {
                                 TextField("0", text: $viewModel.baseAmount)
                                     .keyboardType(.decimalPad)
-                                    .focused($focusedField, equals: .secretHolder)
+                                    .focused($focusedField, equals: .base)
                                     .fixedSize(horizontal: true, vertical: true)
                                     .disableAutocorrection(true)
                                     .textInputAutocapitalization(.never)
@@ -239,7 +337,7 @@ struct SwapView: View, KeyboardReadable {
                             
                             HStack(spacing: 0) {
                                 if let decimal = Decimal(string: viewModel.baseAmount), decimal > 0 {
-                                    Text("\(viewModel.amountValue) usd")
+                                    Text("\(viewModel.baseAmountValue) usd")
                                         .font(.Main.fixed(.monoMedium, size: 16))
                                         .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
                                         .frame(height: 16)
@@ -270,7 +368,7 @@ struct SwapView: View, KeyboardReadable {
                             HStack(spacing: 0) {
                                 TextField("0", text: $viewModel.quoteAmount)
                                     .keyboardType(.decimalPad)
-                                    .focused($focusedField, equals: .secretSeeker)
+                                    .focused($focusedField, equals: .quote)
                                     .fixedSize(horizontal: true, vertical: true)
                                     .disableAutocorrection(true)
                                     .textInputAutocapitalization(.never)
@@ -285,9 +383,16 @@ struct SwapView: View, KeyboardReadable {
                             .padding(.trailing, 16)
                             
                             HStack(spacing: 0) {
+                                if let decimal = Decimal(string: viewModel.quoteAmount), decimal > 0 {
+                                    Text("\(viewModel.quoteAmountValue) usd")
+                                        .font(.Main.fixed(.monoMedium, size: 16))
+                                        .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                                        .frame(height: 16)
+                                }
+                                
                                 Spacer()
                                 
-                                if viewModel.quote != nil {
+                                if viewModel.base != nil {
                                     HStack {
                                         Text("Balance:")
                                             .font(.Main.fixed(.monoMedium, size: 14))
@@ -305,12 +410,12 @@ struct SwapView: View, KeyboardReadable {
                         }
                         .frame(height: 88)
                         .transition(.move(edge: .top).combined(with: .opacity))
-                    case .secretSeeker:
+                    case .quote:
                         VStack(spacing: 8) {
                             HStack(spacing: 0) {
                                 TextField("0", text: $viewModel.quoteAmount)
                                     .keyboardType(.decimalPad)
-                                    .focused($focusedField, equals: .secretSeeker)
+                                    .focused($focusedField, equals: .quote)
                                     .fixedSize(horizontal: true, vertical: true)
                                     .disableAutocorrection(true)
                                     .textInputAutocapitalization(.never)
@@ -329,7 +434,7 @@ struct SwapView: View, KeyboardReadable {
                             
                             HStack(spacing: 0) {
                                 if let decimal = Decimal(string: viewModel.quoteAmount), decimal > 0 {
-                                    Text("\(viewModel.amountValue) usd")
+                                    Text("\(viewModel.quoteAmountValue) usd")
                                         .font(.Main.fixed(.monoMedium, size: 16))
                                         .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
                                         .frame(height: 16)
@@ -360,7 +465,7 @@ struct SwapView: View, KeyboardReadable {
                             HStack(spacing: 0) {
                                 TextField("0", text: $viewModel.baseAmount)
                                     .keyboardType(.decimalPad)
-                                    .focused($focusedField, equals: .secretHolder)
+                                    .focused($focusedField, equals: .base)
                                     .fixedSize(horizontal: true, vertical: true)
                                     .disableAutocorrection(true)
                                     .textInputAutocapitalization(.never)
@@ -376,7 +481,7 @@ struct SwapView: View, KeyboardReadable {
                             
                             HStack(spacing: 0) {
                                 if let decimal = Decimal(string: viewModel.baseAmount), decimal > 0 {
-                                    Text("\(viewModel.amountValue) usd")
+                                    Text("\(viewModel.baseAmountValue) usd")
                                         .font(.Main.fixed(.monoMedium, size: 16))
                                         .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
                                         .frame(height: 16)
@@ -420,95 +525,95 @@ struct SwapView: View, KeyboardReadable {
                     Asset.switchIcon.resizable().frame(width: 22, height: 22).rotationEffect(.degrees(90))
                         .onTapGesture {
                             withAnimation(.spring(response: 0.45, dampingFraction: 0.65, blendDuration: 0)) {
-                                switch viewModel.swapSide {
-                                case .secretHolder:
-                                    viewModel.swapSide = .secretSeeker
-                                case .secretSeeker:
-                                    viewModel.swapSide = .secretHolder
+                                switch viewModel.exchangerSide {
+                                case .base:
+                                    viewModel.exchangerSide = .quote
+                                case .quote:
+                                    viewModel.exchangerSide = .base
                                 }
                             }
                         }
                 }
                 .frame(width: 32, height: 32)
-            case .swapping, .swapped, .commiting:
-                VStack {
-                    VStack(spacing: 8) {
-                        HStack(spacing: 0) {
-                            TextField("0", text: .constant(viewModel.baseAmount))
-                                .keyboardType(.decimalPad)
-                                .fixedSize(horizontal: true, vertical: true)
-                                .disableAutocorrection(true)
-                                .textInputAutocapitalization(.never)
-                                .font(.Main.fixed(.monoBold, size: 26))
-                            
-                            Spacer()
-                            
-                            SwapCoinView(coin: viewModel.base)
-                        }
-                        .frame(height: 32)
-                        .padding(.leading, 20)
-                        .padding(.trailing, 8)
-                        
-                        HStack(spacing: 0) {
-                            if let decimal = Decimal(string: viewModel.baseAmount), decimal > 0 {
-                                Text("\(viewModel.amountValue) usd")
-                                    .font(.Main.fixed(.monoMedium, size: 16))
-                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                    .frame(height: 16)
-                            }
-                            
-                            Spacer()
-                        }
-                        .padding(.leading, 20)
-                        .padding(.trailing, 8)
-                    }
-                    .frame(height: 65)
-                    
-                    HStack {
-                        PButton(config: .onlyLabel("~ swapping for"), style: .free, size: .small, applyGradient: true, enabled: true) {
-                            
-                        }
-                        .frame(width: 160)
-                        
-                        Spacer()
-                    }
-                    .padding(.leading, 30)
-                    
-                    VStack(spacing: 8) {
-                        HStack(spacing: 0) {
-                            TextField("0", text: .constant(viewModel.quoteAmount))
-                                .keyboardType(.decimalPad)
-                                .fixedSize(horizontal: true, vertical: true)
-                                .disableAutocorrection(true)
-                                .textInputAutocapitalization(.never)
-                                .font(.Main.fixed(.monoBold, size: 26))
-                            
-                            Spacer()
-                            
-                            SwapCoinView(coin: viewModel.quote)
-                        }
-                        .frame(height: 32)
-                        .padding(.leading, 20)
-                        .padding(.trailing, 8)
-                        
-                        HStack(spacing: 0) {
-                            if let decimal = Decimal(string: viewModel.quoteAmount), decimal > 0 {
-                                Text("\(viewModel.amountValue) usd")
-                                    .font(.Main.fixed(.monoMedium, size: 16))
-                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                    .frame(height: 16)
-                            }
-                            
-                            Spacer()
-                        }
-                        .padding(.leading, 20)
-                        .padding(.trailing, 8)
-                    }
-                    .frame(height: 65)
-                }
-                
-                Spacer()
-            }
+//            case .open, .commit:
+//                VStack {
+//                    VStack(spacing: 8) {
+//                        HStack(spacing: 0) {
+//                            TextField("0", text: .constant(viewModel.baseAmount))
+//                                .keyboardType(.decimalPad)
+//                                .fixedSize(horizontal: true, vertical: true)
+//                                .disableAutocorrection(true)
+//                                .textInputAutocapitalization(.never)
+//                                .font(.Main.fixed(.monoBold, size: 26))
+//
+//                            Spacer()
+//
+//                            SwapCoinView(coin: viewModel.base)
+//                        }
+//                        .frame(height: 32)
+//                        .padding(.leading, 20)
+//                        .padding(.trailing, 8)
+//
+//                        HStack(spacing: 0) {
+//                            if let decimal = Decimal(string: viewModel.baseAmount), decimal > 0 {
+//                                Text("\(viewModel.baseAmountValue) usd")
+//                                    .font(.Main.fixed(.monoMedium, size: 16))
+//                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+//                                    .frame(height: 16)
+//                            }
+//
+//                            Spacer()
+//                        }
+//                        .padding(.leading, 20)
+//                        .padding(.trailing, 8)
+//                    }
+//                    .frame(height: 65)
+//
+//                    HStack {
+//                        PButton(config: .onlyLabel("~ swapping for"), style: .free, size: .small, applyGradient: true, enabled: true) {
+//
+//                        }
+//                        .frame(width: 160)
+//
+//                        Spacer()
+//                    }
+//                    .padding(.leading, 30)
+//
+//                    VStack(spacing: 8) {
+//                        HStack(spacing: 0) {
+//                            TextField("0", text: .constant(viewModel.quoteAmount))
+//                                .keyboardType(.decimalPad)
+//                                .fixedSize(horizontal: true, vertical: true)
+//                                .disableAutocorrection(true)
+//                                .textInputAutocapitalization(.never)
+//                                .font(.Main.fixed(.monoBold, size: 26))
+//
+//                            Spacer()
+//
+//                            SwapCoinView(coin: viewModel.quote)
+//                        }
+//                        .frame(height: 32)
+//                        .padding(.leading, 20)
+//                        .padding(.trailing, 8)
+//
+//                        HStack(spacing: 0) {
+//                            if let decimal = Decimal(string: viewModel.quoteAmount), decimal > 0 {
+//                                Text("\(viewModel.quoteAmountValue) usd")
+//                                    .font(.Main.fixed(.monoMedium, size: 16))
+//                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+//                                    .frame(height: 16)
+//                            }
+//
+//                            Spacer()
+//                        }
+//                        .padding(.leading, 20)
+//                        .padding(.trailing, 8)
+//                    }
+//                    .frame(height: 65)
+//                }
+//
+//                Spacer()
+//            }
         }
         
     }
