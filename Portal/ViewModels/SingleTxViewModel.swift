@@ -37,7 +37,7 @@ class SingleTxViewModel: ObservableObject {
         case .bitcoin, .lightningBitcoin:
             return (amount/100_000_000 * tx.userData.price).double.usdFormatted()
         case .ethereum:
-            return amount.double.toString(decimal: 8)
+            return (amount * tx.userData.price).double.usdFormatted()
         case .erc20:
             return "0"
         }
