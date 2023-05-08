@@ -151,6 +151,10 @@
 		75772A5D28F8192F00BE80B7 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 75772A5C28F8192F00BE80B7 /* CodeScanner */; };
 		75772A642901793300BE80B7 /* IdentifiableString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A632901793300BE80B7 /* IdentifiableString.swift */; };
 		75772A682902D73E00BE80B7 /* TextLimitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A672902D73E00BE80B7 /* TextLimitter.swift */; };
+		758336B62A05179D000B2375 /* AtomicSwap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758336B52A05179D000B2375 /* AtomicSwap.swift */; };
+		758336B82A051829000B2375 /* AtomicSeekerTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758336B72A051829000B2375 /* AtomicSeekerTemplate.swift */; };
+		758336BA2A051872000B2375 /* AtomicHolderTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758336B92A051872000B2375 /* AtomicHolderTemplate.swift */; };
+		758336BE2A051C22000B2375 /* AtomicSwapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758336BD2A051C22000B2375 /* AtomicSwapViewModel.swift */; };
 		758DFC7E294B65BA00AB35CC /* EthereumAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758DFC7D294B65BA00AB35CC /* EthereumAdapter.swift */; };
 		758DFC85294B6A7600AB35CC /* TransactionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758DFC84294B6A7600AB35CC /* TransactionRecord.swift */; };
 		75A2B68B29EFFAA50076F217 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 75A2B68A29EFFAA50076F217 /* RxRelay */; };
@@ -184,10 +188,10 @@
 		75B7532029F1639B00F2A93D /* QRCodeReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7531E29F1639B00F2A93D /* QRCodeReaderView.swift */; };
 		75B7532129F1639B00F2A93D /* QRCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7531F29F1639B00F2A93D /* QRCodeScannerView.swift */; };
 		75B7532429F1A0B400F2A93D /* SwapStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7532329F1A0B400F2A93D /* SwapStatusView.swift */; };
-		75B7532629F2B15A00F2A93D /* SeekerTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7532529F2B15A00F2A93D /* SeekerTemplate.swift */; };
-		75B7532829F2B1A300F2A93D /* HolderTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7532729F2B1A300F2A93D /* HolderTemplate.swift */; };
+		75B7532629F2B15A00F2A93D /* SubmarineSeekerTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7532529F2B15A00F2A93D /* SubmarineSeekerTemplate.swift */; };
+		75B7532829F2B1A300F2A93D /* SubmarineHolderTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7532729F2B1A300F2A93D /* SubmarineHolderTemplate.swift */; };
 		75B7532B29F2B20C00F2A93D /* SubmarineSwap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7532A29F2B20C00F2A93D /* SubmarineSwap.swift */; };
-		75B7532D29F6B18F00F2A93D /* SwapViewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7532C29F6B18F00F2A93D /* SwapViewViewModel.swift */; };
+		75B7532D29F6B18F00F2A93D /* SubmarineSwapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7532C29F6B18F00F2A93D /* SubmarineSwapViewModel.swift */; };
 		75B7532F29F6C26700F2A93D /* SwapInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7532E29F6C26700F2A93D /* SwapInfo.swift */; };
 		75B7533129F6C30D00F2A93D /* IBitcoinKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7533029F6C30D00F2A93D /* IBitcoinKitManager.swift */; };
 		75B7533329F6C32C00F2A93D /* ISubmarineSwap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7533229F6C32C00F2A93D /* ISubmarineSwap.swift */; };
@@ -355,6 +359,10 @@
 		756DDD9C28A292D4002EDC60 /* RootViewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewViewModel.swift; sourceTree = "<group>"; };
 		75772A632901793300BE80B7 /* IdentifiableString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentifiableString.swift; sourceTree = "<group>"; };
 		75772A672902D73E00BE80B7 /* TextLimitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLimitter.swift; sourceTree = "<group>"; };
+		758336B52A05179D000B2375 /* AtomicSwap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomicSwap.swift; sourceTree = "<group>"; };
+		758336B72A051829000B2375 /* AtomicSeekerTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomicSeekerTemplate.swift; sourceTree = "<group>"; };
+		758336B92A051872000B2375 /* AtomicHolderTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomicHolderTemplate.swift; sourceTree = "<group>"; };
+		758336BD2A051C22000B2375 /* AtomicSwapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomicSwapViewModel.swift; sourceTree = "<group>"; };
 		758DFC7D294B65BA00AB35CC /* EthereumAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EthereumAdapter.swift; sourceTree = "<group>"; };
 		758DFC84294B6A7600AB35CC /* TransactionRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionRecord.swift; sourceTree = "<group>"; };
 		75B752E829F162AA00F2A93D /* RoundedCornerShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoundedCornerShape.swift; sourceTree = "<group>"; };
@@ -387,10 +395,10 @@
 		75B7531E29F1639B00F2A93D /* QRCodeReaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeReaderView.swift; sourceTree = "<group>"; };
 		75B7531F29F1639B00F2A93D /* QRCodeScannerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeScannerView.swift; sourceTree = "<group>"; };
 		75B7532329F1A0B400F2A93D /* SwapStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapStatusView.swift; sourceTree = "<group>"; };
-		75B7532529F2B15A00F2A93D /* SeekerTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekerTemplate.swift; sourceTree = "<group>"; };
-		75B7532729F2B1A300F2A93D /* HolderTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HolderTemplate.swift; sourceTree = "<group>"; };
+		75B7532529F2B15A00F2A93D /* SubmarineSeekerTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmarineSeekerTemplate.swift; sourceTree = "<group>"; };
+		75B7532729F2B1A300F2A93D /* SubmarineHolderTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmarineHolderTemplate.swift; sourceTree = "<group>"; };
 		75B7532A29F2B20C00F2A93D /* SubmarineSwap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmarineSwap.swift; sourceTree = "<group>"; };
-		75B7532C29F6B18F00F2A93D /* SwapViewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapViewViewModel.swift; sourceTree = "<group>"; };
+		75B7532C29F6B18F00F2A93D /* SubmarineSwapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmarineSwapViewModel.swift; sourceTree = "<group>"; };
 		75B7532E29F6C26700F2A93D /* SwapInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInfo.swift; sourceTree = "<group>"; };
 		75B7533029F6C30D00F2A93D /* IBitcoinKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IBitcoinKitManager.swift; sourceTree = "<group>"; };
 		75B7533229F6C32C00F2A93D /* ISubmarineSwap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISubmarineSwap.swift; sourceTree = "<group>"; };
@@ -767,7 +775,8 @@
 				755C56DF28EB09EC00A4B57B /* LabelManagerViewModel.swift */,
 				75CC43AE2913CBC300B15008 /* SingleTxViewModel.swift */,
 				755170722935C96400CC84D7 /* RecoverPhraseViewModel.swift */,
-				75B7532C29F6B18F00F2A93D /* SwapViewViewModel.swift */,
+				75B7532C29F6B18F00F2A93D /* SubmarineSwapViewModel.swift */,
+				758336BD2A051C22000B2375 /* AtomicSwapViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -831,6 +840,26 @@
 			path = DB;
 			sourceTree = "<group>";
 		};
+		758336BB2A051892000B2375 /* atomic */ = {
+			isa = PBXGroup;
+			children = (
+				758336B52A05179D000B2375 /* AtomicSwap.swift */,
+				758336B92A051872000B2375 /* AtomicHolderTemplate.swift */,
+				758336B72A051829000B2375 /* AtomicSeekerTemplate.swift */,
+			);
+			path = atomic;
+			sourceTree = "<group>";
+		};
+		758336BC2A05189D000B2375 /* submarine */ = {
+			isa = PBXGroup;
+			children = (
+				75B7532A29F2B20C00F2A93D /* SubmarineSwap.swift */,
+				75B7532529F2B15A00F2A93D /* SubmarineSeekerTemplate.swift */,
+				75B7532729F2B1A300F2A93D /* SubmarineHolderTemplate.swift */,
+			);
+			path = submarine;
+			sourceTree = "<group>";
+		};
 		75883A10292618330089D714 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
@@ -855,9 +884,8 @@
 		75B7532929F2B1E200F2A93D /* Swaps */ = {
 			isa = PBXGroup;
 			children = (
-				75B7532A29F2B20C00F2A93D /* SubmarineSwap.swift */,
-				75B7532529F2B15A00F2A93D /* SeekerTemplate.swift */,
-				75B7532729F2B1A300F2A93D /* HolderTemplate.swift */,
+				758336BC2A05189D000B2375 /* submarine */,
+				758336BB2A051892000B2375 /* atomic */,
 			);
 			path = Swaps;
 			sourceTree = "<group>";
@@ -1028,6 +1056,7 @@
 				756A311F288821F4004978E2 /* Persistence.swift in Sources */,
 				756A313F28902C6F004978E2 /* MainView.swift in Sources */,
 				750C05DE29641B97005519FF /* Subject+Rx.swift in Sources */,
+				758336BE2A051C22000B2375 /* AtomicSwapViewModel.swift in Sources */,
 				750C05D729641B97005519FF /* PublishSubject+Combine.swift in Sources */,
 				755C56E028EB09EC00A4B57B /* LabelManagerViewModel.swift in Sources */,
 				7564C65228CF3CF600ABA8CF /* SetRecipientView.swift in Sources */,
@@ -1061,6 +1090,7 @@
 				75D8C5B128DADE7500228298 /* IWalletManager.swift in Sources */,
 				75B7530C29F1636000F2A93D /* ClickableWordView.swift in Sources */,
 				75B7531929F1636000F2A93D /* AssetDetailsView.swift in Sources */,
+				758336B82A051829000B2375 /* AtomicSeekerTemplate.swift in Sources */,
 				7542185429A3ABAC0028D5DF /* QRCodeAddressTypeView.swift in Sources */,
 				4774D72928B4FC7500B7988B /* UInt64+Extension.swift in Sources */,
 				7551708E2948C79C00CC84D7 /* SendViewNavigationConfig.swift in Sources */,
@@ -1078,7 +1108,7 @@
 				755170752935E33F00CC84D7 /* RecoveryData.swift in Sources */,
 				75D8C5C328DC715900228298 /* ICoinStorage.swift in Sources */,
 				75D8C5BF28DC710E00228298 /* ICoinManager.swift in Sources */,
-				75B7532829F2B1A300F2A93D /* HolderTemplate.swift in Sources */,
+				75B7532829F2B1A300F2A93D /* SubmarineHolderTemplate.swift in Sources */,
 				75B7530D29F1636000F2A93D /* TextFieldWrapper.swift in Sources */,
 				7564C65728CF6EC400ABA8CF /* SendFlowError.swift in Sources */,
 				758DFC7E294B65BA00AB35CC /* EthereumAdapter.swift in Sources */,
@@ -1107,6 +1137,7 @@
 				756DDD6E28A272AB002EDC60 /* NoAccountView.swift in Sources */,
 				755FDD5329B7815C00D8A29C /* CurrencyTickerModel.swift in Sources */,
 				756A3118288821F3004978E2 /* AccountView.swift in Sources */,
+				758336B62A05179D000B2375 /* AtomicSwap.swift in Sources */,
 				755C56C928EAC99700A4B57B /* TextEditorViewModel.swift in Sources */,
 				75D8C5AE28D8939A00228298 /* BitcoinAdapter.swift in Sources */,
 				7545BC3828C9E32A00ED92C3 /* FiatRatesResponse.swift in Sources */,
@@ -1120,7 +1151,7 @@
 				7564C66228D85AA800ABA8CF /* Exchanger.swift in Sources */,
 				479A7ACB28B759510057E100 /* Portal+Injection.swift in Sources */,
 				752FA62D296C608C00008796 /* RecommendedFees.swift in Sources */,
-				75B7532D29F6B18F00F2A93D /* SwapViewViewModel.swift in Sources */,
+				75B7532D29F6B18F00F2A93D /* SubmarineSwapViewModel.swift in Sources */,
 				4774D72728B4FC5300B7988B /* Double+Extension.swift in Sources */,
 				754F61DF298178060079621C /* INotificationService.swift in Sources */,
 				756DDD7628A27DEA002EDC60 /* RestoreAccountViewModel.swift in Sources */,
@@ -1134,6 +1165,7 @@
 				75B7531429F1636000F2A93D /* ConfirmationCounterView.swift in Sources */,
 				7551706B2934AA7700CC84D7 /* BackUpDetailsView.swift in Sources */,
 				756A313B288AEFA2004978E2 /* QRCodeGeneratorView.swift in Sources */,
+				758336BA2A051872000B2375 /* AtomicHolderTemplate.swift in Sources */,
 				750C05DB29641B97005519FF /* PublishRelay+Combine.swift in Sources */,
 				755170772935E47100CC84D7 /* RecoveryPhraseTestView.swift in Sources */,
 				75B7532F29F6C26700F2A93D /* SwapInfo.swift in Sources */,
@@ -1178,7 +1210,7 @@
 				479A7AD028B7A92C0057E100 /* SendViewViewModel.swift in Sources */,
 				75B7530729F1636000F2A93D /* AmountEditorView.swift in Sources */,
 				75B7532429F1A0B400F2A93D /* SwapStatusView.swift in Sources */,
-				75B7532629F2B15A00F2A93D /* SeekerTemplate.swift in Sources */,
+				75B7532629F2B15A00F2A93D /* SubmarineSeekerTemplate.swift in Sources */,
 				4774D72F28B4FD0D00B7988B /* Date+Extension.swift in Sources */,
 				75D8C59D28D88BFB00228298 /* IAdapter.swift in Sources */,
 				755FDD5529B7817900D8A29C /* TickerModel.swift in Sources */,
