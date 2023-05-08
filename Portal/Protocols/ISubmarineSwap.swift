@@ -8,7 +8,18 @@
 import Foundation
 
 protocol ISubmarineSwap {
-    var data: SwapInfo? { get }
+    var id: String { get }
+    var hash: String { get }
+    var swap: Swap? { get set }
+    func open() async throws
+    func commit() async throws
+    func cancel() async throws
+}
+
+protocol IAtomicSwap {
+    var id: String { get }
+    var secretHash: String { get }
+    var swap: Swap? { get set }
     func open() async throws
     func commit() async throws
     func cancel() async throws
