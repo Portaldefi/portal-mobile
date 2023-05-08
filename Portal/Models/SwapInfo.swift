@@ -7,37 +7,186 @@
 
 import Foundation
 
-struct SwapInfo {
-    let hash: String
-    let secret: String
-    let holderPubKey: String
-    let seekerInvoice: String
-    let seekerL1Address: String
-    let timelock: Int32
-    let amount: Int32
-    let fee: Int32
+struct Swap: Codable {
+    let id: String
+    let secretHash: String
+    let secretHolder: Party
+    let secretSeeker: Party
+    let status: String
+    
+    private enum CodingKeys: String, CodingKey {
+        case id, secretHash, secretHolder, secretSeeker, status
+    }
 }
 
-extension SwapInfo {
-    static var mocked: SwapInfo {
-        let hash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-        let secret = "JNRMmjEDLAw6XiveTb7O1N86Xwt7qzmmzV82K1jsA78="
-        let holderPubKey = "03d16e7689325feee0ae2530be4c19d0c255ff84359d0fa0795f1ebc63d841965c"
-        let seekerInvoice = "lnbcrt500u1pjy9tw8dqqnp4qv6lgq5akth5qmk6a8wg56ak9pze7sn2lpn2utsx0mvu8q20zzns5pp5uwcvgs5clswpfxhm7nyfjmaeysn6us0yvjdexn9yjkv3k7zjhp2ssp553hx30waccaus9z2ueffpul6v7cslrxr75pl2ft7tpl085ts8twq9qyysgqcqpcxqyz5vqrzjqt28qzxnfyzwf9y7hp67qpeqh5klhk7ueacl8regy2ckjleqf43ajqqzwyqqqqgqqyqqqqlgqqqqqqgq9qep0zh4e5wp6da74yxc2qnwjt9f8tgq25da2phde4r9s3nua6ktpx2e5x6s5yv5t2yeqs598d57w5nlzwyrc6u732c4cnsnr3yv92u0gpe9y98w"
-        let seekerL1Address = "bcrt1q8k0csahdjwhcpanc3uzxxju7p78a8sv5whp2wjs0kxg58sysqrrslzhrxn"
-        let timelock: Int32 = 652
-        let amount: Int32 = 50000
-        let fee: Int32 = 1000
+struct Party: Codable {
+    let id: String
+    let swap: SwapId
+    let asset: PAsset
+    let network: AssetNetwork
+    let quantity: Int64
+    let state: [String: String]
+    let isSecretSeeker: Bool
+    let isSecretHolder: Bool
+    
+    private enum CodingKeys: String, CodingKey {
+        case id, swap, asset, network, quantity, state, isSecretSeeker, isSecretHolder
+    }
+}
+
+struct SwapId: Codable {
+    let id: String
+}
+
+struct PAsset: Codable {
+    let name: String
+    let symbol: String
+    let contractAddress: String?
+}
+
+struct AssetNetwork: Codable {
+    let name: String
+    let type: String
+    
+    private enum CodingKeys: String, CodingKey {
+        case name
+        case type = "@type"
+    }
+}
+
+struct Order: Decodable {
+    let id: String
+    let ts: Int64
+    let uid: String
+    let type: OrderType
+    let side: OrderSide
+    let hash: String
+    let baseAsset: String
+    let baseQuantity: Int32
+    let baseNetwork: String
+    let quoteAsset: String
+    let quoteQuantity: Int64
+    let quoteNetwork: String
+    let status: OrderStatus
+    let reason: String?
+    
+    enum OrderType: String, Decodable {
+        case limit, market
+    }
+
+    enum OrderSide: String, Decodable {
+        case ask, bid
+    }
+    
+    enum OrderStatus: String, Decodable {
+        case created, opened, commiting, commited
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, ts, uid, type, side, hash, baseAsset, baseQuantity, baseNetwork, quoteAsset, quoteQuantity, quoteNetwork, status, reason
+    }
+    
+    init(
+        id: String,
+        ts: Int64,
+        uid: String,
+        type: OrderType,
+        side: OrderSide,
+        hash: String,
+        baseAsset: String,
+        baseQuantity: Int32,
+        baseNetwork: String,
+        quoteAsset: String,
+        quoteQuantity: Int64,
+        quoteNetwork: String,
+        status: OrderStatus,
+        reason: String?
+    ) {
+        self.id = id
+        self.ts = ts
+        self.uid = uid
+        self.type = type
+        self.side = side
+        self.hash = hash
+        self.baseAsset = baseAsset
+        self.baseQuantity = baseQuantity
+        self.baseNetwork = baseNetwork
+        self.quoteAsset = quoteAsset
+        self.quoteQuantity = quoteQuantity
+        self.quoteNetwork = quoteNetwork
+        self.status = status
+        self.reason = reason
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        ts = try container.decode(Int64.self, forKey: .ts)
+        uid = try container.decode(String.self, forKey: .uid)
+        hash = try container.decode(String.self, forKey: .hash)
+        baseAsset = try container.decode(String.self, forKey: .baseAsset)
+        baseQuantity = try container.decode(Int32.self, forKey: .baseQuantity)
+        baseNetwork = try container.decode(String.self, forKey: .baseNetwork)
+        quoteAsset = try container.decode(String.self, forKey: .quoteAsset)
+        quoteQuantity = try container.decode(Int64.self, forKey: .quoteQuantity)
+        quoteNetwork = try container.decode(String.self, forKey: .quoteNetwork)
+        reason = try container.decodeIfPresent(String.self, forKey: .reason)
         
-        return SwapInfo(
-            hash: hash,
-            secret: secret,
-            holderPubKey: holderPubKey,
-            seekerInvoice: seekerInvoice,
-            seekerL1Address: seekerL1Address,
-            timelock: timelock,
-            amount: amount,
-            fee: fee
+        let statusString = try container.decode(String.self, forKey: .status)
+        guard let typeValue = OrderStatus(rawValue: statusString) else {
+            throw DecodingError.dataCorruptedError(forKey: .status, in: container, debugDescription: "Invalid order status")
+        }
+        status = typeValue
+
+        let typeString = try container.decode(String.self, forKey: .type)
+        guard let typeValue = OrderType(rawValue: typeString) else {
+            throw DecodingError.dataCorruptedError(forKey: .type, in: container, debugDescription: "Invalid order type")
+        }
+        type = typeValue
+
+        let sideString = try container.decode(String.self, forKey: .side)
+        guard let sideValue = OrderSide(rawValue: sideString) else {
+            throw DecodingError.dataCorruptedError(forKey: .side, in: container, debugDescription: "Invalid swap side")
+        }
+        side = sideValue
+    }
+}
+
+extension Order {
+    static var new: Order {
+        Order(
+            id: String(),
+            ts: 0,
+            uid: String(),
+            type: .limit,
+            side: .ask,
+            hash: String(),
+            baseAsset: String(),
+            baseQuantity: 0,
+            baseNetwork: String(),
+            quoteAsset: String(),
+            quoteQuantity: 0,
+            quoteNetwork: String(),
+            status: .created,
+            reason: nil
+        )
+    }
+    static var mocked: Order {
+        Order(
+            id: "d2abad1aa3c840b18cfa2f7466c6f320",
+            ts: 1683217343964,
+            uid: "alice",
+            type: .limit,
+            side: .ask,
+            hash: "a3622a913a665ca96e0b3e6c74b71072255acba7eb6eb9b71b735015b14c3538",
+            baseAsset: "BTC",
+            baseQuantity: 1000,
+            baseNetwork: "lightning.btc",
+            quoteAsset: "ETH",
+            quoteQuantity: 150000000000000,
+            quoteNetwork: "goerli",
+            status: .created,
+            reason: nil
         )
     }
 }
