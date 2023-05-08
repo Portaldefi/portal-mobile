@@ -11,8 +11,8 @@ import Combine
 protocol IFeeRateProvider {
     var feeRatePriorityList: [FeeRatePriority] { get }
     var defaultFeeRatePriority: FeeRatePriority { get }
-    var recommendedFeeRate: Future<Int, Never> { get }
-    func feeRate(priority: FeeRatePriority) -> Future<Int, Never>
+    func recommendedFeeRate() async throws -> Int
+    func feeRate(priority: FeeRatePriority) async throws -> Int
 }
 
 extension IFeeRateProvider {
@@ -24,13 +24,11 @@ extension IFeeRateProvider {
         .recommended
     }
 
-    func feeRate(priority: FeeRatePriority) -> Future<Int, Never> {
+    func feeRate(priority: FeeRatePriority) async throws -> Int {
         if case let .custom(value, _) = priority {
-            return Future { promise in
-                promise(.success(value))
-            }
+            return value
         } else {
-            return recommendedFeeRate
+            return try await recommendedFeeRate()
         }
     }
 }

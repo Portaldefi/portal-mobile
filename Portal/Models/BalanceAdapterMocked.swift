@@ -52,10 +52,8 @@ class SendAssetMockedService: ISendAssetService {
 }
 
 class MockeFeeRateProvider: IFeeRateProvider {
-    var recommendedFeeRate: Future<Int, Never> {
-        Future { promise in
-            promise(.success(10000))
-        }
+    func recommendedFeeRate() async throws -> Int {
+        10000
     }
 }
 

@@ -1493,7 +1493,7 @@
 			repositoryURL = "https://github.com/horizontalsystems/FeeRateKit.Swift.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 2.0.0;
 			};
 		};
 		7542184D299BDE310028D5DF /* XCRemoteSwiftPackageReference "PopupView" */ = {
@@ -1517,7 +1517,7 @@
 			repositoryURL = "https://github.com/horizontalsystems/EvmKit.Swift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 2.0.0;
 			};
 		};
 		755FDD4F29AFA30A00D8A29C /* XCRemoteSwiftPackageReference "Starscream" */ = {

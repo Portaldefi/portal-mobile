@@ -8,7 +8,6 @@
 
 import Foundation
 import EvmKit
-import RxSwift
 import BigInt
 import Combine
 
@@ -20,9 +19,7 @@ class EthereumAdapter: IAdapter {
     private let evmKit: Kit
     private let signer: Signer?
     private let decimal = 18
-    
-    private let disposeBag = DisposeBag()
-    
+        
     init(evmKit: Kit, signer: Signer?) {
         self.evmKit = evmKit
         self.signer = signer
@@ -80,75 +77,54 @@ extension EthereumAdapter {
         evmKit.transactionsSyncState
     }
 
-    var lastBlockHeightObservable: Observable<Void> {
-        evmKit.lastBlockHeightObservable.map { _ in () }
+    var lastBlockHeightPublisher: AnyPublisher<Void, Never> {
+        evmKit.lastBlockHeightPublisher.map { _ in () }.eraseToAnyPublisher()
     }
 
-    var syncStateObservable: Observable<Void> {
-        evmKit.syncStateObservable.map { _ in () }
+    var syncStatePublisher: AnyPublisher<Void, Never> {
+        evmKit.syncStatePublisher.map { _ in () }.eraseToAnyPublisher()
+    }
+    
+    var transactionsSyncStatePublisher: AnyPublisher<Void, Never> {
+        evmKit.transactionsSyncStatePublisher.map { _ in () }.eraseToAnyPublisher()
+    }
+    
+    var balancePublisher: AnyPublisher<Void, Never> {
+        evmKit.accountStatePublisher.map { _ in () }.eraseToAnyPublisher()
+    }
+    
+    var transactionsPublisher: AnyPublisher<Void, Never> {
+        evmKit.transactionsPublisher(tagQueries: []).map { _ in () }.eraseToAnyPublisher()
     }
 
-    var transactionsSyncStateObservable: Observable<Void> {
-        evmKit.transactionsSyncStateObservable.map { _ in () }
-    }
-
-    var balanceObservable: Observable<Void> {
-        evmKit.accountStateObservable.map { _ in () }
-    }
-
-    var transactionsObservable: Observable<Void> {
-        evmKit.transactionsObservable(tagQueries: []).map { _ in () }
-    }
-
-    func transactionsSingle(from hash: Data?, limit: Int?) -> Future<[TransactionRecord], Never> {
-        Future { [weak self] promise in
-            let disposeBag = DisposeBag()
-            
-            self?.evmKit.transactionsSingle(tagQueries: [], fromHash: hash, limit: limit)
-                    .map { [weak self] in
-                        $0.compactMap {
-                            self?.transactionRecord(fullTransaction: $0)
-                        }
-                    }
-                    .subscribe(onSuccess: { records in
-                        promise(.success(records))
-                    })
-                    .disposed(by: disposeBag)
-        }
+    func transactions(from hash: Data?, limit: Int?) -> [TransactionRecord] {
+        evmKit.transactions(tagQueries: [], fromHash: hash, limit: limit).compactMap { transactionRecord(fullTransaction: $0) }
     }
 
     func transaction(hash: Data, interTransactionIndex: Int) -> TransactionRecord? {
         evmKit.transaction(hash: hash).map { transactionRecord(fullTransaction: $0) }
     }
 
-    func estimatedGasLimit(to address: EvmKit.Address, value: Decimal, gasPrice: GasPrice) -> Single<Int> {
+    func estimatedGasLimit(to address: EvmKit.Address, value: Decimal, gasPrice: GasPrice) async throws -> Int {
         let value = BigUInt(value.hs.roundedString(decimal: decimal))!
-
-        return evmKit.estimateGas(to: address, amount: value, gasPrice: gasPrice)
+        return try await evmKit.fetchEstimateGas(to: address, amount: value, gasPrice: gasPrice)
     }
 
-    func transactionSingle(hash: Data) -> Single<FullTransaction> {
-        evmKit.transactionSingle(hash: hash)
+    func transactionSingle(hash: Data) async throws -> FullTransaction {
+        try await evmKit.fetchTransaction(hash: hash)
     }
 
-    func sendSingle(to: EvmKit.Address, amount: BigUInt, gasLimit: Int, gasPrice: GasPrice) -> Single<FullTransaction> {
+    func send(to: EvmKit.Address, amount: BigUInt, gasLimit: Int, gasPrice: GasPrice) async throws -> FullTransaction {
         guard let signer = signer else {
-            return Single.error(SendError.noSigner)
+            throw SendError.noSigner
         }
-
+        
         let transactionData = evmKit.transferTransactionData(to: to, value: amount)
-
-        return evmKit.rawTransaction(transactionData: transactionData, gasPrice: gasPrice, gasLimit: gasLimit)
-                .flatMap { [weak self] rawTransaction in
-                    guard let strongSelf = self else {
-                        throw Kit.KitError.weakReference
-                    }
-
-                    let signature = try signer.signature(rawTransaction: rawTransaction)
-
-                    return strongSelf.evmKit.sendSingle(rawTransaction: rawTransaction, signature: signature)
-                }
-                .map { (tx: FullTransaction) in tx }
+        
+        let rawTransaction = try await evmKit.fetchRawTransaction(transactionData: transactionData, gasPrice: gasPrice, gasLimit: gasLimit)
+        let signature = try signer.signature(rawTransaction: rawTransaction)
+        
+        return try await evmKit.send(rawTransaction: rawTransaction, signature: signature)
     }
     
     enum SendError: Error {
@@ -170,11 +146,11 @@ extension EthereumAdapter: IBalanceAdapter {
     }
     
     var balanceStateUpdated: AnyPublisher<Void, Never> {
-        syncStateObservable.map { _ in() }.publisher.catch { _ in Just(()) }.eraseToAnyPublisher()
+        syncStatePublisher
     }
     
     var balanceUpdated: AnyPublisher<Void, Never> {
-        evmKit.accountStateObservable.map { _ in() }.publisher.catch { _ in Just(()) }.eraseToAnyPublisher()
+        balancePublisher
     }
     
     var balance: Decimal {
@@ -188,7 +164,10 @@ extension EthereumAdapter: IBalanceAdapter {
 //MARK: - ITransactionsAdapter
 extension EthereumAdapter: ITransactionsAdapter {
     var transactionRecords: AnyPublisher<[TransactionRecord], Never> {
-        transactionsSingle(from: nil, limit: nil).eraseToAnyPublisher()
+        Future { [unowned self] promisse in
+            promisse(.success(self.transactions(from: nil, limit: nil)))
+        }
+        .eraseToAnyPublisher()
     }
 }
 
@@ -206,23 +185,24 @@ extension EthereumAdapter: ISendEthereumAdapter {
     }
     
     func send(tx: SendETHService.Transaction) -> Future<TransactionRecord, Error> {
-        Future { promise in
-            self
-                .sendSingle(
-                    to: tx.data.to,
-                    amount: tx.data.value,
-                    gasLimit: tx.gasData.gasLimit,
-                    gasPrice: .legacy(gasPrice: tx.gasData.gasPrice)
-                )
-                .subscribe { [weak self] fullTransaction in
-                    guard let self = self else { return }
+        Future { [unowned self] promise in
+            Task {
+                do {
+                    let fullTransaction = try await self.send(
+                        to: tx.data.to,
+                        amount: tx.data.value,
+                        gasLimit: tx.gasData.gasLimit,
+                        gasPrice: .legacy(gasPrice: tx.gasData.gasPrice)
+                    )
+                    
                     let record = self.transactionRecord(fullTransaction: fullTransaction)
                     print("Eth tx sent: \(record.id) ")
+                    
                     promise(.success(record))
-                } onError: { error in
+                } catch  {
                     promise(.failure(error))
                 }
-                .disposed(by: self.disposeBag)
+            }
         }
     }
 }

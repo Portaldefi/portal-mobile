@@ -9,12 +9,10 @@ import Foundation
 import EvmKit
 import HdWalletKit
 import Combine
-import RxSwift
 import Factory
 
 class EthereumKitManager {
     private let appConfigProvider: IAppConfigProvider
-    private let disposeBag = DisposeBag()
     
     private(set) var signer: Signer?
     private var ethereumKit: Kit?
@@ -66,15 +64,18 @@ class EthereumKitManager {
     func gasLimit(gasPrice: Int, transactionData: TransactionData) -> Future<Int, Never> {
         Future { [weak self] promise in
             guard let self = self else { promise(.success(Kit.defaultGasLimit));  return }
-                        
-            self.ethereumKit?
-                .estimateGas(transactionData: transactionData, gasPrice: .legacy(gasPrice: gasPrice))
-                .subscribe(onSuccess: { estimatedGasLimit in
-                    promise(.success(estimatedGasLimit))
-                }, onError: { error in
+            
+            Task {
+                do {
+                    if let estimatedGasLimit = try await self.ethereumKit?.fetchEstimateGas(transactionData: transactionData, gasPrice: .legacy(gasPrice: gasPrice)) {
+                        promise(.success(estimatedGasLimit))
+                    } else {
+                        promise(.success(Kit.defaultGasLimit))
+                    }
+                } catch {
                     promise(.success(Kit.defaultGasLimit))
-                })
-                .disposed(by: self.disposeBag)
+                }
+            }
         }
     }
 }

@@ -121,7 +121,7 @@ class AtomicHolderTemplate: IAtomicSwap {
         
         let address = try Address(hex: contractAddress)
         let contractData = CreateInvoiceMethod(tokenAddress: address, tokenAmount: BigUInt(quantity), tokenNetwork: 5)
-        ethereumKit.call
+//        ethereumKit.call
     }
     
     private func signalSwapOpen(secret: String, invoice: String) async throws {
