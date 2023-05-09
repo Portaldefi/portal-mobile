@@ -10,7 +10,6 @@ import Factory
 import HsCryptoKit
 import EvmKit
 import BigInt
-import RxSwift
 
 class CreateInvoiceMethod: ContractMethod {
     private let tokenAddress: Address

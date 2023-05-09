@@ -8,11 +8,9 @@
 import Foundation
 import FeeRateKit
 import Combine
-import RxSwift
 
 class FeeRateProvider {
     private let feeRateKit: FeeRateKit.Kit
-    let disposeBag = DisposeBag()
 
     init(appConfigProvider: IAppConfigProvider) {
         let providerConfig = FeeProviderConfig(
