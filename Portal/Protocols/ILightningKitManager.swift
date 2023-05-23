@@ -20,7 +20,7 @@ protocol ILightningInvoiceHandler {
     func decode(invoice: String) throws -> Invoice?
     func pay(invoice: String) -> Combine.Future<TransactionRecord, Error>
     func pay(invoice: Invoice) async throws -> TransactionRecord
-    func createInvoice(paymentHash: String, satAmount: UInt64) async -> String?
+    func createInvoice(paymentHash: String, satAmount: UInt64) async -> Invoice?
 }
 
 protocol ILightningPeerHandler {
