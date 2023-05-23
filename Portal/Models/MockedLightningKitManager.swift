@@ -9,6 +9,10 @@ import Combine
 import LightningDevKit
 
 class MockedLightningKitManager: ILightningKitManager {
+    func createInvoice(paymentHash: String, satAmount: UInt64) async -> LightningDevKit.Invoice? {
+        nil
+    }
+    
     func broadcastTransaction(tx: [UInt8]) {
         
     }
