@@ -27,6 +27,18 @@ class EthereumAdapter: IAdapter {
 
     private func transactionRecord(fullTransaction: FullTransaction) -> TransactionRecord {
         let transaction = fullTransaction.transaction
+        print("tx \(transaction.hash.toHexString()) decoration: \(fullTransaction.decoration)")
+        
+        switch fullTransaction.decoration {
+        case let decoration as IncomingDecoration:
+            break
+        case let decoration as UnknownTransactionDecoration:
+            print(decoration.fromAddress)
+            print(decoration.internalTransactions)
+        default:
+            break
+        }
+        
         var amount: Decimal?
         if let value = transaction.value, let significand = Decimal(string: value.description) {
             amount = Decimal(sign: .plus, exponent: -decimal, significand: significand)
@@ -204,5 +216,24 @@ extension EthereumAdapter: ISendEthereumAdapter {
                 }
             }
         }
+    }
+    
+    func callSolidity(contractAddress: Address, data: Data) async throws -> Data {
+        try await evmKit.fetchCall(contractAddress: contractAddress, data: data)
+    }
+    
+    func transactionReceipt(hash: Data) async throws -> RpcTransactionReceipt {
+        return try await evmKit.blockchain.transactionReceipt(transactionHash: hash)
+    }
+    
+    func send(transactionData: TransactionData, gasLimit: Int, gasPrice: GasPrice) async throws -> FullTransaction {
+        guard let signer = signer else {
+            throw SendError.noSigner
+        }
+
+        let rawTransaction = try await evmKit.fetchRawTransaction(transactionData: transactionData, gasPrice: gasPrice, gasLimit: gasLimit)
+        let signature = try signer.signature(rawTransaction: rawTransaction)
+
+        return try await evmKit.send(rawTransaction: rawTransaction, signature: signature)
     }
 }
