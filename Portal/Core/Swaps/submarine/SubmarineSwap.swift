@@ -21,6 +21,8 @@ enum SwapError: Error {
     case emptyResponse
     case invalidAmount
     case swapNotExist
+    case missingData
+    case missingEthKit
 }
 
 

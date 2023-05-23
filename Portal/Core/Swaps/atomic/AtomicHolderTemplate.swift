@@ -97,38 +97,131 @@ class AtomicHolderTemplate: IAtomicSwap {
     }
     
     func open() async throws {
-        guard let swap = swap, let contractAddress = swap.secretHolder.asset.contractAddress else { return }
-        
-        print("[SWAP] Open in holder submarin")
+        print("[SWAP] Open in holder")
                 
-        let invoice = try createInvoice(quantity: swap.secretHolder.quantity, contractAddress: contractAddress, keys: Data())
+        guard let swap = swap, let holderAddressHex = swap.secretHolder.asset.contractAddress else {
+            throw SwapError.missingData
+        }
+        
+//        try await signalSwapOpen(swap: swap)
+
+        let tokenAddress = try Address(hex: holderAddressHex)
+        let quantity = BigUInt(swap.secretHolder.quantity)
+        
+        let createInvoiceTransaction = try await createInvoice(tokenAddress: tokenAddress, quantity: quantity, tokenNetwork: 0)
+        
+        print("[SWAP] CreateInvoice tx id: \(createInvoiceTransaction.transaction.hash.toHexString())")
+        
+        let receipt = try await waitForTransactionReceipt(transactionHash: createInvoiceTransaction.transaction.hash)
+        let invoiceId = parseInvoiceId(receipt: receipt)
+        
+        print(invoiceId.description)
+        print("[SWAP] Invoice id: \(invoiceId.description) is created for holder")
+        
+//        let updatedSwap = updateState(swap: swap, state: ["goerli" : invoiceId.description])
+//
+//        print("[SWAP] Sending updated swap: \(updatedSwap) to server")
+//
+//        try await signalSwapOpen(swap: swap)
+        
+        print("[SWAP] Updated state sent")
         
         //subscribe to invoice
         //settleInvoice
     }
     
+    func updateState(swap: Swap, state: [String : [String: InvoiceCodable]]) -> Swap {
+        let secretHolder = swap.secretHolder
+        
+        let secretHolderUpdated = Party(
+            id: secretHolder.id,
+            swap: secretHolder.swap,
+            asset: secretHolder.asset,
+            network: secretHolder.network,
+            quantity: secretHolder.quantity,
+            state: state,
+            isSecretSeeker: secretHolder.isSecretSeeker,
+            isSecretHolder: secretHolder.isSecretHolder
+        )
+        
+        return Swap(
+            id: swap.id,
+            secretHash: swap.secretHash,
+            secretHolder: secretHolderUpdated,
+            secretSeeker: swap.secretSeeker,
+            status: swap.status
+        )
+    }
+    
+    func waitForTransactionReceipt(transactionHash: Data, pollingInterval: TimeInterval = 3) async throws -> RpcTransactionReceipt {
+        while true {
+            do {
+                print("[SWAP] waiting for tx receipt...")
+                let receipt = try await fetchTxReceipt(hash: transactionHash)
+                return receipt
+            } catch {
+                print(error)
+            }
+            try await Task.sleep(nanoseconds: UInt64(pollingInterval * 1000_000_000))
+        }
+    }
+    
+//    func waitForTransactionReceipt(evmKit: ISendEthereumAdapter, transactionHash: Data, pollingInterval: TimeInterval = 5) async throws -> RpcTransactionReceipt {
+//        while true {
+//            let receipt = try await evmKit.transactionReceipt(hash: transactionHash)
+//            print("receipt: \(receipt)")
+//            
+//            
+//            await Task.sleep(UInt64(pollingInterval * 1000_000_000))
+//        }
+//    }
+    
     func commit() async throws {
         guard let swap = swap else { return }
+        
+        //Alice pays lightning invoice
+        
     }
     
     func cancel() async throws {
         
     }
     
-    func createInvoice(quantity: Int64, contractAddress: String, keys: Data) throws {
-        guard let swap = swap else { return }
-        
-        let address = try Address(hex: contractAddress)
-        let contractData = CreateInvoiceMethod(tokenAddress: address, tokenAmount: BigUInt(quantity), tokenNetwork: 5)
-//        ethereumKit.call
+    func fetchTxReceipt(hash: Data) async throws -> RpcTransactionReceipt {
+        try await ethereumKit.transactionReceipt(hash: hash)
     }
     
-    private func signalSwapOpen(secret: String, invoice: String) async throws {
-        let urlString = "http://\(host):\(port)/api/v1/swap"
+    func parseInvoiceId(receipt: RpcTransactionReceipt) -> BigUInt {
+        let hex = receipt.logs[0].data.subdata(in: 1..<33)
+        return BigUInt(hex)
+    }
+    
+    func createInvoice(tokenAddress: Address, quantity: BigUInt, tokenNetwork: BigUInt) async throws -> FullTransaction {
+        let contractData = CreateInvoiceMethod(
+            tokenAddress: tokenAddress,
+            tokenAmount: quantity,
+            tokenNetwork: tokenNetwork
+        )
         
-        guard let swap = swap else {
-            throw SwapError.swapNotExist
-        }
+        let encodedContractData = contractData.encodedABI()
+        
+        let contractAddress = try Address(hex: "0xe2f24575862280cf6574db5b9b3f8fe0be84dc62")
+        let kit = Container.ethereumKitManager()
+        let feerateKit = Container.feeRateProvider()
+        let gasPriceInt = try await feerateKit.ethereumGasPrice()
+        let gasPrice: GasPrice = .legacy(gasPrice: gasPriceInt)
+                
+        let transactionData = TransactionData(to: contractAddress, value: 0, input: encodedContractData)
+        
+        guard let ethKit = kit.ethereumKit else { throw SwapError.missingEthKit }
+        
+        let estimatedGas = try await ethKit.fetchEstimateGas(transactionData: transactionData, gasPrice: gasPrice)
+
+        return try await ethereumKit.send(transactionData: transactionData, gasLimit: estimatedGas, gasPrice: gasPrice)
+    }
+    
+    private func signalSwapOpen(swap: Swap) async throws {
+        let urlString = "http://\(host):\(port)/api/v1/swap"
         
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
@@ -138,14 +231,13 @@ class AtomicHolderTemplate: IAtomicSwap {
         let encoder = JSONEncoder()
         
         let swapData = try encoder.encode(swap)
-        let partyData = try encoder.encode(swap.secretHolder.isSecretHolder ? swap.secretHolder : swap.secretSeeker)
+//        let partyData = try encoder.encode(swap.secretHolder.isSecretHolder ? swap.secretHolder : swap.secretSeeker)
         
         let swapDict = try JSONSerialization.jsonObject(with: swapData, options: []) as? [String: Any]
-        let partyDict = try JSONSerialization.jsonObject(with: partyData, options: []) as? [String: Any]
+//        let partyDict = try JSONSerialization.jsonObject(with: partyData, options: []) as? [String: Any]
         let requestBody: [String: Any] = [
             "swap": swapDict as Any,
-            "party": partyDict as Any,
-            "invoice": invoice
+//            "party": partyDict as Any
         ]
                 
         let request = try buildRequest(url: url, method: "PUT", userId: swap.secretHolder.isSecretHolder ? swap.secretHolder.id : swap.secretSeeker.id, body: requestBody)
@@ -153,7 +245,6 @@ class AtomicHolderTemplate: IAtomicSwap {
         let (data, _) = try await URLSession.shared.data(for: request)
         if let responseString = String(data: data, encoding: .utf8) {
             print("Response: \(responseString)")
-            print(responseString)
         } else {
             print("No response data")
             throw SwapError.emptyResponse

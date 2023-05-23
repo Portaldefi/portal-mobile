@@ -9,6 +9,7 @@ import Foundation
 import Starscream
 import Combine
 import Factory
+import BigInt
 
 class AtomicSwap {
     private let host = "localhost"
@@ -104,14 +105,8 @@ class AtomicSwap {
             "baseQuantity": 10000,
             "baseNetwork": "lightning.btc",
             "quoteAsset": "ETH",
-            "quoteQuantity": 150000000000000,
+            "quoteQuantity": 100000,
             "quoteNetwork": "goerli"
-//            "baseAsset": "BTC",
-//            "baseQuantity": baseQuantity,
-//            "baseNetwork": "lightning.btc",
-//            "quoteAsset": "ETH",
-//            "quoteQuantity": quoteQuantity,//150000000000000,
-//            "quoteNetwork": "goerli"
         ]
         
         let request = try buildRequest(url: url, method: "PUT", userId: userId, body: requestBody)
