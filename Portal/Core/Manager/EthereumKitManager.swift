@@ -15,7 +15,7 @@ class EthereumKitManager {
     private let appConfigProvider: IAppConfigProvider
     
     private(set) var signer: Signer?
-    private var ethereumKit: Kit?
+    var ethereumKit: Kit?
     private var currentAccount: Account?
     
     init(appConfigProvider: IAppConfigProvider) {
@@ -45,10 +45,10 @@ class EthereumKitManager {
             address: address,
             chain: chain,
             rpcSource: .goerliInfuraWebsocket(
-                projectId: "7bffa4b191da4e9682d4351178c4736e",
-                projectSecret: "5dedf9a8a4c4477687cfac3debbc23c6"
+                projectId: appConfigProvider.infuraCredentials.id,
+                projectSecret: appConfigProvider.infuraCredentials.secret
             ),
-            transactionSource: .goerliEtherscan(apiKey: "PYPJHJFA2MUT12KPTT8FCKPAMGHTRDQICB"),
+            transactionSource: .goerliEtherscan(apiKey: appConfigProvider.etherscanKey),
             walletId: account.id,
             minLogLevel: .error
         )
@@ -77,6 +77,10 @@ class EthereumKitManager {
                 }
             }
         }
+    }
+    
+    func gasLimit(gasPrice: Int, transactionData: TransactionData) async throws -> Int? {
+        try await self.ethereumKit?.fetchEstimateGas(transactionData: transactionData, gasPrice: .legacy(gasPrice: gasPrice))
     }
 }
 
