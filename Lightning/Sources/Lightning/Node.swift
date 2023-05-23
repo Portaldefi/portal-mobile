@@ -363,7 +363,7 @@ public class Node {
     }
     
     //MARK: - Create invoice
-    public func createInvoice(paymentHash: String, satAmount: UInt64) async -> String? {
+    public func createInvoice(paymentHash: String, satAmount: UInt64) async -> Invoice? {
         guard let channelManager = channelManager, let keyInterface = keysManager else {
             return nil
         }
@@ -384,8 +384,7 @@ public class Node {
         )
         
         if result.isOk(), let invoice = result.getValue() {
-            let invoiceString = invoice.toStr()
-            return invoiceString
+            return invoice
         } else if let error = result.getError() {
             print(error.toStr())
             return nil
