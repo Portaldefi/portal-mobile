@@ -69,7 +69,7 @@ extension SharedContainer {
     }
     
     static let lightningKitManager = Factory<ILightningKitManager>(scope: .singleton) {
-        let config = BitcoinCoreRpcConfig(username: "polaruser", password: "polarpass", port: 18454, host: "localhost")
+        let config = BitcoinCoreRpcConfig(username: "polaruser", password: "polarpass", port: 18443, host: "localhost")
         let connectionType: ConnectionType = .regtest(config)
         return LightningKitManager(connectionType: connectionType)
     }
