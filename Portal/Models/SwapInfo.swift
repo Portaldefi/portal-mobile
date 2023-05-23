@@ -25,7 +25,7 @@ struct Party: Codable {
     let asset: PAsset
     let network: AssetNetwork
     let quantity: Int64
-    let state: [String: String]
+    let state: [String: [String: InvoiceCodable]]
     let isSecretSeeker: Bool
     let isSecretHolder: Bool
     
