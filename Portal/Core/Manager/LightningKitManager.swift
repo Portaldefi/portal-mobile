@@ -241,7 +241,7 @@ extension LightningKitManager: ILightningInvoiceHandler {
         return await instance.createInvoice(satAmount: nil, description: description)
     }
     
-    func createInvoice(paymentHash: String, satAmount: UInt64) async -> String? {
+    func createInvoice(paymentHash: String, satAmount: UInt64) async -> Invoice? {
         await instance.createInvoice(paymentHash: paymentHash, satAmount: satAmount)
     }
     
