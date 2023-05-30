@@ -15,6 +15,7 @@ class AccountViewModel: ObservableObject {
     @Published private(set) var accountName = String()
     @Published private(set) var totalBalance: String = "0"
     @Published private(set) var totalValue: String = "0"
+    @Published var fiatCurrency = FiatCurrency(code: "USD")
     
     @Published private(set) var items: [WalletItem] = [] {
         didSet {
@@ -39,6 +40,7 @@ class AccountViewModel: ObservableObject {
         }
     }
     @Published var goToReceive = false
+    @Published var settings: PortalSettings
     
     private let accountManager: IAccountManager
     private let walletManager: IWalletManager
@@ -57,13 +59,15 @@ class AccountViewModel: ObservableObject {
         walletManager: IWalletManager,
         adapterManager: IAdapterManager,
         localStorage: ILocalStorage,
-        marketData: IMarketDataRepository
+        marketData: IMarketDataRepository,
+        settings: PortalSettings
     ) {
         self.accountManager = accountManager
         self.walletManager = walletManager
         self.adapterManager = adapterManager
         self.localStorage = localStorage
         self.marketData = marketData
+        self.settings = settings
         
         subscribeForUpdates()
         
@@ -98,6 +102,15 @@ class AccountViewModel: ObservableObject {
                 self?.accountName = account.name
             }
             .store(in: &subscriptions)
+        
+        settings
+            .$fiatCurrency
+            .receive(on: RunLoop.main)
+            .sink { [weak self] currency in
+                self?.fiatCurrency = currency
+                self?.updateValue()
+            }
+            .store(in: &subscriptions)
     }
     
     func updateValues() {
@@ -126,7 +139,7 @@ class AccountViewModel: ObservableObject {
     }
     
     private func updateValue() {
-        let value = items.map{ convertToBtcBalance(item: $0) * marketData.lastSeenBtcPrice }.reduce(0, { $0 + $1 }).double.usdFormatted()
+        let value = items.map{ convertToBtcBalance(item: $0) * marketData.lastSeenBtcPrice * fiatCurrency.rate }.reduce(0, { $0 + $1 }).double.usdFormatted()
         
         if totalValue != value {
             DispatchQueue.main.async {
@@ -147,7 +160,8 @@ extension AccountViewModel {
             walletManager: WalletManager.mocked,
             adapterManager: AdapterManager.mocked,
             localStorage: LocalStorage.mocked,
-            marketData: MarketDataService.mocked
+            marketData: MarketDataService.mocked,
+            settings: PortalSettings()
         )
         viewModel.accountName = "Mocked"
         viewModel.totalBalance = "0.00055"

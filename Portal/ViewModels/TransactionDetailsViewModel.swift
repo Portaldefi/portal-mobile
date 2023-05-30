@@ -28,6 +28,12 @@ class TransactionDetailsViewModel: ObservableObject {
     @Published var showAddLabelInterface = false
     @Published var newLabelTitle: String?
     @Published var source: TxSource = .btcOnChain
+    
+    @Injected(Container.settings) private var settings
+
+    var fiatCurrency: FiatCurrency {
+        settings.fiatCurrency
+    }
         
     var title: String {
         transaction.type.description
@@ -58,9 +64,9 @@ class TransactionDetailsViewModel: ObservableObject {
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            return (transaction.userData.price * (amount/100_000_000)).double.usdFormatted()
+            return (transaction.userData.price * (amount/100_000_000) * fiatCurrency.rate).double.usdFormatted()
         case .ethereum, .erc20:
-            return (transaction.userData.price * amount).double.usdFormatted()
+            return (transaction.userData.price * amount * fiatCurrency.rate).double.usdFormatted()
         }
     }
     

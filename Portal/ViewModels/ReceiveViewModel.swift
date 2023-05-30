@@ -48,9 +48,14 @@ class ReceiveViewModel: ObservableObject {
     @Published var sharedItem: QRCodeSharedItem?
     
     @Injected(Container.marketData) private var marketData
+    @Injected(Container.settings) private var settings
     @Injected(Container.lightningKitManager) private var lightningKit
     
     private var subscriptions = Set<AnyCancellable>()
+    
+    var fiatCurrency: FiatCurrency {
+        settings.fiatCurrency
+    }
     
     var receiveAddress: String {
         adapter?.receiveAddress ?? "Address"
@@ -82,15 +87,15 @@ class ReceiveViewModel: ObservableObject {
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            price = marketData.lastSeenBtcPrice
+            price = marketData.lastSeenBtcPrice * fiatCurrency.rate
         case .ethereum, .erc20:
-            price = marketData.lastSeenEthPrice
+            price = marketData.lastSeenEthPrice * fiatCurrency.rate
             qrAddressType = .onChain
         }
         
         exchanger = Exchanger(
             base: coin,
-            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)),
+            quote: .fiat(fiatCurrency),
             price: price
         )
         

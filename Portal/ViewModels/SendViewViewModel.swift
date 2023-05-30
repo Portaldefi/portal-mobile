@@ -40,7 +40,12 @@ class SendViewViewModel: ObservableObject {
         
     @Injected(Container.accountViewModel) private var account
     @Injected(Container.marketData) private var marketData
+    @Injected(Container.settings) private var settings
     @LazyInjected(Container.biometricAuthentification) private var biometrics
+    
+    var fiatCurrency: FiatCurrency {
+        settings.fiatCurrency
+    }
         
     var fee: String {
         guard let coin = coin, let recomendedFees = recomendedFees, let sendService = sendService else { return String() }
@@ -98,11 +103,11 @@ class SendViewViewModel: ObservableObject {
                 
                 switch coin.type {
                 case .bitcoin:
-                    self.valueString = (sendService.balance * self.marketData.lastSeenBtcPrice).double.usdFormatted()
+                    self.valueString = (sendService.balance * self.marketData.lastSeenBtcPrice * self.fiatCurrency.rate).double.usdFormatted()
                 case .lightningBitcoin:
                     fatalError("not implemented")
                 case .ethereum, .erc20:
-                    self.valueString = (sendService.balance * self.marketData.lastSeenEthPrice).double.usdFormatted()
+                    self.valueString = (sendService.balance * self.marketData.lastSeenEthPrice * self.fiatCurrency.rate).double.usdFormatted()
                 }
             }
             .store(in: &subscriptions)
@@ -126,7 +131,7 @@ class SendViewViewModel: ObservableObject {
         
         exchanger = Exchanger(
             base: coin,
-            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)),
+            quote: .fiat(fiatCurrency),
             price: price
         )
         
@@ -168,7 +173,7 @@ class SendViewViewModel: ObservableObject {
             
             if let service = sendService {
                 balanceString = String(describing: service.spendable)
-                valueString = (service.balance * marketData.lastSeenBtcPrice).double.usdFormatted()
+                valueString = (service.balance * marketData.lastSeenBtcPrice * fiatCurrency.rate).double.usdFormatted()
             }
         case .lightningBitcoin:
             fatalError("not implemented yet")
@@ -185,7 +190,7 @@ class SendViewViewModel: ObservableObject {
             
             if let service = sendService {
                 balanceString = String(describing: service.spendable)
-                valueString = (service.balance * marketData.lastSeenEthPrice).double.usdFormatted()
+                valueString = (service.balance * marketData.lastSeenEthPrice * fiatCurrency.rate).double.usdFormatted()
             }
         }
         

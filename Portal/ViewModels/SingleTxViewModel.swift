@@ -17,6 +17,12 @@ class SingleTxViewModel: ObservableObject {
     @Published private(set) var notes: String?
     @Published private(set) var labels: [TxLabel]
     
+    @Injected(Container.settings) private var settings
+
+    var fiatCurrency: FiatCurrency {
+        settings.fiatCurrency
+    }
+    
     var amount: String {
         guard let amount = tx.amount else { return "0" }
         switch coin.type {
@@ -35,9 +41,9 @@ class SingleTxViewModel: ObservableObject {
         guard let amount = tx.amount else { return "0" }
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            return (amount/100_000_000 * tx.userData.price).double.usdFormatted()
+            return (amount/100_000_000 * tx.userData.price * fiatCurrency.rate).double.usdFormatted()
         case .ethereum:
-            return (amount * tx.userData.price).double.usdFormatted()
+            return (amount * tx.userData.price * fiatCurrency.rate).double.usdFormatted()
         case .erc20:
             return "0"
         }

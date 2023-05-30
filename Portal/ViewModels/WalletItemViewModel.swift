@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 import Factory
-import SwiftUI
 
 class WalletItemViewModel: ObservableObject {
     let coin: Coin
@@ -22,6 +21,9 @@ class WalletItemViewModel: ObservableObject {
     
     @Published var balanceString = String()
     @Published var valueString = String()
+    @Published var fiatCurrency = FiatCurrency(code: "USD")
+    
+    @Injected(Container.settings) private var settings
     
     var value: Decimal {
         switch coin.type {
@@ -57,6 +59,15 @@ class WalletItemViewModel: ObservableObject {
             }
             .store(in: &subscriptions)
         
+        settings
+            .$fiatCurrency
+            .receive(on: RunLoop.main)
+            .sink { [weak self] currency in
+                self?.fiatCurrency = currency
+                self?.updateValue()
+            }
+            .store(in: &subscriptions)
+        
         updateValue()
     }
     
@@ -73,11 +84,11 @@ class WalletItemViewModel: ObservableObject {
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            _valueString = (marketData.lastSeenBtcPrice * balance).double.usdFormatted()
+            _valueString = (marketData.lastSeenBtcPrice * balance * fiatCurrency.rate).double.usdFormatted()
         case .ethereum, .erc20:
-            _valueString = (marketData.lastSeenEthPrice * balance).double.usdFormatted()
+            _valueString = (marketData.lastSeenEthPrice * balance * fiatCurrency.rate).double.usdFormatted()
         }
-        
+                
         if valueString != _valueString {
             valueString = _valueString
         }
