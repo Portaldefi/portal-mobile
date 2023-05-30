@@ -15,6 +15,7 @@ class ViewState: ObservableObject {
         case lightning
     }
     
+    @Published var showSettings = false
     @Published var showBackUpFlow = false
     @Published var hideTabBar = false
     @Published var showQRCodeScannerFromTabBar: Bool = false {
