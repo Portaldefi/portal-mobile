@@ -80,6 +80,9 @@ struct AccountView: View {
         .fullScreenCover(isPresented: $viewState.showBackUpFlow) {
             AccountBackupRootView().environmentObject(viewState)
         }
+        .fullScreenCover(isPresented: $viewState.showSettings) {
+            SettingsView()
+        }
     }
     
     func AccountView() -> some View {
@@ -116,9 +119,11 @@ struct AccountView: View {
                     .padding(.leading)
                 }
                 
-                Asset.gearIcon
-                    .foregroundColor(Palette.grayScale6A)
-                    .padding()
+                PButton(config: .onlyIcon(Asset.gearIcon), style: .free, size: .medium, color: Palette.grayScale6A, enabled: true) {
+                    viewState.showSettings.toggle()
+                }
+                .frame(width: 30, height: 30)
+                .padding(.horizontal)
             }
         }
         .frame(height: 73)
@@ -151,7 +156,7 @@ struct AccountView: View {
                         Text(value)
                             .font(.Main.fixed(.monoMedium, size: 16))
                             .foregroundColor(Palette.grayScaleEA)
-                        Text("usd")
+                        Text(viewModel.fiatCurrency.code.lowercased())
                             .font(.Main.fixed(.monoMedium, size: 12))
                             .foregroundColor(Palette.grayScale6A)
                             .offset(y: 2)

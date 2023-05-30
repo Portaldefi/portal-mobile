@@ -158,7 +158,12 @@ struct TransactionDetailsView: View {
                 ConfirmationCounterView(confirmations: viewModel.confirmations)
             }
             
-            TxAmountView(amount: viewModel.amountString, value: viewModel.currencyAmountString, code: viewModel.coin.code.lowercased())
+            TxAmountView(
+                amount: viewModel.amountString,
+                value: viewModel.currencyAmountString,
+                coinCode: viewModel.coin.code.lowercased(),
+                currencyCode: viewModel.fiatCurrency.code.lowercased()
+            )
             
             Text(viewModel.dateString)
                 .font(.Main.fixed(.monoMedium, size: 16))

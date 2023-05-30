@@ -80,7 +80,7 @@ struct SingleTxView: View {
                                 Spacer()
                             }
                             .frame(width: 30)
-                            Text("usd")
+                            Text(viewModel.fiatCurrency.code.lowercased())
                                 .font(.Main.fixed(.monoMedium, size: 12))
                                 .foregroundColor(Palette.grayScale6A)
                                 .offset(x: -1, y: 5)

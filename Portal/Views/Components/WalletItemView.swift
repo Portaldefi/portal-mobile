@@ -55,7 +55,7 @@ struct WalletItemView: View {
                             Spacer()
                         }
                         .frame(width: 40)
-                        Text("usd")
+                        Text(viewModel.fiatCurrency.code.lowercased())
                             .font(.Main.fixed(.monoRegular, size: 14))
                             .foregroundColor(Palette.grayScale6A)
                             .offset(y: 4)
