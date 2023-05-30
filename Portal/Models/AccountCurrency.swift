@@ -46,4 +46,13 @@ enum AccountCurrency: Equatable {
             return coin.name
         }
     }
+    
+    var rate: Decimal {
+        switch self {
+        case .fiat(let fiatCurrency):
+            return fiatCurrency.rate
+        case .coin(let coin):
+            return 1
+        }
+    }
 }
