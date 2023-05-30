@@ -12,6 +12,7 @@ import Starscream
 final class MarketDataService {
     private let btcTickerID: Any = "BTCUSD.G"
     private let ethTickerID: Any = "ETHUSD.G"
+    private let supportedFiatCurrenciesSymbols = "JPY USD EUR INR CAD GBP NZD SGD"
     
     private var btcTicker: TickerModel?
     private var ethTicker: TickerModel?
@@ -107,7 +108,12 @@ final class MarketDataService {
     private func fetchFiatCurrencies() {
         let loginString = "\(configProvider.rafaUser):\(configProvider.rafaPass)"
 
-        guard let loginData = loginString.data(using: String.Encoding.utf8), let url = URL(string: configProvider.forexUrl) else { return }
+        guard
+            let loginData = loginString.data(using: String.Encoding.utf8),
+            let url = URL(
+                string: configProvider.forexUrl + "?ticker_id=USD/JPY,EUR/USD,USD/INR,USD/CAD,GBP/USD,NZD/USD,USD/SGD"
+            )
+        else { return }
         
         let base64LoginString = loginData.base64EncodedString()
         let session = URLSession.shared
@@ -123,12 +129,19 @@ final class MarketDataService {
                 let fiatCurrenciesTickers = try self.jsonDecoder.decode([CurrencyTickerModel].self, from: data)
                 
                 self.fiatCurrencies = fiatCurrenciesTickers
-                    .filter{ $0.ticker.contains("/USD") }
-                    .compactMap{
-                        guard let range = $0.ticker.range(of: "/")?.lowerBound else { return nil }
-                        let code = String($0.ticker[...range].dropLast())
-                        return FiatCurrency(code: code, name: code, rate: Double($0.bid) ?? 1)
+                    .map{ model -> FiatCurrency in
+                        let tickerParts = model.ticker.split(separator: "/")
+                        let code: String
+                        if tickerParts[0] == "USD" {
+                            code = String(tickerParts[1])
+                        } else {
+                            code = String(tickerParts[0])
+                        }
+                        
+                        let rate = Decimal(string: model.bid) ?? 1
+                        return FiatCurrency(code: code, rate: rate)
                     }
+                self.fiatCurrencies.append(FiatCurrency(code: "USD"))
             } catch {
                 print(error)
             }
