@@ -89,13 +89,15 @@ extension SharedContainer {
         let userDefaults = UserDefaults.standard
         let localStorage = LocalStorage(storage: userDefaults)
         let marketData = Container.marketData()
+        let settings = Container.settings()
         
         return AccountViewModel(
             accountManager: accountManager,
             walletManager: walletManager,
             adapterManager: adapterManager,
             localStorage: localStorage,
-            marketData: marketData
+            marketData: marketData,
+            settings: settings
         )
     }
     
@@ -105,6 +107,10 @@ extension SharedContainer {
     
     static let biometricAuthentification = Factory<BiometricAuthentication>(scope: .singleton) {
         BiometricAuthentication()
+    }
+    
+    static let settings = Factory<PortalSettings>(scope: .singleton) {
+        PortalSettings()
     }
     
     static let marketData = Factory<IMarketDataRepository>(scope: .singleton) {
