@@ -44,7 +44,7 @@ extension UInt64 {
         let double = Double(self)
         switch currency {
         case .fiat(let currency):
-            return localizedValueString(value: double * currency.rate, symbol: currency.symbol)
+            return localizedValueString(value: double * currency.rate.double, symbol: currency.symbol)
         case .coin(let coin):
             switch coin.type {
             case .bitcoin, .lightningBitcoin:
