@@ -143,6 +143,7 @@
 		756E29DA2A25F9C900C7D618 /* PortalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756E29D92A25F9C900C7D618 /* PortalSettings.swift */; };
 		756E29DC2A25FA0400C7D618 /* Preference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756E29DB2A25FA0400C7D618 /* Preference.swift */; };
 		756E29DE2A25FA3F00C7D618 /* PublisherObservableObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756E29DD2A25FA3F00C7D618 /* PublisherObservableObject.swift */; };
+		756E29E32A27423100C7D618 /* Eip20Kit in Frameworks */ = {isa = PBXBuildFile; productRef = 756E29E22A27423100C7D618 /* Eip20Kit */; };
 		75772A5D28F8192F00BE80B7 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 75772A5C28F8192F00BE80B7 /* CodeScanner */; };
 		75772A642901793300BE80B7 /* IdentifiableString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A632901793300BE80B7 /* IdentifiableString.swift */; };
 		75772A682902D73E00BE80B7 /* TextLimitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A672902D73E00BE80B7 /* TextLimitter.swift */; };
@@ -428,6 +429,7 @@
 				75421841298BD2A80028D5DF /* Lightning in Frameworks */,
 				755105F3294C6B4300525A16 /* EvmKit in Frameworks */,
 				7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */,
+				756E29E32A27423100C7D618 /* Eip20Kit in Frameworks */,
 				7502D68B289BD8EF00613323 /* PortalUI in Frameworks */,
 				75D8C5CA28E1B00800228298 /* Kingfisher in Frameworks */,
 				756A312A2888252D004978E2 /* BitcoinDevKit in Frameworks */,
@@ -926,6 +928,7 @@
 				75421840298BD2A80028D5DF /* Lightning */,
 				7542184E299BDE320028D5DF /* PopupView */,
 				755FDD5029AFA30A00D8A29C /* Starscream */,
+				756E29E22A27423100C7D618 /* Eip20Kit */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* Portal.app */;
@@ -968,6 +971,7 @@
 				752FA62329670DD900008796 /* XCRemoteSwiftPackageReference "FeeRateKit.Swift" */,
 				7542184D299BDE310028D5DF /* XCRemoteSwiftPackageReference "PopupView" */,
 				755FDD4F29AFA30A00D8A29C /* XCRemoteSwiftPackageReference "Starscream" */,
+				756E29E12A27423100C7D618 /* XCRemoteSwiftPackageReference "Eip20Kit.Swift" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -1498,6 +1502,14 @@
 				kind = branch;
 			};
 		};
+		756E29E12A27423100C7D618 /* XCRemoteSwiftPackageReference "Eip20Kit.Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/horizontalsystems/Eip20Kit.Swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		75772A5B28F8192F00BE80B7 /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cuhte3/CodeScanner";
@@ -1570,6 +1582,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 756DDD8A28A28858002EDC60 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
+		};
+		756E29E22A27423100C7D618 /* Eip20Kit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 756E29E12A27423100C7D618 /* XCRemoteSwiftPackageReference "Eip20Kit.Swift" */;
+			productName = Eip20Kit;
 		};
 		75772A5C28F8192F00BE80B7 /* CodeScanner */ = {
 			isa = XCSwiftPackageProductDependency;
