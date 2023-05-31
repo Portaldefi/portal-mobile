@@ -10,19 +10,20 @@ import EvmKit
 import HdWalletKit
 import Combine
 import Factory
+import Eip20Kit
 
 class EthereumKitManager {
     private let appConfigProvider: IAppConfigProvider
     
     private(set) var signer: Signer?
-    var ethereumKit: Kit?
+    var ethereumKit: EvmKit.Kit?
     private var currentAccount: Account?
     
     init(appConfigProvider: IAppConfigProvider) {
         self.appConfigProvider = appConfigProvider
     }
     
-    func kit(account: Account) throws -> Kit {
+    func kit(account: Account) throws -> EvmKit.Kit {
         if let ethKit = ethereumKit, let currentAccount = currentAccount, currentAccount == account {
             return ethKit
         }
@@ -41,7 +42,7 @@ class EthereumKitManager {
         
         self.signer = signer
         
-        let ethereumKit = try Kit.instance(
+        let ethereumKit = try EvmKit.Kit.instance(
             address: address,
             chain: chain,
             rpcSource: .goerliInfuraWebsocket(
@@ -52,6 +53,17 @@ class EthereumKitManager {
             walletId: account.id,
             minLogLevel: .error
         )
+        
+        let eip20Kit = try Eip20Kit.Kit.instance(
+            evmKit: ethereumKit,
+            contractAddress: address
+        )
+        
+        // Decorators are needed to detect transactions as `Eip20` transfer/approve transactions
+        Eip20Kit.Kit.addDecorators(to: ethereumKit)
+
+        // Eip20 transactions syncer is needed to pull Eip20 transfer transactions from Etherscan
+        Eip20Kit.Kit.addTransactionSyncer(to: ethereumKit)
 
         ethereumKit.start()
 
