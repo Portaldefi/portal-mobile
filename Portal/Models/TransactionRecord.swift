@@ -51,7 +51,7 @@ struct TransactionRecord: Identifiable {
                 self.amount = Decimal(sent - received)
             case .received:
                 self.amount = Decimal(received - sent)
-            case .swapped:
+            case .swapped, .unknown:
                 fatalError("should not happen")
             }
         } else if sent == 0, received > 0 {
@@ -99,9 +99,35 @@ struct TransactionRecord: Identifiable {
         self.timestamp = transaction.timestamp
         self.blockHeight = transaction.blockNumber
         self.source = .ethOnChain
-        
+                
         if let feeAmount = transaction.gasUsed ?? transaction.gasLimit, let gasPrice = transaction.gasPrice {
             let feeDecimal = Decimal(sign: .plus, exponent: -coin.decimal, significand: Decimal(feeAmount) * Decimal(gasPrice))
+            fee = feeDecimal
+        } else {
+            fee = nil
+        }
+        
+        preimage = nil
+        nodeId = nil
+        
+        let storage = Container.txDataStorage()
+        let data = storage.fetch(source: source, id: id)
+        self.userData = TxUserData(data: data)
+    }
+    
+    init(token: Erc20Token, transaction: EvmKit.Transaction, amount: Decimal?, type: TxType, from: String?, to: String?) {
+        self.id = transaction.hash.hs.hexString
+        self.type = type
+        self.amount = amount
+        self.to = to ?? "-"
+        self.from = from ?? "-"
+        self.timestamp = transaction.timestamp
+        self.blockHeight = transaction.blockNumber
+        self.source = .ethOnChain
+        
+        
+        if let feeAmount = transaction.gasUsed ?? transaction.gasLimit, let gasPrice = transaction.gasPrice {
+            let feeDecimal = Decimal(sign: .plus, exponent: -token.decimal, significand: Decimal(feeAmount) * Decimal(gasPrice))
             fee = feeDecimal
         } else {
             fee = nil
