@@ -63,9 +63,13 @@ extension SharedContainer {
     
     static let walletManager = Factory<IWalletManager>(scope: .singleton) {
         let accountManager = Container.accountManager()
-        let coinManager = CoinManagerMocked()
+        let coinManager = Container.coinManager()
         let walletStorage = WalletStorage(coinManager: coinManager, accountManager: accountManager)
         return WalletManager(accountManager: accountManager, storage: walletStorage)
+    }
+    
+    static let coinManager = Factory<ICoinManager>(scope: .singleton) {
+        CoinManager(storage: CoinStorage(), accountManager: Container.accountManager())
     }
     
     static let lightningKitManager = Factory<ILightningKitManager>(scope: .singleton) {
