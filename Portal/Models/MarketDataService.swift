@@ -12,10 +12,13 @@ import Starscream
 final class MarketDataService {
     private let btcTickerID: Any = "BTCUSD.G"
     private let ethTickerID: Any = "ETHUSD.G"
+    private let linkTickerID: Any = "LINKUSD.G"
+
     private let supportedFiatCurrenciesSymbols = "JPY USD EUR INR CAD GBP NZD SGD"
     
     private var btcTicker: TickerModel?
     private var ethTicker: TickerModel?
+    private var linkTicker: TickerModel?
     private(set) var fiatCurrencies = [FiatCurrency]()
     
     private let jsonDecoder: JSONDecoder
@@ -29,7 +32,7 @@ final class MarketDataService {
     
     private var socketData: [String: Any] {
         let messageTypes = ["quotes"]
-        let tickers = [btcTickerID, ethTickerID].map{["ticker_id": $0, "message_types": messageTypes]}
+        let tickers = [btcTickerID, ethTickerID, linkTickerID].map{["ticker_id": $0, "message_types": messageTypes]}
         
         return [
             "action": "subscribe",
@@ -77,7 +80,7 @@ final class MarketDataService {
         guard let dataFromSocketString = string.data(using: String.Encoding.utf8, allowLossyConversion: false) else { return }
         
         if let results = try? jsonDecoder.decode([TickerModel].self, from: dataFromSocketString), !results.isEmpty {
-            if btcTicker == nil || ethTicker == nil || btcTicker?.price == nil || ethTicker?.price == nil {
+            if btcTicker == nil || ethTicker == nil || btcTicker?.price == nil || ethTicker?.price == nil || linkTicker == nil || linkTicker?.price == nil {
                 if let updatedBtcTicker = results.first(where: { $0.ticker_id == btcTickerID as? String }) {
                     btcTicker = updatedBtcTicker
                     UserDefaults.standard.set(updatedBtcTicker.price, forKey: "lastSeenBtcPrice")
@@ -86,6 +89,11 @@ final class MarketDataService {
                 if let updatedEthTicker = results.first(where: { $0.ticker_id == ethTickerID as? String }) {
                     ethTicker = updatedEthTicker
                     UserDefaults.standard.set(updatedEthTicker.price, forKey: "lastSeenEthPrice")
+                }
+                
+                if let updatedLinkTicker = results.first(where: { $0.ticker_id == linkTickerID as? String }) {
+                    linkTicker = updatedLinkTicker
+                    UserDefaults.standard.set(updatedLinkTicker.price, forKey: "lastSeenLinkPrice")
                 }
             } else if Date() > lastUpdated {
                 if let updatedBtcTicker = results.first(where: { $0.ticker_id == btcTickerID as? String }) {
@@ -164,6 +172,10 @@ extension MarketDataService: IMarketDataRepository {
         Decimal(UserDefaults.standard.double(forKey: "lastSeenEthPrice"))
     }
     
+    var lastSeenLinkPrice: Decimal {
+        Decimal(UserDefaults.standard.double(forKey: "lastSeenLinkPrice"))
+    }
+    
     func pause() {
         
     }
@@ -205,6 +217,10 @@ extension MarketDataService {
         }
         
         var lastSeenEthPrice: Decimal {
+            1000
+        }
+        
+        var lastSeenLinkPrice: Decimal {
             1000
         }
         
