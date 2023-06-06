@@ -29,8 +29,10 @@ class WalletItemViewModel: ObservableObject {
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
             return marketData.lastSeenBtcPrice
-        case .ethereum, .erc20:
+        case .ethereum:
             return balance * marketData.lastSeenEthPrice
+        case .erc20:
+            return balance * marketData.lastSeenLinkPrice
         }
     }
     
@@ -85,8 +87,10 @@ class WalletItemViewModel: ObservableObject {
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
             _valueString = (marketData.lastSeenBtcPrice * balance * fiatCurrency.rate).double.usdFormatted()
-        case .ethereum, .erc20:
+        case .ethereum:
             _valueString = (marketData.lastSeenEthPrice * balance * fiatCurrency.rate).double.usdFormatted()
+        case .erc20:
+            _valueString = (marketData.lastSeenLinkPrice * balance * fiatCurrency.rate).double.usdFormatted()
         }
                 
         if valueString != _valueString {

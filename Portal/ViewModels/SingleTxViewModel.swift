@@ -31,7 +31,7 @@ class SingleTxViewModel: ObservableObject {
         case .ethereum:
             return amount.double.toString(decimal: 8)
         case .erc20:
-            return "0"
+            return amount.double.toString(decimal: 8)
         case .lightningBitcoin:
             return "0"
         }
@@ -45,7 +45,7 @@ class SingleTxViewModel: ObservableObject {
         case .ethereum:
             return (amount * tx.userData.price * fiatCurrency.rate).double.usdFormatted()
         case .erc20:
-            return "0"
+            return (amount * tx.userData.price * fiatCurrency.rate).double.usdFormatted()
         }
     }
         

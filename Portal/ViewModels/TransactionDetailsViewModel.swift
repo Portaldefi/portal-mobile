@@ -54,6 +54,8 @@ class TransactionDetailsViewModel: ObservableObject {
             return Double(amount.double/100_000_000).toString(decimal: 8)
         case .ethereum:
             return amount.double.toString(decimal: 8)
+        case .erc20:
+            return amount.double.toString(decimal: 8)
         default:
             return "0"
         }
@@ -75,9 +77,20 @@ class TransactionDetailsViewModel: ObservableObject {
         case .btcOnChain:
             return ""//storage.object(forKey: transaction.id + "recipient") as? String
         case .ethOnChain:
-            return ""//storage.object(forKey: transaction.id + "recipient") as? String
+            return transaction.to
         case .lightning:
             return transaction.to
+        }
+    }
+    
+    var senderString: String? {
+        switch source {
+        case .btcOnChain:
+            return ""//storage.object(forKey: transaction.id + "recipient") as? String
+        case .ethOnChain:
+            return transaction.from
+        case .lightning:
+            return transaction.from
         }
     }
     

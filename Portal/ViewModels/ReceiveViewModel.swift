@@ -88,9 +88,16 @@ class ReceiveViewModel: ObservableObject {
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
             price = marketData.lastSeenBtcPrice * fiatCurrency.rate
-        case .ethereum, .erc20:
+        case .ethereum:
             price = marketData.lastSeenEthPrice * fiatCurrency.rate
             qrAddressType = .onChain
+        case .erc20(let address):
+            if address == "0x326C977E6efc84E512bB9C30f76E30c160eD06FB" {
+                price = marketData.lastSeenLinkPrice * fiatCurrency.rate
+                qrAddressType = .onChain
+            } else {
+                price = 0
+            }
         }
         
         exchanger = Exchanger(
@@ -190,6 +197,12 @@ class ReceiveViewModel: ObservableObject {
             }
         case .ethereum:
             qrCodeString = "ethereum:\(receiveAddress)"
+            
+            if let components = pathComponents() {
+                qrCodeString += components
+            }
+        case .erc20:
+            qrCodeString = "link:\(receiveAddress)"
             
             if let components = pathComponents() {
                 qrCodeString += components
