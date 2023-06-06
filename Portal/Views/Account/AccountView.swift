@@ -42,7 +42,7 @@ struct AccountView: View {
                     ForEach(viewModel.items) { item in
                         ZStack(alignment: .trailing) {
                             WalletItemView(viewModel: item.viewModel)
-                                .padding(.leading, 16)
+                                .padding(.leading, 12)
                                 .padding(.trailing, 10)
                                 .contentShape(Rectangle())
                                 .onTapGesture {
@@ -53,7 +53,7 @@ struct AccountView: View {
                                 }
                             Asset.chevronRightIcon
                                 .foregroundColor(Palette.grayScale4A)
-                                .offset(x: 5)
+                                .offset(x: 2)
                         }
                         Divider()
                             .frame(height: 1)
@@ -141,7 +141,7 @@ struct AccountView: View {
                             .foregroundColor(Palette.grayScaleEA)
                             .minimumScaleFactor(0.5)
                             .lineLimit(1)
-                        Text("btc")
+                        Text(viewModel.portolioCurrency.code.uppercased())
                             .font(.Main.fixed(.monoRegular, size: 18))
                             .foregroundColor(Palette.grayScale6A)
                             .padding(.bottom, 4)
@@ -149,14 +149,14 @@ struct AccountView: View {
                     }
                     .frame(height: 32)
                     .onTapGesture {
-                        
+                        viewModel.updatePortfolioCurrency()
                     }
                     
                     HStack(spacing: 4) {
                         Text(value)
                             .font(.Main.fixed(.monoMedium, size: 16))
                             .foregroundColor(Palette.grayScaleEA)
-                        Text(viewModel.fiatCurrency.code.lowercased())
+                        Text(viewModel.fiatCurrency.code.uppercased())
                             .font(.Main.fixed(.monoMedium, size: 12))
                             .foregroundColor(Palette.grayScale6A)
                             .offset(y: 2)
