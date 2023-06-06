@@ -31,6 +31,21 @@ class AdapterFactory: IAdapterFactory {
             } else {
                 return nil
             }
+        case .erc20(let contractAddress):
+            if let ethKit = try? ethereumKitManager.kit(account: wallet.account) {
+                return try? Erc20Adapter(
+                    evmKit: ethKit,
+                    signer: ethereumKitManager.signer,
+                    token: Erc20Token(
+                        name: wallet.coin.name,
+                        code: wallet.coin.code,
+                        contractAddress: contractAddress,
+                        decimal: wallet.coin.decimal
+                    )
+                )
+            } else {
+                return nil
+            }
         default:
             return nil
         }
