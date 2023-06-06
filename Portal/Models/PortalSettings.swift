@@ -15,9 +15,21 @@ class PortalSettings: ObservableObject {
         }
     }
     
-    @Published var portfolioCurrency = Coin.bitcoin()
+    @Published var userCoins = [String]() {
+        didSet {
+            updateUserCoins()
+        }
+    }
+    
+    @Published var portfolioCurrency = Coin.bitcoin() {
+        didSet {
+            updatePortfolioCurrency()
+        }
+    }
     
     @Preference(\.fiatCurrencyData) private var fiatCurrencyData
+    @Preference(\.portfolioCurrencyData) private var portfolioCurrencyData
+    @Preference(\.userCoins) private var userCoinsData
     
     private var subscriptions = Set<AnyCancellable>()
     
@@ -28,6 +40,15 @@ class PortalSettings: ObservableObject {
         else { return }
         
         fiatCurrency = decoded
+        
+        switch portfolioCurrencyData {
+        case "ETH":
+            portfolioCurrency = .ethereum()
+        default:
+            break
+        }
+        
+        userCoins = userCoinsData
     }
     
     private func updateFiatCurrencyData() {
@@ -38,5 +59,13 @@ class PortalSettings: ObservableObject {
         else { return }
         
         self.fiatCurrencyData = encodedString
+    }
+    
+    private func updatePortfolioCurrency() {
+        portfolioCurrencyData = portfolioCurrency.code
+    }
+    
+    private func updateUserCoins() {
+        userCoinsData = userCoins
     }
 }
