@@ -13,6 +13,21 @@ class SettingsViewViewModel: ObservableObject {
     
     @Injected(Container.settings) private var settings
     
+    @Published var portfolioCurrencyIndex: Int = 0 {
+        didSet {
+            //settings.portfolioCurrency = portfolioCurrencies[portfolioCurrencyIndex]
+        }
+    }
+    
+    @Published var selectedCoins: [Coin] = [] {
+        didSet {
+            let selected = selectedCoins.map{ $0.code }
+            guard settings.userCoins != selected else { return }
+            settings.userCoins = selectedCoins.map{ $0.code }
+            //accountManager.addCoin(coin: "coin.code")
+        }
+    }
+        
     var fiatCurrency: FiatCurrency {
         get {
             settings.fiatCurrency
