@@ -11,10 +11,7 @@ import Combine
 
 class BiometricAuthentication: ObservableObject {
     private let context = LAContext()
-    
-    // .deviceOwnerAuthentication allows
-    // biometric or passcode authentication
-    private let authenticationPolicy: LAPolicy = .deviceOwnerAuthentication
+    private let authenticationPolicy: LAPolicy = .deviceOwnerAuthenticationWithBiometrics
     
     @Published private(set) var biometryType: LABiometryType
     @Published private(set) var permissionsGranted: Bool
