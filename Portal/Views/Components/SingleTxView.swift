@@ -30,6 +30,10 @@ struct SingleTxView: View {
                     case .swapped:
                         Asset.txReceivedIcon.cornerRadius(16)
                             .offset(y: -6)
+                    case .unknown:
+                        Circle()
+                            .frame(width: 24, height: 24)
+                            .offset(y: -6)
                     }
                     
                     VStack(alignment: .leading, spacing: 0) {
@@ -79,11 +83,12 @@ struct SingleTxView: View {
                                     .offset(y: -1)
                                 Spacer()
                             }
-                            .frame(width: 30)
-                            Text(viewModel.fiatCurrency.code.lowercased())
+                            .frame(width: 38)
+                            
+                            Text(viewModel.fiatCurrency.code.uppercased())
                                 .font(.Main.fixed(.monoMedium, size: 12))
                                 .foregroundColor(Palette.grayScale6A)
-                                .offset(x: -1, y: 5)
+                                .offset(x: 1, y: 4)
                         }
                         
                     }

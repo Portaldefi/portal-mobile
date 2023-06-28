@@ -31,7 +31,7 @@ final class Preferences {
 struct UserDefault<Value> {
     let key: String
     let defaultValue: Value
-
+    
     var wrappedValue: Value {
         get { fatalError("Wrapped value should not be used.") }
         set { fatalError("Wrapped value should not be used.") }
@@ -79,12 +79,12 @@ struct Preference<Value>: DynamicProperty {
             .eraseToAnyPublisher()
         self.preferencesObserver = .init(publisher: publisher)
     }
-
+    
     var wrappedValue: Value {
         get { preferences[keyPath: keyPath] }
         nonmutating set { preferences[keyPath: keyPath] = newValue }
     }
-
+    
     var projectedValue: Binding<Value> {
         Binding(
             get: { wrappedValue },

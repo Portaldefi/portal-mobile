@@ -148,6 +148,8 @@
 		756E29DA2A25F9C900C7D618 /* PortalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756E29D92A25F9C900C7D618 /* PortalSettings.swift */; };
 		756E29DC2A25FA0400C7D618 /* Preference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756E29DB2A25FA0400C7D618 /* Preference.swift */; };
 		756E29DE2A25FA3F00C7D618 /* PublisherObservableObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756E29DD2A25FA3F00C7D618 /* PublisherObservableObject.swift */; };
+		756E29E32A27423100C7D618 /* Eip20Kit in Frameworks */ = {isa = PBXBuildFile; productRef = 756E29E22A27423100C7D618 /* Eip20Kit */; };
+		756E29E52A2748C300C7D618 /* Erc20Adapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756E29E42A2748C300C7D618 /* Erc20Adapter.swift */; };
 		75772A5D28F8192F00BE80B7 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 75772A5C28F8192F00BE80B7 /* CodeScanner */; };
 		75772A642901793300BE80B7 /* IdentifiableString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A632901793300BE80B7 /* IdentifiableString.swift */; };
 		75772A682902D73E00BE80B7 /* TextLimitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75772A672902D73E00BE80B7 /* TextLimitter.swift */; };
@@ -171,7 +173,7 @@
 		75B7530E29F1636000F2A93D /* AmountValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752F429F1636000F2A93D /* AmountValueView.swift */; };
 		75B7530F29F1636000F2A93D /* LabelsManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752F529F1636000F2A93D /* LabelsManagerView.swift */; };
 		75B7531029F1636000F2A93D /* CoinImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752F629F1636000F2A93D /* CoinImageView.swift */; };
-		75B7531129F1636000F2A93D /* TxRecipientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752F729F1636000F2A93D /* TxRecipientView.swift */; };
+		75B7531129F1636000F2A93D /* TxAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752F729F1636000F2A93D /* TxAddressView.swift */; };
 		75B7531229F1636000F2A93D /* ActivityShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752F829F1636000F2A93D /* ActivityShareView.swift */; };
 		75B7531329F1636000F2A93D /* SelectableTxLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752F929F1636000F2A93D /* SelectableTxLabelView.swift */; };
 		75B7531429F1636000F2A93D /* ConfirmationCounterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752FA29F1636000F2A93D /* ConfirmationCounterView.swift */; };
@@ -368,6 +370,7 @@
 		756E29D92A25F9C900C7D618 /* PortalSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortalSettings.swift; sourceTree = "<group>"; };
 		756E29DB2A25FA0400C7D618 /* Preference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preference.swift; sourceTree = "<group>"; };
 		756E29DD2A25FA3F00C7D618 /* PublisherObservableObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublisherObservableObject.swift; sourceTree = "<group>"; };
+		756E29E42A2748C300C7D618 /* Erc20Adapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Erc20Adapter.swift; sourceTree = "<group>"; };
 		75772A632901793300BE80B7 /* IdentifiableString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentifiableString.swift; sourceTree = "<group>"; };
 		75772A672902D73E00BE80B7 /* TextLimitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLimitter.swift; sourceTree = "<group>"; };
 		758336B52A05179D000B2375 /* AtomicSwap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomicSwap.swift; sourceTree = "<group>"; };
@@ -391,7 +394,7 @@
 		75B752F429F1636000F2A93D /* AmountValueView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmountValueView.swift; sourceTree = "<group>"; };
 		75B752F529F1636000F2A93D /* LabelsManagerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelsManagerView.swift; sourceTree = "<group>"; };
 		75B752F629F1636000F2A93D /* CoinImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoinImageView.swift; sourceTree = "<group>"; };
-		75B752F729F1636000F2A93D /* TxRecipientView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TxRecipientView.swift; sourceTree = "<group>"; };
+		75B752F729F1636000F2A93D /* TxAddressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TxAddressView.swift; sourceTree = "<group>"; };
 		75B752F829F1636000F2A93D /* ActivityShareView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityShareView.swift; sourceTree = "<group>"; };
 		75B752F929F1636000F2A93D /* SelectableTxLabelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectableTxLabelView.swift; sourceTree = "<group>"; };
 		75B752FA29F1636000F2A93D /* ConfirmationCounterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfirmationCounterView.swift; sourceTree = "<group>"; };
@@ -462,6 +465,7 @@
 				75421841298BD2A80028D5DF /* Lightning in Frameworks */,
 				755105F3294C6B4300525A16 /* EvmKit in Frameworks */,
 				7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */,
+				756E29E32A27423100C7D618 /* Eip20Kit in Frameworks */,
 				7502D68B289BD8EF00613323 /* PortalUI in Frameworks */,
 				75D8C5CA28E1B00800228298 /* Kingfisher in Frameworks */,
 				756A312A2888252D004978E2 /* BitcoinDevKit in Frameworks */,
@@ -570,7 +574,7 @@
 				75B752F129F1635F00F2A93D /* TxIDView.swift */,
 				75B7530129F1636000F2A93D /* TxLabelsView.swift */,
 				75B7530229F1636000F2A93D /* TxLabelView.swift */,
-				75B752F729F1636000F2A93D /* TxRecipientView.swift */,
+				75B752F729F1636000F2A93D /* TxAddressView.swift */,
 				75B752F029F1635F00F2A93D /* WalletItemView.swift */,
 				75B752FB29F1636000F2A93D /* WordView.swift */,
 				75B752EA29F1635F00F2A93D /* WrappedHStack.swift */,
@@ -622,6 +626,7 @@
 				755170892948C1C300CC84D7 /* AccountRootView.swift */,
 				756A3117288821F3004978E2 /* AccountView.swift */,
 				75388B7A2A3079C000B879A2 /* Settings */,
+				756E29D52A1CC89D00C7D618 /* SettingsView.swift */,
 				755170912948C8C800CC84D7 /* Receive */,
 				7564C65028CF3C2E00ABA8CF /* Send */,
 				75F9B9D32A3C27600085F607 /* ActivityView.swift */,
@@ -744,7 +749,6 @@
 				755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */,
 				7542185729A3E01A0028D5DF /* MockedAdapter.swift */,
 				755FDD4D29AD00D500D8A29C /* MockedLightningKitManager.swift */,
-				756DDD9128A28C0A002EDC60 /* DB */,
 				755C56D228EACC9000A4B57B /* TxLabel.swift */,
 				755C56DB28EB096E00A4B57B /* TextFieldAlert.swift */,
 				755C56DD28EB09B000A4B57B /* TextFieldAlertController.swift */,
@@ -762,6 +766,7 @@
 				756E29D92A25F9C900C7D618 /* PortalSettings.swift */,
 				756E29DB2A25FA0400C7D618 /* Preference.swift */,
 				756E29DD2A25FA3F00C7D618 /* PublisherObservableObject.swift */,
+				756DDD9128A28C0A002EDC60 /* DB */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -951,6 +956,7 @@
 			children = (
 				75D8C5AD28D8939A00228298 /* BitcoinAdapter.swift */,
 				758DFC7D294B65BA00AB35CC /* EthereumAdapter.swift */,
+				756E29E42A2748C300C7D618 /* Erc20Adapter.swift */,
 			);
 			path = Adapters;
 			sourceTree = "<group>";
@@ -985,6 +991,7 @@
 				75421840298BD2A80028D5DF /* Lightning */,
 				7542184E299BDE320028D5DF /* PopupView */,
 				755FDD5029AFA30A00D8A29C /* Starscream */,
+				756E29E22A27423100C7D618 /* Eip20Kit */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* Portal.app */;
@@ -1027,6 +1034,7 @@
 				752FA62329670DD900008796 /* XCRemoteSwiftPackageReference "FeeRateKit.Swift" */,
 				7542184D299BDE310028D5DF /* XCRemoteSwiftPackageReference "PopupView" */,
 				755FDD4F29AFA30A00D8A29C /* XCRemoteSwiftPackageReference "Starscream" */,
+				756E29E12A27423100C7D618 /* XCRemoteSwiftPackageReference "Eip20Kit.Swift" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -1205,12 +1213,13 @@
 				75B7533129F6C30D00F2A93D /* IBitcoinKitManager.swift in Sources */,
 				75B7531329F1636000F2A93D /* SelectableTxLabelView.swift in Sources */,
 				7542185629A3C3F10028D5DF /* BTCQRCodeAddressType.swift in Sources */,
-				75B7531129F1636000F2A93D /* TxRecipientView.swift in Sources */,
+				75B7531129F1636000F2A93D /* TxAddressView.swift in Sources */,
 				75B7530B29F1636000F2A93D /* TxIDView.swift in Sources */,
 				755C56C228E9B13700A4B57B /* TransactionDetailsViewModel.swift in Sources */,
 				75517081293A515E00CC84D7 /* NavigationStackView.swift in Sources */,
 				75388B7C2A3079E500B879A2 /* SecuritySettingsView.swift in Sources */,
 				756DDD8228A2879E002EDC60 /* IKeyChainStorage.swift in Sources */,
+				756E29E52A2748C300C7D618 /* Erc20Adapter.swift in Sources */,
 				7542185A29A49EFA0028D5DF /* QRCodeFullStringView.swift in Sources */,
 				756DDD9928A28FC6002EDC60 /* AccountManager.swift in Sources */,
 				75D8C5A528D88E0900228298 /* IDepositAdapter.swift in Sources */,
@@ -1574,6 +1583,14 @@
 				kind = branch;
 			};
 		};
+		756E29E12A27423100C7D618 /* XCRemoteSwiftPackageReference "Eip20Kit.Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/horizontalsystems/Eip20Kit.Swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		75772A5B28F8192F00BE80B7 /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cuhte3/CodeScanner";
@@ -1646,6 +1663,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 756DDD8A28A28858002EDC60 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
+		};
+		756E29E22A27423100C7D618 /* Eip20Kit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 756E29E12A27423100C7D618 /* XCRemoteSwiftPackageReference "Eip20Kit.Swift" */;
+			productName = Eip20Kit;
 		};
 		75772A5C28F8192F00BE80B7 /* CodeScanner */ = {
 			isa = XCSwiftPackageProductDependency;

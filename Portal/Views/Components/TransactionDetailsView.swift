@@ -28,50 +28,58 @@ struct TransactionDetailsView: View {
                     Divider().frame(height: 1)
 
                     VStack(spacing: 0) {
-                        if let recipient = viewModel.recipientString {
-                            TxRecipientView(recipient: recipient.turnicated(grouppedBy: 4))
-                        }
-                        
-                        Divider()
-                        
-                        TxFeesView(fees: viewModel.feeString, coin: viewModel.coin.code.lowercased(), source: viewModel.source)
-                        
-                        Divider()
-                        
-                        if viewModel.source != .lightning {
-                            TxIDView(txID: viewModel.txIdString, explorerURL: viewModel.explorerUrl)
-                            
-                            Divider()
-                        } else {
-                            HStack(alignment: .firstTextBaseline) {
-                                Text("Payment Preimage")
-                                    .font(.Main.fixed(.monoBold, size: 14))
-                                    .foregroundColor(Palette.grayScaleAA)
-                                Spacer()
-                                VStack(alignment: .trailing, spacing: 8) {
-                                    Text(viewModel.transaction.preimage!.turnicated(grouppedBy: 4))
-                                        .font(.Main.fixed(.monoRegular, size: 16))
-                                        .foregroundColor(Palette.grayScaleF4)
-                                }
+                        Group {
+                            if let recipient = viewModel.recipientString {
+                                TxAddressView(title: "Recipient", address: recipient.turnicated(grouppedBy: 4))
                             }
-                            .frame(height: 52)
                             
                             Divider()
                             
-                            HStack(alignment: .firstTextBaseline) {
-                                Text("Node ID")
-                                    .font(.Main.fixed(.monoBold, size: 14))
-                                    .foregroundColor(Palette.grayScaleAA)
-                                Spacer()
-                                VStack(alignment: .trailing, spacing: 8) {
-                                    Text(viewModel.transaction.nodeId?.turnicated(grouppedBy: 4) ?? "-")
-                                        .font(.Main.fixed(.monoRegular, size: 16))
-                                        .foregroundColor(Palette.grayScaleF4)
-                                }
+                            if let sender = viewModel.senderString {
+                                TxAddressView(title: "Sender", address: sender.turnicated(grouppedBy: 4))
                             }
-                            .frame(height: 52)
                             
                             Divider()
+                            
+                            TxFeesView(fees: viewModel.feeString, coin: viewModel.coin.code.lowercased(), source: viewModel.source)
+                            
+                            Divider()
+                            
+                            if viewModel.source != .lightning {
+                                TxIDView(txID: viewModel.txIdString, explorerURL: viewModel.explorerUrl)
+                                
+                                Divider()
+                            } else {
+                                HStack(alignment: .firstTextBaseline) {
+                                    Text("Payment Preimage")
+                                        .font(.Main.fixed(.monoBold, size: 14))
+                                        .foregroundColor(Palette.grayScaleAA)
+                                    Spacer()
+                                    VStack(alignment: .trailing, spacing: 8) {
+                                        Text(viewModel.transaction.preimage!.turnicated(grouppedBy: 4))
+                                            .font(.Main.fixed(.monoRegular, size: 16))
+                                            .foregroundColor(Palette.grayScaleF4)
+                                    }
+                                }
+                                .frame(height: 52)
+                                
+                                Divider()
+                                
+                                HStack(alignment: .firstTextBaseline) {
+                                    Text("Node ID")
+                                        .font(.Main.fixed(.monoBold, size: 14))
+                                        .foregroundColor(Palette.grayScaleAA)
+                                    Spacer()
+                                    VStack(alignment: .trailing, spacing: 8) {
+                                        Text(viewModel.transaction.nodeId?.turnicated(grouppedBy: 4) ?? "-")
+                                            .font(.Main.fixed(.monoRegular, size: 16))
+                                            .foregroundColor(Palette.grayScaleF4)
+                                    }
+                                }
+                                .frame(height: 52)
+                                
+                                Divider()
+                            }
                         }
                         
                         NotesView()

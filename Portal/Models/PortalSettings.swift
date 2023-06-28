@@ -114,4 +114,12 @@ class PortalSettings: ObservableObject {
         guard biometricsEnabledPreference != biometricsEnabled else { return }
         biometricsEnabledPreference = biometricsEnabled
     }
+    
+    private func updatePortfolioCurrency() {
+        portfolioCurrencyData = portfolioCurrency.code
+    }
+    
+    private func updateUserCoins() {
+        userCoinsData = userCoins
+    }
 }

@@ -11,7 +11,6 @@ import EvmKit
 import BigInt
 import Combine
 
-
 //MARK: - IAdapter
 class EthereumAdapter: IAdapter {
     var blockchainHeight: Int32 = 0
@@ -29,27 +28,20 @@ class EthereumAdapter: IAdapter {
         let transaction = fullTransaction.transaction
         print("tx \(transaction.hash.toHexString()) decoration: \(fullTransaction.decoration)")
         
+        let type: TxType
+        
         switch fullTransaction.decoration {
-        case let decoration as IncomingDecoration:
-            break
-        case let decoration as UnknownTransactionDecoration:
-            print(decoration.fromAddress)
-            print(decoration.internalTransactions)
+        case is IncomingDecoration:
+            type = .received
+        case is OutgoingDecoration:
+            type = .sent
         default:
-            break
+            type = .unknown
         }
         
         var amount: Decimal?
         if let value = transaction.value, let significand = Decimal(string: value.description) {
             amount = Decimal(sign: .plus, exponent: -decimal, significand: significand)
-        }
-        
-        let type: TxType
-        
-        if transaction.to?.hex == receiveAddress {
-            type = .received
-        } else {
-            type = .sent
         }
         
         return TransactionRecord(coin: .ethereum(), transaction: transaction, amount: amount, type: type)
@@ -106,11 +98,11 @@ extension EthereumAdapter {
     }
     
     var transactionsPublisher: AnyPublisher<Void, Never> {
-        evmKit.transactionsPublisher(tagQueries: []).map { _ in () }.eraseToAnyPublisher()
+        evmKit.transactionsPublisher(tagQueries: [TransactionTagQuery(protocol: .native)]).map { _ in () }.eraseToAnyPublisher()
     }
 
     func transactions(from hash: Data?, limit: Int?) -> [TransactionRecord] {
-        evmKit.transactions(tagQueries: [], fromHash: hash, limit: limit).compactMap { transactionRecord(fullTransaction: $0) }
+        evmKit.transactions(tagQueries: [TransactionTagQuery(protocol: .native)], fromHash: hash, limit: limit).compactMap { transactionRecord(fullTransaction: $0) }
     }
 
     func transaction(hash: Data, interTransactionIndex: Int) -> TransactionRecord? {

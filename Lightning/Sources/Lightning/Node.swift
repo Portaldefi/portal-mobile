@@ -619,7 +619,7 @@ extension Node {
         
         rpcInterface.blockchainMonitorPublisher
             .sink(receiveCompletion: { error in
-                print("CasaLDK: Error subscribing to blockchain monitor")
+                print("Error subscribing to blockchain monitor")
             }, receiveValue: { [unowned self] _ in
                 if let channelManagerConstructor = channelManagerConstructor, let persister = persister {
                     channelManagerConstructor.chainSyncCompleted(persister: persister)

@@ -9,10 +9,12 @@ import BitcoinDevKit
 import Foundation
 
 enum TxType: Equatable {
-    case sent, received, swapped(for: Coin)
+    case unknown, sent, received, swapped(for: Coin)
     
     var description: String {
         switch self {
+        case .unknown:
+            return "Unknown"
         case .sent:
             return "Sent"
         case .received:

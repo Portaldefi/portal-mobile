@@ -25,6 +25,15 @@ struct Coin: Identifiable {
     let decimal: Int
     let icon: String
     
+    var network: String {
+        switch type {
+        case .bitcoin, .lightningBitcoin:
+            return "Lightning"
+        case .ethereum, .erc20:
+            return "Ethereum"
+        }
+    }
+    
     var unit: String {
         switch type {
         case .bitcoin, .ethereum, .erc20:
@@ -84,7 +93,7 @@ struct Coin: Identifiable {
     }
     
     static func mocked() -> Self {
-        Coin(type: .erc20(address: "0xC3Ce6148B680D0DB3AdD8504A78340AA471C4190"), code: "MOC", name: "Mock coin", decimal: 18, iconUrl: "https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/96/Ethereum-ETH-icon.png")
+        Coin(type: .erc20(address: "0xC3Ce6148B680D0DB3AdD8504A78340AA471C4190"), code: "MOCK", name: "Mock coin", decimal: 18, iconUrl: "https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/96/Ethereum-ETH-icon.png")
     }
 }
 

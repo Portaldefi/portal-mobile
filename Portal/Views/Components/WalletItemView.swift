@@ -21,20 +21,28 @@ struct WalletItemView: View {
         HStack(alignment: .firstTextBaseline) {
             VStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 4.2) {
-                    HStack(spacing: 6) {
+                    HStack(spacing: 8) {
                         CoinImageView(
-                            size: 24,
+                            size: 32,
                             url: viewModel.coin.icon,
                             placeholderForegroundColor: Color.gray
                         )
-                        Text(viewModel.coin.name)
-                            .font(.Main.fixed(.monoBold, size: 16))
-                            .foregroundColor(.white)
-                            .frame(height: 16)
+                        
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(viewModel.coin.name)
+                                .font(.Main.fixed(.monoBold, size: 16))
+                                .foregroundColor(.white)
+                                .frame(height: 16)
+                            Text("\(viewModel.coin.code.uppercased()) • \(viewModel.coin.network)")
+                                .font(.Main.fixed(.monoRegular, size: 14))
+                                .foregroundColor(Palette.grayScale6A)
+                        }
                     }
                 }
             }
+            
             Spacer()
+            
             if showBalance {
                 HStack(spacing: 6) {
                     VStack(alignment: .trailing, spacing: 0) {
@@ -49,16 +57,16 @@ struct WalletItemView: View {
                     }
                     VStack(alignment: .leading, spacing: 0) {
                         HStack {
-                            Text(viewModel.coin.unit.lowercased())
+                            Text(viewModel.coin.unit.uppercased())
                                 .font(.Main.fixed(.monoRegular, size: 14))
                                 .foregroundColor(Palette.grayScaleAA)
                             Spacer()
                         }
-                        .frame(width: 40)
-                        Text(viewModel.fiatCurrency.code.lowercased())
+                        .frame(width: 42)
+                        Text(viewModel.fiatCurrency.code.uppercased())
                             .font(.Main.fixed(.monoRegular, size: 14))
                             .foregroundColor(Palette.grayScale6A)
-                            .offset(y: 4)
+                            .offset(y: 3)
                     }
                 }
             }
@@ -70,7 +78,7 @@ struct WalletItemView: View {
 
 struct WalletItemView_Previews: PreviewProvider {
     static var previews: some View {
-        WalletItemView(viewModel: WalletItem.mockedBtc.viewModel)
+        WalletItemView(viewModel: WalletItem.mocked.viewModel)
             .previewLayout(PreviewLayout.sizeThatFits)
             .padding()
     }

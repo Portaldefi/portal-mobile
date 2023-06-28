@@ -15,7 +15,9 @@ class AccountViewModel: ObservableObject {
     @Published private(set) var accountName = String()
     @Published private(set) var totalBalance: String = "0"
     @Published private(set) var totalValue: String = "0"
-    @Published var fiatCurrency = FiatCurrency(code: "USD")
+    
+    private(set) var fiatCurrency = FiatCurrency(code: "USD")
+    private(set) var portolioCurrency = Coin.bitcoin()
     
     @Published private(set) var items: [WalletItem] = [] {
         didSet {
@@ -113,11 +115,30 @@ class AccountViewModel: ObservableObject {
                 self?.updateValue()
             }
             .store(in: &subscriptions)
+        
+        settings
+            .$portfolioCurrency
+            .receive(on: RunLoop.main)
+            .sink { [weak self] currency in
+                self?.portolioCurrency = currency
+                self?.updateBalance()
+            }
+            .store(in: &subscriptions)
     }
     
     func updateValues() {
         updateBalance()
         updateValue()
+    }
+    
+    func updatePortfolioCurrency() {
+        if portolioCurrency == .bitcoin() {
+            portolioCurrency = .ethereum()
+        } else {
+            portolioCurrency = .bitcoin()
+        }
+        
+        updateBalance()
     }
     
     private func convertToBtcBalance(item: WalletItem) -> Decimal {
@@ -128,12 +149,35 @@ class AccountViewModel: ObservableObject {
             return (item.viewModel.balance * marketData.lastSeenEthPrice) / marketData.lastSeenBtcPrice
         case .erc20:
             //FIX ME
-            return (item.viewModel.balance * marketData.lastSeenEthPrice) / marketData.lastSeenBtcPrice
+            return (item.viewModel.balance * marketData.lastSeenLinkPrice) / marketData.lastSeenBtcPrice
+        }
+    }
+    
+    private func convertToEthBalance(item: WalletItem) -> Decimal {
+        switch item.coin.type {
+        case .bitcoin, .lightningBitcoin:
+            return (item.viewModel.balance * marketData.lastSeenBtcPrice) / marketData.lastSeenEthPrice
+        case .ethereum:
+            return item.viewModel.balance
+        case .erc20:
+            //FIX ME
+            return (item.viewModel.balance * marketData.lastSeenLinkPrice) / marketData.lastSeenEthPrice
+        }
+    }
+    
+    private func convertToPortfolioBalance(item: WalletItem) -> Decimal {
+        switch portolioCurrency.type {
+        case .bitcoin:
+            return convertToBtcBalance(item: item)
+        case .ethereum:
+            return convertToEthBalance(item: item)
+        default:
+            return 0
         }
     }
         
     private func updateBalance() {        
-        let balance = items.map{ convertToBtcBalance(item: $0) }.reduce(0){ $0 + $1 }.double.rounded(toPlaces: 12)
+        let balance = items.map{ convertToPortfolioBalance(item: $0) }.reduce(0){ $0 + $1 }.double.rounded(toPlaces: 12)
         
         if totalBalance != "\(balance)" {
             totalBalance = "\(balance)"
