@@ -69,16 +69,16 @@ struct AssetDetailsView: View {
             
             ZStack {
                 ScrollView {
-                    ForEach(viewModel.transactions, id: \.self) { transaction in
-                        SingleTxView(coin: viewModel.coin, transaction: transaction)
-                            .padding(.leading, 10)
-                            .padding(.trailing, 6)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                selectedTx = transaction
-                            }
-                        Divider()
-                            .overlay(Palette.grayScale1A)
+                    VStack(spacing: 0) {
+                        ForEach(viewModel.transactions, id: \.self) { transaction in
+                            SingleTxView(transaction: transaction)
+                                .padding(.leading, 10)
+                                .padding(.trailing, 6)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    selectedTx = transaction
+                                }
+                        }
                     }
                 }
                 .background(Palette.grayScale20)
@@ -94,7 +94,7 @@ struct AssetDetailsView: View {
         .sheet(item: $selectedTx, onDismiss: {
             viewModel.updateTransactions()
         }) { tx in
-            TransactionDetailsView(coin: viewModel.coin, tx: tx)
+            TransactionDetailsView(coin: viewModel.coin, tx: tx).lockableView()
         }
         .sheet(isPresented: $viewModel.goToReceive, onDismiss: {
             viewModel.updateTransactions()
@@ -103,12 +103,12 @@ struct AssetDetailsView: View {
             let item = account.items.first{ $0.coin == viewModel.coin }
             let receiveViewModel = ReceiveViewModel.config(items: account.items, selectedItem: item)
             
-            ReceiveRootView(viewModel: receiveViewModel, withAssetPicker: false)
+            ReceiveRootView(viewModel: receiveViewModel, withAssetPicker: false).lockableView()
         }
         .sheet(isPresented: $viewModel.goSend, onDismiss: {
             viewModel.updateTransactions()
         }) {
-            SendRootView(withAssetPicker: false)
+            SendRootView(withAssetPicker: false).lockableView()
         }
     }
     
