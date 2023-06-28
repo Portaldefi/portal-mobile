@@ -17,9 +17,11 @@ struct ReviewTransactionView: View {
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel: SendViewViewModel
     @EnvironmentObject private var navigation: NavigationStack
+    
     @State private var step: ReviewStep = .reviewing
     @State private var actionButtonEnabled = true
     @State private var editingAmount = false
+    @State private var locked = false
     
     enum ReviewStep {
         case reviewing, signing, sent
@@ -241,15 +243,16 @@ struct ReviewTransactionView: View {
                         }
                         
                         PButton(config: .onlyLabel(viewModel.sendError == nil ? "Send" : "Try again"), style: .filled, size: .big, enabled: viewModel.amountIsValid) {
-                            viewModel.authenticateUser { authentificated in
-                                if authentificated {
+                            
+                            if viewModel.signingTxProtected {
+                                locked = true
+                            } else {
+                                withAnimation {
+                                    step = .signing
+                                }
+                                viewModel.send { success in
                                     withAnimation {
-                                        step = .signing
-                                    }
-                                    viewModel.send { success in
-                                        withAnimation {
-                                            step = success ? .sent : .reviewing
-                                        }
+                                        step = success ? .sent : .reviewing
                                     }
                                 }
                             }
@@ -338,6 +341,19 @@ struct ReviewTransactionView: View {
               .closeOnTap(false)
               .closeOnTapOutside(false)
               .backgroundColor(.black.opacity(0.5))
+        }
+        //LockScreen
+        .fullScreenCover(isPresented: $locked, onDismiss: {
+            withAnimation {
+                step = .signing
+            }
+            viewModel.send { success in
+                withAnimation {
+                    step = success ? .sent : .reviewing
+                }
+            }
+        }) {
+            TxSignConfirmationView()
         }
     }
 }
