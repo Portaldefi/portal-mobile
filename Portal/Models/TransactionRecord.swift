@@ -11,6 +11,7 @@ enum TxSource {
 import Factory
 
 struct TransactionRecord: Identifiable {
+    let coin: Coin
     let id: String
     let type: TxType
     let timestamp: Int?
@@ -39,6 +40,7 @@ struct TransactionRecord: Identifiable {
     
     init(transaction: BitcoinDevKit.TransactionDetails) {
         self.id = transaction.txid
+        self.coin = .bitcoin()
         
         let sent = transaction.sent
         let received = transaction.received
@@ -92,6 +94,7 @@ struct TransactionRecord: Identifiable {
     
     init(coin: Coin, transaction: EvmKit.Transaction, amount: Decimal?, type: TxType) {
         self.id = transaction.hash.hs.hexString
+        self.coin = coin
         self.type = type
         self.amount = amount
         self.to = transaction.to?.hex
@@ -114,9 +117,37 @@ struct TransactionRecord: Identifiable {
         let data = storage.fetch(source: source, id: id)
         self.userData = TxUserData(data: data)
     }
+    
+//    init(token: Erc20Token, transaction: EvmKit.Transaction, amount: Decimal?, type: TxType, from: String?, to: String?) {
+//        self.id = transaction.hash.hs.hexString
+//        self.coin = Coin(type: .erc20(address: token.contractAddress), code: token.code, name: token.name, decimal: token.decimal, iconUrl: token.name)
+//        self.type = type
+//        self.amount = amount
+//        self.to = to ?? "-"
+//        self.from = from ?? "-"
+//        self.timestamp = transaction.timestamp
+//        self.blockHeight = transaction.blockNumber
+//        self.source = .ethOnChain
+//        
+//        
+//        if let feeAmount = transaction.gasUsed ?? transaction.gasLimit, let gasPrice = transaction.gasPrice {
+//            let feeDecimal = Decimal(sign: .plus, exponent: -token.decimal, significand: Decimal(feeAmount) * Decimal(gasPrice))
+//            fee = feeDecimal
+//        } else {
+//            fee = nil
+//        }
+//        
+//        preimage = nil
+//        nodeId = nil
+//        
+//        let storage = Container.txDataStorage()
+//        let data = storage.fetch(source: source, id: id)
+//        self.userData = TxUserData(data: data)
+//    }
         
     init(payment: LightningPayment) {
         self.id = payment.paymentId
+        self.coin = .bitcoin()
         self.type = payment.type == .sent ? .sent : .received
         self.source = .lightning
         self.timestamp = payment.timestamp
@@ -164,7 +195,7 @@ extension TransactionRecord {
     }
     
     static var mockedLightning: TransactionRecord {
-        let invoice = Invoice.fromStr(s: "lntb150u1pjpm2rwpp5qtqkpsfupwnl5cm0jvd7v8asa3qd5y8kc2l2e3ua6v5dlszkzgyqdqqcqzpgxqyz5vqsp5kspjm0vlt6xhp5q6e78cp66e2fdx0lzg57ktf6kf30423qagstcq9qyyssq4l53zjvsqyc76ps7drxe2xjes2uvphh4ujr8dxpggx0sxcxtaa8q8f26k786gwrnususx5kcufr5gv5ktvj9d4vu9v8a2jehjhkv90spd6j4r3").getValue()!
+        _ = Invoice.fromStr(s: "lntb150u1pjpm2rwpp5qtqkpsfupwnl5cm0jvd7v8asa3qd5y8kc2l2e3ua6v5dlszkzgyqdqqcqzpgxqyz5vqsp5kspjm0vlt6xhp5q6e78cp66e2fdx0lzg57ktf6kf30423qagstcq9qyyssq4l53zjvsqyc76ps7drxe2xjes2uvphh4ujr8dxpggx0sxcxtaa8q8f26k786gwrnususx5kcufr5gv5ktvj9d4vu9v8a2jehjhkv90spd6j4r3").getValue()!
 
         let payment = LightningPayment(
             nodeId: "hdyvu5uumvyt7j5twkpp55eham28a4cnwz3epal2geeceskmjs6pxp",
