@@ -30,6 +30,16 @@ struct NoAccountViewConfig: NavigationConfigurator {
                 id: screen.id,
                 wrappedElement: AnyView(CreateAccountView(words: words))
             )
+        case .setSecuritySettings(let viewModel):
+            return ViewElement(
+                id: screen.id,
+                wrappedElement: AnyView(SetSecuritySettingsView(viewModel: viewModel))
+            )
+        case .setPinCode:
+            return ViewElement(
+                id: screen.id,
+                wrappedElement: AnyView(SetPincodeView())
+            )
         default:
             fatalError("unsupported navigation case")
         }
