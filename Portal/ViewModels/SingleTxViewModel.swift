@@ -11,7 +11,6 @@ import BitcoinDevKit
 import Factory
 
 class SingleTxViewModel: ObservableObject {
-    let coin: Coin
     let tx: TransactionRecord
     
     @Published private(set) var notes: String?
@@ -25,7 +24,7 @@ class SingleTxViewModel: ObservableObject {
     
     var amount: String {
         guard let amount = tx.amount else { return "0" }
-        switch coin.type {
+        switch tx.coin.type {
         case .bitcoin:
             return (amount.double/100_000_000).toString(decimal: 8)
         case .ethereum:
@@ -39,7 +38,7 @@ class SingleTxViewModel: ObservableObject {
     
     var value: String {
         guard let amount = tx.amount else { return "0" }
-        switch coin.type {
+        switch tx.coin.type {
         case .bitcoin, .lightningBitcoin:
             return (amount/100_000_000 * tx.userData.price * fiatCurrency.rate).double.usdFormatted()
         case .ethereum:
@@ -49,8 +48,7 @@ class SingleTxViewModel: ObservableObject {
         }
     }
         
-    init(coin: Coin, tx: TransactionRecord) {
-        self.coin = coin
+    init(tx: TransactionRecord) {
         self.tx = tx
         self.notes = tx.notes
         self.labels = tx.labels
