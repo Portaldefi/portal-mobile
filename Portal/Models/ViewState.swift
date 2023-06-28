@@ -7,15 +7,20 @@
 
 import Combine
 import Factory
+import Foundation
 
 class ViewState: ObservableObject {
     enum Tab: Int {
         case wallet = 0
-        case swap
+//        case swap
         case lightning
+        case activity
     }
     
-    @Published var showSettings = false
+    enum SceneState {
+        case inactive, active, background
+    }
+    
     @Published var showBackUpFlow = false
     @Published var hideTabBar = false
     @Published var showQRCodeScannerFromTabBar: Bool = false {
@@ -26,12 +31,40 @@ class ViewState: ObservableObject {
         }
     }    
     @Published private(set) var selectedTab: Tab = .wallet
+    @Published var walletLocked = false
+    @Published var sceneState: SceneState = .inactive
+    
+    @Injected(Container.settings) var settings
     
     var onAssetBalancesUpdate = PassthroughSubject<Void, Never>()
+    
+    private var subscriptions = Set<AnyCancellable>()
         
-    init() {}
+    init() {
+        updateScene(state: .background)
+    }
     
     func openTab(_ tab: Tab) {
         selectedTab = tab
+    }
+    
+    func updateScene(state: SceneState) {
+        switch state {
+        case .background:
+            print("app went to background state")
+            
+            guard sceneState != .background else { return }
+            sceneState = .background
+            
+            walletLocked = settings.pincodeEnabled || settings.biometricsEnabled
+        case .active:
+            print("app went to active state")
+            
+            guard sceneState != .active else { return }
+            
+            sceneState = .active
+        case .inactive:
+            print("app went to inactive state")
+        }
     }
 }
