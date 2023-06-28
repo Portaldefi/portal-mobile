@@ -11,13 +11,15 @@ import Factory
 
 struct Mainview: View {
     private let views: [AnyView]
-    @ObservedObject private var viewState = Container.viewState()
+    @ObservedObject private var viewState: ViewState = Container.viewState()
+    @Environment(\.scenePhase) private var scenePhase
     
     init() {
         views = [
             AnyView(AccountRootView()),
-            AnyView(SwapView()),
-            AnyView(LightningStatstView())
+//            AnyView(SwapView()),
+            AnyView(LightningStatstView()),
+            AnyView(ActivityView())
         ]
     }
         
@@ -46,30 +48,30 @@ struct Mainview: View {
             }
             .frame(width: 65)
             
-            Spacer()
-            
-            Button {
-                viewState.openTab(.swap)
-            } label: {
-                if viewState.selectedTab == .swap {
-                    RadialGradient.main
-                        .mask(
-                            VStack(spacing: 4) {
-                                Asset.swapIcon
-                                Text("Swap")
-                                    .font(.Main.fixed(.bold, size: 14))
-                            }
-                        )
-                } else {
-                    VStack(spacing: 4) {
-                        Asset.swapIcon
-                        Text("Swap")
-                            .font(.Main.fixed(.bold, size: 14))
-                    }
-                    .foregroundColor(Color.gray)
-                }
-            }
-            .frame(width: 85)
+//            Spacer()
+//
+//            Button {
+//                viewState.openTab(.swap)
+//            } label: {
+//                if viewState.selectedTab == .swap {
+//                    RadialGradient.main
+//                        .mask(
+//                            VStack(spacing: 4) {
+//                                Asset.swapIcon
+//                                Text("Swap")
+//                                    .font(.Main.fixed(.bold, size: 14))
+//                            }
+//                        )
+//                } else {
+//                    VStack(spacing: 4) {
+//                        Asset.swapIcon
+//                        Text("Swap")
+//                            .font(.Main.fixed(.bold, size: 14))
+//                    }
+//                    .foregroundColor(Color.gray)
+//                }
+//            }
+//            .frame(width: 85)
             
             Spacer()
                         
@@ -101,6 +103,33 @@ struct Mainview: View {
             Spacer()
             
             Button {
+                viewState.openTab(.activity)
+            } label: {
+                if viewState.selectedTab == .activity {
+                    RadialGradient.main
+                        .mask(
+                            VStack(spacing: 4) {
+                                Asset.activityIcon
+                                Text("Activity")
+                                    .font(.Main.fixed(.bold, size: 14))
+                            }
+                        )
+                } else {
+                    VStack(spacing: 4) {
+                        Asset.activityIcon
+                        Text("Activity")
+                            .font(.Main.fixed(.bold, size: 14))
+                    }
+                    .padding(6)
+                    .foregroundColor(Color.gray)
+                }
+            }
+            .frame(width: 85)
+            .disabled(false)
+            
+            Spacer()
+            
+            Button {
                 viewState.showQRCodeScannerFromTabBar.toggle()
             } label: {
                 Asset.scanQRIcon
@@ -116,10 +145,24 @@ struct Mainview: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             views[viewState.selectedTab.rawValue]
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             
             TabBar
                 .offset(y: viewState.hideTabBar ? 109 : 0)
                 .zIndex(1)
+        }
+        .lockableView()
+        .onChange(of: scenePhase) { newValue in
+            switch newValue {
+            case .inactive:
+                viewState.updateScene(state: .inactive)
+            case .active:
+                viewState.updateScene(state: .active)
+            case .background:
+                viewState.updateScene(state: .background)
+            @unknown default:
+                break
+            }
         }
     }
 }
