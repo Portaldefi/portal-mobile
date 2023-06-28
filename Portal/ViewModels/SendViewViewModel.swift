@@ -37,14 +37,18 @@ class SendViewViewModel: ObservableObject {
     @Published private(set) var recomendedFees: RecomendedFees?
     @Published private(set) var exchanger: Exchanger?
     @Published private(set) var sendError: Error?
-        
+    @Published var confirmSigning = false
+
     @Injected(Container.accountViewModel) private var account
     @Injected(Container.marketData) private var marketData
     @Injected(Container.settings) private var settings
-    @LazyInjected(Container.biometricAuthentification) private var biometrics
     
     var fiatCurrency: FiatCurrency {
         settings.fiatCurrency
+    }
+    
+    var signingTxProtected: Bool {
+        settings.pincodeEnabled || settings.biometricsEnabled
     }
         
     var fee: String {
@@ -199,57 +203,7 @@ class SendViewViewModel: ObservableObject {
         }
         .store(in: &subscriptions)
     }
-        
-    private func unwrapAuthenticationError(error: LAError) -> String {
-        switch error {
-        case LAError.appCancel:
-            // The app canceled authentication by
-            // invalidating the LAContext
-            return "The app canceled authentication by invalidating the LAContext"
-        case LAError.authenticationFailed:
-            // The user did not provide
-            // valid credentials
-            return "The user did not provide valid credentials"
-        case LAError.invalidContext:
-            // The LAContext was invalid
-            return "The LAContext was invalid"
-        case LAError.notInteractive:
-            // Interaction was not allowed so the
-            // authentication failed
-            return "Interaction was not allowed so the authentication failed"
-        case LAError.passcodeNotSet:
-            // The user has not set a passcode
-            // on this device
-            return "The user has not set a passcode on this device"
-        case LAError.systemCancel:
-            // The system canceled authentication,
-            // for example to show another app
-            return "The system canceled authentication, for example to show another app"
-        case LAError.userCancel:
-            // The user canceled the
-            // authentication dialog
-            return "The user canceled the authentication dialog"
-        case LAError.userFallback:
-            // The user selected to use a fallback
-            // authentication method
-            return "The user selected to use a fallback authentication method"
-        case LAError.biometryLockout:
-            // Too many failed attempts locked
-            // biometric authentication
-            return "Too many failed attempts locked biometric authentication"
-        case LAError.biometryNotAvailable:
-            // The user's device does not support
-            // biometric authentication
-            return "The user's device does not support biometric authentication"
-        case LAError.biometryNotEnrolled:
-            // The user has not configured
-            // biometric authentication
-            return "The user has not configured biometric authentication"
-        default:
-            return "Unknown authentification error"
-        }
-    }
-        
+                
     func validateInput() throws -> UserInputResult {
         guard let sendService = sendService else {
             throw SendFlowError.addressIsntValid
@@ -260,62 +214,51 @@ class SendViewViewModel: ObservableObject {
     func updateError() {
         sendError = SendFlowError.addressIsntValid
     }
-    
-    func authenticateUser(completion: @escaping (Bool) -> Void) {
-        biometrics.authenticateUser { [unowned self] success, error in
-            if let error = error {
-                DispatchQueue.main.async {
-                    self.sendError = SendFlowError.error(self.unwrapAuthenticationError(error: error))
-                }
-            }
-            completion(success)
-        }
-    }
-    
+        
     func send(_ completionHandler: @escaping (Bool) -> ()) {
-        if !useAllFundsEnabled {
-            sendService?
-                .sendMax()
-                .receive(on: RunLoop.main)
-                .sink(receiveCompletion: { [weak self] completion in
-                    guard let self = self else { return }
-
-                    if case let .failure(error) = completion {
-                        withAnimation {
-                            self.sendError = error
-                        }
-                        completionHandler(false)
-                    }
-                }, receiveValue: { [weak self] transaction in
-                    guard let self = self else { return }
-
-                    self.unconfirmedTx = transaction
-
-                    completionHandler(true)
-                })
-                .store(in: &subscriptions)
-        } else {
-            sendService?
-                .send()
-                .receive(on: RunLoop.main)
-                .sink(receiveCompletion: { [weak self] completion in
-                    guard let self = self else { return }
-
-                    if case let .failure(error) = completion {
-                        withAnimation {
-                            self.sendError = error
-                        }
-                        completionHandler(false)
-                    }
-                }, receiveValue: { [weak self] transaction in
-                    guard let self = self else { return }
-
-                    self.unconfirmedTx = transaction
-
-                    completionHandler(true)
-                })
-                .store(in: &subscriptions)
-        }
+//        if !useAllFundsEnabled {
+//            sendService?
+//                .sendMax()
+//                .receive(on: RunLoop.main)
+//                .sink(receiveCompletion: { [weak self] completion in
+//                    guard let self = self else { return }
+//
+//                    if case let .failure(error) = completion {
+//                        withAnimation {
+//                            self.sendError = error
+//                        }
+//                        completionHandler(false)
+//                    }
+//                }, receiveValue: { [weak self] transaction in
+//                    guard let self = self else { return }
+//
+//                    self.unconfirmedTx = transaction
+//
+//                    completionHandler(true)
+//                })
+//                .store(in: &subscriptions)
+//        } else {
+//            sendService?
+//                .send()
+//                .receive(on: RunLoop.main)
+//                .sink(receiveCompletion: { [weak self] completion in
+//                    guard let self = self else { return }
+//
+//                    if case let .failure(error) = completion {
+//                        withAnimation {
+//                            self.sendError = error
+//                        }
+//                        completionHandler(false)
+//                    }
+//                }, receiveValue: { [weak self] transaction in
+//                    guard let self = self else { return }
+//
+//                    self.unconfirmedTx = transaction
+//
+//                    completionHandler(true)
+//                })
+//                .store(in: &subscriptions)
+//        }
     }
     
     func clearRecipient() {
