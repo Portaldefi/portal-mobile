@@ -40,6 +40,7 @@ class AccountViewModel: ObservableObject {
         }
     }
     @Published var goToReceive = false
+    @Published var goToSettings = false
     @Published var settings: PortalSettings
     
     private let accountManager: IAccountManager
@@ -90,7 +91,7 @@ class AccountViewModel: ObservableObject {
             .onMarketDataUpdate
             .receive(on: RunLoop.main)
             .sink { [unowned self] _ in
-                guard !self.goToSend && !self.goToReceive else { return }
+                guard !self.goToSend && !self.goToReceive && !self.goToSettings else { return }
                 self.updateValue()
             }
             .store(in: &subscriptions)
@@ -98,6 +99,7 @@ class AccountViewModel: ObservableObject {
         accountManager
             .onActiveAccountUpdate
             .compactMap { $0 }
+            .receive(on: RunLoop.main)
             .sink { [weak self] account in
                 self?.accountName = account.name
             }
