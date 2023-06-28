@@ -16,11 +16,15 @@ extension SharedContainer {
         AccountManager(accountStorage: Container.accountStorage())
     }
     
+    static let secureStorage = Factory<IKeychainStorage>(scope: .singleton) {
+        let keychain = Keychain(service: "com.portal.keychain")
+        return KeychainStorage(keychain: keychain)
+    }
+    
     static let accountStorage = Factory<IAccountStorage>(scope: .singleton) {
         let userDefaults = UserDefaults.standard
         let localStorage = LocalStorage(storage: userDefaults)
-        let keychain = Keychain(service: "com.portal.keychain")
-        let secureStorage = KeychainStorage(keychain: keychain)
+        let secureStorage = Container.secureStorage()
         
         let dbContext: NSManagedObjectContext = {
             let backgroundContext = PersistenceController.shared.container.newBackgroundContext()
