@@ -45,6 +45,10 @@ extension View {
     func filledBackground<Style: ViewModifier>(_ style: Style) -> some View {
         ModifiedContent(content: self, modifier: style)
     }
+    
+    func lockableView() -> some View {
+        self.modifier(LockScreenModifier())
+    }
 }
 
 struct BackgroundColorModifier_Previews: PreviewProvider {
