@@ -66,22 +66,22 @@ struct AccountView: View {
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         .sheet(isPresented: $viewState.showQRCodeScannerFromTabBar) {
-            QRCodeReaderRootView(config: .universal)
+            QRCodeReaderRootView(config: .universal).lockableView()
         }
         .sheet(isPresented: $viewModel.goToReceive) {
             let viewModel = ReceiveViewModel.config(items: viewModel.items, selectedItem: nil)
-            ReceiveRootView(viewModel: viewModel, withAssetPicker: true)
+            ReceiveRootView(viewModel: viewModel, withAssetPicker: true).lockableView()
         }
         .sheet(isPresented: $viewModel.goToSend, onDismiss: {
             viewModel.updateValues()
         }) {
-            SendRootView(withAssetPicker: true)
+            SendRootView(withAssetPicker: true).lockableView()
         }
         .fullScreenCover(isPresented: $viewState.showBackUpFlow) {
-            AccountBackupRootView().environmentObject(viewState)
+            AccountBackupRootView().environmentObject(viewState).lockableView()
         }
-        .fullScreenCover(isPresented: $viewState.showSettings) {
-            SettingsView()
+        .fullScreenCover(isPresented: $viewModel.goToSettings) {
+            SettingsRootView().lockableView()
         }
     }
     
@@ -120,7 +120,7 @@ struct AccountView: View {
                 }
                 
                 PButton(config: .onlyIcon(Asset.gearIcon), style: .free, size: .medium, color: Palette.grayScale6A, enabled: true) {
-                    viewState.showSettings.toggle()
+                    viewModel.goToSettings.toggle()
                 }
                 .frame(width: 30, height: 30)
                 .padding(.horizontal)
