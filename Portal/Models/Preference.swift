@@ -21,6 +21,10 @@ final class Preferences {
     }
     
     @UserDefault("fiatCurrencyData") var fiatCurrencyData = String()
+    @UserDefault("portfolioCurrencyData") var portfolioCurrencyData = String()
+    @UserDefault("userCoins") var userCoins = [String]()
+    @UserDefault("pinCodeEnabled") var pincodeEnabled = false
+    @UserDefault("biometricsEnabled") var biometricsEnabled = false
 }
 
 @propertyWrapper
