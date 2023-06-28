@@ -12,8 +12,8 @@ import PortalUI
 struct SingleTxView: View {
     @ObservedObject var viewModel: SingleTxViewModel
     
-    init(coin: Coin, transaction: TransactionRecord) {
-        self._viewModel = ObservedObject(initialValue: SingleTxViewModel(coin: coin, tx: transaction))
+    init(transaction: TransactionRecord) {
+        self._viewModel = ObservedObject(initialValue: SingleTxViewModel(tx: transaction))
     }
     
     var body: some View {
@@ -73,7 +73,7 @@ struct SingleTxView: View {
                         }
                         VStack(alignment: .leading, spacing: 0) {
                             HStack {
-                                Text(viewModel.coin.code.lowercased())
+                                Text(viewModel.tx.coin.code.uppercased())
                                     .font(.Main.fixed(.monoMedium, size: 12))
                                     .foregroundColor(Palette.grayScale6A)
                                     .offset(y: -1)
@@ -89,7 +89,7 @@ struct SingleTxView: View {
                     }
                 }
                 
-                if let notes = viewModel.tx.notes {
+                if let notes = viewModel.tx.notes, !notes.isEmpty {
                     Text(notes)
                         .multilineTextAlignment(.leading)
                         .font(.Main.fixed(.monoRegular, size: 14))
@@ -97,8 +97,8 @@ struct SingleTxView: View {
                         .padding(.leading, 40)
                         .padding(.trailing, 8)
                 }
-                
-                if let labels = viewModel.tx.labels {
+
+                if let labels = viewModel.tx.labels, !labels.isEmpty {
                     WrappedHStack(labels) { label in
                         TxLabelView(label: label)
                     }
@@ -110,6 +110,7 @@ struct SingleTxView: View {
             
             Divider()
                 .overlay(Color(red: 26/255, green: 26/255, blue: 26/255))
+                .frame(height: 2)
         }
         .contextMenu {
             Button(action: {
@@ -122,7 +123,7 @@ struct SingleTxView: View {
 
 struct SingleTxView_Previews: PreviewProvider {
     static var previews: some View {
-        SingleTxView(coin: .bitcoin(), transaction: TransactionRecord.mocked)
+        SingleTxView(transaction: TransactionRecord.mocked)
             .padding(.horizontal)
             .previewLayout(.sizeThatFits)
     }
