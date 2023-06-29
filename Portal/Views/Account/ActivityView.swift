@@ -10,9 +10,10 @@ import PortalUI
 import Factory
 import Combine
 
-class ActivityViewModel: ObservableObject {
+struct ActivityView: View {
+    @StateObject private var viewModel = ActivityViewModel()
     
-    var keyboardPublisher: AnyPublisher<Bool, Never> {
+    private var keyboardPublisher: AnyPublisher<Bool, Never> {
         Publishers.Merge(
             NotificationCenter.default
                 .publisher(for: UIResponder.keyboardWillShowNotification)
@@ -25,58 +26,6 @@ class ActivityViewModel: ObservableObject {
         .eraseToAnyPublisher()
     }
     
-    @Published var selectedTx: TransactionRecord?
-    @Published private(set) var transactions = [TransactionRecord]()
-    @Published private(set) var searchResults = [TransactionRecord]()
-    @Published var searchContext = String()
-    @Injected(Container.viewState) var viewState
-    
-    private var subscriptions = Set<AnyCancellable>()
-    
-    init() {
-        updateTransactions()
-        
-        $searchContext.sink { [unowned self] context in
-            guard !context.isEmpty else { return }
-            let searchContext = context.lowercased()
-            self.searchResults = transactions.filter {
-                $0.coin.name.lowercased().contains(searchContext) ||
-                $0.coin.code.lowercased().contains(searchContext) ||
-                String(describing: $0.amount ?? 0).lowercased().contains(searchContext) ||
-                $0.notes?.lowercased().contains(searchContext) ?? false ||
-                !$0.labels.filter{ $0.label.contains(searchContext) }.isEmpty ||
-                $0.type.description.lowercased().contains(searchContext)
-            }
-        }
-        .store(in: &subscriptions)
-    }
-    
-    func updateTransactions() {
-        subscriptions.removeAll()
-        transactions.removeAll()
-        
-        let adapterManager: IAdapterManager = Container.adapterManager()
-        let walletManager: IWalletManager = Container.walletManager()
-        
-        Publishers.MergeMany(
-            walletManager.activeWallets
-                .compactMap { adapterManager.transactionsAdapter(for: $0) }
-                .compactMap { $0.transactionRecords }
-        )
-        .flatMap { Publishers.Sequence(sequence: $0) }
-        .receive(on: RunLoop.main)
-        .sink { [weak self] transactionRecord in
-            guard let self = self else { return }
-            let index = self.transactions.firstIndex { $0.timestamp ?? 1 < transactionRecord.timestamp ?? 1 } ?? self.transactions.endIndex
-            self.transactions.insert(transactionRecord, at: index)
-        }
-        .store(in: &subscriptions)
-    }
-}
-
-struct ActivityView: View {
-    @StateObject private var viewModel = ActivityViewModel()
-    
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
@@ -87,23 +36,156 @@ struct ActivityView: View {
                     Spacer()
                 }
                 .padding(.horizontal, 16)
+                .padding(.bottom, 24)
                 
-                TextField("Search", text: $viewModel.searchContext)
-                    .disableAutocorrection(true)
-                    .font(.Main.fixed(.monoRegular, size: 16))
-                    .padding()
+                HStack {
+                    HStack(spacing: 4) {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(Palette.grayScale4A)
+                        
+                        TextField("Search", text: $viewModel.searchContext)
+                            .disableAutocorrection(true)
+                            .font(.Main.fixed(.monoRegular, size: 16))
+                    }
+                    .padding(.horizontal, 12)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(Palette.grayScale3A, lineWidth: 1)
                             .frame(height: 40)
                     )
-                    .padding(.horizontal, 12)
                     .padding(.bottom, 4)
-                    .onReceive(viewModel.keyboardPublisher) { newIsKeyboardVisible in
+                    .onReceive(keyboardPublisher) { newIsKeyboardVisible in
                         Container.viewState().hideTabBar = newIsKeyboardVisible
                     }
+                    .layoutPriority(1)
+                    
+                    Menu {
+                        // An expandable submenu
+                        Menu {
+                            Button(action: { viewModel.updateTxTypeFilter(filter: .none) }) {
+                                Text("None")
+                                if viewModel.txTypeFilter == .none {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                            
+                            Button(action: { viewModel.updateTxTypeFilter(filter: .send) }) {
+                                Text("Sent")
+                                if viewModel.txTypeFilter == .send {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                            
+                            Button(action: { viewModel.updateTxTypeFilter(filter: .received) }) {
+                                Text("Received")
+                                if viewModel.txTypeFilter == .received {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                            
+                            Button(action: { viewModel.updateTxTypeFilter(filter: .swapped) }) {
+                                Text("Swaps")
+                                if viewModel.txTypeFilter == .swapped {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                            
+                            Divider()
+                            
+                            Button(action: { viewModel.updateTxStatusFilter(filter: .success) }) {
+                                Text("Success")
+                                if viewModel.txStatusFilter == .success {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                            
+                            Button(action: { viewModel.updateTxStatusFilter(filter: .failed) }) {
+                                Text("Failed")
+                                if viewModel.txStatusFilter == .failed {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                            
+                            Button(action: { viewModel.updateTxStatusFilter(filter: .pending) }) {
+                                Text("Pending")
+                                if viewModel.txStatusFilter == .pending {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        } label: {
+                            Label {
+                                Text("Filter")
+                            } icon: {
+                                Image(systemName: "slider.vertical.3")
+                                    .resizable()
+                                    .frame(width: 20, height: 20)
+                                    .foregroundColor(Palette.grayScale6A)
+                            }
+                        }
+                        
+                        Divider()
+                        
+                        Menu {
+                            Button(action: { viewModel.updateSort(sort: .date) }) {
+                                Text("Date")
+                                if viewModel.selectedSort == .date {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                            
+                            Button(action: { viewModel.updateSort(sort: .amount) }) {
+                                Text("Amount")
+                                if viewModel.selectedSort == .amount {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                            
+                            Button(action: { viewModel.updateSort(sort: .coin) }) {
+                                Text("Coin")
+                                if viewModel.selectedSort == .coin {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                            
+                            Divider()
+                            
+                            Button(action: { viewModel.toggleSortOrder() }) {
+                                Text("Ascending")
+                                if !viewModel.isDescending {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                            
+                            Button(action: { viewModel.toggleSortOrder() }) {
+                                Text("Descending")
+                                if viewModel.isDescending {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                            
+                        } label: {
+                            Label {
+                                Text("Sort By")
+                            } icon: {
+                                Image(systemName: "arrow.up.arrow.down")
+                                    .resizable()
+                                    .frame(width: 20, height: 20)
+                                    .foregroundColor(Palette.grayScale6A)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "slider.vertical.3")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .foregroundColor(Palette.grayScale6A)
+                    }
+                    .padding(.leading, 16)
+                }
+                .padding(.leading, 8)
+                .padding(.trailing, 16)
             }
             .padding(.horizontal, 8)
+            .padding(.bottom, 12)
             
             Divider()
                 .overlay(Palette.grayScale10)
@@ -111,7 +193,7 @@ struct ActivityView: View {
             ZStack {
                 ScrollView {
                     VStack(spacing: 0) {
-                        ForEach(viewModel.searchContext.isEmpty ? viewModel.transactions : viewModel.searchResults, id: \.self) { transaction in
+                        ForEach(viewModel.searchContext.isEmpty ? viewModel.filteredTransactions : viewModel.searchResults, id: \.self) { transaction in
                             SingleTxView(transaction: transaction)
                                 .padding(.leading, 10)
                                 .padding(.trailing, 6)
@@ -125,7 +207,11 @@ struct ActivityView: View {
                 }
                 .background(Palette.grayScale20)
                 
-                if viewModel.transactions.isEmpty {
+                if viewModel.searchContext.isEmpty && viewModel.transactions.isEmpty {
+                    Text("No transactions yet.")
+                        .font(.Main.fixed(.monoRegular, size: 16))
+                        .padding()
+                } else if viewModel.filteredTransactions.isEmpty {
                     Text("No transactions yet.")
                         .font(.Main.fixed(.monoRegular, size: 16))
                         .padding()
