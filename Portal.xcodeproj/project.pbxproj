@@ -234,6 +234,8 @@
 		75F9B9E82A4B227A0085F607 /* PincodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9E72A4B227A0085F607 /* PincodeViewModel.swift */; };
 		75F9B9EA2A4CA9C20085F607 /* TxSignConfirmationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9E92A4CA9C20085F607 /* TxSignConfirmationViewModel.swift */; };
 		75F9B9EC2A4CADE90085F607 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9EB2A4CADE90085F607 /* SettingsView.swift */; };
+		75F9B9EE2A4D66230085F607 /* ActivityViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9ED2A4D66230085F607 /* ActivityViewModel.swift */; };
+		75F9B9F02A4DD0680085F607 /* TxType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9EF2A4DD0680085F607 /* TxType.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -454,6 +456,8 @@
 		75F9B9E72A4B227A0085F607 /* PincodeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PincodeViewModel.swift; sourceTree = "<group>"; };
 		75F9B9E92A4CA9C20085F607 /* TxSignConfirmationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxSignConfirmationViewModel.swift; sourceTree = "<group>"; };
 		75F9B9EB2A4CADE90085F607 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		75F9B9ED2A4D66230085F607 /* ActivityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityViewModel.swift; sourceTree = "<group>"; };
+		75F9B9EF2A4DD0680085F607 /* TxType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxType.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -765,6 +769,7 @@
 				756E29D92A25F9C900C7D618 /* PortalSettings.swift */,
 				756E29DB2A25FA0400C7D618 /* Preference.swift */,
 				756E29DD2A25FA3F00C7D618 /* PublisherObservableObject.swift */,
+				75F9B9EF2A4DD0680085F607 /* TxType.swift */,
 				756DDD9128A28C0A002EDC60 /* DB */,
 			);
 			path = Models;
@@ -793,6 +798,7 @@
 				75F9B9DF2A4B21290085F607 /* SetPincodeViewModel.swift */,
 				75F9B9E72A4B227A0085F607 /* PincodeViewModel.swift */,
 				75F9B9E92A4CA9C20085F607 /* TxSignConfirmationViewModel.swift */,
+				75F9B9ED2A4D66230085F607 /* ActivityViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -1151,6 +1157,7 @@
 				4774D71A28AF916600B7988B /* QRCodeItem.swift in Sources */,
 				75F9B9E62A4B223B0085F607 /* ShakeEffect.swift in Sources */,
 				756DDD9328A28DE7002EDC60 /* RootView.swift in Sources */,
+				75F9B9F02A4DD0680085F607 /* TxType.swift in Sources */,
 				4774D72528B4FC2000B7988B /* StringFormatter.swift in Sources */,
 				755FDD4E29AD00D500D8A29C /* MockedLightningKitManager.swift in Sources */,
 				75772A682902D73E00BE80B7 /* TextLimitter.swift in Sources */,
@@ -1244,6 +1251,7 @@
 				7545BC0728C1F03A00ED92C3 /* BiometricAuthentication.swift in Sources */,
 				752FA62929670E4500008796 /* FeeRateProvider.swift in Sources */,
 				756DDD7028A275AD002EDC60 /* CreateAccountView.swift in Sources */,
+				75F9B9EE2A4D66230085F607 /* ActivityViewModel.swift in Sources */,
 				75D8C59828D88A5600228298 /* AppConfigProvider.swift in Sources */,
 				756A313528898CA2004978E2 /* BasicTextStyleModifier.swift in Sources */,
 				75D8C5C728DC89DB00228298 /* ReceiveViewModel.swift in Sources */,
