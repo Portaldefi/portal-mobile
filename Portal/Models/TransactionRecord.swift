@@ -121,6 +121,7 @@ struct TransactionRecord: Identifiable {
     init(token: Erc20Token, transaction: EvmKit.Transaction, amount: Decimal?, type: TxType, from: String?, to: String?) {
         self.id = transaction.hash.hs.hexString
         self.type = type
+        self.coin = Coin(type: .erc20(address: token.contractAddress), code: token.code, name: token.name, decimal: token.decimal, iconUrl: token.name)
         self.amount = amount
         self.to = to ?? "-"
         self.from = from ?? "-"

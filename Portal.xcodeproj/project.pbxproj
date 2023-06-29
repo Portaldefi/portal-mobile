@@ -143,7 +143,6 @@
 		756DDD9728A28F8F002EDC60 /* IAccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD9528A28F8F002EDC60 /* IAccountManager.swift */; };
 		756DDD9928A28FC6002EDC60 /* AccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD9828A28FC6002EDC60 /* AccountManager.swift */; };
 		756DDD9D28A292D4002EDC60 /* RootViewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756DDD9C28A292D4002EDC60 /* RootViewViewModel.swift */; };
-		756E29D62A1CC89D00C7D618 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756E29D52A1CC89D00C7D618 /* SettingsView.swift */; };
 		756E29D82A25F95E00C7D618 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756E29D72A25F95E00C7D618 /* SettingsViewModel.swift */; };
 		756E29DA2A25F9C900C7D618 /* PortalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756E29D92A25F9C900C7D618 /* PortalSettings.swift */; };
 		756E29DC2A25FA0400C7D618 /* Preference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756E29DB2A25FA0400C7D618 /* Preference.swift */; };
@@ -234,6 +233,7 @@
 		75F9B9E62A4B223B0085F607 /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9E52A4B223B0085F607 /* ShakeEffect.swift */; };
 		75F9B9E82A4B227A0085F607 /* PincodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9E72A4B227A0085F607 /* PincodeViewModel.swift */; };
 		75F9B9EA2A4CA9C20085F607 /* TxSignConfirmationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9E92A4CA9C20085F607 /* TxSignConfirmationViewModel.swift */; };
+		75F9B9EC2A4CADE90085F607 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9EB2A4CADE90085F607 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -365,7 +365,6 @@
 		756DDD9528A28F8F002EDC60 /* IAccountManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAccountManager.swift; sourceTree = "<group>"; };
 		756DDD9828A28FC6002EDC60 /* AccountManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountManager.swift; sourceTree = "<group>"; };
 		756DDD9C28A292D4002EDC60 /* RootViewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewViewModel.swift; sourceTree = "<group>"; };
-		756E29D52A1CC89D00C7D618 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SettingsView.swift; path = ../../SettingsView.swift; sourceTree = "<group>"; };
 		756E29D72A25F95E00C7D618 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		756E29D92A25F9C900C7D618 /* PortalSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortalSettings.swift; sourceTree = "<group>"; };
 		756E29DB2A25FA0400C7D618 /* Preference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preference.swift; sourceTree = "<group>"; };
@@ -454,6 +453,7 @@
 		75F9B9E52A4B223B0085F607 /* ShakeEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeEffect.swift; sourceTree = "<group>"; };
 		75F9B9E72A4B227A0085F607 /* PincodeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PincodeViewModel.swift; sourceTree = "<group>"; };
 		75F9B9E92A4CA9C20085F607 /* TxSignConfirmationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxSignConfirmationViewModel.swift; sourceTree = "<group>"; };
+		75F9B9EB2A4CADE90085F607 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -519,7 +519,7 @@
 		75388B7A2A3079C000B879A2 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				756E29D52A1CC89D00C7D618 /* SettingsView.swift */,
+				75F9B9EB2A4CADE90085F607 /* SettingsView.swift */,
 				75388B7B2A3079E500B879A2 /* SecuritySettingsView.swift */,
 				75388B7D2A31F57400B879A2 /* SetPincodeView.swift */,
 				75388B832A3A15AF00B879A2 /* PincodeView.swift */,
@@ -626,7 +626,6 @@
 				755170892948C1C300CC84D7 /* AccountRootView.swift */,
 				756A3117288821F3004978E2 /* AccountView.swift */,
 				75388B7A2A3079C000B879A2 /* Settings */,
-				756E29D52A1CC89D00C7D618 /* SettingsView.swift */,
 				755170912948C8C800CC84D7 /* Receive */,
 				7564C65028CF3C2E00ABA8CF /* Send */,
 				75F9B9D32A3C27600085F607 /* ActivityView.swift */,
@@ -1085,7 +1084,6 @@
 				756DDD7428A27C86002EDC60 /* RestoreAccountView.swift in Sources */,
 				756DDD9028A28C06002EDC60 /* AccountRecord+CoreDataClass.swift in Sources */,
 				752FA62729670E0A00008796 /* EthereumFeeRateProvider.swift in Sources */,
-				756E29D62A1CC89D00C7D618 /* SettingsView.swift in Sources */,
 				75772A642901793300BE80B7 /* IdentifiableString.swift in Sources */,
 				756E29DE2A25FA3F00C7D618 /* PublisherObservableObject.swift in Sources */,
 				758DFC85294B6A7600AB35CC /* TransactionRecord.swift in Sources */,
@@ -1098,6 +1096,7 @@
 				756DDD7D28A28754002EDC60 /* AccountStorage.swift in Sources */,
 				7551706D2934B10000CC84D7 /* RecoveryPhraseView.swift in Sources */,
 				75231FE429FBD097001EED49 /* ITxUserDataStorage.swift in Sources */,
+				75F9B9EC2A4CADE90085F607 /* SettingsView.swift in Sources */,
 				75B7531029F1636000F2A93D /* CoinImageView.swift in Sources */,
 				75B7531629F1636000F2A93D /* TextEditorView.swift in Sources */,
 				7551707F293A509A00CC84D7 /* NavigationStack.swift in Sources */,

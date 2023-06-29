@@ -116,10 +116,10 @@ class PortalSettings: ObservableObject {
     }
     
     private func updatePortfolioCurrency() {
-        portfolioCurrencyData = portfolioCurrency.code
+        portfolioCurrencyPreference = portfolioCurrency.code
     }
     
     private func updateUserCoins() {
-        userCoinsData = userCoins
+        userCoinsPreference = userCoins
     }
 }
