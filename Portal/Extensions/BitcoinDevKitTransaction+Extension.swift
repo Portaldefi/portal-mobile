@@ -8,23 +8,6 @@
 import BitcoinDevKit
 import Foundation
 
-enum TxType: Equatable {
-    case unknown, sent, received, swapped(for: Coin)
-    
-    var description: String {
-        switch self {
-        case .unknown:
-            return "Unknown"
-        case .sent:
-            return "Sent"
-        case .received:
-            return "Received"
-        case .swapped(for: let coin):
-            return "Swapped for \(coin.code)"
-        }
-    }
-}
-
 extension BitcoinDevKit.TransactionDetails: Equatable {
     public static func == (lhs: BitcoinDevKit.TransactionDetails, rhs: BitcoinDevKit.TransactionDetails) -> Bool {
         lhs.txid == rhs.txid
