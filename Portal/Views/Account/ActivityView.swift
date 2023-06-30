@@ -92,23 +92,23 @@ struct ActivityView: View {
                             
                             Divider()
                             
-                            Button(action: { viewModel.updateTxStatusFilter(filter: .success) }) {
+                            Button(action: { viewModel.updateTxTypeFilter(filter: .success) }) {
                                 Text("Success")
-                                if viewModel.txStatusFilter == .success {
+                                if viewModel.txTypeFilter == .success {
                                     Image(systemName: "checkmark")
                                 }
                             }
                             
-                            Button(action: { viewModel.updateTxStatusFilter(filter: .failed) }) {
+                            Button(action: { viewModel.updateTxTypeFilter(filter: .failed) }) {
                                 Text("Failed")
-                                if viewModel.txStatusFilter == .failed {
+                                if viewModel.txTypeFilter == .failed {
                                     Image(systemName: "checkmark")
                                 }
                             }
                             
-                            Button(action: { viewModel.updateTxStatusFilter(filter: .pending) }) {
+                            Button(action: { viewModel.updateTxTypeFilter(filter: .pending) }) {
                                 Text("Pending")
-                                if viewModel.txStatusFilter == .pending {
+                                if viewModel.txTypeFilter == .pending {
                                     Image(systemName: "checkmark")
                                 }
                             }
@@ -207,11 +207,7 @@ struct ActivityView: View {
                 }
                 .background(Palette.grayScale20)
                 
-                if viewModel.searchContext.isEmpty && viewModel.transactions.isEmpty {
-                    Text("No transactions yet.")
-                        .font(.Main.fixed(.monoRegular, size: 16))
-                        .padding()
-                } else if viewModel.filteredTransactions.isEmpty {
+                if viewModel.searchContext.isEmpty && viewModel.filteredTransactions.isEmpty {
                     Text("No transactions yet.")
                         .font(.Main.fixed(.monoRegular, size: 16))
                         .padding()

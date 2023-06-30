@@ -13,23 +13,19 @@ enum SortOptions {
     case date, amount, coin
 }
 
-enum TxTypeFilterOption {
-    case none, send, received, swapped
-}
-
-enum TxStatusFilterOption {
-    case success, pending, failed
+enum TxFilterOption {
+    case none, send, received, swapped, success, pending, failed
 }
 
 class ActivityViewModel: ObservableObject {
     @Published var selectedTx: TransactionRecord?
-    @Published private(set) var transactions = [TransactionRecord]()
     @Published private(set) var searchResults = [TransactionRecord]()
     @Published var filteredTransactions = [TransactionRecord]()
-    @Published var txTypeFilter: TxTypeFilterOption = .none
-    @Published var txStatusFilter: TxStatusFilterOption = .success
+    @Published var txTypeFilter: TxFilterOption = .none
     @Published var selectedSort: SortOptions = .date
     @Published var isDescending: Bool = false
+    
+    private var transactions = [TransactionRecord]()
         
     @Published var searchContext = String()
     @Injected(Container.viewState) var viewState
@@ -72,21 +68,16 @@ class ActivityViewModel: ObservableObject {
             guard let self = self else { return }
             let index = self.transactions.firstIndex { $0.timestamp ?? 1 < transactionRecord.timestamp ?? 1 } ?? self.transactions.endIndex
             self.transactions.insert(transactionRecord, at: index)
-            self.filteredTransactions = self.transactions
+            self.applyFilterAndSort()
         }
         .store(in: &subscriptions)
     }
     
-    func updateTxTypeFilter(filter: TxTypeFilterOption) {
+    func updateTxTypeFilter(filter: TxFilterOption) {
         self.txTypeFilter = filter
         self.applyFilterAndSort()
     }
-    
-    func updateTxStatusFilter(filter: TxStatusFilterOption) {
-        self.txStatusFilter = filter
-        self.applyFilterAndSort()
-    }
-    
+        
     func updateSort(sort: SortOptions) {
         self.selectedSort = sort
         self.applyFilterAndSort()
@@ -100,11 +91,11 @@ class ActivityViewModel: ObservableObject {
     private func applyFilterAndSort() {
         var newTransactions = transactions
         
-        if txTypeFilter != .none {
+        switch txTypeFilter {
+        case .none:
+            break
+        case .send, .received, .swapped:
             newTransactions = newTransactions.filter { $0.type == TxType.typeFor(filter: txTypeFilter) }
-        }
-        
-        switch txStatusFilter {
         case .success:
             newTransactions = newTransactions.filter { $0.confirmationTimeString != nil }
         case .pending:
@@ -112,7 +103,7 @@ class ActivityViewModel: ObservableObject {
         case .failed:
             newTransactions = []
         }
-                
+        
         newTransactions.sort { record1, record2 in
             switch selectedSort {
             case .date:
@@ -126,7 +117,7 @@ class ActivityViewModel: ObservableObject {
                 let amount2 = record2.amount ?? 0
                 return isDescending ? (amount1 < amount2) : (amount1 > amount2)
             case .coin:
-                return isDescending ? (record1.coin.code < record2.coin.code) : (record1.coin.code > record2.coin.code)
+                return !isDescending ? (record1.coin.code < record2.coin.code) : (record1.coin.code > record2.coin.code)
             }
         }
         

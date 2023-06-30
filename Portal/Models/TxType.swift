@@ -23,9 +23,9 @@ enum TxType: Equatable {
         }
     }
     
-    static func typeFor(filter: TxTypeFilterOption) -> TxType {
+    static func typeFor(filter: TxFilterOption) -> TxType {
         switch filter {
-        case .none:
+        case .none, .success, .pending, .failed:
             return .unknown
         case .received:
             return .received
