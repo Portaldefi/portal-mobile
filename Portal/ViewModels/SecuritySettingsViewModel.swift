@@ -10,7 +10,7 @@ import Factory
 
 class SecuritySettingsViewModel: ObservableObject {
     @Injected(Container.settings) var settings
-    @Injected(Container.viewState) var viewState
+    @Injected(Container.biometricAuthentification) var biometrics
 
     @Published var pinCodeEnabled = false {
         didSet {
@@ -19,6 +19,9 @@ class SecuritySettingsViewModel: ObservableObject {
     }
     @Published var biometricEnabled = false {
         didSet {
+            if biometricEnabled && !biometrics.permissionsGranted {
+                biometrics.authenticate()
+            }
             settings.biometricsEnabled = biometricEnabled
         }
     }
