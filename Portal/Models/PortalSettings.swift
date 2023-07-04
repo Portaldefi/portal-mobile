@@ -48,12 +48,9 @@ class PortalSettings: ObservableObject {
     private var subscriptions = Set<AnyCancellable>()
     
     init() {
-        guard
-            let data = fiatCurrencyPreference.data(using: .utf8),
-            let decoded = try? JSONDecoder().decode(FiatCurrency.self, from: data)
-        else { return }
-        
-        fiatCurrency = decoded
+        if let data = fiatCurrencyPreference.data(using: .utf8), let decoded = try? JSONDecoder().decode(FiatCurrency.self, from: data) {
+            fiatCurrency = decoded
+        }
         
         switch portfolioCurrencyPreference {
         case "ETH":
