@@ -39,6 +39,9 @@ final class BitcoinAdapter {
     private var _receiveAddress = AddressInfo(index: 0, address: String())
     private var _transactions = [TransactionDetails]()
     
+    @Injected(Container.notificationService) var notificationService
+    @Injected(Container.txDataStorage) private var txDataStorage
+    
     static private func descriptor(derivedKey: String, network: Network) throws -> Descriptor {
         try Descriptor(descriptor: "wpkh(\(derivedKey))", network: network)
     }
@@ -183,8 +186,16 @@ final class BitcoinAdapter {
     private func updateTransactions() throws {
         let transactions = try wallet.listTransactions(includeRaw: true)
         guard transactions != _transactions else { return }
+                
         _transactions = transactions
-        let txRecords = transactions.map{ TransactionRecord(transaction: $0) }
+        
+        let txRecords = transactions.map {
+            let source: TxSource = .btcOnChain
+            let data = txDataStorage.fetch(source: source, id: $0.txid)
+            let userData = TxUserData(data: data)
+            return TransactionRecord(transaction: $0, userData: userData)
+        }
+        
         transactionsSubject.send(txRecords)
     }
     
@@ -316,7 +327,10 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                 
                 if finalized {
                     try blockchain.broadcast(transaction: psbt.extractTx())
-                    let record = TransactionRecord(transaction: txDetails)
+                    let source: TxSource = .btcOnChain
+                    let data = txDataStorage.fetch(source: source, id: txDetails.txid)
+                    let userData = TxUserData(data: data)
+                    let record = TransactionRecord(transaction: txDetails, userData: userData)
                     promise(.success(record))
                 } else {
                     promise(.failure(SendFlowError.error("Tx not finalized")))
@@ -350,7 +364,10 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         
         if finalized {
             try blockchain.broadcast(transaction: psbt.extractTx())
-            let record = TransactionRecord(transaction: txDetails)
+            let source: TxSource = .btcOnChain
+            let data = txDataStorage.fetch(source: source, id: txDetails.txid)
+            let userData = TxUserData(data: data)
+            let record = TransactionRecord(transaction: txDetails, userData: userData)
             return(record)
         } else {
             throw SendFlowError.error("Tx not finalized")
@@ -391,7 +408,10 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
 
                 if finalized {
                     try blockchain.broadcast(transaction: psbt.extractTx())
-                    let record = TransactionRecord(transaction: txDetails)
+                    let source: TxSource = .btcOnChain
+                    let data = txDataStorage.fetch(source: source, id: txDetails.txid)
+                    let userData = TxUserData(data: data)
+                    let record = TransactionRecord(transaction: txDetails, userData: userData)
                     promise(.success(record))
                 } else {
                     promise(.failure(SendFlowError.error("Tx not finalized")))

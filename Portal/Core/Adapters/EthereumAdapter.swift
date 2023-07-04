@@ -10,6 +10,7 @@ import Foundation
 import EvmKit
 import BigInt
 import Combine
+import Factory
 
 //MARK: - IAdapter
 class EthereumAdapter: IAdapter {
@@ -18,6 +19,8 @@ class EthereumAdapter: IAdapter {
     private let evmKit: Kit
     private let signer: Signer?
     private let decimal = 18
+    
+    @Injected(Container.txDataStorage) private var txDataStorage
         
     init(evmKit: Kit, signer: Signer?) {
         self.evmKit = evmKit
@@ -44,7 +47,11 @@ class EthereumAdapter: IAdapter {
             amount = Decimal(sign: .plus, exponent: -decimal, significand: significand)
         }
         
-        return TransactionRecord(coin: .ethereum(), transaction: transaction, amount: amount, type: type)
+        let source: TxSource = .ethOnChain
+        let data = txDataStorage.fetch(source: source, id: transaction.hash.toHexString())
+        let userData = TxUserData(data: data)
+        
+        return TransactionRecord(coin: .ethereum(), transaction: transaction, amount: amount, type: type, userData: userData)
     }
     
     private func convertToAdapterState(evmSyncState: SyncState) -> AdapterState {

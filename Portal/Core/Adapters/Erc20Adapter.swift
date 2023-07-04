@@ -11,6 +11,7 @@ import BigInt
 import EvmKit
 import Eip20Kit
 import HsExtensions
+import Factory
 
 struct Erc20Token {
     let name: String
@@ -24,6 +25,8 @@ class Erc20Adapter {
     private let signer: Signer?
     private let eip20Kit: Eip20Kit.Kit
     private let token: Erc20Token
+    
+    @Injected(Container.txDataStorage) private var txDataStorage
 
     init(evmKit: EvmKit.Kit, signer: Signer?, token: Erc20Token) throws {
         self.evmKit = evmKit
@@ -39,6 +42,10 @@ class Erc20Adapter {
         let transaction = fullTransaction.transaction
         
         var type: TxType = .unknown
+        
+        let source: TxSource = .ethOnChain
+        let data = txDataStorage.fetch(source: source, id: transaction.hash.toHexString())
+        let userData = TxUserData(data: data)
         
         switch fullTransaction.decoration {
         case is IncomingDecoration:
@@ -61,7 +68,7 @@ class Erc20Adapter {
                     amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
                 }
                 
-                return TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transfer.from.eip55, to: transfer.to.eip55)
+                return TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transfer.from.eip55, to: transfer.to.eip55, userData: userData)
             } else if let transfer = outgoingTransfers.first, outgoingTransfers.count == 1 {
                 type = .sent
                 
@@ -69,7 +76,7 @@ class Erc20Adapter {
                     amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
                 }
                 
-                return TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transfer.from.eip55, to: transfer.to.eip55)
+                return TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transfer.from.eip55, to: transfer.to.eip55, userData: userData)
             }
         case is OutgoingEip20Decoration:
             type = .sent
@@ -87,7 +94,7 @@ class Erc20Adapter {
             amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
         }
                 
-        return TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transaction.from?.eip55, to: transaction.to?.eip55)
+        return TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transaction.from?.eip55, to: transaction.to?.eip55, userData: userData)
     }
 }
 

@@ -38,7 +38,7 @@ struct TransactionRecord: Identifiable {
         userData.labels
     }
     
-    init(transaction: BitcoinDevKit.TransactionDetails) {
+    init(transaction: BitcoinDevKit.TransactionDetails, userData: TxUserData) {
         self.id = transaction.txid
         self.coin = .bitcoin()
         
@@ -87,12 +87,10 @@ struct TransactionRecord: Identifiable {
         preimage = nil
         nodeId = nil
         
-        let storage = Container.txDataStorage()
-        let data = storage.fetch(source: source, id: id)
-        self.userData = TxUserData(data: data)
+        self.userData = userData
     }
     
-    init(coin: Coin, transaction: EvmKit.Transaction, amount: Decimal?, type: TxType) {
+    init(coin: Coin, transaction: EvmKit.Transaction, amount: Decimal?, type: TxType, userData: TxUserData) {
         self.id = transaction.hash.hs.hexString
         self.coin = coin
         self.type = type
@@ -113,12 +111,10 @@ struct TransactionRecord: Identifiable {
         preimage = nil
         nodeId = nil
         
-        let storage = Container.txDataStorage()
-        let data = storage.fetch(source: source, id: id)
-        self.userData = TxUserData(data: data)
+        self.userData = userData
     }
     
-    init(token: Erc20Token, transaction: EvmKit.Transaction, amount: Decimal?, type: TxType, from: String?, to: String?) {
+    init(token: Erc20Token, transaction: EvmKit.Transaction, amount: Decimal?, type: TxType, from: String?, to: String?, userData: TxUserData) {
         self.id = transaction.hash.hs.hexString
         self.type = type
         self.coin = Coin(type: .erc20(address: token.contractAddress), code: token.code, name: token.name, decimal: token.decimal, iconUrl: token.name)
@@ -140,12 +136,10 @@ struct TransactionRecord: Identifiable {
         preimage = nil
         nodeId = nil
         
-        let storage = Container.txDataStorage()
-        let data = storage.fetch(source: source, id: id)
-        self.userData = TxUserData(data: data)
+        self.userData = userData
     }
         
-    init(payment: LightningPayment) {
+    init(payment: LightningPayment, userData: TxUserData) {
         self.id = payment.paymentId
         self.coin = .bitcoin()
         self.type = payment.type == .sent ? .sent : .received
@@ -173,9 +167,7 @@ struct TransactionRecord: Identifiable {
         self.nodeId = payment.nodeId
         self.blockHeight = nil
         
-        let storage = Container.txDataStorage()
-        let data = storage.fetch(source: source, id: id)
-        self.userData = TxUserData(data: data)
+        self.userData = userData
     }
 }
 
@@ -191,7 +183,7 @@ extension TransactionRecord: Hashable {
 
 extension TransactionRecord {
     static var mocked: TransactionRecord {
-        TransactionRecord(transaction: TransactionDetails.mockedConfirmed)
+        TransactionRecord(transaction: TransactionDetails.mockedConfirmed, userData: TxUserData(price: 1000))
     }
     
     static var mockedLightning: TransactionRecord {
@@ -206,6 +198,6 @@ extension TransactionRecord {
             timestamp: Int(Date().timeIntervalSince1970),
             fee: 1000
         )
-        return TransactionRecord(payment: payment)
+        return TransactionRecord(payment: payment, userData: TxUserData(price: 1000))
     }
 }

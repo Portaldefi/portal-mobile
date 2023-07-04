@@ -42,7 +42,7 @@ class SendAssetMockedService: ISendAssetService {
     
     func send() -> Future<TransactionRecord, Error> {
         Future { promise in
-            promise(.success(TransactionRecord(transaction: TransactionDetails.mockedConfirmed)))
+            promise(.success(TransactionRecord(transaction: TransactionDetails.mockedConfirmed, userData: TxUserData(price: 1000))))
         }
     }
     
