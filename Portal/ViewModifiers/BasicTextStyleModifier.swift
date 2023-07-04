@@ -49,6 +49,10 @@ extension View {
     func lockableView() -> some View {
         self.modifier(LockScreenModifier())
     }
+    
+    func notifiebleView() -> some View {
+        self.modifier(NotifiableViewModifier())
+    }
 }
 
 struct BackgroundColorModifier_Previews: PreviewProvider {
