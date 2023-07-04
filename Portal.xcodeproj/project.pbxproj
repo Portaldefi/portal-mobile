@@ -236,6 +236,8 @@
 		75F9B9EC2A4CADE90085F607 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9EB2A4CADE90085F607 /* SettingsView.swift */; };
 		75F9B9EE2A4D66230085F607 /* ActivityViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9ED2A4D66230085F607 /* ActivityViewModel.swift */; };
 		75F9B9F02A4DD0680085F607 /* TxType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9EF2A4DD0680085F607 /* TxType.swift */; };
+		75F9B9F22A4ED4880085F607 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9F12A4ED4880085F607 /* NotificationService.swift */; };
+		75F9B9F42A4ED5AC0085F607 /* alert.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 75F9B9F32A4ED5AC0085F607 /* alert.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -458,6 +460,8 @@
 		75F9B9EB2A4CADE90085F607 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		75F9B9ED2A4D66230085F607 /* ActivityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityViewModel.swift; sourceTree = "<group>"; };
 		75F9B9EF2A4DD0680085F607 /* TxType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxType.swift; sourceTree = "<group>"; };
+		75F9B9F12A4ED4880085F607 /* NotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		75F9B9F32A4ED5AC0085F607 /* alert.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = alert.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -502,6 +506,7 @@
 		750C05E429646838005519FF /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				75F9B9F12A4ED4880085F607 /* NotificationService.swift */,
 				750C05E229646803005519FF /* SendETHService.swift */,
 				752FA6212965A0AF00008796 /* SendBTCService.swift */,
 				752FA62629670E0A00008796 /* EthereumFeeRateProvider.swift */,
@@ -679,6 +684,7 @@
 		756A3109288821F3004978E2 = {
 			isa = PBXGroup;
 			children = (
+				75F9B9F32A4ED5AC0085F607 /* alert.mp3 */,
 				758336BF2A0A5D0A000B2375 /* EvmKit.Swift */,
 				756A3114288821F3004978E2 /* Portal */,
 				756A3113288821F3004978E2 /* Products */,
@@ -1057,6 +1063,7 @@
 			files = (
 				756A311D288821F4004978E2 /* Preview Assets.xcassets in Resources */,
 				756A311A288821F4004978E2 /* Assets.xcassets in Resources */,
+				75F9B9F42A4ED5AC0085F607 /* alert.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1261,6 +1268,7 @@
 				756DDD8428A2879E002EDC60 /* IAccountRecordStorage.swift in Sources */,
 				7564C65B28D08F6F00ABA8CF /* AmountView.swift in Sources */,
 				75D8C5C128DC711F00228298 /* CoinManager.swift in Sources */,
+				75F9B9F22A4ED4880085F607 /* NotificationService.swift in Sources */,
 				756A3116288821F3004978E2 /* Portal.swift in Sources */,
 				755C56DC28EB096E00A4B57B /* TextFieldAlert.swift in Sources */,
 				756DDD9728A28F8F002EDC60 /* IAccountManager.swift in Sources */,
