@@ -16,6 +16,11 @@ extension SharedContainer {
         AccountManager(accountStorage: Container.accountStorage())
     }
     
+    static let notificationService = Factory<NotificationService>(scope: .singleton) {
+        let accountManager = Container.accountManager()
+        return NotificationService(accountManager: accountManager)
+    }
+    
     static let secureStorage = Factory<IKeychainStorage>(scope: .singleton) {
         let keychain = Keychain(service: "com.portal.keychain")
         return KeychainStorage(keychain: keychain)
