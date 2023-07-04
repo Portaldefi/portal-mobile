@@ -24,6 +24,7 @@ struct SettingsView: View {
                 Spacer()
                 
                 PButton(config: .onlyIcon(Asset.xIcon), style: .free, size: .medium, enabled: true) {
+                    viewModel.updateWallet()
                     presentationMode.wrappedValue.dismiss()
                 }
                 .frame(width: 20)
@@ -72,11 +73,7 @@ struct SettingsView: View {
                             isSelected: viewModel.selectedCoins.contains(coin)
                         ) {
                             DispatchQueue.main.async {
-                                if viewModel.selectedCoins.contains(coin) {
-                                    viewModel.selectedCoins.removeAll(where: { $0 == coin })
-                                } else {
-                                    viewModel.selectedCoins.append(coin)
-                                }
+                                viewModel.updatedWallet(coin)
                             }
                         }
                     }
