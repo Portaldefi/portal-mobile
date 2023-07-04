@@ -152,6 +152,7 @@ struct Mainview: View {
                 .zIndex(1)
         }
         .lockableView()
+        .notifiebleView()
         .onChange(of: scenePhase) { newValue in
             switch newValue {
             case .inactive:
