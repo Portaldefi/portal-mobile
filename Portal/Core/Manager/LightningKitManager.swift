@@ -20,12 +20,20 @@ public struct BlockInfo {
 }
 
 class LightningKitManager: ILightningKitManager {
+    @Injected(Container.notificationService) private var notificationService
+    @Injected(Container.txDataStorage) private var txDataStorage
+    
     private let instance: Node
     private let fileManager = LightningFileManager()
     private var started = false
         
     var transactionsPublisher: AnyPublisher<[TransactionRecord], Never> {
-        let payments = fileManager.getPayments().map{ TransactionRecord(payment: $0)}
+        let payments = fileManager.getPayments().map { payment in
+            let source: TxSource = .lightning
+            let data = txDataStorage.fetch(source: source, id: payment.paymentId)
+            let userData = TxUserData(data: data)
+            return TransactionRecord(payment: payment, userData: userData)
+        }
         return Just(payments).eraseToAnyPublisher()
     }
             
@@ -115,6 +123,13 @@ class LightningKitManager: ILightningKitManager {
                 print("Unable to persist payment \(paymentId)")
                 print("ERROR: \(error.localizedDescription)")
             }
+            
+            let btcAmount = Double(payment.amount) / Double(100_000_000)
+            let formatted = String(format: "%.8f", btcAmount).trimmingCharacters(in: CharacterSet(charactersIn: "0").inverted)
+            let result = "You received \(formatted.last == "." ? String(formatted.dropLast()) : formatted) BTC"
+            
+            let notification = PNotification(message: result)
+            notificationService.notify(notification)
             
         case .PaymentSent:
             print("PaymentSent")
@@ -253,7 +268,10 @@ extension LightningKitManager: ILightningInvoiceHandler {
                         print("Invoice decoded")
                         
                         let paymentResult = try await self.instance.pay(invoice: invoice)
-                        let transactionRecord = TransactionRecord(payment: paymentResult)
+                        let source: TxSource = .lightning
+                        let data = txDataStorage.fetch(source: source, id: paymentResult.paymentId)
+                        let userData = TxUserData(data: data)
+                        let transactionRecord = TransactionRecord(payment: paymentResult, userData: userData)
                         promise(.success(transactionRecord))
                     }
                 } catch {
@@ -264,7 +282,11 @@ extension LightningKitManager: ILightningInvoiceHandler {
     }
     
     func pay(invoice: Invoice) async throws -> TransactionRecord {
-        TransactionRecord(payment: try await self.instance.pay(invoice: invoice))
+        let paymentResult = try await self.instance.pay(invoice: invoice)
+        let source: TxSource = .lightning
+        let data = txDataStorage.fetch(source: source, id: paymentResult.paymentId)
+        let userData = TxUserData(data: data)
+        return TransactionRecord(payment: paymentResult, userData: userData)
     }
     
     func decode(invoice: String) throws -> Invoice? {
