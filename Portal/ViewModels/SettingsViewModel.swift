@@ -20,14 +20,7 @@ class SettingsViewViewModel: ObservableObject {
         }
     }
     
-    @Published var selectedCoins: [Coin] = [] {
-        didSet {
-            let selected = selectedCoins.map{ $0.code }
-            guard settings.userCoins != selected else { return }
-            settings.userCoins = selectedCoins.map{ $0.code }
-            accountManager.addCoin(coin: "coin.code")
-        }
-    }
+    @Published private(set) var selectedCoins: [Coin] = []
         
     var fiatCurrency: FiatCurrency {
         get {
@@ -57,5 +50,20 @@ class SettingsViewViewModel: ObservableObject {
     
     var coins: [Coin] {
         coinManager.avaliableCoins
+    }
+    
+    func updateWallet() {
+        let selected = selectedCoins.map{ $0.code }
+        guard settings.userCoins != selected else { return }
+        settings.userCoins = selectedCoins.map{ $0.code }
+        accountManager.addCoin(coin: "coin.code")
+    }
+    
+    func updatedWallet(_ coin: Coin) {
+        if selectedCoins.contains(coin) {
+            selectedCoins.removeAll(where: { $0 == coin })
+        } else {
+            selectedCoins.append(coin)
+        }
     }
 }
