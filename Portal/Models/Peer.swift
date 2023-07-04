@@ -45,7 +45,7 @@ class Peer: Codable, Equatable {
 extension Peer {
     static var alice: Peer {
         let name = "Alice"
-        let pubKey = "025f3afd463c9c2d535241a130879326e2c8320ba58f9253d523be3939af7aa114"
+        let pubKey = "031d4f7f926e7b6d74362e5996b67563fef459bbb3465e7da320d932d85786abb6"
         let host = "127.0.0.1"
         let port: UInt16 = 9735
                 
@@ -57,7 +57,7 @@ extension Peer {
     }
     static var bob: Peer {
         let name = "Bob"
-        let pubKey = "02f16b6cbcadede7a6fc4bff1ffa39a01bb7fedc3b38b8637746b4684beb533ca3"
+        let pubKey = "02030e7ed5557c27b8d3ddfe0fcf9297209623af1683e3ca83ad276ceeb451afe1"
         let host = "127.0.0.1"    //P2p external
         let port: UInt16 = 9736   //in Polar
                 
@@ -69,7 +69,7 @@ extension Peer {
     }
     static var carol: Peer {
         let name = "Carol"
-        let pubKey = "032ee612780f5e9c0ab56dfd269ce8d8e7cebeb31bc88f92bcf2fcbe8e9128d14d"
+        let pubKey = "038e6e4a8c1315a6311991ed919a9de052dfcd9c19fa22ca54fc90b64073ff80c2"
         let host = "127.0.0.1"    //P2p external
         let port: UInt16 = 9737   //in Polar
                 
