@@ -26,6 +26,7 @@ class Erc20Adapter {
     private let eip20Kit: Eip20Kit.Kit
     private let token: Erc20Token
     
+    @Injected(Container.notificationService) var notificationService
     @Injected(Container.txDataStorage) private var txDataStorage
 
     init(evmKit: EvmKit.Kit, signer: Signer?, token: Erc20Token) throws {
@@ -40,6 +41,9 @@ class Erc20Adapter {
 
     private func transactionRecord(fromTransaction fullTransaction: FullTransaction) -> TransactionRecord? {
         let transaction = fullTransaction.transaction
+        
+        var isNew = false
+        if txDataStorage.fetchTxData(txID: transaction.hash.toHexString()) == nil { isNew = true }
         
         var type: TxType = .unknown
         
@@ -68,7 +72,17 @@ class Erc20Adapter {
                     amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
                 }
                 
-                return TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transfer.from.eip55, to: transfer.to.eip55, userData: userData)
+                let record = TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transfer.from.eip55, to: transfer.to.eip55, userData: userData)
+                
+                if isNew {
+                    let amount = "\(record.amount?.double ?? 0)"
+                    let message = "You've received \(amount) \(record.coin.code.uppercased())"
+
+                    let pNotification = PNotification(message: message)
+                    notificationService.notify(pNotification)
+                }
+                
+                return record
             } else if let transfer = outgoingTransfers.first, outgoingTransfers.count == 1 {
                 type = .sent
                 
@@ -93,8 +107,20 @@ class Erc20Adapter {
         if let value = transaction.value, let significand = Decimal(string: value.description) {
             amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
         }
+        
+        let record =  TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transaction.from?.eip55, to: transaction.to?.eip55, userData: userData)
+        
+        if isNew {
+            guard record.type == .received else { return record }
+
+            let amount = "\(record.amount?.double ?? 0)"
+            let message = "You've received \(amount) \(record.coin.code.uppercased())"
+
+            let pNotification = PNotification(message: message)
+            notificationService.notify(pNotification)
+        }
                 
-        return TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transaction.from?.eip55, to: transaction.to?.eip55, userData: userData)
+        return record
     }
 }
 
