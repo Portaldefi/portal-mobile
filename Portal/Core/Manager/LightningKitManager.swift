@@ -125,8 +125,7 @@ class LightningKitManager: ILightningKitManager {
             }
             
             let btcAmount = Double(payment.amount) / Double(100_000_000)
-            let formatted = String(format: "%.8f", btcAmount).trimmingCharacters(in: CharacterSet(charactersIn: "0").inverted)
-            let result = "You received \(formatted.last == "." ? String(formatted.dropLast()) : formatted) BTC"
+            let message = "You've received \(btcAmount) BTC"
             
             let notification = PNotification(message: result)
             notificationService.notify(notification)
