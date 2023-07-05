@@ -21,6 +21,7 @@ class EthereumAdapter: IAdapter {
     private let decimal = 18
     
     @Injected(Container.txDataStorage) private var txDataStorage
+    @Injected(Container.notificationService) var notificationService
         
     init(evmKit: Kit, signer: Signer?) {
         self.evmKit = evmKit
@@ -29,6 +30,10 @@ class EthereumAdapter: IAdapter {
 
     private func transactionRecord(fullTransaction: FullTransaction) -> TransactionRecord {
         let transaction = fullTransaction.transaction
+        
+        var isNew = false
+        if txDataStorage.fetchTxData(txID: transaction.hash.toHexString()) == nil { isNew = true }
+        
         print("tx \(transaction.hash.toHexString()) decoration: \(fullTransaction.decoration)")
         
         let type: TxType
@@ -51,7 +56,19 @@ class EthereumAdapter: IAdapter {
         let data = txDataStorage.fetch(source: source, id: transaction.hash.toHexString())
         let userData = TxUserData(data: data)
         
-        return TransactionRecord(coin: .ethereum(), transaction: transaction, amount: amount, type: type, userData: userData)
+        let record = TransactionRecord(coin: .ethereum(), transaction: transaction, amount: amount, type: type, userData: userData)
+        
+        if isNew {
+            guard record.type == .received else { return record }
+
+            let amount = "\(record.amount?.double ?? 0)"
+            let message = "You've received \(amount) \(record.coin.code.uppercased())"
+
+            let pNotification = PNotification(message: message)
+            notificationService.notify(pNotification)
+        }
+        
+        return record
     }
     
     private func convertToAdapterState(evmSyncState: SyncState) -> AdapterState {
