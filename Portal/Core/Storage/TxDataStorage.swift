@@ -17,8 +17,10 @@ class TxDataStorage {
         self.context = context
         self.marketData = marketData
     }
-    
-    private func fetchTxData(txID: String) -> TxData? {
+}
+
+extension TxDataStorage: ITxUserDataStorage {
+    func fetchTxData(txID: String) -> TxData? {
         var txData: TxData? = nil
         
         context.performAndWait {
@@ -34,9 +36,7 @@ class TxDataStorage {
         
         return txData
     }
-}
-
-extension TxDataStorage: ITxUserDataStorage {
+    
     func update(source: TxSource, id: String, notes: String) {
         let tx = fetch(source: source, id: id)
         tx.notes = notes
