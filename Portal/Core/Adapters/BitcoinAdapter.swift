@@ -186,16 +186,34 @@ final class BitcoinAdapter {
     private func updateTransactions() throws {
         let transactions = try wallet.listTransactions(includeRaw: true)
         guard transactions != _transactions else { return }
-                
+        
         _transactions = transactions
         
-        let txRecords = transactions.map {
-            let source: TxSource = .btcOnChain
-            let data = txDataStorage.fetch(source: source, id: $0.txid)
-            let userData = TxUserData(data: data)
-            return TransactionRecord(transaction: $0, userData: userData)
-        }
+        var txRecords = [TransactionRecord]()
         
+        for txRecord in transactions {
+            var isNew = false
+            if txDataStorage.fetchTxData(txID: txRecord.txid) == nil { isNew = true }
+            
+            let source: TxSource = .btcOnChain
+            let data = txDataStorage.fetch(source: source, id: txRecord.txid)
+            let userData = TxUserData(data: data)
+            let record = TransactionRecord(transaction: txRecord, userData: userData)
+            
+            txRecords.append(record)
+            
+            if isNew {
+                guard record.type == .received else { return }
+                
+                let satAmount = record.amount?.double ?? 0
+                let btcAmount = satAmount / 100_000_000
+                let message = "You've received \(btcAmount) \(record.coin.code.uppercased())"
+                
+                let pNotification = PNotification(message: message)
+                notificationService.notify(pNotification)
+            }
+        }
+                
         transactionsSubject.send(txRecords)
     }
     
