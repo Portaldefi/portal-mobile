@@ -9,7 +9,7 @@ import Foundation
 import AVFoundation
 import Combine
 
-final class NotificationService: ObservableObject {
+final class NotificationService: INotificationService {
     private let player: AVPlayer?
     
     private(set) var notifications = CurrentValueSubject<[PNotification], Never>([])
