@@ -164,6 +164,10 @@ final class MarketDataService {
 }
 
 extension MarketDataService: IMarketDataRepository {
+    func fetchTxData(txID: String) -> TxData? {
+        nil
+    }
+    
     var lastSeenBtcPrice: Decimal {
         Decimal(UserDefaults.standard.double(forKey: "lastSeenBtcPrice"))
     }
@@ -212,6 +216,10 @@ extension MarketDataService: WebSocketDelegate {
 
 extension MarketDataService {
     private class MarketDataMocked: IMarketDataRepository {
+        func fetchTxData(txID: String) -> TxData? {
+            nil
+        }
+        
         var lastSeenBtcPrice: Decimal {
             2000
         }
