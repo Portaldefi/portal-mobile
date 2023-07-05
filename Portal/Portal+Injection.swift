@@ -16,7 +16,7 @@ extension SharedContainer {
         AccountManager(accountStorage: Container.accountStorage())
     }
     
-    static let notificationService = Factory<NotificationService>(scope: .singleton) {
+    static let notificationService = Factory<INotificationService>(scope: .singleton) {
         let accountManager = Container.accountManager()
         return NotificationService(accountManager: accountManager)
     }
