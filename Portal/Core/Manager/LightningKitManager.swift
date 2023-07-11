@@ -127,7 +127,7 @@ class LightningKitManager: ILightningKitManager {
             let btcAmount = Double(payment.amount) / Double(100_000_000)
             let message = "You've received \(btcAmount) BTC"
             
-            let notification = PNotification(message: result)
+            let notification = PNotification(message: message)
             notificationService.notify(notification)
             
         case .PaymentSent:
