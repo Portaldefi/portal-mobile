@@ -194,7 +194,7 @@ struct ActivityView: View {
                 ScrollView {
                     VStack(spacing: 0) {
                         ForEach(viewModel.searchContext.isEmpty ? viewModel.filteredTransactions : viewModel.searchResults, id: \.self) { transaction in
-                            SingleTxView(transaction: transaction)
+                            SingleTxView(searchContext: viewModel.searchContext, transaction: transaction)
                                 .padding(.leading, 10)
                                 .padding(.trailing, 6)
                                 .contentShape(Rectangle())
