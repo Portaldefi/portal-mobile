@@ -10,9 +10,12 @@ import BitcoinDevKit
 import PortalUI
 
 struct SingleTxView: View {
+    let searchContext: String?
+    
     @ObservedObject var viewModel: SingleTxViewModel
     
-    init(transaction: TransactionRecord) {
+    init(searchContext: String? = nil, transaction: TransactionRecord) {
+        self.searchContext = searchContext
         self._viewModel = ObservedObject(initialValue: SingleTxViewModel(tx: transaction))
     }
     
@@ -37,9 +40,13 @@ struct SingleTxView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 0) {
-                        Text(viewModel.tx.type.description)
-                            .font(.Main.fixed(.monoMedium, size: 16))
-                            .foregroundColor(Palette.grayScaleEA)
+                        HighlightedText(
+                            text: viewModel.tx.type.description,
+                            textColor: Palette.grayScaleEA,
+                            highlight: searchContext,
+                            font: .Main.fixed(.monoMedium, size: 16)
+                        )
+
                         if let confirmatioDate = viewModel.tx.confirmationTimeString {
                             Text(confirmatioDate)
                                 .font(.Main.fixed(.monoRegular, size: 14))
@@ -61,9 +68,12 @@ struct SingleTxView: View {
                                 Text("\(viewModel.tx.type == .received ? "+" : "-")")
                                     .font(.Main.fixed(.monoMedium, size: 16))
                                     .foregroundColor(viewModel.tx.type == .received ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA)
-                                Text(viewModel.amount)
-                                    .font(.Main.fixed(.monoMedium, size: 16))
-                                    .foregroundColor(viewModel.tx.type == .received ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA)
+                                HighlightedText(
+                                    text: viewModel.amount,
+                                    textColor: viewModel.tx.type == .received ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA,
+                                    highlight: searchContext,
+                                    font: .Main.fixed(.monoMedium, size: 16)
+                                )
                             }
                             HStack {
                                 Text("\(viewModel.tx.type == .received ? "+" : "-")")
@@ -77,10 +87,14 @@ struct SingleTxView: View {
                         }
                         VStack(alignment: .leading, spacing: 0) {
                             HStack {
-                                Text(viewModel.tx.coin.code.uppercased())
-                                    .font(.Main.fixed(.monoMedium, size: 12))
-                                    .foregroundColor(Palette.grayScale6A)
-                                    .offset(y: -1)
+                                HighlightedText(
+                                    text: viewModel.tx.coin.code.uppercased(),
+                                    textColor: Palette.grayScale6A,
+                                    highlight: searchContext,
+                                    font: .Main.fixed(.monoMedium, size: 12)
+                                )
+                                .offset(y: -1)
+                                
                                 Spacer()
                             }
                             .frame(width: 38)
@@ -95,17 +109,20 @@ struct SingleTxView: View {
                 }
                 
                 if let notes = viewModel.tx.notes, !notes.isEmpty {
-                    Text(notes)
-                        .multilineTextAlignment(.leading)
-                        .font(.Main.fixed(.monoRegular, size: 14))
-                        .foregroundColor(Palette.grayScaleAA)
-                        .padding(.leading, 40)
-                        .padding(.trailing, 8)
+                    HighlightedText(
+                        text: notes,
+                        textColor: Palette.grayScaleAA,
+                        highlight: searchContext,
+                        font: .Main.fixed(.monoRegular, size: 14)
+                    )
+                    .multilineTextAlignment(.leading)
+                    .padding(.leading, 40)
+                    .padding(.trailing, 8)
                 }
 
                 if let labels = viewModel.tx.labels, !labels.isEmpty {
                     WrappedHStack(labels) { label in
-                        TxLabelView(label: label)
+                        TxLabelView(searchContext: searchContext, label: label)
                     }
                     .padding(.leading, 35)
                 }
