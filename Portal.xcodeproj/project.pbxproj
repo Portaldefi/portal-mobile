@@ -86,6 +86,7 @@
 		755170952948CBC300CC84D7 /* ReceiveViewNavigationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170942948CBC300CC84D7 /* ReceiveViewNavigationConfig.swift */; };
 		755170982948CF3400CC84D7 /* AccountBackupRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170972948CF3400CC84D7 /* AccountBackupRootView.swift */; };
 		7551709A2948D02700CC84D7 /* AccountBackupNavigationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170992948D02700CC84D7 /* AccountBackupNavigationConfig.swift */; };
+		755501BE2A5D57310027D5FD /* HighlightedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755501BD2A5D57310027D5FD /* HighlightedText.swift */; };
 		755C56AF28E5BDD600A4B57B /* WalletItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */; };
 		755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */; };
 		755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */; };
@@ -315,6 +316,7 @@
 		755170942948CBC300CC84D7 /* ReceiveViewNavigationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveViewNavigationConfig.swift; sourceTree = "<group>"; };
 		755170972948CF3400CC84D7 /* AccountBackupRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountBackupRootView.swift; sourceTree = "<group>"; };
 		755170992948D02700CC84D7 /* AccountBackupNavigationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountBackupNavigationConfig.swift; sourceTree = "<group>"; };
+		755501BD2A5D57310027D5FD /* HighlightedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedText.swift; sourceTree = "<group>"; };
 		755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemViewModel.swift; sourceTree = "<group>"; };
 		755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceAdapterMocked.swift; sourceTree = "<group>"; };
 		755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMarketDataRepository.swift; sourceTree = "<group>"; };
@@ -592,6 +594,7 @@
 				75F9B9E12A4B21790085F607 /* NumpadView.swift */,
 				75F9B9E32A4B21F80085F607 /* CircleProgressView.swift */,
 				75F9B9E52A4B223B0085F607 /* ShakeEffect.swift */,
+				755501BD2A5D57310027D5FD /* HighlightedText.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -1167,6 +1170,7 @@
 				75F9B9F02A4DD0680085F607 /* TxType.swift in Sources */,
 				4774D72528B4FC2000B7988B /* StringFormatter.swift in Sources */,
 				755FDD4E29AD00D500D8A29C /* MockedLightningKitManager.swift in Sources */,
+				755501BE2A5D57310027D5FD /* HighlightedText.swift in Sources */,
 				75772A682902D73E00BE80B7 /* TextLimitter.swift in Sources */,
 				756DDD6E28A272AB002EDC60 /* NoAccountView.swift in Sources */,
 				755FDD5329B7815C00D8A29C /* CurrencyTickerModel.swift in Sources */,
