@@ -34,20 +34,6 @@ class ActivityViewModel: ObservableObject {
     
     init() {
         updateTransactions()
-        
-        $searchContext.sink { [unowned self] context in
-            guard !context.isEmpty else { return }
-            let searchContext = context.lowercased()
-            self.searchResults = transactions.filter {
-                $0.coin.name.lowercased().contains(searchContext) ||
-                $0.coin.code.lowercased().contains(searchContext) ||
-                String(describing: $0.amount ?? 0).lowercased().contains(searchContext) ||
-                $0.notes?.lowercased().contains(searchContext) ?? false ||
-                !$0.labels.filter{ $0.label.contains(searchContext) }.isEmpty ||
-                $0.type.description.lowercased().contains(searchContext)
-            }
-        }
-        .store(in: &subscriptions)
     }
     
     func updateTransactions() {
@@ -68,7 +54,24 @@ class ActivityViewModel: ObservableObject {
             guard let self = self else { return }
             let index = self.transactions.firstIndex { $0.timestamp ?? 1 < transactionRecord.timestamp ?? 1 } ?? self.transactions.endIndex
             self.transactions.insert(transactionRecord, at: index)
+            self.subscribeForSearchContext()
             self.applyFilterAndSort()
+        }
+        .store(in: &subscriptions)
+    }
+    
+    private func subscribeForSearchContext() {
+        $searchContext.sink { [unowned self] context in
+            guard !context.isEmpty else { return }
+            let searchContext = context.lowercased()
+            self.searchResults = transactions.filter {
+                $0.coin.name.lowercased().contains(searchContext) ||
+                $0.coin.code.lowercased().contains(searchContext) ||
+                String(describing: $0.amount ?? 0).lowercased().contains(searchContext) ||
+                $0.notes?.lowercased().contains(searchContext) ?? false ||
+                !$0.labels.filter{ $0.label.contains(searchContext) }.isEmpty ||
+                $0.type.description.lowercased().contains(searchContext)
+            }
         }
         .store(in: &subscriptions)
     }
