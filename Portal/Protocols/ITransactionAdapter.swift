@@ -9,5 +9,5 @@ import Foundation
 import Combine
 
 protocol ITransactionsAdapter {
-    var transactionRecords: AnyPublisher<[TransactionRecord], Never> { get }
+    var transactionRecords: [TransactionRecord] { get }
 }

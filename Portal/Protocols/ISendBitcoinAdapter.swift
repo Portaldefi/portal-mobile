@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 import BitcoinDevKit
 
 protocol ISendBitcoinAdapter {
@@ -14,8 +13,8 @@ protocol ISendBitcoinAdapter {
     var balance: Decimal { get }
     func validate(address: String) throws
     func fee(max: Bool, address: String, amount: Decimal, fee: Int?) throws -> UInt64?
-    func send(amount: Decimal, address: String, fee: Int?) -> Future<TransactionRecord, Error>
+    func send(amount: Decimal, address: String, fee: Int?) throws -> TransactionRecord
     func rawTransaction(amount: UInt64, address: String) throws -> Transaction
-    func sendMax(address: String, fee: Int?) -> Future<TransactionRecord, Error>
+    func sendMax(address: String, fee: Int?) throws -> TransactionRecord
     func send(amount: Decimal, address: String) throws -> TransactionRecord
 }

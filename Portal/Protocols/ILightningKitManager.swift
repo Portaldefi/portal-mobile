@@ -17,8 +17,8 @@ protocol ILightningChannels {
 
 protocol ILightningInvoiceHandler {
     func createInvoice(amount: String, description: String) async -> String?
-    func decode(invoice: String) throws -> Invoice?
-    func pay(invoice: String) -> Combine.Future<TransactionRecord, Error>
+    func decode(invoice: String) throws -> Invoice
+    func pay(invoice: String) async throws -> TransactionRecord
     func pay(invoice: Invoice) async throws -> TransactionRecord
     func createInvoice(paymentHash: String, satAmount: UInt64) async -> Invoice?
 }
@@ -37,6 +37,7 @@ protocol IBitcoinCore {
 }
 
 protocol ILightningKitManager: ILightningChannels, ILightningInvoiceHandler, ILightningPeerHandler, IBitcoinCore {
+    var transactions: [TransactionRecord] { get }
     var transactionsPublisher: AnyPublisher<[TransactionRecord], Never> { get }
     var activePeersPublisher: AnyPublisher<[String], Never> { get }
     func start() async throws

@@ -18,6 +18,6 @@ protocol ISendAssetService {
     var recomendedFees: CurrentValueSubject<RecomendedFees?, Never> { get }
     
     func validateUserInput() throws -> UserInputResult
-    func send() -> Future<TransactionRecord, Error>
-    func sendMax() -> Future<TransactionRecord, Error>
+    func send() async throws -> TransactionRecord
+    func sendMax() async throws -> TransactionRecord
 }
