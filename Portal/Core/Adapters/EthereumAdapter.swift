@@ -191,11 +191,8 @@ extension EthereumAdapter: IBalanceAdapter {
 
 //MARK: - ITransactionsAdapter
 extension EthereumAdapter: ITransactionsAdapter {
-    var transactionRecords: AnyPublisher<[TransactionRecord], Never> {
-        Future { [unowned self] promisse in
-            promisse(.success(self.transactions(from: nil, limit: nil)))
-        }
-        .eraseToAnyPublisher()
+    var transactionRecords: [TransactionRecord] {
+        transactions(from: nil, limit: nil)
     }
 }
 
@@ -212,26 +209,17 @@ extension EthereumAdapter: ISendEthereumAdapter {
         evmKit.transferTransactionData(to: address, value: amount)
     }
     
-    func send(tx: SendETHService.Transaction) -> Future<TransactionRecord, Error> {
-        Future { [unowned self] promise in
-            Task {
-                do {
-                    let fullTransaction = try await self.send(
-                        to: tx.data.to,
-                        amount: tx.data.value,
-                        gasLimit: tx.gasData.gasLimit,
-                        gasPrice: .legacy(gasPrice: tx.gasData.gasPrice)
-                    )
-                    
-                    let record = self.transactionRecord(fullTransaction: fullTransaction)
-                    print("Eth tx sent: \(record.id) ")
-                    
-                    promise(.success(record))
-                } catch  {
-                    promise(.failure(error))
-                }
-            }
-        }
+    func send(tx: SendETHService.Transaction) async throws -> TransactionRecord {
+        let fullTransaction = try await send(
+            to: tx.data.to,
+            amount: tx.data.value,
+            gasLimit: tx.gasData.gasLimit,
+            gasPrice: .legacy(gasPrice: tx.gasData.gasPrice)
+        )
+        
+        let record = transactionRecord(fullTransaction: fullTransaction)
+        print("Eth tx sent: \(record.id) ")
+        return record
     }
     
     func callSolidity(contractAddress: Address, data: Data) async throws -> Data {
