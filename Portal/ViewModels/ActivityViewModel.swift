@@ -37,7 +37,6 @@ class ActivityViewModel: ObservableObject {
     }
     
     func updateTransactions() {
-        subscriptions.removeAll()
         transactions.removeAll()
         
         let adapterManager: IAdapterManager = Container.adapterManager()
@@ -50,6 +49,8 @@ class ActivityViewModel: ObservableObject {
     }
     
     private func subscribeForSearchContext() {
+        subscriptions.removeAll()
+
         $searchContext.sink { [unowned self] context in
             guard !context.isEmpty else { return }
             let searchContext = context.lowercased()
