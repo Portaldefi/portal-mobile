@@ -168,9 +168,9 @@ extension Erc20Adapter: IBalanceAdapter {
     }
 }
 
-extension Erc20Adapter: ITransactionsAdapter {
-    var transactionRecords: AnyPublisher<[TransactionRecord], Never> {
-        Just(transactions(from: nil, limit: nil)).eraseToAnyPublisher()
+extension Erc20Adapter: ITransactionsAdapter {    
+    var transactionRecords: [TransactionRecord] {
+        transactions(from: nil, limit: nil)
     }
 }
 
@@ -185,10 +185,8 @@ extension Erc20Adapter: ISendEthereumAdapter {
         eip20Kit.transferTransactionData(to: address, value: amount)
     }
     
-    func send(tx: SendETHService.Transaction) -> Future<TransactionRecord, Error> {
-        Future { promiss in
-            promiss(.success(TransactionRecord.mocked))
-        }
+    func send(tx: SendETHService.Transaction) async throws -> TransactionRecord {
+        .mocked
     }
     
     func callSolidity(contractAddress: EvmKit.Address, data: Data) async throws -> Data {
