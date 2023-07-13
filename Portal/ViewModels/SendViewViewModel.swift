@@ -214,51 +214,26 @@ class SendViewViewModel: ObservableObject {
     func updateError() {
         sendError = SendFlowError.addressIsntValid
     }
-        
-    func send(_ completionHandler: @escaping (Bool) -> ()) {
-//        if !useAllFundsEnabled {
-//            sendService?
-//                .sendMax()
-//                .receive(on: RunLoop.main)
-//                .sink(receiveCompletion: { [weak self] completion in
-//                    guard let self = self else { return }
-//
-//                    if case let .failure(error) = completion {
-//                        withAnimation {
-//                            self.sendError = error
-//                        }
-//                        completionHandler(false)
-//                    }
-//                }, receiveValue: { [weak self] transaction in
-//                    guard let self = self else { return }
-//
-//                    self.unconfirmedTx = transaction
-//
-//                    completionHandler(true)
-//                })
-//                .store(in: &subscriptions)
-//        } else {
-//            sendService?
-//                .send()
-//                .receive(on: RunLoop.main)
-//                .sink(receiveCompletion: { [weak self] completion in
-//                    guard let self = self else { return }
-//
-//                    if case let .failure(error) = completion {
-//                        withAnimation {
-//                            self.sendError = error
-//                        }
-//                        completionHandler(false)
-//                    }
-//                }, receiveValue: { [weak self] transaction in
-//                    guard let self = self else { return }
-//
-//                    self.unconfirmedTx = transaction
-//
-//                    completionHandler(true)
-//                })
-//                .store(in: &subscriptions)
-//        }
+    
+    func send() async -> Bool {
+        guard let service = sendService else {
+            withAnimation {
+                self.sendError = SendFlowError.error("Send service is nil")
+            }
+            return false
+        }
+        do {
+            let transaction = !useAllFundsEnabled ? try await service.sendMax() : try await service.send()
+            DispatchQueue.main.async {
+                self.unconfirmedTx = transaction
+            }
+            return true
+        } catch {
+            withAnimation {
+                self.sendError = error
+            }
+            return false
+        }
     }
     
     func clearRecipient() {
