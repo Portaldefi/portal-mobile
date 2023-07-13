@@ -243,14 +243,14 @@ struct ReviewTransactionView: View {
                         }
                         
                         PButton(config: .onlyLabel(viewModel.sendError == nil ? "Send" : "Try again"), style: .filled, size: .big, enabled: viewModel.amountIsValid) {
-                            
                             if viewModel.signingTxProtected {
                                 locked = true
                             } else {
                                 withAnimation {
                                     step = .signing
                                 }
-                                viewModel.send { success in
+                                Task {
+                                    let success = await viewModel.send()
                                     withAnimation {
                                         step = success ? .sent : .reviewing
                                     }
@@ -347,7 +347,8 @@ struct ReviewTransactionView: View {
             withAnimation {
                 step = .signing
             }
-            viewModel.send { success in
+            Task {
+                let success = await viewModel.send()
                 withAnimation {
                     step = success ? .sent : .reviewing
                 }
