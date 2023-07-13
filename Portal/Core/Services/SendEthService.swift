@@ -134,15 +134,15 @@ class SendETHService: ISendAssetService {
         return .ethOnChain(address: receiverAddress.value)
     }
     
-    func send() -> Future<TransactionRecord, Error> {
+    func send() async throws -> TransactionRecord {
         guard let transaction = transaction else {
-            return Future { $0(.failure(SendError.noTransaction)) }
+            throw SendError.noTransaction
         }
-        return sendAdapter.send(tx: transaction)
+        return try await sendAdapter.send(tx: transaction)
     }
     
-    func sendMax() -> Future<TransactionRecord, Error> {
-        send()
+    func sendMax() async throws -> TransactionRecord {
+        try await send()
     }
 }
 
