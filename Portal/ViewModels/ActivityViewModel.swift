@@ -43,21 +43,10 @@ class ActivityViewModel: ObservableObject {
         let adapterManager: IAdapterManager = Container.adapterManager()
         let walletManager: IWalletManager = Container.walletManager()
         
-        Publishers.MergeMany(
-            walletManager.activeWallets
-                .compactMap { adapterManager.transactionsAdapter(for: $0) }
-                .compactMap { $0.transactionRecords }
-        )
-        .flatMap { Publishers.Sequence(sequence: $0) }
-        .receive(on: RunLoop.main)
-        .sink { [weak self] transactionRecord in
-            guard let self = self else { return }
-            let index = self.transactions.firstIndex { $0.timestamp ?? 1 < transactionRecord.timestamp ?? 1 } ?? self.transactions.endIndex
-            self.transactions.insert(transactionRecord, at: index)
-            self.subscribeForSearchContext()
-            self.applyFilterAndSort()
-        }
-        .store(in: &subscriptions)
+        self.transactions = walletManager.activeWallets.compactMap{ adapterManager.transactionsAdapter(for: $0) }.flatMap{ $0.transactionRecords }
+        
+        self.subscribeForSearchContext()
+        self.applyFilterAndSort()
     }
     
     private func subscribeForSearchContext() {
@@ -110,9 +99,9 @@ class ActivityViewModel: ObservableObject {
         newTransactions.sort { record1, record2 in
             switch selectedSort {
             case .date:
-                // Make sure that timestamp is not nil
-                let date1 = record1.timestamp != nil ? Date(timeIntervalSince1970: TimeInterval(record1.timestamp!)) : Date.distantPast
-                let date2 = record2.timestamp != nil ? Date(timeIntervalSince1970: TimeInterval(record2.timestamp!)) : Date.distantPast
+                // Make sure that timestamp is not nil and insert unconfirmed transactions on top
+                let date1 = record1.timestamp != nil ? Date(timeIntervalSince1970: TimeInterval(record1.timestamp!)) : isDescending ? Date.distantPast : Date.now
+                let date2 = record2.timestamp != nil ? Date(timeIntervalSince1970: TimeInterval(record2.timestamp!)) : isDescending ? Date.distantPast : Date.now
                 return isDescending ? (date1 < date2) : (date1 > date2)
             case .amount:
                 // Make sure that amount is not nil
