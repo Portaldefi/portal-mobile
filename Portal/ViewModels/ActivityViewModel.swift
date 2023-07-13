@@ -34,6 +34,7 @@ class ActivityViewModel: ObservableObject {
     
     init() {
         updateTransactions()
+        subscribeForSearchContext()
     }
     
     func updateTransactions() {
@@ -44,7 +45,6 @@ class ActivityViewModel: ObservableObject {
         
         self.transactions = walletManager.activeWallets.compactMap{ adapterManager.transactionsAdapter(for: $0) }.flatMap{ $0.transactionRecords }
         
-        self.subscribeForSearchContext()
         self.applyFilterAndSort()
     }
     
