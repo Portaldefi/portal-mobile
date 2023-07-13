@@ -554,12 +554,16 @@ public class Node {
         }
     }
     //MARK: - Decode invoice
-    public func decode(invoice: String) throws -> Invoice? {
+    public func decode(invoice: String) throws -> Invoice {
         let decodedInvoice = Invoice.fromStr(s: invoice)
         guard decodedInvoice.isOk() else {
             throw NodeError.Invoice.decodingError
         }
-        return decodedInvoice.getValue()
+        if let invoice = decodedInvoice.getValue() {
+            return invoice
+        } else {
+            throw NodeError.Invoice.decodingError
+        }
     }
     
     public func claimFunds(preimage: [UInt8]) {
