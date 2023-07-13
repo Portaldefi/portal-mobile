@@ -31,11 +31,7 @@ class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepos
     }
     
     var receiveAddress: String = "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3"
-    
-    var transactionRecords: AnyPublisher<[TransactionRecord], Never> {
-        Just([TransactionRecord.mocked]).eraseToAnyPublisher()
-    }
-    
+        
     var balance: Decimal = 1
     
     func validate(address: String) throws {
@@ -46,16 +42,12 @@ class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepos
         1000
     }
     
-    func send(amount: Decimal, address: String, fee: Int?) -> Future<TransactionRecord, Error> {
-        Future { promise in
-            promise(.success(TransactionRecord.mocked))
-        }
+    func send(amount: Decimal, address: String, fee: Int?) throws -> TransactionRecord {
+        TransactionRecord.mocked
     }
     
-    func sendMax(address: String, fee: Int?) -> Future<TransactionRecord, Error> {
-        Future { promise in
-            promise(.success(TransactionRecord.mocked))
-        }
+    func sendMax(address: String, fee: Int?) throws -> TransactionRecord {
+        TransactionRecord.mocked
     }
     
     func rawTransaction(amount: UInt64, address: String) throws -> Transaction {
@@ -72,6 +64,10 @@ class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepos
     
     func refresh() {
         
+    }
+    
+    var transactionRecords: [TransactionRecord] {
+        [TransactionRecord.mocked]
     }
     
     var blockchainHeight: Int32 = 0

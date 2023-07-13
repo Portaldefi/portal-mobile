@@ -40,14 +40,12 @@ class SendAssetMockedService: ISendAssetService {
         throw SendFlowError.addressIsntValid
     }
     
-    func send() -> Future<TransactionRecord, Error> {
-        Future { promise in
-            promise(.success(TransactionRecord(transaction: TransactionDetails.mockedConfirmed, userData: TxUserData(price: 1000))))
-        }
+    func send() async throws -> TransactionRecord {
+        TransactionRecord(transaction: TransactionDetails.mockedConfirmed, userData: TxUserData(price: 1000))
     }
     
-    func sendMax() -> Future<TransactionRecord, Error> {
-        send()
+    func sendMax() async throws -> TransactionRecord {
+        try await send()
     }
 }
 
