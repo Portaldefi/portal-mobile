@@ -30,18 +30,16 @@ class AssetDetailsViewModel: ObservableObject {
         self.coin = coin
         self.transactionAdapter = transactionAdapter
         
-        subscribe()
+        updateTransactions()
     }
-    
-    private func subscribe() {
-        transactionAdapter
-            .transactionRecords
-            .receive(on: RunLoop.main)
-            .assign(to: &$transactions)
-    }
-    
+        
     func updateTransactions() {
-        subscribe()
+        let unconfirmedTxs = transactionAdapter.transactionRecords.filter{ $0.timestamp == nil }
+        let confirmedTxs = transactionAdapter.transactionRecords.filter{ $0.timestamp != nil }.sorted{ $0.timestamp! > $1.timestamp! }
+        
+        DispatchQueue.main.async {
+            self.transactions = unconfirmedTxs + confirmedTxs
+        }
     }
     
     deinit {
