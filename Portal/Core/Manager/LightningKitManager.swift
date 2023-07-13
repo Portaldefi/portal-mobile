@@ -20,6 +20,15 @@ public struct BlockInfo {
 }
 
 class LightningKitManager: ILightningKitManager {
+    var transactions: [TransactionRecord] {
+        return fileManager.getPayments().map { payment in
+            let source: TxSource = .lightning
+            let data = txDataStorage.fetch(source: source, id: payment.paymentId)
+            let userData = TxUserData(data: data)
+            return TransactionRecord(payment: payment, userData: userData)
+        }
+    }
+    
     @Injected(Container.notificationService) private var notificationService
     @Injected(Container.txDataStorage) private var txDataStorage
     
@@ -259,36 +268,20 @@ extension LightningKitManager: ILightningInvoiceHandler {
         await instance.createInvoice(paymentHash: paymentHash, satAmount: satAmount)
     }
     
-    func pay(invoice: String) -> Combine.Future<TransactionRecord, Error> {
-        Future { [unowned self] promise in
-            Task {
-                do {
-                    if let invoice = try self.decode(invoice: invoice) {
-                        print("Invoice decoded")
-                        
-                        let paymentResult = try await self.instance.pay(invoice: invoice)
-                        let source: TxSource = .lightning
-                        let data = txDataStorage.fetch(source: source, id: paymentResult.paymentId)
-                        let userData = TxUserData(data: data)
-                        let transactionRecord = TransactionRecord(payment: paymentResult, userData: userData)
-                        promise(.success(transactionRecord))
-                    }
-                } catch {
-                    promise(.failure(error))
-                }
-            }
-        }
+    func pay(invoice: String) async throws -> TransactionRecord {
+        let decodedInvoice = try decode(invoice: invoice)
+        return try await pay(invoice: decodedInvoice)
     }
     
     func pay(invoice: Invoice) async throws -> TransactionRecord {
-        let paymentResult = try await self.instance.pay(invoice: invoice)
+        let paymentResult = try await instance.pay(invoice: invoice)
         let source: TxSource = .lightning
         let data = txDataStorage.fetch(source: source, id: paymentResult.paymentId)
         let userData = TxUserData(data: data)
         return TransactionRecord(payment: paymentResult, userData: userData)
     }
     
-    func decode(invoice: String) throws -> Invoice? {
+    func decode(invoice: String) throws -> Invoice {
         try instance.decode(invoice: invoice)
     }
 }
@@ -349,5 +342,6 @@ extension LightningKitManager {
         case cannotOpenChannel
         case keySeedNotFound
         case invoicePaymentFailed
+        case invalidInvoice
     }
 }
