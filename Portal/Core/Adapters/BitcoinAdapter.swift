@@ -268,13 +268,34 @@ extension BitcoinAdapter: IDepositAdapter {
     }
 }
 
-extension BitcoinAdapter: ITransactionsAdapter {
-    var transactionRecords: AnyPublisher<[TransactionRecord], Never> {
-        transactionsSubject
-            .combineLatest(ldkManager.transactionsPublisher) { btcTxs, lightningTxs in
-                (btcTxs + lightningTxs).sorted(by: { $0.timestamp ?? 1 > $1.timestamp ?? 0 })
+extension BitcoinAdapter: ITransactionsAdapter {    
+    var transactionRecords: [TransactionRecord] {
+        var txRecords = [TransactionRecord]()
+        
+        for txRecord in _transactions {
+            var isNew = false
+            if txDataStorage.fetchTxData(txID: txRecord.txid) == nil { isNew = true }
+            
+            let source: TxSource = .btcOnChain
+            let data = txDataStorage.fetch(source: source, id: txRecord.txid)
+            let userData = TxUserData(data: data)
+            let record = TransactionRecord(transaction: txRecord, userData: userData)
+            
+            txRecords.append(record)
+            
+            if isNew {
+                if record.type == .received {
+                    let satAmount = record.amount?.double ?? 0
+                    let btcAmount = satAmount / 100_000_000
+                    let message = "You've received \(btcAmount) \(record.coin.code.uppercased())"
+                    
+                    let pNotification = PNotification(message: message)
+                    notificationService.notify(pNotification)
+                }
             }
-            .eraseToAnyPublisher()
+        }
+        
+        return (txRecords + ldkManager.transactions).sorted(by: { $0.timestamp ?? 1 > $1.timestamp ?? 0 })
     }
 }
 
@@ -311,51 +332,44 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         }
     }
     
-    func send(amount: Decimal, address: String, fee: Int?) -> Combine.Future<TransactionRecord, Error> {
-        Future { [unowned self] promise in
-            do {
-                let satsAmount = UInt64((amount * 100_000_000).double)
-                let receiverAddress = try Address(address: address)
-                let receiverAddressScript = receiverAddress.scriptPubkey()
-                let txBuilderResult: TxBuilderResult
-                let utxos = try? wallet.listUnspent()
-                let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
-
-                if let fee = fee {
-                    txBuilderResult = try TxBuilder()
-                        .addUtxos(outpoints: outpoints)
-                        .addRecipient(script: receiverAddressScript, amount: satsAmount)
-                        .feeRate(satPerVbyte: Float(fee))
-                        .enableRbf()
-                        .finish(wallet: wallet)
-                } else {
-                    txBuilderResult = try TxBuilder()
-                        .addUtxos(outpoints: outpoints)
-                        .addRecipient(script: receiverAddressScript, amount: satsAmount)
-                        .enableRbf()
-                        .finish(wallet: wallet)
-                }
-                
-                let psbt = txBuilderResult.psbt
-                let txDetails = txBuilderResult.transactionDetails
-                print("txDetails: \(txDetails)")
-                
-                let finalized = try wallet.sign(psbt: psbt, signOptions: .none)
-                print("Tx id: \(psbt.txid())")
-                
-                if finalized {
-                    try blockchain.broadcast(transaction: psbt.extractTx())
-                    let source: TxSource = .btcOnChain
-                    let data = txDataStorage.fetch(source: source, id: txDetails.txid)
-                    let userData = TxUserData(data: data)
-                    let record = TransactionRecord(transaction: txDetails, userData: userData)
-                    promise(.success(record))
-                } else {
-                    promise(.failure(SendFlowError.error("Tx not finalized")))
-                }
-            } catch {
-                promise(.failure(error))
-            }
+    func send(amount: Decimal, address: String, fee: Int?) throws -> TransactionRecord {
+        let satsAmount = UInt64((amount * 100_000_000).double)
+        let receiverAddress = try Address(address: address)
+        let receiverAddressScript = receiverAddress.scriptPubkey()
+        let txBuilderResult: TxBuilderResult
+        let utxos = try? wallet.listUnspent()
+        let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
+        
+        if let fee = fee {
+            txBuilderResult = try TxBuilder()
+                .addUtxos(outpoints: outpoints)
+                .addRecipient(script: receiverAddressScript, amount: satsAmount)
+                .feeRate(satPerVbyte: Float(fee))
+                .enableRbf()
+                .finish(wallet: wallet)
+        } else {
+            txBuilderResult = try TxBuilder()
+                .addUtxos(outpoints: outpoints)
+                .addRecipient(script: receiverAddressScript, amount: satsAmount)
+                .enableRbf()
+                .finish(wallet: wallet)
+        }
+        
+        let psbt = txBuilderResult.psbt
+        let txDetails = txBuilderResult.transactionDetails
+        print("txDetails: \(txDetails)")
+        
+        let finalized = try wallet.sign(psbt: psbt, signOptions: .none)
+        print("Tx id: \(psbt.txid())")
+        
+        if finalized {
+            try blockchain.broadcast(transaction: psbt.extractTx())
+            let source: TxSource = .btcOnChain
+            let data = txDataStorage.fetch(source: source, id: txDetails.txid)
+            let userData = TxUserData(data: data)
+            return TransactionRecord(transaction: txDetails, userData: userData)
+        } else {
+            throw SendFlowError.error("Tx not finalized")
         }
     }
     
@@ -392,51 +406,44 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         }
     }
     
-    func sendMax(address: String, fee: Int?) -> Combine.Future<TransactionRecord, Error> {
-        Future { [unowned self] promise in
-            do {
-                let txBuilderResult: TxBuilderResult
-                let receiverAddress = try Address(address: address)
-                let utxos = try? wallet.listUnspent()
-                let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
+    func sendMax(address: String, fee: Int?) throws -> TransactionRecord {
+        let txBuilderResult: TxBuilderResult
+        let receiverAddress = try Address(address: address)
+        let utxos = try? wallet.listUnspent()
+        let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
 
-                if let fee = fee {
-                    txBuilderResult = try TxBuilder()
-                        .addUtxos(outpoints: outpoints)
-                        .drainWallet()
-                        .drainTo(script: receiverAddress.scriptPubkey())
-                        .feeRate(satPerVbyte: Float(fee))
-                        .enableRbf()
-                        .finish(wallet: wallet)
-                } else {
-                    txBuilderResult = try TxBuilder()
-                        .addUtxos(outpoints: outpoints)
-                        .drainWallet()
-                        .drainTo(script: receiverAddress.scriptPubkey())
-                        .enableRbf()
-                        .finish(wallet: wallet)
-                }
-                
-                let psbt = txBuilderResult.psbt
-                let txDetails = txBuilderResult.transactionDetails
-                print("txDetails: \(txDetails)")
+        if let fee = fee {
+            txBuilderResult = try TxBuilder()
+                .addUtxos(outpoints: outpoints)
+                .drainWallet()
+                .drainTo(script: receiverAddress.scriptPubkey())
+                .feeRate(satPerVbyte: Float(fee))
+                .enableRbf()
+                .finish(wallet: wallet)
+        } else {
+            txBuilderResult = try TxBuilder()
+                .addUtxos(outpoints: outpoints)
+                .drainWallet()
+                .drainTo(script: receiverAddress.scriptPubkey())
+                .enableRbf()
+                .finish(wallet: wallet)
+        }
+        
+        let psbt = txBuilderResult.psbt
+        let txDetails = txBuilderResult.transactionDetails
+        print("txDetails: \(txDetails)")
 
-                let finalized = try wallet.sign(psbt: psbt, signOptions: .none)
-                print("Tx id: \(psbt.txid())")
+        let finalized = try wallet.sign(psbt: psbt, signOptions: .none)
+        print("Tx id: \(psbt.txid())")
 
-                if finalized {
-                    try blockchain.broadcast(transaction: psbt.extractTx())
-                    let source: TxSource = .btcOnChain
-                    let data = txDataStorage.fetch(source: source, id: txDetails.txid)
-                    let userData = TxUserData(data: data)
-                    let record = TransactionRecord(transaction: txDetails, userData: userData)
-                    promise(.success(record))
-                } else {
-                    promise(.failure(SendFlowError.error("Tx not finalized")))
-                }
-            } catch {
-                promise(.failure(error))
-            }
+        if finalized {
+            try blockchain.broadcast(transaction: psbt.extractTx())
+            let source: TxSource = .btcOnChain
+            let data = txDataStorage.fetch(source: source, id: txDetails.txid)
+            let userData = TxUserData(data: data)
+            return TransactionRecord(transaction: txDetails, userData: userData)
+        } else {
+            throw SendFlowError.error("Tx not finalized")
         }
     }
     
