@@ -105,12 +105,9 @@ class SendBTCService: ISendAssetService {
         let inputString = receiverAddress.value
         
         do {
-            if let invoice = try ldkManager.decode(invoice: inputString) {
-                if let value = invoice.amountMilliSatoshis() {
-                    return .lightningInvoice(amount: String(describing: Decimal(value)/1000/100_000_000))
-                } else {
-                    return .lightningInvoice(amount: String())
-                }
+            let invoice = try ldkManager.decode(invoice: inputString)
+            if let value = invoice.amountMilliSatoshis() {
+                return .lightningInvoice(amount: String(describing: Decimal(value)/1000/100_000_000))
             } else {
                 return .lightningInvoice(amount: String())
             }
@@ -128,26 +125,21 @@ class SendBTCService: ISendAssetService {
         throw SendFlowError.addressIsntValid
     }
     
-    func send() -> Future<TransactionRecord, Error> {
-        if let result = try? validateUserInput() {
-            switch result {
-            case .btcOnChain:
-                return sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: self.recomendedFee)
-            case .lightningInvoice:
-                let manager = Container.lightningKitManager()
-                
-                return manager.pay(invoice: receiverAddress.value)
-            case .ethOnChain:
-                return sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: self.recomendedFee)
-            }
-        } else {
-            return Future { promise in
-                promise(.failure(SendFlowError.error("Not valid user input")))
-            }
+    func send() async throws -> TransactionRecord {
+        let result = try validateUserInput()
+        switch result {
+        case .btcOnChain:
+            return try sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: self.recomendedFee)
+        case .lightningInvoice:
+            let manager = Container.lightningKitManager()
+            
+            return try await manager.pay(invoice: receiverAddress.value)
+        case .ethOnChain:
+            return try sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: self.recomendedFee)
         }
     }
     
-    func sendMax() -> Future<TransactionRecord, Error> {
-        sendAdapter.sendMax(address: receiverAddress.value, fee: self.recomendedFee)
+    func sendMax() async throws -> TransactionRecord {
+        try sendAdapter.sendMax(address: receiverAddress.value, fee: self.recomendedFee)
     }
 }
