@@ -180,7 +180,9 @@ class AccountViewModel: ObservableObject {
         let balance = items.map{ convertToPortfolioBalance(item: $0) }.reduce(0){ $0 + $1 }.double.rounded(toPlaces: 12)
         
         if totalBalance != "\(balance)" {
-            totalBalance = "\(balance)"
+            DispatchQueue.main.async {
+                self.totalBalance = "\(balance)"
+            }
         }
     }
     
