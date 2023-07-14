@@ -65,27 +65,6 @@ class PeerStore: ObservableObject {
         }
     }
     
-    static func update(peer: Peer, completion: @escaping(Result<Int, Error>) -> Void) {
-        PeerStore.load { result in
-            switch result {
-            case .success(var peers):
-                peers.updateValue(peer, forKey: peer.peerPubKey)
-                peers.updateValue(peer, forKey: peer.connectionInformation.hostname)
-                peers.updateValue(peer, forKey: String(peer.connectionInformation.port))
-                PeerStore.save(peers: Array(peers.values)) { result in
-                    switch result {
-                    case .success(_):
-                        print("Updated Peer Information: \(peer.peerPubKey)")
-                    case .failure(_):
-                        print("Error saving peer information \(peer.peerPubKey)")
-                    }
-                }
-            case .failure(let error):
-                print("Error: \(error)")
-            }
-        }
-    }
-    
     private static func fileUrl() throws -> URL {
         try FileManager.default.url(for: .documentDirectory,
                                     in: .userDomainMask,

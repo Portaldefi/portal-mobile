@@ -196,18 +196,6 @@ class LightningKitManager: ILightningKitManager {
         let seed = AES.randomIV(32)
         _ = fileManager.persistKeySeed(keySeed: seed)
     }
-            
-    private func update(peer: Peer) {
-        PeerStore.update(peer: peer) { result in
-            switch result {
-            case .success(_):
-                print("Saved peer: \(peer.peerPubKey)")
-            case .failure(_):
-                // TOODO: Handle saving new funding transaction pubkey error
-                print("Error persisting new pub key")
-            }
-        }
-    }
     
     private func rawTx(amount: UInt64, address: String) throws -> Transaction {
         let adapterManager = Container.adapterManager()
