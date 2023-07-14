@@ -87,7 +87,7 @@
 		755170982948CF3400CC84D7 /* AccountBackupRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170972948CF3400CC84D7 /* AccountBackupRootView.swift */; };
 		7551709A2948D02700CC84D7 /* AccountBackupNavigationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170992948D02700CC84D7 /* AccountBackupNavigationConfig.swift */; };
 		755501BE2A5D57310027D5FD /* HighlightedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755501BD2A5D57310027D5FD /* HighlightedText.swift */; };
-		755501C62A6131230027D5FD /* PortalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755501C52A6131230027D5FD /* PortalTests.swift */; };
+		755501C62A6131230027D5FD /* PeerStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755501C52A6131230027D5FD /* PeerStoreTests.swift */; };
 		755501CE2A613B2F0027D5FD /* EvmKit in Frameworks */ = {isa = PBXBuildFile; productRef = 755501CD2A613B2F0027D5FD /* EvmKit */; };
 		755501D02A613B2F0027D5FD /* Lightning in Frameworks */ = {isa = PBXBuildFile; productRef = 755501CF2A613B2F0027D5FD /* Lightning */; };
 		755501D22A613B2F0027D5FD /* BitcoinDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 755501D12A613B2F0027D5FD /* BitcoinDevKit */; };
@@ -342,7 +342,7 @@
 		755170992948D02700CC84D7 /* AccountBackupNavigationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountBackupNavigationConfig.swift; sourceTree = "<group>"; };
 		755501BD2A5D57310027D5FD /* HighlightedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedText.swift; sourceTree = "<group>"; };
 		755501C32A6131230027D5FD /* PortalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PortalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		755501C52A6131230027D5FD /* PortalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortalTests.swift; sourceTree = "<group>"; };
+		755501C52A6131230027D5FD /* PeerStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeerStoreTests.swift; sourceTree = "<group>"; };
 		755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemViewModel.swift; sourceTree = "<group>"; };
 		755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceAdapterMocked.swift; sourceTree = "<group>"; };
 		755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMarketDataRepository.swift; sourceTree = "<group>"; };
@@ -726,7 +726,7 @@
 		755501CC2A6131540027D5FD /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
-				755501C52A6131230027D5FD /* PortalTests.swift */,
+				755501C52A6131230027D5FD /* PeerStoreTests.swift */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
@@ -1186,7 +1186,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				755501C62A6131230027D5FD /* PortalTests.swift in Sources */,
+				755501C62A6131230027D5FD /* PeerStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
