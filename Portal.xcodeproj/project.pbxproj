@@ -88,6 +88,19 @@
 		7551709A2948D02700CC84D7 /* AccountBackupNavigationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755170992948D02700CC84D7 /* AccountBackupNavigationConfig.swift */; };
 		755501BE2A5D57310027D5FD /* HighlightedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755501BD2A5D57310027D5FD /* HighlightedText.swift */; };
 		755501C62A6131230027D5FD /* PortalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755501C52A6131230027D5FD /* PortalTests.swift */; };
+		755501CE2A613B2F0027D5FD /* EvmKit in Frameworks */ = {isa = PBXBuildFile; productRef = 755501CD2A613B2F0027D5FD /* EvmKit */; };
+		755501D02A613B2F0027D5FD /* Lightning in Frameworks */ = {isa = PBXBuildFile; productRef = 755501CF2A613B2F0027D5FD /* Lightning */; };
+		755501D22A613B2F0027D5FD /* BitcoinDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 755501D12A613B2F0027D5FD /* BitcoinDevKit */; };
+		755501D42A613B2F0027D5FD /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 755501D32A613B2F0027D5FD /* KeychainAccess */; };
+		755501D62A613B2F0027D5FD /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = 755501D52A613B2F0027D5FD /* Factory */; };
+		755501D82A613B2F0027D5FD /* Coinpaprika in Frameworks */ = {isa = PBXBuildFile; productRef = 755501D72A613B2F0027D5FD /* Coinpaprika */; };
+		755501DA2A613B2F0027D5FD /* DataField in Frameworks */ = {isa = PBXBuildFile; productRef = 755501D92A613B2F0027D5FD /* DataField */; };
+		755501DC2A613B2F0027D5FD /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 755501DB2A613B2F0027D5FD /* Kingfisher */; };
+		755501DE2A613B2F0027D5FD /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 755501DD2A613B2F0027D5FD /* CodeScanner */; };
+		755501E02A613B2F0027D5FD /* FeeRateKit in Frameworks */ = {isa = PBXBuildFile; productRef = 755501DF2A613B2F0027D5FD /* FeeRateKit */; };
+		755501E22A613B2F0027D5FD /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 755501E12A613B2F0027D5FD /* PopupView */; };
+		755501E42A613B2F0027D5FD /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 755501E32A613B2F0027D5FD /* Starscream */; };
+		755501E62A613B2F0027D5FD /* Eip20Kit in Frameworks */ = {isa = PBXBuildFile; productRef = 755501E52A613B2F0027D5FD /* Eip20Kit */; };
 		755C56AF28E5BDD600A4B57B /* WalletItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */; };
 		755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */; };
 		755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */; };
@@ -484,6 +497,19 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				755501D42A613B2F0027D5FD /* KeychainAccess in Frameworks */,
+				755501D62A613B2F0027D5FD /* Factory in Frameworks */,
+				755501D82A613B2F0027D5FD /* Coinpaprika in Frameworks */,
+				755501E22A613B2F0027D5FD /* PopupView in Frameworks */,
+				755501DA2A613B2F0027D5FD /* DataField in Frameworks */,
+				755501DC2A613B2F0027D5FD /* Kingfisher in Frameworks */,
+				755501E62A613B2F0027D5FD /* Eip20Kit in Frameworks */,
+				755501D22A613B2F0027D5FD /* BitcoinDevKit in Frameworks */,
+				755501E02A613B2F0027D5FD /* FeeRateKit in Frameworks */,
+				755501CE2A613B2F0027D5FD /* EvmKit in Frameworks */,
+				755501D02A613B2F0027D5FD /* Lightning in Frameworks */,
+				755501DE2A613B2F0027D5FD /* CodeScanner in Frameworks */,
+				755501E42A613B2F0027D5FD /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1030,6 +1056,21 @@
 				755501C82A6131230027D5FD /* PBXTargetDependency */,
 			);
 			name = PortalTests;
+			packageProductDependencies = (
+				755501CD2A613B2F0027D5FD /* EvmKit */,
+				755501CF2A613B2F0027D5FD /* Lightning */,
+				755501D12A613B2F0027D5FD /* BitcoinDevKit */,
+				755501D32A613B2F0027D5FD /* KeychainAccess */,
+				755501D52A613B2F0027D5FD /* Factory */,
+				755501D72A613B2F0027D5FD /* Coinpaprika */,
+				755501D92A613B2F0027D5FD /* DataField */,
+				755501DB2A613B2F0027D5FD /* Kingfisher */,
+				755501DD2A613B2F0027D5FD /* CodeScanner */,
+				755501DF2A613B2F0027D5FD /* FeeRateKit */,
+				755501E12A613B2F0027D5FD /* PopupView */,
+				755501E32A613B2F0027D5FD /* Starscream */,
+				755501E52A613B2F0027D5FD /* Eip20Kit */,
+			);
 			productName = PortalTests;
 			productReference = 755501C32A6131230027D5FD /* PortalTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -1795,6 +1836,69 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 755105F1294C6B4300525A16 /* XCRemoteSwiftPackageReference "EvmKit" */;
 			productName = EvmKit;
+		};
+		755501CD2A613B2F0027D5FD /* EvmKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EvmKit;
+		};
+		755501CF2A613B2F0027D5FD /* Lightning */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Lightning;
+		};
+		755501D12A613B2F0027D5FD /* BitcoinDevKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 756A31282888252D004978E2 /* XCRemoteSwiftPackageReference "bdk-swift" */;
+			productName = BitcoinDevKit;
+		};
+		755501D32A613B2F0027D5FD /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 756DDD8A28A28858002EDC60 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+		755501D52A613B2F0027D5FD /* Factory */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 479A7AC728B756DF0057E100 /* XCRemoteSwiftPackageReference "Factory" */;
+			productName = Factory;
+		};
+		755501D72A613B2F0027D5FD /* Coinpaprika */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7545BC3F28CA107100ED92C3 /* XCRemoteSwiftPackageReference "coinpaprika-api-swift-client" */;
+			productName = Coinpaprika;
+		};
+		755501D92A613B2F0027D5FD /* DataField */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7564C65C28D1F89E00ABA8CF /* XCRemoteSwiftPackageReference "data-field" */;
+			productName = DataField;
+		};
+		755501DB2A613B2F0027D5FD /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 75D8C5C828E1B00800228298 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		755501DD2A613B2F0027D5FD /* CodeScanner */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 75772A5B28F8192F00BE80B7 /* XCRemoteSwiftPackageReference "CodeScanner" */;
+			productName = CodeScanner;
+		};
+		755501DF2A613B2F0027D5FD /* FeeRateKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 752FA62329670DD900008796 /* XCRemoteSwiftPackageReference "FeeRateKit.Swift" */;
+			productName = FeeRateKit;
+		};
+		755501E12A613B2F0027D5FD /* PopupView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7542184D299BDE310028D5DF /* XCRemoteSwiftPackageReference "PopupView" */;
+			productName = PopupView;
+		};
+		755501E32A613B2F0027D5FD /* Starscream */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 755FDD4F29AFA30A00D8A29C /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
+		};
+		755501E52A613B2F0027D5FD /* Eip20Kit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 756E29E12A27423100C7D618 /* XCRemoteSwiftPackageReference "Eip20Kit.Swift" */;
+			productName = Eip20Kit;
 		};
 		755FDD5029AFA30A00D8A29C /* Starscream */ = {
 			isa = XCSwiftPackageProductDependency;
