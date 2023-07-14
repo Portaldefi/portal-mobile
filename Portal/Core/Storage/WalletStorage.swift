@@ -26,7 +26,8 @@ class WalletStorage: IWalletStorage {
     }
     
     private func subscribeForUpdates() {
-        Publishers.CombineLatest(accountManager.onActiveAccountUpdate, coinManager.onCoinsUpdate)
+        accountManager.onActiveAccountUpdate.map { _ in () }  // map to Void
+            .merge(with: coinManager.onCoinsUpdate.map { _ in () })  // map to Void
             .sink { [weak self] _ in
                 self?.syncWallets()
             }
