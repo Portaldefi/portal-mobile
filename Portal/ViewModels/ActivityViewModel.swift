@@ -49,8 +49,6 @@ class ActivityViewModel: ObservableObject {
     }
     
     private func subscribeForSearchContext() {
-        subscriptions.removeAll()
-
         $searchContext.sink { [unowned self] context in
             guard !context.isEmpty else { return }
             let searchContext = context.lowercased()
