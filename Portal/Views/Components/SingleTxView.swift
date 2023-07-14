@@ -44,7 +44,8 @@ struct SingleTxView: View {
                             text: viewModel.tx.type.description,
                             textColor: Palette.grayScaleEA,
                             highlight: searchContext,
-                            font: .Main.fixed(.monoMedium, size: 16)
+                            font: .Main.fixed(.monoMedium, size: 16),
+                            highlightFont: .Main.fixed(.monoBold, size: 16)
                         )
 
                         if let confirmatioDate = viewModel.tx.confirmationTimeString {
@@ -72,7 +73,8 @@ struct SingleTxView: View {
                                     text: viewModel.amount,
                                     textColor: viewModel.tx.type == .received ? Color(red: 0.191, green: 0.858, blue: 0.418) : Palette.grayScaleEA,
                                     highlight: searchContext,
-                                    font: .Main.fixed(.monoMedium, size: 16)
+                                    font: .Main.fixed(.monoMedium, size: 16),
+                                    highlightFont: .Main.fixed(.monoBold, size: 16)
                                 )
                             }
                             HStack {
@@ -91,7 +93,8 @@ struct SingleTxView: View {
                                     text: viewModel.tx.coin.code.uppercased(),
                                     textColor: Palette.grayScale6A,
                                     highlight: searchContext,
-                                    font: .Main.fixed(.monoMedium, size: 12)
+                                    font: .Main.fixed(.monoMedium, size: 12),
+                                    highlightFont: .Main.fixed(.monoBold, size: 16)
                                 )
                                 .offset(y: -1)
                                 
@@ -113,7 +116,8 @@ struct SingleTxView: View {
                         text: notes,
                         textColor: Palette.grayScaleAA,
                         highlight: searchContext,
-                        font: .Main.fixed(.monoRegular, size: 14)
+                        font: .Main.fixed(.monoRegular, size: 14),
+                        highlightFont: .Main.fixed(.monoBold, size: 14)
                     )
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 40)
