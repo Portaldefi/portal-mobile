@@ -10,7 +10,7 @@ import XCTest
 
 final class PeerStoreTest: XCTestCase {
     
-    var testPeer: Peer!
+    private var testPeer: Peer!
 
     override func setUpWithError() throws {
         super.setUp()
