@@ -1,5 +1,5 @@
 //
-//  WalletStorageUnitTests.swift
+//  WalletStorageTest.swift
 //  UnitTestsMacOS
 //
 //  Created by farid on 1/21/22.
@@ -9,7 +9,7 @@ import XCTest
 @testable import Portal
 import Combine
 
-class WalletStorageUnitTests: XCTestCase {
+class WalletStorageTest: XCTestCase {
     
     private var sut: WalletStorage!
     private var subscriptions = Set<AnyCancellable>()

@@ -1,5 +1,5 @@
 //
-//  PortalTests.swift
+//  PortalTest.swift
 //  PortalTests
 //
 //  Created by farid on 14.07.2023.
@@ -8,7 +8,7 @@
 import XCTest
 @testable import Portal
 
-final class PeerStoreTests: XCTestCase {
+final class PeerStoreTest: XCTestCase {
     
     var testPeer: Peer!
 
