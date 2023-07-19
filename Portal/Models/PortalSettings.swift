@@ -8,37 +8,13 @@
 import Foundation
 import Combine
 
-class PortalSettings: ObservableObject {
-    @Published var fiatCurrency = FiatCurrency(code: "USD") {
-        didSet {
-            updateFiatCurrencySetting()
-        }
-    }
-    
-    @Published var userCoins = [String]() {
-        didSet {
-            updateUserCoinsSetting()
-        }
-    }
-    
-    @Published var portfolioCurrency = Coin.bitcoin() {
-        didSet {
-            updatePortfolioCurrencySetting()
-        }
-    }
-    
-    @Published var pincodeEnabled = false {
-        didSet {
-            updatePinCodeSetting()
-        }
-    }
-    
-    @Published var biometricsEnabled = false {
-        didSet {
-            updateBiometricsSetting()
-        }
-    }
-    
+class PortalSettings: IPortalSettings {
+    private(set) var fiatCurrency: CurrentValueSubject<FiatCurrency, Never> = .init(FiatCurrency(code: "USD"))
+    private(set) var userCoins: CurrentValueSubject<[String], Never> = .init([String]())
+    private(set) var portfolioCurrency: CurrentValueSubject<Coin, Never> = .init(.bitcoin())
+    private(set) var pincodeEnabled: CurrentValueSubject<Bool, Never> = .init(false)
+    private(set) var biometricsEnabled: CurrentValueSubject<Bool, Never> = .init(false)
+        
     @Preference(\.fiatCurrencyData) private var fiatCurrencyPreference
     @Preference(\.portfolioCurrencyData) private var portfolioCurrencyPreference
     @Preference(\.userCoins) private var userCoinsPreference
@@ -49,19 +25,19 @@ class PortalSettings: ObservableObject {
     
     init() {
         if let data = fiatCurrencyPreference.data(using: .utf8), let decoded = try? JSONDecoder().decode(FiatCurrency.self, from: data) {
-            fiatCurrency = decoded
+            fiatCurrency.send(decoded)
         }
         
         switch portfolioCurrencyPreference {
         case "ETH":
-            portfolioCurrency = .ethereum()
+            portfolioCurrency.send(.ethereum())
         default:
             break
         }
         
-        userCoins = userCoinsPreference
-        pincodeEnabled = pincodeEnabledPreference
-        biometricsEnabled = biometricsEnabledPreference
+        userCoins.send(userCoinsPreference)
+        pincodeEnabled.send(pincodeEnabledPreference)
+        biometricsEnabled.send(biometricsEnabledPreference)
         
         Preferences.standard
             .preferencesChangedSubject
@@ -69,7 +45,7 @@ class PortalSettings: ObservableObject {
                 changedKeyPath == \Preferences.biometricsEnabled
             }.sink { [weak self] _ in
                 guard let self = self else { return }
-                self.biometricsEnabled = self.biometricsEnabledPreference
+                self.biometricsEnabled.send(self.biometricsEnabledPreference)
             }
             .store(in: &subscriptions)
         
@@ -79,44 +55,43 @@ class PortalSettings: ObservableObject {
                 changedKeyPath == \Preferences.pincodeEnabled
             }.sink { [weak self] _ in
                 guard let self = self else { return }
-                self.pincodeEnabled = self.pincodeEnabledPreference
+                self.pincodeEnabled.send(self.pincodeEnabledPreference)
             }
             .store(in: &subscriptions)
     }
     
-    private func updateFiatCurrencySetting() {
+    func updateFiatCurrency(_ currency: FiatCurrency) {
         guard
-            let encodedCurrencyData = try? JSONEncoder().encode(fiatCurrency),
+            let encodedCurrencyData = try? JSONEncoder().encode(currency),
             let encodedString = String(data: encodedCurrencyData, encoding: .utf8),
             fiatCurrencyPreference != encodedString
         else { return }
         
         self.fiatCurrencyPreference = encodedString
+        self.fiatCurrency.send(currency)
     }
     
-    private func updatePortfolioCurrencySetting() {
-        portfolioCurrencyPreference = portfolioCurrency.code
+    func updatePortfolioCurrency(_ coin: Coin) {
+        guard portfolioCurrencyPreference != coin.code else { return }
+        portfolioCurrencyPreference = coin.code
+        portfolioCurrency.send(coin)
     }
     
-    private func updateUserCoinsSetting() {
-        userCoinsPreference = userCoins
+    func updateUserCoins(_ codes: [String]) {
+        guard userCoinsPreference != codes else { return }
+        userCoinsPreference = codes
+        userCoins.send(codes)
     }
     
-    private func updatePinCodeSetting() {
-        guard pincodeEnabledPreference != pincodeEnabled else { return }
-        pincodeEnabledPreference = pincodeEnabled
+    func updatePinCodeSetting(enabled: Bool) {
+        guard pincodeEnabledPreference != enabled else { return }
+        pincodeEnabledPreference = enabled
+        pincodeEnabled.send(enabled)
     }
     
-    private func updateBiometricsSetting() {
-        guard biometricsEnabledPreference != biometricsEnabled else { return }
-        biometricsEnabledPreference = biometricsEnabled
-    }
-    
-    private func updatePortfolioCurrency() {
-        portfolioCurrencyPreference = portfolioCurrency.code
-    }
-    
-    private func updateUserCoins() {
-        userCoinsPreference = userCoins
+    func updateBiometricsSetting(enabled: Bool) {
+        guard biometricsEnabledPreference != enabled else { return }
+        biometricsEnabledPreference = enabled
+        biometricsEnabled.send(enabled)
     }
 }
