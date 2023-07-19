@@ -53,7 +53,7 @@ class TxSignConfirmationViewModel: ObservableObject {
         }
         .store(in: &subscriptions)
         
-        settings.$biometricsEnabled.receive(on: RunLoop.main).sink { [weak self] enabled in
+        settings.biometricsEnabled.receive(on: RunLoop.main).sink { [weak self] enabled in
             self?.requiredBiometrics = enabled
 
             guard enabled, let self = self else { return }
@@ -108,13 +108,13 @@ class TxSignConfirmationViewModel: ObservableObject {
                                 // The user's device does not support
                                 // biometric authentication
                                 print("The user's device does not support biometric authentication")
-                                self.settings.biometricsEnabled = false
+                                self.settings.updateBiometricsSetting(enabled: false)
                                 self.requiredBiometrics = false
                             case LAError.biometryNotEnrolled:
                                 // The user has not configured
                                 // biometric authentication
                                 print("The user has not configured biometric authentication")
-                                self.settings.biometricsEnabled = false
+                                self.settings.updateBiometricsSetting(enabled: false)
                                 self.requiredBiometrics = false
                             default:
                                 print("Unknown authentification error")

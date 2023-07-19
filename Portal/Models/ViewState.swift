@@ -56,7 +56,7 @@ class ViewState: ObservableObject {
             guard sceneState != .background else { return }
             sceneState = .background
             
-            walletLocked = settings.pincodeEnabled || settings.biometricsEnabled
+            walletLocked = settings.pincodeEnabled.value || settings.biometricsEnabled.value
         case .active:
             print("app went to active state")
             

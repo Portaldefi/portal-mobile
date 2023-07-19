@@ -62,7 +62,7 @@ class WalletItemViewModel: ObservableObject {
             .store(in: &subscriptions)
         
         settings
-            .$fiatCurrency
+            .fiatCurrency
             .receive(on: RunLoop.main)
             .sink { [weak self] currency in
                 self?.fiatCurrency = currency

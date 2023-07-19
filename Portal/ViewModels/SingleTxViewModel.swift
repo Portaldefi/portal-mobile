@@ -19,7 +19,7 @@ class SingleTxViewModel: ObservableObject {
     @Injected(Container.settings) private var settings
 
     var fiatCurrency: FiatCurrency {
-        settings.fiatCurrency
+        settings.fiatCurrency.value
     }
     
     var amount: String {

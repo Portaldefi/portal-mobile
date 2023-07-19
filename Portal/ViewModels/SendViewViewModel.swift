@@ -44,11 +44,11 @@ class SendViewViewModel: ObservableObject {
     @Injected(Container.settings) private var settings
     
     var fiatCurrency: FiatCurrency {
-        settings.fiatCurrency
+        settings.fiatCurrency.value
     }
     
     var signingTxProtected: Bool {
-        settings.pincodeEnabled || settings.biometricsEnabled
+        settings.pincodeEnabled.value || settings.biometricsEnabled.value
     }
         
     var fee: String {

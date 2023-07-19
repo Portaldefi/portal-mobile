@@ -43,13 +43,13 @@ class AccountViewModel: ObservableObject {
     }
     @Published var goToReceive = false
     @Published var goToSettings = false
-    @Published var settings: PortalSettings
     
     private let accountManager: IAccountManager
     private let walletManager: IWalletManager
     private let adapterManager: IAdapterManager
     private let marketData: IMarketDataRepository
     private let localStorage: ILocalStorage
+    private let settings: IPortalSettings
     
     private var subscriptions = Set<AnyCancellable>()
         
@@ -63,7 +63,7 @@ class AccountViewModel: ObservableObject {
         adapterManager: IAdapterManager,
         localStorage: ILocalStorage,
         marketData: IMarketDataRepository,
-        settings: PortalSettings
+        settings: IPortalSettings
     ) {
         self.accountManager = accountManager
         self.walletManager = walletManager
@@ -108,7 +108,7 @@ class AccountViewModel: ObservableObject {
             .store(in: &subscriptions)
         
         settings
-            .$fiatCurrency
+            .fiatCurrency
             .receive(on: RunLoop.main)
             .sink { [weak self] currency in
                 self?.fiatCurrency = currency
@@ -117,7 +117,7 @@ class AccountViewModel: ObservableObject {
             .store(in: &subscriptions)
         
         settings
-            .$portfolioCurrency
+            .portfolioCurrency
             .receive(on: RunLoop.main)
             .sink { [weak self] currency in
                 self?.portolioCurrency = currency
@@ -209,13 +209,14 @@ extension AccountViewModel {
             adapterManager: AdapterManager.mocked,
             localStorage: LocalStorage.mocked,
             marketData: MarketDataService.mocked,
-            settings: PortalSettings()
+            settings: MockedPortalSettings()
         )
         viewModel.accountName = "Mocked"
         viewModel.totalBalance = "0.00055"
         viewModel.totalValue = "2.15"
         viewModel.items = [WalletItem.mockedBtc]
         viewModel.objectWillChange.send()
+        
         return viewModel
     }
 }

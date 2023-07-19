@@ -14,7 +14,7 @@ class SecuritySettingsViewModel: ObservableObject {
 
     @Published var pinCodeEnabled = false {
         didSet {
-            settings.pincodeEnabled = pinCodeEnabled
+            settings.updatePinCodeSetting(enabled: pinCodeEnabled)
         }
     }
     @Published var biometricEnabled = false {
@@ -22,14 +22,14 @@ class SecuritySettingsViewModel: ObservableObject {
             if biometricEnabled && !biometrics.permissionsGranted {
                 biometrics.authenticate()
             }
-            settings.biometricsEnabled = biometricEnabled
+            settings.updateBiometricsSetting(enabled: biometricEnabled)
         }
     }
     
     private var subscriptions = Set<AnyCancellable>()
     
     init() {
-        pinCodeEnabled = settings.pincodeEnabled
-        biometricEnabled = settings.biometricsEnabled
+        pinCodeEnabled = settings.pincodeEnabled.value
+        biometricEnabled = settings.biometricsEnabled.value
     }
 }

@@ -54,7 +54,7 @@ class ReceiveViewModel: ObservableObject {
     private var subscriptions = Set<AnyCancellable>()
     
     var fiatCurrency: FiatCurrency {
-        settings.fiatCurrency
+        settings.fiatCurrency.value
     }
     
     var receiveAddress: String {

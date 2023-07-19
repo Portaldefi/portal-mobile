@@ -58,7 +58,7 @@ class PincodeViewModel: ObservableObject {
         }
         .store(in: &subscriptions)
         
-        settings.$biometricsEnabled.receive(on: RunLoop.main).sink { [weak self] enabled in
+        settings.biometricsEnabled.receive(on: RunLoop.main).sink { [weak self] enabled in
             self?.requiredBiometrics = enabled
         }
         .store(in: &subscriptions)
@@ -66,7 +66,7 @@ class PincodeViewModel: ObservableObject {
         viewState.$sceneState.filter{ $0 == .active }.subscribe(on: RunLoop.main).sink { [weak self] _ in
             guard let self = self else { return }
             print(self.requiredBiometrics)
-            guard self.requiredBiometrics && self.settings.biometricsEnabled && self.viewState.walletLocked else { return }
+            guard self.requiredBiometrics && self.settings.biometricsEnabled.value && self.viewState.walletLocked else { return }
 
             self.biometrics.authenticateUser { success, error in
                 DispatchQueue.main.async {
@@ -118,13 +118,13 @@ class PincodeViewModel: ObservableObject {
                                 // The user's device does not support
                                 // biometric authentication
                                 print("The user's device does not support biometric authentication")
-                                self.settings.biometricsEnabled = false
+                                self.settings.updateBiometricsSetting(enabled: false)
                                 self.requiredBiometrics = false
                             case LAError.biometryNotEnrolled:
                                 // The user has not configured
                                 // biometric authentication
                                 print("The user has not configured biometric authentication")
-                                self.settings.biometricsEnabled = false
+                                self.settings.updateBiometricsSetting(enabled: false)
                                 self.requiredBiometrics = false
                             default:
                                 print("Unknown authentification error")
@@ -138,7 +138,6 @@ class PincodeViewModel: ObservableObject {
     }
     
     deinit {
-        //TODO:- fixme vm won't deinit
         print("pincode vm deinit")
     }
         
