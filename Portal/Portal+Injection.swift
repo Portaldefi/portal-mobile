@@ -78,7 +78,7 @@ extension SharedContainer {
     }
     
     static let coinManager = Factory<ICoinManager>(scope: .singleton) {
-        CoinManager(storage: CoinStorage(), accountManager: Container.accountManager())
+        CoinManager(storage: CoinStorage(), accountManager: Container.accountManager(), userSettings: Container.settings())
     }
     
     static let lightningKitManager = Factory<ILightningKitManager>(scope: .singleton) {
@@ -122,7 +122,7 @@ extension SharedContainer {
         BiometricAuthentication()
     }
     
-    static let settings = Factory<PortalSettings>(scope: .singleton) {
+    static let settings = Factory<IPortalSettings>(scope: .singleton) {
         PortalSettings()
     }
     
