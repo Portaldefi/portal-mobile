@@ -119,6 +119,7 @@
 		7555020F2A67EA4C0027D5FD /* IPortalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555020E2A67EA4C0027D5FD /* IPortalSettings.swift */; };
 		755502112A67EAF30027D5FD /* MockedPortalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755502102A67EAF30027D5FD /* MockedPortalSettings.swift */; };
 		755502132A6807310027D5FD /* MockedCoinStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755502122A6807310027D5FD /* MockedCoinStorage.swift */; };
+		755502152A6918730027D5FD /* MockedAdapterFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755502142A6918730027D5FD /* MockedAdapterFactory.swift */; };
 		755C56AF28E5BDD600A4B57B /* WalletItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */; };
 		755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */; };
 		755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */; };
@@ -379,6 +380,7 @@
 		7555020E2A67EA4C0027D5FD /* IPortalSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPortalSettings.swift; sourceTree = "<group>"; };
 		755502102A67EAF30027D5FD /* MockedPortalSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedPortalSettings.swift; sourceTree = "<group>"; };
 		755502122A6807310027D5FD /* MockedCoinStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedCoinStorage.swift; sourceTree = "<group>"; };
+		755502142A6918730027D5FD /* MockedAdapterFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedAdapterFactory.swift; sourceTree = "<group>"; };
 		755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemViewModel.swift; sourceTree = "<group>"; };
 		755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceAdapterMocked.swift; sourceTree = "<group>"; };
 		755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMarketDataRepository.swift; sourceTree = "<group>"; };
@@ -822,6 +824,7 @@
 				755501EB2A61588C0027D5FD /* MockedCoinManager.swift */,
 				755502102A67EAF30027D5FD /* MockedPortalSettings.swift */,
 				755502122A6807310027D5FD /* MockedCoinStorage.swift */,
+				755502142A6918730027D5FD /* MockedAdapterFactory.swift */,
 			);
 			path = Mocked;
 			sourceTree = "<group>";
@@ -1311,6 +1314,7 @@
 				7564C65428CF3D3900ABA8CF /* SetAmountView.swift in Sources */,
 				756A312D28884452004978E2 /* WalletItem.swift in Sources */,
 				756DDD8F28A28C06002EDC60 /* AccountRecord+CoreDataProperties.swift in Sources */,
+				755502152A6918730027D5FD /* MockedAdapterFactory.swift in Sources */,
 				756A311F288821F4004978E2 /* Persistence.swift in Sources */,
 				756A313F28902C6F004978E2 /* MainView.swift in Sources */,
 				758336BE2A051C22000B2375 /* AtomicSwapViewModel.swift in Sources */,
