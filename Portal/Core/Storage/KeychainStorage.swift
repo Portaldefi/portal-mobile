@@ -79,8 +79,10 @@ extension KeychainStorage: IKeychainStorage {
     }
 }
 
+import BitcoinDevKit
+
 extension KeychainStorage {
-    fileprivate class KeychainStorageMock: IKeychainStorage {
+    class KeychainStorageMock: IKeychainStorage {
         func save(data: Data, key: String) {
             
         }
@@ -110,7 +112,18 @@ extension KeychainStorage {
         }
         
         func value<T>(for key: String) -> T? where T : LosslessStringConvertible {
-            nil
+            if T.self == String.self {
+                if key == "words_MockedAccountID_mnemonic" {
+                    let mnemonicString = Mnemonic(wordCount: .words12).asString().replacingOccurrences(of: " ", with: ", ")
+                    return mnemonicString as? T
+                } else if key == "salt_MockedAccountID_mnemonic" {
+                    return "test_salt" as? T
+                } else {
+                    return nil
+                }
+            }
+            // Add similar cases for other types if needed
+            return nil
         }
         
         func set<T>(value: T?, for key: String) throws where T : LosslessStringConvertible {
