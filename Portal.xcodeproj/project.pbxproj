@@ -687,6 +687,7 @@
 			isa = PBXGroup;
 			children = (
 				75D8C5B228DADF8700228298 /* WalletManager.swift */,
+				756DDD9828A28FC6002EDC60 /* AccountManager.swift */,
 				75D8C5BC28DC70AD00228298 /* AdapterManager.swift */,
 				75D8C5C028DC711F00228298 /* CoinManager.swift */,
 				755105F5294CA4AB00525A16 /* EthereumKitManager.swift */,
@@ -911,7 +912,6 @@
 				4774D72C28B4FCCC00B7988B /* AccountCurrency.swift */,
 				756A312C28884452004978E2 /* WalletItem.swift */,
 				756DDD8628A287CC002EDC60 /* Account.swift */,
-				756DDD9828A28FC6002EDC60 /* AccountManager.swift */,
 				4774D71928AF916600B7988B /* QRCodeItem.swift */,
 				4774D71B28AF920100B7988B /* QRCodeParser.swift */,
 				4774D71F28B4B0C600B7988B /* ViewState.swift */,
