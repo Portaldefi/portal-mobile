@@ -49,7 +49,7 @@ extension Account: Hashable {
 
 extension Account {
     static var mocked: Account {
-        let id = "Mocked Account ID"
+        let id = "MockedAccountID"
         let index = 0
         let name = "Mocked"
         let mnemonic = Mnemonic(wordCount: .words12)
