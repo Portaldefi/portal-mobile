@@ -98,7 +98,7 @@ extension LocalStorage {
         }
         
         func getCurrentAccountID() -> String? {
-            nil
+            "MockedAccountID"
         }
         
         func setCurrentAccountID(_ id: String) {
