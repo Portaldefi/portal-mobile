@@ -120,6 +120,7 @@
 		755502112A67EAF30027D5FD /* MockedPortalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755502102A67EAF30027D5FD /* MockedPortalSettings.swift */; };
 		755502132A6807310027D5FD /* MockedCoinStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755502122A6807310027D5FD /* MockedCoinStorage.swift */; };
 		755502152A6918730027D5FD /* MockedAdapterFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755502142A6918730027D5FD /* MockedAdapterFactory.swift */; };
+		755502182A7107730027D5FD /* FiatCurrencyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755502172A7107730027D5FD /* FiatCurrencyTest.swift */; };
 		755C56AF28E5BDD600A4B57B /* WalletItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */; };
 		755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */; };
 		755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */; };
@@ -381,6 +382,7 @@
 		755502102A67EAF30027D5FD /* MockedPortalSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedPortalSettings.swift; sourceTree = "<group>"; };
 		755502122A6807310027D5FD /* MockedCoinStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedCoinStorage.swift; sourceTree = "<group>"; };
 		755502142A6918730027D5FD /* MockedAdapterFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedAdapterFactory.swift; sourceTree = "<group>"; };
+		755502172A7107730027D5FD /* FiatCurrencyTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiatCurrencyTest.swift; sourceTree = "<group>"; };
 		755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemViewModel.swift; sourceTree = "<group>"; };
 		755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceAdapterMocked.swift; sourceTree = "<group>"; };
 		755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMarketDataRepository.swift; sourceTree = "<group>"; };
@@ -765,6 +767,7 @@
 		755501CC2A6131540027D5FD /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
+				755502162A71071C0027D5FD /* Models */,
 				755501FA2A617D940027D5FD /* Services */,
 				755501F52A6177930027D5FD /* Storage */,
 				755501FD2A617DC80027D5FD /* Manager */,
@@ -828,6 +831,14 @@
 				755502142A6918730027D5FD /* MockedAdapterFactory.swift */,
 			);
 			path = Mocked;
+			sourceTree = "<group>";
+		};
+		755502162A71071C0027D5FD /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				755502172A7107730027D5FD /* FiatCurrencyTest.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		7564C65028CF3C2E00ABA8CF /* Send */ = {
@@ -1283,6 +1294,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				755502182A7107730027D5FD /* FiatCurrencyTest.swift in Sources */,
 				755502072A617F880027D5FD /* BitcoinAdapterTest.swift in Sources */,
 				755502012A617DFD0027D5FD /* CoinManagerTest.swift in Sources */,
 				755502032A617E1F0027D5FD /* LightningKitManager.swift in Sources */,

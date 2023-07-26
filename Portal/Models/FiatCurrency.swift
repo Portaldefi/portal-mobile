@@ -12,7 +12,7 @@ struct FiatCurrency: Codable {
     let rate: Decimal
     
     var name: String {
-        names[code] ?? "Unknown"
+        Self.names[code] ?? "Unknown"
     }
     
     var symbol: String {
@@ -69,7 +69,7 @@ extension FiatCurrency: Hashable, Equatable {
 }
 
 extension FiatCurrency {
-    private var names: [String : String] {
+    static var names: [String : String] {
         [
             "AED": "United Arab Emirates Dirham",
             "AFN": "Afghan Afghani",
@@ -92,21 +92,17 @@ extension FiatCurrency {
             "BOB": "Bolivian Boliviano",
             "BRL": "Brazilian Real",
             "BSD": "Bahamian Dollar",
-            "BTC": "Bitcoin",
             "BTN": "Bhutanese Ngultrum",
             "BWP": "Botswanan Pula",
             "BYN": "New Belarusian Ruble",
-            "BYR": "Belarusian Ruble",
             "BZD": "Belize Dollar",
             "CAD": "Canadian Dollar",
             "CDF": "Congolese Franc",
             "CHF": "Swiss Franc",
-            "CLF": "Chilean Unit of Account (UF)",
             "CLP": "Chilean Peso",
             "CNY": "Chinese Yuan",
             "COP": "Colombian Peso",
             "CRC": "Costa Rican Colón",
-            "CUC": "Cuban Convertible Peso",
             "CUP": "Cuban Peso",
             "CVE": "Cape Verdean Escudo",
             "CZK": "Czech Republic Koruna",
@@ -122,7 +118,6 @@ extension FiatCurrency {
             "FKP": "Falkland Islands Pound",
             "GBP": "British Pound Sterling",
             "GEL": "Georgian Lari",
-            "GGP": "Guernsey Pound",
             "GHS": "Ghanaian Cedi",
             "GIP": "Gibraltar Pound",
             "GMD": "Gambian Dalasi",
@@ -136,12 +131,10 @@ extension FiatCurrency {
             "HUF": "Hungarian Forint",
             "IDR": "Indonesian Rupiah",
             "ILS": "Israeli New Sheqel",
-            "IMP": "Manx pound",
             "INR": "Indian Rupee",
             "IQD": "Iraqi Dinar",
             "IRR": "Iranian Rial",
             "ISK": "Icelandic Króna",
-            "JEP": "Jersey Pound",
             "JMD": "Jamaican Dollar",
             "JOD": "Jordanian Dinar",
             "JPY": "Japanese Yen",
@@ -158,9 +151,6 @@ extension FiatCurrency {
             "LBP": "Lebanese Pound",
             "LKR": "Sri Lankan Rupee",
             "LRD": "Liberian Dollar",
-            "LSL": "Lesotho Loti",
-            "LTL": "Lithuanian Litas",
-            "LVL": "Latvian Lats",
             "LYD": "Libyan Dinar",
             "MAD": "Moroccan Dirham",
             "MDL": "Moldovan Leu",
@@ -169,7 +159,6 @@ extension FiatCurrency {
             "MMK": "Myanma Kyat",
             "MNT": "Mongolian Tugrik",
             "MOP": "Macanese Pataca",
-            "MRO": "Mauritanian Ouguiya",
             "MUR": "Mauritian Rupee",
             "MVR": "Maldivian Rufiyaa",
             "MWK": "Malawian Kwacha",
@@ -202,12 +191,9 @@ extension FiatCurrency {
             "SEK": "Swedish Krona",
             "SGD": "Singapore Dollar",
             "SHP": "Saint Helena Pound",
-            "SLE": "Sierra Leonean Leone",
             "SLL": "Sierra Leonean Leone",
             "SOS": "Somali Shilling",
             "SRD": "Surinamese Dollar",
-            "STD": "São Tomé and Príncipe Dobra",
-            "SVC": "Salvadoran Colón",
             "SYP": "Syrian Pound",
             "SZL": "Swazi Lilangeni",
             "THB": "Thai Baht",
@@ -224,23 +210,17 @@ extension FiatCurrency {
             "USD": "United States Dollar",
             "UYU": "Uruguayan Peso",
             "UZS": "Uzbekistan Som",
-            "VEF": "Venezuelan Bolívar Fuerte",
             "VES": "Sovereign Bolivar",
             "VND": "Vietnamese Dong",
             "VUV": "Vanuatu Vatu",
             "WST": "Samoan Tala",
             "XAF": "CFA Franc BEAC",
-            "XAG": "Silver (troy ounce)",
-            "XAU": "Gold (troy ounce)",
             "XCD": "East Caribbean Dollar",
-            "XDR": "Special Drawing Rights",
             "XOF": "CFA Franc BCEAO",
             "XPF": "CFP Franc",
             "YER": "Yemeni Rial",
             "ZAR": "South African Rand",
-            "ZMK": "Zambian Kwacha (pre-2013)",
             "ZMW": "Zambian Kwacha",
-            "ZWL": "Zimbabwean Dollar"
         ]
     }
 }
