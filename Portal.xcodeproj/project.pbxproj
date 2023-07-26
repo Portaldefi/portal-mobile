@@ -121,6 +121,7 @@
 		755502132A6807310027D5FD /* MockedCoinStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755502122A6807310027D5FD /* MockedCoinStorage.swift */; };
 		755502152A6918730027D5FD /* MockedAdapterFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755502142A6918730027D5FD /* MockedAdapterFactory.swift */; };
 		755502182A7107730027D5FD /* FiatCurrencyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755502172A7107730027D5FD /* FiatCurrencyTest.swift */; };
+		7555021A2A7118A80027D5FD /* CoinTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755502192A7118A80027D5FD /* CoinTest.swift */; };
 		755C56AF28E5BDD600A4B57B /* WalletItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */; };
 		755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */; };
 		755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */; };
@@ -383,6 +384,7 @@
 		755502122A6807310027D5FD /* MockedCoinStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedCoinStorage.swift; sourceTree = "<group>"; };
 		755502142A6918730027D5FD /* MockedAdapterFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedAdapterFactory.swift; sourceTree = "<group>"; };
 		755502172A7107730027D5FD /* FiatCurrencyTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiatCurrencyTest.swift; sourceTree = "<group>"; };
+		755502192A7118A80027D5FD /* CoinTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinTest.swift; sourceTree = "<group>"; };
 		755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemViewModel.swift; sourceTree = "<group>"; };
 		755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceAdapterMocked.swift; sourceTree = "<group>"; };
 		755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMarketDataRepository.swift; sourceTree = "<group>"; };
@@ -837,6 +839,7 @@
 			isa = PBXGroup;
 			children = (
 				755502172A7107730027D5FD /* FiatCurrencyTest.swift */,
+				755502192A7118A80027D5FD /* CoinTest.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1296,6 +1299,7 @@
 			files = (
 				755502182A7107730027D5FD /* FiatCurrencyTest.swift in Sources */,
 				755502072A617F880027D5FD /* BitcoinAdapterTest.swift in Sources */,
+				7555021A2A7118A80027D5FD /* CoinTest.swift in Sources */,
 				755502012A617DFD0027D5FD /* CoinManagerTest.swift in Sources */,
 				755502032A617E1F0027D5FD /* LightningKitManager.swift in Sources */,
 				755501F72A6177F90027D5FD /* NotificationServiceTest.swift in Sources */,
