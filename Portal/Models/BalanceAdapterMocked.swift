@@ -10,6 +10,8 @@ import Combine
 import BitcoinDevKit
 
 class BalanceAdapterMocked: IBalanceAdapter {
+    var L1Balance: Decimal { 0.003 }    
+    
     var state: AdapterState = .synced
     var balance: Decimal = 0.00055
     var balanceStateUpdated: AnyPublisher<Void, Never> {
@@ -34,13 +36,13 @@ class SendAssetMockedService: ISendAssetService {
         
     }
     
-    func validateAddress() throws {
-        
+    func validateUserInput() throws -> UserInputResult {
+        throw SendFlowError.addressIsntValid
     }
     
     func send() -> Future<TransactionRecord, Error> {
         Future { promise in
-            promise(.success(TransactionRecord(transaction: TransactionDetails.mockedConfirmed)))
+            promise(.success(TransactionRecord(transaction: TransactionDetails.mockedConfirmed, userData: TxUserData(price: 1000))))
         }
     }
     
@@ -50,10 +52,8 @@ class SendAssetMockedService: ISendAssetService {
 }
 
 class MockeFeeRateProvider: IFeeRateProvider {
-    var recommendedFeeRate: Future<Int, Never> {
-        Future { promise in
-            promise(.success(10000))
-        }
+    func recommendedFeeRate() async throws -> Int {
+        10000
     }
 }
 

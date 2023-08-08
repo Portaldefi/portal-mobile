@@ -101,7 +101,7 @@ struct SetAmountView: View {
                                             text.foregroundColor(Palette.grayScale6A)
                                         })
                                             
-                                            Text("usd")
+                                        Text(viewModel.fiatCurrency.code.lowercased())
                                             .font(.Main.fixed(.monoMedium, size: 11))
                                             .foregroundColor(Palette.grayScale6A)
                                             .frame(width: 34)
@@ -119,7 +119,7 @@ struct SetAmountView: View {
                                             text.foregroundColor(Palette.grayScaleCA)
                                         })
                                             
-                                    Text("usd")
+                                    Text(viewModel.fiatCurrency.code.lowercased())
                                         .font(.Main.fixed(.monoMedium, size: 11))
                                         .foregroundColor(Palette.grayScale6A)
                                         .frame(width: 34)

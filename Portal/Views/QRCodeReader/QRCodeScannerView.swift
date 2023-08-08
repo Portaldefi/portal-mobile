@@ -11,7 +11,7 @@ import PortalUI
 
 struct QRCodeScannerView: View {
     private let selectionFeedbackGenerator = UISelectionFeedbackGenerator()
-    private let qrCodeSimulatedData = "bitcoin:BC1QYLH3U67J673H6Y6ALV70M0PL2YZ53TZHVXGG7U?amount=0.00001&label=sbddesign%3A%20For%20lunch%20Tuesday&message=For%20lunch%20Tuesday&lightning=LNO1PG257ENXV4EZQCNEYPE82UM50YNHXGRWDAJX283QFWDPL28QQMC78YMLVHMXCSYWDK5WRJNJ36JRYG488QWLRNZYJCZS"
+    private let qrCodeSimulatedData = "bitcoin:BC1QYLH3U67J673H6Y6ALV70M0PL2YZ53TZHVXGG7U?amount=0.00001&label=sbddesign%3A%20For%20lunch%20Tuesday&message=For%20lunch%20Tuesday&lightning=lnbcrt250u1pjrdpd4pp568nmj4yt4r4ykfyeqcnavq4xxzpq7pzcx2nrm3kxutdgajxv3gpqdqqcqzpgxqyz5vqsp5200ml9jsyuk54uf77mv5xq8ky0qek2097eapyzsejzd85z36rhes9qyyssqyykk2jt8268tsqyq8jvcsy85myszuv5rzluu32a0dd5a8e48zfp48z3pj4twf3ajnuracqgx3m9v0xd56g0ncxsar3pf7t7etsh627qp4l4kc4"
     @State private var importFromLibrary = false
     @State private var torchOn  = false
     @State private var scanState: ScanState = .detecting
@@ -52,11 +52,7 @@ struct QRCodeScannerView: View {
                                 let supportedItems = items.filter{ $0.type != .unsupported }
                                 if let item = supportedItems.first {
                                     switch config {
-                                    case .send:
-                                        detectedItems.removeAll()
-                                        scanState = .detecting
-                                        detected(item)
-                                    case .universal:
+                                    case .send, .universal:
                                         withAnimation(.easeInOut(duration: 0.25)) {
                                             detectedItems = items
                                             scanState = .detected

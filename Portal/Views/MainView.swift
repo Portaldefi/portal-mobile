@@ -11,11 +11,14 @@ import Factory
 
 struct Mainview: View {
     private let views: [AnyView]
-    @ObservedObject private var viewState = Container.viewState()
+    @ObservedObject private var viewState: ViewState = Container.viewState()
+    @Environment(\.scenePhase) private var scenePhase
     
     init() {
         views = [
             AnyView(AccountRootView()),
+//            AnyView(SwapView()),
+            AnyView(LightningStatstView()),
             AnyView(ActivityView())
         ]
     }
@@ -45,6 +48,58 @@ struct Mainview: View {
             }
             .frame(width: 65)
             
+//            Spacer()
+//
+//            Button {
+//                viewState.openTab(.swap)
+//            } label: {
+//                if viewState.selectedTab == .swap {
+//                    RadialGradient.main
+//                        .mask(
+//                            VStack(spacing: 4) {
+//                                Asset.swapIcon
+//                                Text("Swap")
+//                                    .font(.Main.fixed(.bold, size: 14))
+//                            }
+//                        )
+//                } else {
+//                    VStack(spacing: 4) {
+//                        Asset.swapIcon
+//                        Text("Swap")
+//                            .font(.Main.fixed(.bold, size: 14))
+//                    }
+//                    .foregroundColor(Color.gray)
+//                }
+//            }
+//            .frame(width: 85)
+            
+            Spacer()
+                        
+            Button {
+                viewState.openTab(.lightning)
+            } label: {
+                if viewState.selectedTab == .lightning {
+                    RadialGradient.main
+                        .mask(
+                            VStack(spacing: 4) {
+                                Asset.lightningIcon
+                                Text("Lightning")
+                                    .font(.Main.fixed(.bold, size: 14))
+                            }
+                        )
+                } else {
+                    VStack(spacing: 4) {
+                        Asset.lightningIcon
+                        Text("Lightning")
+                            .font(.Main.fixed(.bold, size: 14))
+                    }
+                    .padding(6)
+                    .foregroundColor(Color.gray)
+                }
+            }
+            .frame(width: 85)
+            .disabled(false)
+            
             Spacer()
             
             Button {
@@ -70,8 +125,7 @@ struct Mainview: View {
                 }
             }
             .frame(width: 85)
-            .opacity(0.65)
-            .disabled(true)
+            .disabled(false)
             
             Spacer()
             
@@ -82,6 +136,7 @@ struct Mainview: View {
             }
             .frame(width: 65)
         }
+        .opacity(viewState.hideTabBar ? 0.25 : 1)
         .padding(.horizontal, 25.5)
         .frame(height: 65)
         .background(Palette.grayScale0A)
@@ -90,10 +145,25 @@ struct Mainview: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             views[viewState.selectedTab.rawValue]
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             
             TabBar
                 .offset(y: viewState.hideTabBar ? 109 : 0)
                 .zIndex(1)
+        }
+        .lockableView()
+        .notifiebleView()
+        .onChange(of: scenePhase) { newValue in
+            switch newValue {
+            case .inactive:
+                viewState.updateScene(state: .inactive)
+            case .active:
+                viewState.updateScene(state: .active)
+            case .background:
+                viewState.updateScene(state: .background)
+            @unknown default:
+                break
+            }
         }
     }
 }

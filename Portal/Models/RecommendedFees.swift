@@ -8,9 +8,14 @@
 import Foundation
 
 struct RecomendedFees: Codable {
+    // FIXME: The actual values suppose to be Ints, however string formattesrs we use for UI need Int extensions
     let fastestFee: Decimal
     let halfHourFee: Decimal
     let hourFee: Decimal
+    
+    enum Keys: String, CodingKey {
+        case high_fee_per_kb, medium_fee_per_kb, low_fee_per_kb
+    }
     
     func fee(_ state: TxFees) -> Decimal {
         switch state {
@@ -23,5 +28,22 @@ struct RecomendedFees: Codable {
         case .custom:
             fatalError("custom fees not implemented")
         }
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: Keys.self)
+        
+        let fastestFeeDecimal = try container.decode(Decimal.self, forKey: .high_fee_per_kb)/1000
+        fastestFee = Decimal((fastestFeeDecimal as NSDecimalNumber).intValue)
+        let halfHourFeeDecimal = try container.decode(Decimal.self, forKey: .medium_fee_per_kb)/1000
+        halfHourFee = Decimal((halfHourFeeDecimal as NSDecimalNumber).intValue)
+        let hourFeeDecimal = try container.decode(Decimal.self, forKey: .low_fee_per_kb)/1000
+        hourFee = Decimal((hourFeeDecimal as NSDecimalNumber).intValue)
+    }
+    
+    init(fastestFee: Decimal, halfHourFee: Decimal, hourFee: Decimal) {
+        self.fastestFee = fastestFee
+        self.halfHourFee = halfHourFee
+        self.hourFee = hourFee
     }
 }

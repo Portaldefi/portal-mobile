@@ -21,7 +21,7 @@ class ChainFilter: Filter {
         watchedTransactions.append((txid, scriptPubkey))
     }
     
-    override func registerOutput(output: WatchedOutput) {
+    override func registerOutput(output: Bindings.WatchedOutput) {
         self.watchedOutputs.append(output)
     }
 }

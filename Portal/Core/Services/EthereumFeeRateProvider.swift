@@ -19,7 +19,10 @@ class EthereumFeeRateProvider: IFeeRateProvider {
         self.feeRateProvider = feeRateProvider
     }
 
-    var recommendedFeeRate: Future<Int, Never> { feeRateProvider.ethereumGasPrice }
+    func recommendedFeeRate() async throws -> Int {
+        try await feeRateProvider.ethereumGasPrice()
+    }
+    
     var feeRatePriorityList: [FeeRatePriority] {
         [.recommended, .custom(value: lower, range: lower...upper)]
     }

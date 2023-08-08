@@ -11,21 +11,29 @@ import BitcoinDevKit
 import Factory
 import BigInt
 
-class TransactionDetailsViewModel: ObservableObject {
-    let storage: UserDefaults
-    
+class TransactionDetailsViewModel: ObservableObject {    
     struct TestNetDataResponse: Codable {
         let height: Int
     }
     
     let coin: Coin
     let transaction: TransactionRecord
-    let blockChainHeight: Int32
+    
+    private let storage: ITxUserDataStorage
+    
+    @Published var blockChainHeight: Int32 = 0
     
     @Published var editingNotes = false
     @Published var editingLabels = false
     @Published var showAddLabelInterface = false
     @Published var newLabelTitle: String?
+    @Published var source: TxSource = .btcOnChain
+    
+    @Injected(Container.settings) private var settings
+
+    var fiatCurrency: FiatCurrency {
+        settings.fiatCurrency
+    }
         
     var title: String {
         transaction.type.description
@@ -46,17 +54,44 @@ class TransactionDetailsViewModel: ObservableObject {
             return Double(amount.double/100_000_000).toString(decimal: 8)
         case .ethereum:
             return amount.double.toString(decimal: 8)
+        case .erc20:
+            return amount.double.toString(decimal: 8)
         default:
             return "0"
         }
     }
     
     var currencyAmountString: String {
-        "1.29"
+        guard let amount = transaction.amount else { return "0" }
+        
+        switch coin.type {
+        case .bitcoin, .lightningBitcoin:
+            return (transaction.userData.price * (amount/100_000_000) * fiatCurrency.rate).double.usdFormatted()
+        case .ethereum, .erc20:
+            return (transaction.userData.price * amount * fiatCurrency.rate).double.usdFormatted()
+        }
     }
     
     var recipientString: String? {
-        storage.object(forKey: transaction.id + "recipient") as? String
+        switch source {
+        case .btcOnChain:
+            return ""//storage.object(forKey: transaction.id + "recipient") as? String
+        case .ethOnChain:
+            return transaction.to
+        case .lightning:
+            return transaction.to
+        }
+    }
+    
+    var senderString: String? {
+        switch source {
+        case .btcOnChain:
+            return ""//storage.object(forKey: transaction.id + "recipient") as? String
+        case .ethOnChain:
+            return transaction.from
+        case .lightning:
+            return transaction.from
+        }
     }
     
     var dateString: String {
@@ -79,7 +114,7 @@ class TransactionDetailsViewModel: ObservableObject {
     @Published var confirmations: Int32 = 0
     
     @Published var notes = String()
-    @Published var labels: [TxLable] = []
+    @Published var labels: [TxLabel] = []
     
     var explorerUrl: URL? {
         switch coin.type {
@@ -95,30 +130,30 @@ class TransactionDetailsViewModel: ObservableObject {
     private var subscriptions = Set<AnyCancellable>()
     
     init(coin: Coin, tx: TransactionRecord, blockChainHeight: Int32) {
+        self.storage = Container.txDataStorage()
+
         self.coin = coin
-        self.storage = UserDefaults.standard
         self.transaction = tx
         self.blockChainHeight = blockChainHeight
-        
-        if let notes = storage.string(forKey: transaction.id + "notes") {
-            self.notes = notes
-        }
-        
-        if let tags = storage.object(forKey: transaction.id + "labels") as? [String] {
-            self.labels = tags.map{ TxLable(label: $0 )}
-        }
+        self.source = transaction.source
         
         if let blockHeight = tx.blockHeight {
             confirmations = blockChainHeight - Int32(blockHeight) + 1
         }
+                
+        if let notes = tx.userData.notes, !notes.isEmpty {
+            self.notes = notes
+        }
         
-        $labels.sink { [unowned self] labels in
-            self.storage.set(labels.map{ $0.label }, forKey: self.transaction.id + "labels")
+        self.labels = tx.userData.labels
+        
+        $labels.removeDuplicates().dropFirst().sink { [unowned self] labels in
+            self.storage.update(source: tx.source, id: tx.id, labels: labels)
         }
         .store(in: &subscriptions)
         
-        $notes.sink { [unowned self] notes in
-            self.storage.set(notes, forKey: self.transaction.id + "notes")
+        $notes.removeDuplicates().dropFirst().sink { [unowned self] notes in
+            self.storage.update(source: tx.source, id: tx.id, notes: notes)
         }
         .store(in: &subscriptions)
     }
@@ -128,14 +163,14 @@ extension TransactionDetailsViewModel {
     static func config(coin: Coin, tx: TransactionRecord) -> TransactionDetailsViewModel {
         let adapterManager: IAdapterManager = Container.adapterManager()
         let walletManager: IWalletManager = Container.walletManager()
-                
+
         guard
             let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
             let adapter = adapterManager.adapter(for: wallet)
         else {
             fatalError("coudn't fetch dependencies")
         }
-        
+
         return TransactionDetailsViewModel(coin: coin, tx: tx, blockChainHeight: adapter.blockchainHeight)
     }
 }

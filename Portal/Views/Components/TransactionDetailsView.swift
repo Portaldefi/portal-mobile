@@ -28,19 +28,59 @@ struct TransactionDetailsView: View {
                     Divider().frame(height: 1)
 
                     VStack(spacing: 0) {
-                        if let recipient = viewModel.recipientString {
-                            TxRecipientView(recipient: recipient)
+                        Group {
+                            if let recipient = viewModel.recipientString {
+                                TxAddressView(title: "Recipient", address: recipient.turnicated(grouppedBy: 4))
+                            }
+                            
+                            Divider()
+                            
+                            if let sender = viewModel.senderString {
+                                TxAddressView(title: "Sender", address: sender.turnicated(grouppedBy: 4))
+                            }
+                            
+                            Divider()
+                            
+                            TxFeesView(fees: viewModel.feeString, coin: viewModel.coin.code.lowercased(), source: viewModel.source)
+                            
+                            Divider()
+                            
+                            if viewModel.source != .lightning {
+                                TxIDView(txID: viewModel.txIdString, explorerURL: viewModel.explorerUrl)
+                                
+                                Divider()
+                            } else {
+                                HStack(alignment: .firstTextBaseline) {
+                                    Text("Payment Preimage")
+                                        .font(.Main.fixed(.monoBold, size: 14))
+                                        .foregroundColor(Palette.grayScaleAA)
+                                    Spacer()
+                                    VStack(alignment: .trailing, spacing: 8) {
+                                        Text(viewModel.transaction.preimage!.turnicated(grouppedBy: 4))
+                                            .font(.Main.fixed(.monoRegular, size: 16))
+                                            .foregroundColor(Palette.grayScaleF4)
+                                    }
+                                }
+                                .frame(height: 52)
+                                
+                                Divider()
+                                
+                                HStack(alignment: .firstTextBaseline) {
+                                    Text("Node ID")
+                                        .font(.Main.fixed(.monoBold, size: 14))
+                                        .foregroundColor(Palette.grayScaleAA)
+                                    Spacer()
+                                    VStack(alignment: .trailing, spacing: 8) {
+                                        Text(viewModel.transaction.nodeId?.turnicated(grouppedBy: 4) ?? "-")
+                                            .font(.Main.fixed(.monoRegular, size: 16))
+                                            .foregroundColor(Palette.grayScaleF4)
+                                    }
+                                }
+                                .frame(height: 52)
+                                
+                                Divider()
+                            }
                         }
-                        
-                        Divider()
-                        
-                        TxFeesView(fees: viewModel.feeString, coin: viewModel.coin.code.lowercased())
-                        
-                        Divider()
-                        
-                        TxIDView(txID: viewModel.txIdString, explorerURL: viewModel.explorerUrl)
-                        
-                        Divider()
                         
                         NotesView()
                         
@@ -122,9 +162,16 @@ struct TransactionDetailsView: View {
     
     private func TxSummaryView() -> some View {
         VStack(spacing: 24) {
-            ConfirmationCounterView(confirmations: viewModel.confirmations)
+            if viewModel.source != .lightning {
+                ConfirmationCounterView(confirmations: viewModel.confirmations)
+            }
             
-            TxAmountView(amount: viewModel.amountString, value: viewModel.currencyAmountString, code: viewModel.coin.code.lowercased())
+            TxAmountView(
+                amount: viewModel.amountString,
+                value: viewModel.currencyAmountString,
+                coinCode: viewModel.coin.code.lowercased(),
+                currencyCode: viewModel.fiatCurrency.code.lowercased()
+            )
             
             Text(viewModel.dateString)
                 .font(.Main.fixed(.monoMedium, size: 16))

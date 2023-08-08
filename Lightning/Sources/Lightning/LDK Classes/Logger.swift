@@ -12,22 +12,28 @@ class Logger: LightningDevKit.Logger {
     override func log(record: Bindings.Record) {
         let messageLevel = record.getLevel()
         let arguments = record.getArgs()
-        
+                
         switch messageLevel {
         case .Debug:
-            print("\nDebug Logger:\n>\(arguments)\n")
+            print("LDK LOG - Debug:")
+            print("\(arguments)\n")
         case .Info:
-            print("\nInfo Logger:\n>\(arguments)\n")
+            print("LDK LOG - Info:")
+            print("\(arguments)\n")
         case .Warn:
-            print("\nWarn Logger:\n>\(arguments)\n")
+            print("LDK LOG - Warn:")
+            print("\(arguments)\n")
         case .Error:
-            print("\nError Logger:\n>\(arguments)\n")
+            print("LDK LOG - Error:")
+            print("\(arguments)\n")
         case .Gossip:
-            print("\nGossip Logger:\n>\(arguments)\n")
+            break //print("\nGossip Logger:\n>\(arguments)\n")
         case .Trace:
-            print("\nTrace Logger:\n>\(arguments)\n")
-        @unknown default:
-            print("\nUnknown Logger:\n>\(arguments)\n")
+            print("LDK LOG - Trace:")
+            print("\(arguments)\n")
+        default:
+            print("LDK LOG - Unknown:")
+            print("\(arguments)\n")
         }
     }
 }

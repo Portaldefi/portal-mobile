@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import BitcoinAddressValidator
+import BitcoinDevKit
 
 struct QRCodeParser {
     enum ParserResults {
@@ -32,10 +32,6 @@ struct QRCodeParser {
     }
         
     static func parse(code: String) -> [QRCodeItem] {
-        guard !BitcoinAddressValidator.isValid(address: code) else {
-            return [QRCodeItem.bip21(address: code)]
-        }
-
         guard
             let url = URL(string: code),
             let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
@@ -48,7 +44,7 @@ struct QRCodeParser {
             let btcAddress = components.path
 
             guard let queryItems = components.queryItems else {
-                if BitcoinAddressValidator.isValid(address: btcAddress) {
+                if ((try? Address(address: btcAddress)) != nil) {
                     return [QRCodeItem.bip21(address: btcAddress)]
                 } else {
                     return [QRCodeItem.unsupported]

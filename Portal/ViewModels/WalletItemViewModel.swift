@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 import Factory
-import SwiftUI
 
 class WalletItemViewModel: ObservableObject {
     let coin: Coin
@@ -16,20 +15,24 @@ class WalletItemViewModel: ObservableObject {
     
     private var subscriptions = Set<AnyCancellable>()
     private var marketData: IMarketDataRepository
+    private let updateBalanceTimer = RepeatingTimer(timeInterval: 1)
         
-    @Published var balance: Decimal
-    @Published var balanceString: String
+    private(set) var balance: Decimal
     
-    var valueString: String {
+    @Published var balanceString = String()
+    @Published var valueString = String()
+    @Published var fiatCurrency = FiatCurrency(code: "USD")
+    
+    @Injected(Container.settings) private var settings
+    
+    var value: Decimal {
         switch coin.type {
-        case .bitcoin:
-            let btcPriceInUsd = Decimal(marketData.btcTicker?.price ?? 1)
-            return (balance * btcPriceInUsd).double.usdFormatted()
-        case .lightningBitcoin:
-            let btcPriceInUsd = Decimal(marketData.btcTicker?.price ?? 1)
-            return (balance * btcPriceInUsd).double.usdFormatted()
-        case .ethereum, .erc20:
-            return (balance * 1200).double.usdFormatted()
+        case .bitcoin, .lightningBitcoin:
+            return marketData.lastSeenBtcPrice
+        case .ethereum:
+            return balance * marketData.lastSeenEthPrice
+        case .erc20:
+            return balance * marketData.lastSeenLinkPrice
         }
     }
     
@@ -40,19 +43,59 @@ class WalletItemViewModel: ObservableObject {
         
         self.balance = balanceAdapter.balance
         self.balanceString = "\(balanceAdapter.balance)"
+                
+        self.updateBalanceTimer.eventHandler = {
+            DispatchQueue.main.async {
+                self.updateBalance()
+            }
+        }
         
-        subscribeForUpdates()
-    }
-    
-    private func subscribeForUpdates() {
-        balanceAdapter.balanceUpdated
+        self.updateBalanceTimer.resume()
+        
+        self
+            .marketData
+            .onMarketDataUpdate
             .receive(on: RunLoop.main)
-            .sink { [weak self] in
-                guard let self = self else { return }
-                self.balance = self.balanceAdapter.balance
-                self.balanceString = "\(self.balanceAdapter.balance)"
+            .sink { [unowned self] _ in
+                self.updateValue()
             }
             .store(in: &subscriptions)
+        
+        settings
+            .$fiatCurrency
+            .receive(on: RunLoop.main)
+            .sink { [weak self] currency in
+                self?.fiatCurrency = currency
+                self?.updateValue()
+            }
+            .store(in: &subscriptions)
+        
+        updateValue()
+    }
+    
+    private func updateBalance() {
+        if balance != balanceAdapter.balance {
+            balance = balanceAdapter.balance
+            balanceString = "\(balanceAdapter.balance)"
+            updateValue()
+        }
+    }
+    
+    private func updateValue() {
+        let _valueString: String
+        
+        switch coin.type {
+        case .bitcoin, .lightningBitcoin:
+            _valueString = (marketData.lastSeenBtcPrice * balance * fiatCurrency.rate).double.usdFormatted()
+        case .ethereum:
+            _valueString = (marketData.lastSeenEthPrice * balance * fiatCurrency.rate).double.usdFormatted()
+        case .erc20:
+            _valueString = (marketData.lastSeenLinkPrice * balance * fiatCurrency.rate).double.usdFormatted()
+        }
+                
+        if valueString != _valueString {
+            valueString = _valueString
+        }
     }
 }
 

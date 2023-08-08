@@ -81,9 +81,7 @@ struct CreateAccountView: View {
                         .overlay(Palette.grayScale4A)
                     
                     PButton(config: .onlyLabel("Continue"), style: .filled, size: .big, enabled: !viewModel.accountName.isEmpty) {
-                        withAnimation {
-                            viewModel.createAccount()
-                        }
+                        navigation.push(.setSecuritySettings(viewModel: viewModel))
                     }
                     .padding(16)
                 }

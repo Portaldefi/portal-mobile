@@ -57,7 +57,7 @@ class BlockStreamChainManager {
     private var chainListeners = [ChainListener]()
     
     var blockchainMonitorPublisher: AnyPublisher<Void, Error> {
-        Timer.publish(every: 5, on: RunLoop.main, in: .default)
+        Timer.publish(every: 15, on: RunLoop.main, in: .default)
             .autoconnect()
             .flatMap { [unowned self] _ in
                 Future { promise in
@@ -202,11 +202,7 @@ extension BlockStreamChainManager {
             }
             return responseDictionary
         case .getBlockBinary:
-            if let blockBinary = String.init(data: data, encoding: String.Encoding.utf8) {
-                print(blockBinary)
-                return ["blockBinary": blockBinary as Any]
-            }
-            return [:]
+            return ["blockBinary": data.toHexString() as Any]
         case .getBlockHeader:
             let response = try JSONSerialization.jsonObject(with: data, options: .topLevelDictionaryAssumed)
             let responseDictionary = response as! [String: Any]
@@ -224,7 +220,7 @@ extension BlockStreamChainManager {
             return [:]
         case .postRawTx:
             if let txID = String.init(data: data, encoding: String.Encoding.utf8) {
-                print(txID)
+                print("posted txID: \(txID)")
                 return ["txID": txID as Any]
             }
             return [:]
@@ -294,8 +290,10 @@ extension BlockStreamChainManager {
 extension BlockStreamChainManager {
     func getChaintipHeight() async throws -> UInt32 {
         let response = try await self.callRpcMethod(method: .getChainTip)
-        let result = response["chainTip"] as! UInt32
-        return result
+        if let result = response["chainTip"] as? UInt32 {
+            return result
+        }
+        throw ChainManagerError.unknownAnchorBlock
     }
     
     func getChaintipHash() async throws -> [UInt8] {
@@ -392,12 +390,28 @@ extension BlockStreamChainManager {
 
 // MARK: Common ChainManager Functions
 extension BlockStreamChainManager: RpcChainManager {
+    func mineBlocks(number: Int, coinbaseDestinationAddress: String) async throws -> [String] {
+        []
+    }
+    
+    func scanTxOutSet(descriptor: String) async throws -> [String : Any] {
+        [:]
+    }
+    
+    func getDescriptorInfo(descriptor: String) async throws -> String {
+        String()
+    }
+    
+    func decodeScript(script: [UInt8]) async throws -> [String : Any] {
+        [:]
+    }
+    
     func submitTransaction(transaction: [UInt8]) async throws -> String {
         let txHex = bytesToHexString(bytes: transaction)
-        let response = try await self.callRpcMethod(method: .postRawTx(txHex))
+        let response = try? await self.callRpcMethod(method: .postRawTx(txHex))
         // returns the txid
-        let result = response["result"] as! String
-        return result
+        let result = response?["txID"] as? String
+        return result ?? "unknown tx id"
     }
 }
 

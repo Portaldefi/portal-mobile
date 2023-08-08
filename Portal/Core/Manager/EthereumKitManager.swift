@@ -9,22 +9,21 @@ import Foundation
 import EvmKit
 import HdWalletKit
 import Combine
-import RxSwift
 import Factory
+import Eip20Kit
 
 class EthereumKitManager {
     private let appConfigProvider: IAppConfigProvider
-    private let disposeBag = DisposeBag()
     
     private(set) var signer: Signer?
-    private var ethereumKit: Kit?
+    var ethereumKit: EvmKit.Kit?
     private var currentAccount: Account?
     
     init(appConfigProvider: IAppConfigProvider) {
         self.appConfigProvider = appConfigProvider
     }
     
-    func kit(account: Account) throws -> Kit {
+    func kit(account: Account) throws -> EvmKit.Kit {
         if let ethKit = ethereumKit, let currentAccount = currentAccount, currentAccount == account {
             return ethKit
         }
@@ -43,17 +42,28 @@ class EthereumKitManager {
         
         self.signer = signer
         
-        let ethereumKit = try Kit.instance(
+        let ethereumKit = try EvmKit.Kit.instance(
             address: address,
             chain: chain,
             rpcSource: .goerliInfuraWebsocket(
-                projectId: "7bffa4b191da4e9682d4351178c4736e",
-                projectSecret: "5dedf9a8a4c4477687cfac3debbc23c6"
+                projectId: appConfigProvider.infuraCredentials.id,
+                projectSecret: appConfigProvider.infuraCredentials.secret
             ),
-            transactionSource: .goerliEtherscan(apiKey: "PYPJHJFA2MUT12KPTT8FCKPAMGHTRDQICB"),
+            transactionSource: .goerliEtherscan(apiKey: appConfigProvider.etherscanKey),
             walletId: account.id,
             minLogLevel: .error
         )
+        
+        let eip20Kit = try Eip20Kit.Kit.instance(
+            evmKit: ethereumKit,
+            contractAddress: address
+        )
+        
+        // Decorators are needed to detect transactions as `Eip20` transfer/approve transactions
+        Eip20Kit.Kit.addDecorators(to: ethereumKit)
+
+        // Eip20 transactions syncer is needed to pull Eip20 transfer transactions from Etherscan
+        Eip20Kit.Kit.addTransactionSyncer(to: ethereumKit)
 
         ethereumKit.start()
 
@@ -66,16 +76,23 @@ class EthereumKitManager {
     func gasLimit(gasPrice: Int, transactionData: TransactionData) -> Future<Int, Never> {
         Future { [weak self] promise in
             guard let self = self else { promise(.success(Kit.defaultGasLimit));  return }
-                        
-            self.ethereumKit?
-                .estimateGas(transactionData: transactionData, gasPrice: .legacy(gasPrice: gasPrice))
-                .subscribe(onSuccess: { estimatedGasLimit in
-                    promise(.success(estimatedGasLimit))
-                }, onError: { error in
+            
+            Task {
+                do {
+                    if let estimatedGasLimit = try await self.ethereumKit?.fetchEstimateGas(transactionData: transactionData, gasPrice: .legacy(gasPrice: gasPrice)) {
+                        promise(.success(estimatedGasLimit))
+                    } else {
+                        promise(.success(Kit.defaultGasLimit))
+                    }
+                } catch {
                     promise(.success(Kit.defaultGasLimit))
-                })
-                .disposed(by: self.disposeBag)
+                }
+            }
         }
+    }
+    
+    func gasLimit(gasPrice: Int, transactionData: TransactionData) async throws -> Int? {
+        try await self.ethereumKit?.fetchEstimateGas(transactionData: transactionData, gasPrice: .legacy(gasPrice: gasPrice))
     }
 }
 

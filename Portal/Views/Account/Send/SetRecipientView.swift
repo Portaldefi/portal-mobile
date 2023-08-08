@@ -8,15 +8,36 @@
 import SwiftUI
 import PortalUI
 
+struct ViewHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat { 0 }
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value = value + nextValue()
+    }
+}
+
 struct SetRecipientView: View {
-    @State private var textHeight: CGFloat = 60
     @State private var showScanner = false
+    @State var textEditorHeight : CGFloat = 0
     @ObservedObject var viewModel: SendViewViewModel
     @EnvironmentObject private var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
     
     let rootView: Bool
-            
+    
+    private var textEditorColor: Color {
+        guard viewModel.sendError == nil else {
+            return Color(red: 255/255, green: 82/255, blue: 82/255)
+        }
+        return Palette.grayScale3A
+    }
+    
+    private var textEditorInputColor: Color {
+        guard viewModel.sendError == nil else {
+            return Color(red: 255/255, green: 82/255, blue: 82/255)
+        }
+        return .white
+    }
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
@@ -46,41 +67,48 @@ struct SetRecipientView: View {
                             .font(.Main.fixed(.bold, size: 24))
                             .foregroundColor(Palette.grayScaleCA)
                         
-                        ZStack {
-                            if viewModel.sendError == nil {
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Palette.grayScale3A, lineWidth: 1)
-                                    .allowsHitTesting(false)
-
-                            } else {
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(red: 255/255, green: 82/255, blue: 82/255), lineWidth: 1)
-                                    .allowsHitTesting(false)
-                            }
+                        ZStack(alignment: .leading) {
+                            // Workaround issue with TextEditor being resized wrong on going back in navigation stack
+                            // .fixedSize(horizontal: false, vertical: true)
+                            Text(viewModel.receiverAddress)
+                                .font(.Main.fixed(.monoRegular, size: 16))
+                                .foregroundColor(.clear)
+                                .padding(10)
+                                .background(
+                                    GeometryReader {
+                                        Color.clear.preference(
+                                            key: ViewHeightKey.self,
+                                            value: $0.frame(in: .local).size.height + 4
+                                        )
+                                    }
+                                )
+                            //
                             
-                            ZStack(alignment: .leading) {
-                                TextEditor(text: $viewModel.receiverAddress)
-                                    .hideBackground()
-                                    .lineLimit(2)
-                                    .frame(height: viewModel.receiverAddress.count > 34 ? 60 : 40)
-                                    .disableAutocorrection(true)
-                                    .textInputAutocapitalization(.never)
+                            TextEditor(text: $viewModel.receiverAddress)
+                                .hideBackground()
+                                .disableAutocorrection(true)
+                                .textInputAutocapitalization(.never)
+                                .font(.Main.fixed(.monoRegular, size: 16))
+                                .foregroundColor(textEditorInputColor)
+                                .frame(height: max(40, textEditorHeight))
+                                .padding(8)
+                            
+                            if viewModel.receiverAddress.isEmpty {
+                                Text("Enter address")
                                     .font(.Main.fixed(.monoRegular, size: 16))
-                                    .foregroundColor(viewModel.sendError == nil ? .white : Color(red: 1, green: 0.349, blue: 0.349))
-                                    .padding(8)
-
-                                if viewModel.receiverAddress.isEmpty {
-                                    Text("Enter address")
-                                        .font(.Main.fixed(.monoRegular, size: 16))
-                                        .foregroundColor(Palette.grayScale4A)
-                                        .padding(16)
-                                        .allowsHitTesting(false)
-                                }
+                                    .foregroundColor(Palette.grayScale4A)
+                                    .padding(16)
+                                    .allowsHitTesting(false)
                             }
-                            .frame(height: 58)
                         }
-                        .cornerRadius(12)
-                        .frame(height: 58)
+                        .onPreferenceChange(ViewHeightKey.self) {
+                            textEditorHeight = $0
+                        }
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(textEditorColor, lineWidth: 1)
+                                .allowsHitTesting(false)
+                        )
                     }
                     
                     HStack(spacing: 16) {
@@ -92,13 +120,24 @@ struct SetRecipientView: View {
                         ) {
                             showScanner.toggle()
                         }
+
+                        //Apparently SwiftUI button has an animation issue on TextField resizing. Recreating PButton view without wrapping into SwiftUI Button
                         
-                        PButton(
-                            config: .labelAndIconLeft(label: "Paste", icon: Asset.pasteIcon),
-                            style: .outline,
-                            size: .medium,
-                            enabled: true
-                        ) {
+                        HStack(spacing: 6) {
+                            Asset.pasteIcon
+                                .resizable()
+                                .frame(width: 26, height: 26)
+                            Text("Paste")
+                                .font(.Main.fixed(.monoBold, size: 16))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 40)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(RadialGradient.main, lineWidth: 2)
+                        )
+                        .containerShape(Rectangle())
+                        .onTapGesture {
                             viewModel.pasteFromClipboard()
                         }
                     }
@@ -127,12 +166,22 @@ struct SetRecipientView: View {
                         size: .big,
                         enabled: !viewModel.receiverAddress.isEmpty && viewModel.sendError == nil
                     ) {
-                        withAnimation {
-                            viewModel.validateReceiverAddress()
-                        }
-                        
-                        if viewModel.sendError == nil {
-                            navigation.push(.sendSetAmount(viewModel: viewModel))
+                        do {
+                            let result = try viewModel.validateInput()
+                            
+                            switch result {
+                            case .btcOnChain, .ethOnChain:
+                                navigation.push(.sendSetAmount(viewModel: viewModel))
+                            case .lightningInvoice(let amount):
+                                viewModel.exchanger?.amount.string = amount
+                                
+                                navigation.push(.sendSetAmount(viewModel: viewModel))
+                                navigation.push(.sendReviewTxView(viewModel: viewModel))
+                            }
+                        } catch {
+                            withAnimation {
+                                viewModel.updateError()
+                            }
                         }
                     }
                 }
@@ -143,7 +192,6 @@ struct SetRecipientView: View {
             )
             .transition(.move(edge: .bottom).combined(with: .opacity))
             .zIndex(1)
-
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .alert(isPresented: $viewModel.clipboardIsEmpty) {
@@ -152,31 +200,18 @@ struct SetRecipientView: View {
         .sheet(isPresented: $showScanner) {
             if let coin = viewModel.coin {
                 QRCodeReaderView(config: .send(coin)) { item in
-                    let address: String
-                    let amount: String?
-                    
-                    switch item.type {
-                    case .bip21(let adr, let amt, _):
-                        address = adr
-                        amount = amt
-                    case .eth(let adr, let amt, _):
-                        address = adr
-                        amount = amt
-                    default:
-                        address = String()
-                        amount = nil
-                    }
-                    
-                    viewModel.receiverAddress = address
-                    
-                    guard let amt = amount else {
+                    guard viewModel.hasAmount(item: item) else {
                         navigation.push(.sendSetAmount(viewModel: viewModel))
                         return
                     }
+                    guard !viewModel.receiverAddress.isEmpty else { return }
                     
-                    viewModel.exchanger?.amount.string = amt
+                    switch item.type {
+                    case .bip21, .eth:
+                        navigation.push(.sendSetAmount(viewModel: viewModel))
+                    default: break
+                    }
                     
-                    navigation.push(.sendSetAmount(viewModel: viewModel))
                     navigation.push(.sendReviewTxView(viewModel: viewModel))
                 }
             }

@@ -22,12 +22,27 @@ class AdapterFactory: IAdapterFactory {
             do {
                 return try BitcoinAdapter(wallet: wallet)
             } catch {
-                print(error.localizedDescription)
+                print(error)
                 fatalError(error.localizedDescription)
             }
         case .ethereum:
             if let ethKit = try? ethereumKitManager.kit(account: wallet.account) {
                 return EthereumAdapter(evmKit: ethKit, signer: ethereumKitManager.signer)
+            } else {
+                return nil
+            }
+        case .erc20(let contractAddress):
+            if let ethKit = try? ethereumKitManager.kit(account: wallet.account) {
+                return try? Erc20Adapter(
+                    evmKit: ethKit,
+                    signer: ethereumKitManager.signer,
+                    token: Erc20Token(
+                        name: wallet.coin.name,
+                        code: wallet.coin.code,
+                        contractAddress: contractAddress,
+                        decimal: wallet.coin.decimal
+                    )
+                )
             } else {
                 return nil
             }

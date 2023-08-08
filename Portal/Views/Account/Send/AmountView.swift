@@ -154,7 +154,7 @@ struct AmountView_Previews: PreviewProvider {
         AmountView(exchanger: Exchanger(
             base: .bitcoin(),
             quote: .fiat(
-                FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)
+                FiatCurrency(code: "USD", rate: 1)
             ), price: 21000
         ), isValid: true)
         .padding()

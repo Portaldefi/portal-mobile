@@ -8,9 +8,10 @@
 import Foundation
 import Combine
 import BitcoinDevKit
+import Factory
 
 class SendBTCService: ISendAssetService {
-    private var url: URL? = URL(string: "https://bitcoinfees.earn.com/api/v1/fees/recommended")
+    private var url: URL? = URL(string: "https://api.blockcypher.com/v1/btc/test3")
     private var urlSession: URLSession
     private let sendAdapter: ISendBitcoinAdapter
     private var subscriptions = Set<AnyCancellable>()
@@ -53,16 +54,21 @@ class SendBTCService: ISendAssetService {
                 print("send btc service amount = \(String(describing: amount))")
                 
                 do {
-                    try self.validateAddress()
+                    let result = try self.validateUserInput()
                     
-                    let txFee = try self.sendAdapter.fee(
-                        max: amount == self.spendable,
-                        address: address,
-                        amount: amount,
-                        fee: self.recomendedFee
-                    )
-                    
-                    return Just(txFee).eraseToAnyPublisher()
+                    switch result {
+                    case .btcOnChain(let address):
+                        let txFee = try self.sendAdapter.fee(
+                            max: amount == self.spendable,
+                            address: address,
+                            amount: amount,
+                            fee: self.recomendedFee
+                        )
+                        
+                        return Just(txFee).eraseToAnyPublisher()
+                    case .lightningInvoice, .ethOnChain:
+                        return Just(nil).eraseToAnyPublisher()
+                    }
                 } catch {
                     print(error)
                     return Just(nil).eraseToAnyPublisher()
@@ -94,12 +100,51 @@ class SendBTCService: ISendAssetService {
             .store(in: &subscriptions)
     }
     
-    func validateAddress() throws {
-        try sendAdapter.validate(address: receiverAddress.value)
+    func validateUserInput() throws -> UserInputResult {
+        let ldkManager = Container.lightningKitManager()
+        let inputString = receiverAddress.value
+        
+        do {
+            if let invoice = try ldkManager.decode(invoice: inputString) {
+                if let value = invoice.amountMilliSatoshis() {
+                    return .lightningInvoice(amount: String(describing: Decimal(value)/1000/100_000_000))
+                } else {
+                    return .lightningInvoice(amount: String())
+                }
+            } else {
+                return .lightningInvoice(amount: String())
+            }
+        } catch {
+            print("user input isn't invoice")
+        }
+        
+        do {
+            try sendAdapter.validate(address: inputString)
+            return .btcOnChain(address: inputString)
+        } catch {
+            print("user input isn't on chain address")
+        }
+        
+        throw SendFlowError.addressIsntValid
     }
     
     func send() -> Future<TransactionRecord, Error> {
-        sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: self.recomendedFee)
+        if let result = try? validateUserInput() {
+            switch result {
+            case .btcOnChain:
+                return sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: self.recomendedFee)
+            case .lightningInvoice:
+                let manager = Container.lightningKitManager()
+                
+                return manager.pay(invoice: receiverAddress.value)
+            case .ethOnChain:
+                return sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: self.recomendedFee)
+            }
+        } else {
+            return Future { promise in
+                promise(.failure(SendFlowError.error("Not valid user input")))
+            }
+        }
     }
     
     func sendMax() -> Future<TransactionRecord, Error> {

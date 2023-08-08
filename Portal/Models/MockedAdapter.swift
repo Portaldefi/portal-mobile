@@ -7,8 +7,19 @@
 
 import Foundation
 import Combine
+import BitcoinDevKit
 
 class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepositAdapter, IBalanceAdapter {
+    var pubKey: String {
+        "tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3"
+    }
+    
+    var L1Balance: Decimal { 0.003 }
+    
+    func send(amount: Decimal, address: String) throws -> TransactionRecord {
+        TransactionRecord.mocked
+    }
+    
     var state: AdapterState = .synced
     
     var balanceStateUpdated: AnyPublisher<Void, Never> {
@@ -45,6 +56,10 @@ class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepos
         Future { promise in
             promise(.success(TransactionRecord.mocked))
         }
+    }
+    
+    func rawTransaction(amount: UInt64, address: String) throws -> Transaction {
+        try! Transaction(transactionBytes: [])
     }
     
     func start() {

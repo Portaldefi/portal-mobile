@@ -129,8 +129,9 @@ class SendETHService: ISendAssetService {
         estimatedGasLimit + Int(Double(estimatedGasLimit) / 100.0 * Double(gasLimitSurchargePercent))
     }
     
-    func validateAddress() throws {
+    func validateUserInput() throws -> UserInputResult {
         _ = try EvmKit.Address.init(hex: receiverAddress.value)
+        return .ethOnChain(address: receiverAddress.value)
     }
     
     func send() -> Future<TransactionRecord, Error> {

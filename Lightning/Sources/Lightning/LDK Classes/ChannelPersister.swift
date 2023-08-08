@@ -8,7 +8,7 @@
 import Foundation
 import LightningDevKit
 
-class ChannelPersister: Persist {
+class ChannelPersister: Persist {    
     override func persistNewChannel(channelId: Bindings.OutPoint, data: Bindings.ChannelMonitor, updateId: Bindings.MonitorUpdateId) -> Bindings.ChannelMonitorUpdateStatus {
         let idBytes: [UInt8] = channelId.write()
         let monitorBytes: [UInt8] = data.write()
@@ -48,9 +48,9 @@ class ChannelPersister: Persist {
         do {
            let data = try NSKeyedArchiver.archivedData(
                withRootObject: channelMonitor,
-               requiringSecureCoding: false
+               requiringSecureCoding: true
            )
-           try data.write(to: pathToPersist)
+           try data.write(to: pathToPersist, options: [.atomic, .completeFileProtection])
         } catch {
            throw error
         }

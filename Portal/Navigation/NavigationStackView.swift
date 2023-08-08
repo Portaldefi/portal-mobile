@@ -17,6 +17,9 @@ enum Screen {
     case send(item: WalletItem)
     case receive(item: WalletItem)
     case accountBackup
+    case securitySettings
+    case setSecuritySettings(viewModel: CreateAccountViewModel)
+    case setPinCode
     case assetDetails(item: WalletItem)
     case createAccount
     case restoreAccount
@@ -26,6 +29,7 @@ enum Screen {
     case recoveryPhraseTest(viewModel: RecoveryPhraseViewModel)
     case recoveryWarning(viewModel: RecoveryPhraseViewModel)
     case transactionDetails(coin: Coin, tx: TransactionRecord)
+    case setupSecuritySettings
     
     case sendSelectAsset(viewModel: SendViewViewModel)
     case sendSetRecipient(viewModel: SendViewViewModel)
@@ -76,6 +80,14 @@ extension Screen {
             return "send_review_tx_ID"
         case .receiveGenerateQRCode:
             return "receive_generate_qr_code_ID"
+        case .securitySettings:
+            return "security_settings_ID"
+        case .setSecuritySettings:
+            return "set_security_settings_ID"
+        case .setPinCode:
+            return "set_pincode_ID"
+        case .setupSecuritySettings:
+            return "set_security_settings_ID"
         }
     }
 }

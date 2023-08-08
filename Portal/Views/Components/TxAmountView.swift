@@ -11,7 +11,8 @@ import PortalUI
 struct TxAmountView: View {
     let amount: String
     let value: String
-    let code: String
+    let coinCode: String
+    let currencyCode: String
     
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
@@ -21,7 +22,7 @@ struct TxAmountView: View {
                     .foregroundColor(Palette.grayScaleEA)
                     .frame(height: 26)
                 
-                Text(code)
+                Text(coinCode)
                     .font(.Main.fixed(.monoRegular, size: 18))
                     .foregroundColor(Palette.grayScale6A)
             }
@@ -31,7 +32,7 @@ struct TxAmountView: View {
                     .font(.Main.fixed(.monoMedium, size: 16))
                     .foregroundColor(Palette.grayScale6A)
                 
-                Text("usd")
+                Text(currencyCode)
                     .font(.Main.fixed(.monoMedium, size: 12))
                     .foregroundColor(Palette.grayScale6A)
             }
@@ -41,7 +42,7 @@ struct TxAmountView: View {
 
 struct TxAmountView_Previews: PreviewProvider {
     static var previews: some View {
-        TxAmountView(amount: "0.000055", value: "1.24", code: "btc")
+        TxAmountView(amount: "0.000055", value: "1.24", coinCode: "btc", currencyCode: "usd")
             .padding()
             .previewLayout(.sizeThatFits)
     }

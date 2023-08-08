@@ -66,7 +66,7 @@ extension Exchanger {
     }
     
     static func mocked() -> Exchanger {
-        let exchanger = Exchanger(base: .bitcoin(), quote: .fiat(FiatCurrency(code: "USD", name: "Dollar")), price: 21000)
+        let exchanger = Exchanger(base: .bitcoin(), quote: .fiat(FiatCurrency(code: "USD")), price: 21000)
         exchanger.amount.string = "0.00001"
         return exchanger
     }

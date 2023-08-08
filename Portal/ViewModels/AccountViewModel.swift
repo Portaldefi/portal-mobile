@@ -16,14 +16,18 @@ class AccountViewModel: ObservableObject {
     @Published private(set) var totalBalance: String = "0"
     @Published private(set) var totalValue: String = "0"
     
+    private(set) var fiatCurrency = FiatCurrency(code: "USD")
+    private(set) var portolioCurrency = Coin.bitcoin()
+    
     @Published private(set) var items: [WalletItem] = [] {
         didSet {
+            updateValues()
+            
             Publishers.Sequence(sequence: items)
                 .flatMap { $0.balanceUpdated }
                 .receive(on: RunLoop.main)
-                .sink { [weak self] _ in
-                    self?.updateBalance()
-                    self?.updateValue()
+                .sink { [unowned self] _ in
+                    self.updateValues()
                 }
                 .store(in: &subscriptions)
         }
@@ -38,6 +42,8 @@ class AccountViewModel: ObservableObject {
         }
     }
     @Published var goToReceive = false
+    @Published var goToSettings = false
+    @Published var settings: PortalSettings
     
     private let accountManager: IAccountManager
     private let walletManager: IWalletManager
@@ -56,13 +62,15 @@ class AccountViewModel: ObservableObject {
         walletManager: IWalletManager,
         adapterManager: IAdapterManager,
         localStorage: ILocalStorage,
-        marketData: IMarketDataRepository
+        marketData: IMarketDataRepository,
+        settings: PortalSettings
     ) {
         self.accountManager = accountManager
         self.walletManager = walletManager
         self.adapterManager = adapterManager
         self.localStorage = localStorage
         self.marketData = marketData
+        self.settings = settings
         
         subscribeForUpdates()
         
@@ -84,7 +92,8 @@ class AccountViewModel: ObservableObject {
         marketData
             .onMarketDataUpdate
             .receive(on: RunLoop.main)
-            .sink { _ in
+            .sink { [unowned self] _ in
+                guard !self.goToSend && !self.goToReceive && !self.goToSettings else { return }
                 self.updateValue()
             }
             .store(in: &subscriptions)
@@ -92,23 +101,83 @@ class AccountViewModel: ObservableObject {
         accountManager
             .onActiveAccountUpdate
             .compactMap { $0 }
+            .receive(on: RunLoop.main)
             .sink { [weak self] account in
                 self?.accountName = account.name
             }
             .store(in: &subscriptions)
         
-        $items
-            .filter{ !$0.isEmpty }
-            .delay(for: .seconds(0.1), scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.updateBalance()
+        settings
+            .$fiatCurrency
+            .receive(on: RunLoop.main)
+            .sink { [weak self] currency in
+                self?.fiatCurrency = currency
                 self?.updateValue()
+            }
+            .store(in: &subscriptions)
+        
+        settings
+            .$portfolioCurrency
+            .receive(on: RunLoop.main)
+            .sink { [weak self] currency in
+                self?.portolioCurrency = currency
+                self?.updateBalance()
             }
             .store(in: &subscriptions)
     }
     
-    private func updateBalance() {
-        let balance = items.map{ $0.viewModel.balance }.reduce(0){ $0 + $1 }
+    func updateValues() {
+        updateBalance()
+        updateValue()
+    }
+    
+    func updatePortfolioCurrency() {
+        if portolioCurrency == .bitcoin() {
+            portolioCurrency = .ethereum()
+        } else {
+            portolioCurrency = .bitcoin()
+        }
+        
+        updateBalance()
+    }
+    
+    private func convertToBtcBalance(item: WalletItem) -> Decimal {
+        switch item.coin.type {
+        case .bitcoin, .lightningBitcoin:
+            return item.viewModel.balance
+        case .ethereum:
+            return (item.viewModel.balance * marketData.lastSeenEthPrice) / marketData.lastSeenBtcPrice
+        case .erc20:
+            //FIX ME
+            return (item.viewModel.balance * marketData.lastSeenLinkPrice) / marketData.lastSeenBtcPrice
+        }
+    }
+    
+    private func convertToEthBalance(item: WalletItem) -> Decimal {
+        switch item.coin.type {
+        case .bitcoin, .lightningBitcoin:
+            return (item.viewModel.balance * marketData.lastSeenBtcPrice) / marketData.lastSeenEthPrice
+        case .ethereum:
+            return item.viewModel.balance
+        case .erc20:
+            //FIX ME
+            return (item.viewModel.balance * marketData.lastSeenLinkPrice) / marketData.lastSeenEthPrice
+        }
+    }
+    
+    private func convertToPortfolioBalance(item: WalletItem) -> Decimal {
+        switch portolioCurrency.type {
+        case .bitcoin:
+            return convertToBtcBalance(item: item)
+        case .ethereum:
+            return convertToEthBalance(item: item)
+        default:
+            return 0
+        }
+    }
+        
+    private func updateBalance() {        
+        let balance = items.map{ convertToPortfolioBalance(item: $0) }.reduce(0){ $0 + $1 }.double.rounded(toPlaces: 12)
         
         if totalBalance != "\(balance)" {
             totalBalance = "\(balance)"
@@ -116,8 +185,12 @@ class AccountViewModel: ObservableObject {
     }
     
     private func updateValue() {
-        if let value = items.first?.viewModel.valueString, totalValue != value {
-            totalValue = value
+        let value = items.map{ convertToBtcBalance(item: $0) * marketData.lastSeenBtcPrice * fiatCurrency.rate }.reduce(0, { $0 + $1 }).double.usdFormatted()
+        
+        if totalValue != value {
+            DispatchQueue.main.async {
+                self.totalValue = value
+            }
         }
     }
     
@@ -133,7 +206,8 @@ extension AccountViewModel {
             walletManager: WalletManager.mocked,
             adapterManager: AdapterManager.mocked,
             localStorage: LocalStorage.mocked,
-            marketData: MarketDataService.mocked
+            marketData: MarketDataService.mocked,
+            settings: PortalSettings()
         )
         viewModel.accountName = "Mocked"
         viewModel.totalBalance = "0.00055"

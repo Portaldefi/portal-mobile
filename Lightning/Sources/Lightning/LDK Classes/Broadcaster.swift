@@ -18,10 +18,10 @@ class Broadcaster: BroadcasterInterface {
     }
 
     override func broadcastTransaction(tx: [UInt8]) {
-        print("Broadcasting Transaction")
+        print("Broadcasting Transaction: \(tx.toHexString())")
 
         Task {
-          try? await self.chainInterface.submitTransaction(transaction: tx)
+            try? await self.chainInterface.submitTransaction(transaction: tx)
         }
     }
 }

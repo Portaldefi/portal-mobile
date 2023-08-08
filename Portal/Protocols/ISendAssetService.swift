@@ -17,7 +17,7 @@ protocol ISendAssetService {
     var feeRateType: CurrentValueSubject<TxFees, Never> { get }
     var recomendedFees: CurrentValueSubject<RecomendedFees?, Never> { get }
     
-    func validateAddress() throws
+    func validateUserInput() throws -> UserInputResult
     func send() -> Future<TransactionRecord, Error>
     func sendMax() -> Future<TransactionRecord, Error>
 }

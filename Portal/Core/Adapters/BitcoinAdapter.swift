@@ -8,9 +8,21 @@
 import Foundation
 import Combine
 import BitcoinDevKit
-import BitcoinAddressValidator
+import HsCryptoKit
+import Factory
 
 final class BitcoinAdapter {
+    private let publicKey: String
+    private let ldkManager = Container.lightningKitManager()
+    
+    private enum DereviationPathBranch: Int {
+        case external = 0, `internal`
+    }
+    
+    private let electrumTestNetURL = "ssl://electrum.blockstream.info:60002"
+    private let espolaRegTestURL = "http:/localhost:3002"
+    private var blockChainHeight: Int32 = 0
+    
     private let coinRate: Decimal = pow(10, 8)
     
     private let stateUpdatedSubject = PassthroughSubject<Void, Never>()
@@ -19,32 +31,94 @@ final class BitcoinAdapter {
     
     private let wallet: BitcoinDevKit.Wallet
     private let blockchain: BitcoinDevKit.Blockchain
-    private let updateTimer = RepeatingTimer(timeInterval: 180)
+    private let updateTimer = RepeatingTimer(timeInterval: 10)
     private let networkQueue = DispatchQueue(label: "com.portal.network.layer.queue", qos: .userInitiated)
     
-    private var adapterState: AdapterState = .syncing(progress: 0, lastBlockDate: nil)
+    private var adapterState: AdapterState = .synced
     private var _balance = Balance(immature: 0, trustedPending: 0, untrustedPending: 0, confirmed: 0, spendable: 0, total: 0)
     private var _receiveAddress = AddressInfo(index: 0, address: String())
+    private var _transactions = [TransactionDetails]()
+    
+    @Injected(Container.notificationService) var notificationService
+    @Injected(Container.txDataStorage) private var txDataStorage
+    
+    static private func descriptor(derivedKey: String, network: Network) throws -> Descriptor {
+        try Descriptor(descriptor: "wpkh(\(derivedKey))", network: network)
+    }
+    
+    static private func dereviationPath(index: Int, branch: DereviationPathBranch) throws -> DerivationPath {
+        try DerivationPath(path: "m/84h/0h/\(index)h/\(branch.rawValue)")
+    }
         
     init(wallet: Wallet) throws {
+        let network = wallet.account.btcNetwork
+        
         let account = wallet.account
-        let bip32RootKey = wallet.account.rootKey
-        let deriviationPath = try DerivationPath(path: "m/84h/0h/\(account.index)h/0")
+        let accountIndex = account.index
+        
+        let bip32RootKey = try DescriptorSecretKey.fromString(secretKey: wallet.account.rootKey)
+        
+        let deriviationPath = try Self.dereviationPath(index: accountIndex, branch: .external)
         let derivedKey = try bip32RootKey.derive(path: deriviationPath)
-        let descriptor = try Descriptor(descriptor: "wpkh(\(derivedKey.asString()))", network: .testnet)
+        
+        let descriptor = try Self.descriptor(derivedKey: derivedKey.asString(), network: network)
+        
+        let changeDerivationPath = try Self.dereviationPath(index: accountIndex, branch: .internal)
+        let changeDerivedKey = try bip32RootKey.derive(path: changeDerivationPath)
+        let changeDescriptor = try Self.descriptor(derivedKey: changeDerivedKey.asString(), network: network)
+        
+        let keyBytes = derivedKey.asString().bytes
+        let keyData = Data(keyBytes)
+        
+        let compressedKey = Crypto.publicKey(privateKey: keyData, compressed: true)
+        self.publicKey = compressedKey.toHexString()
+
         
         if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
             let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite" + "\(account.id)")
             let dbConfig = DatabaseConfig.sqlite(config: sqliteConfig)
-            let electrum = ElectrumConfig(url: "ssl://electrum.blockstream.info:60002", socks5: nil, retry: 5, timeout: nil, stopGap: 10, validateDomain: false)
-            let blockchainConfig = BlockchainConfig.electrum(config: electrum)
+            let blockchainConfig: BlockchainConfig
             
+            switch network {
+            case .bitcoin, .signet:
+                fatalError("not implemented")
+            case .testnet:
+                let electrumConfig = ElectrumConfig(
+                    url: electrumTestNetURL,
+                    socks5: nil,
+                    retry: 5,
+                    timeout: nil,
+                    stopGap: 10,
+                    validateDomain: false
+                )
+                blockchainConfig = BlockchainConfig.electrum(config: electrumConfig)
+            case .regtest:
+                let espolaConfig = EsploraConfig(
+                    baseUrl: espolaRegTestURL,
+                    proxy: nil,
+                    concurrency: nil,
+                    stopGap: 10,
+                    timeout: nil
+                )
+                blockchainConfig = BlockchainConfig.esplora(config: espolaConfig)
+                
+//                let rpcConfig = RpcConfig(
+//                    url: "localhost:18454",
+//                    auth: .userPass(username: "polaruser", password: "polarpass"),
+//                    network: .regtest,
+//                    walletName: "portal.regtest",
+//                    syncParams: nil
+//                )
+//
+//                blockchainConfig = BlockchainConfig.rpc(config: rpcConfig)
+            }
+                        
             blockchain = try Blockchain(config: blockchainConfig)
             
             self.wallet = try BitcoinDevKit.Wallet(
                 descriptor: descriptor,
-                changeDescriptor: nil,
-                network: Network.testnet,
+                changeDescriptor: changeDescriptor,
+                network: network,
                 databaseConfig: dbConfig
             )
             
@@ -53,33 +127,43 @@ final class BitcoinAdapter {
             updateTimer.eventHandler = { [unowned self] in
                 self.syncData()
             }
+            
+            Task {
+                try await ldkManager.start()
+            }
         } else {
             throw BtcAdapterError.dbNotFound
         }
     }
     
     private func syncData() {
+        if case .syncing = adapterState { return }
+        
         update(state: .syncing(progress: 0, lastBlockDate: nil))
         
-        do {
-            print("SYNCING WITH BITCOIN NETWORK...")
-            try wallet.sync(blockchain: blockchain, progress: nil)
-            print("BITCOIN NETWORK SYNCED")
-            try update()
-            print("BITCOIN DATA UPDATED")
-            update(state: .synced)
-        } catch {
-            print("BITCOIN NETWORK SYNC ERROR: \(error)")
-            update(state: .notSynced(error: error))
+        networkQueue.async {
+            do {
+                print("SYNCING WITH BITCOIN NETWORK...")
+                let start = DispatchTime.now()
+                try self.wallet.sync(blockchain: self.blockchain, progress: nil)
+                let end = DispatchTime.now()
+                let nanoTime = end.uptimeNanoseconds - start.uptimeNanoseconds
+                let timeInterval = Double(nanoTime)/1_000_000_000
+                print("SYNCED in \(timeInterval) seconds")
+                try self.update()
+                self.update(state: .synced)
+            } catch {
+                print("BITCOIN NETWORK SYNC ERROR: \(error)")
+                self.update(state: .notSynced(error: error))
+            }
         }
     }
     
     private func update() throws {
         try updateAddress()
         try updateBalance()
-        print("BITCOIN BALANCE UPDATED")
         try updateTransactions()
-        print("BITCOIN TRANSACTIONS UPDATED")
+        try updateBlockHeight()
     }
     
     private func update(state: AdapterState) {
@@ -88,18 +172,53 @@ final class BitcoinAdapter {
     }
     
     private func updateBalance() throws {
+        let oldValue = _balance
         _balance = try wallet.getBalance()
-        balanceUpdatedSubject.send()
+        if _balance != oldValue {
+            balanceUpdatedSubject.send()
+        }
     }
     
     private func updateAddress() throws {
-        let addressInfo = try wallet.getAddress(addressIndex: AddressIndex.lastUnused)
-        _receiveAddress = addressInfo
+        _receiveAddress = try wallet.getAddress(addressIndex: AddressIndex.lastUnused)
     }
     
     private func updateTransactions() throws {
-        let transactions = try wallet.listTransactions().map{ TransactionRecord(transaction: $0) }
-        transactionsSubject.send(transactions)
+        let transactions = try wallet.listTransactions(includeRaw: true)
+        guard transactions != _transactions else { return }
+        
+        _transactions = transactions
+        
+        var txRecords = [TransactionRecord]()
+        
+        for txRecord in transactions {
+            var isNew = false
+            if txDataStorage.fetchTxData(txID: txRecord.txid) == nil { isNew = true }
+            
+            let source: TxSource = .btcOnChain
+            let data = txDataStorage.fetch(source: source, id: txRecord.txid)
+            let userData = TxUserData(data: data)
+            let record = TransactionRecord(transaction: txRecord, userData: userData)
+            
+            txRecords.append(record)
+            
+            if isNew {
+                guard record.type == .received else { return }
+                
+                let satAmount = record.amount?.double ?? 0
+                let btcAmount = satAmount / 100_000_000
+                let message = "You've received \(btcAmount) \(record.coin.code.uppercased())"
+                
+                let pNotification = PNotification(message: message)
+                notificationService.notify(pNotification)
+            }
+        }
+                
+        transactionsSubject.send(txRecords)
+    }
+    
+    private func updateBlockHeight() throws {
+        blockChainHeight = Int32(try blockchain.getHeight())
     }
 }
 
@@ -117,10 +236,7 @@ extension BitcoinAdapter: IAdapter {
     }
     
     var blockchainHeight: Int32 {
-        if let height = try? blockchain.getHeight() {
-            return Int32(height)
-        }
-        return 0
+        blockChainHeight
     }
 }
 
@@ -129,8 +245,12 @@ extension BitcoinAdapter: IBalanceAdapter {
         adapterState
     }
     
+    var L1Balance: Decimal {
+        Decimal(_balance.spendable + _balance.untrustedPending)/coinRate
+    }
+    
     var balance: Decimal {
-        Decimal(_balance.spendable)/coinRate
+        ldkManager.channelBalance/1000/coinRate
     }
     
     var balanceStateUpdated: AnyPublisher<Void, Never> {
@@ -150,11 +270,47 @@ extension BitcoinAdapter: IDepositAdapter {
 
 extension BitcoinAdapter: ITransactionsAdapter {
     var transactionRecords: AnyPublisher<[TransactionRecord], Never> {
-        transactionsSubject.eraseToAnyPublisher()
+        transactionsSubject
+            .combineLatest(ldkManager.transactionsPublisher) { btcTxs, lightningTxs in
+                (btcTxs + lightningTxs).sorted(by: { $0.timestamp ?? 1 > $1.timestamp ?? 0 })
+            }
+            .eraseToAnyPublisher()
     }
 }
 
 extension BitcoinAdapter: ISendBitcoinAdapter {
+    var pubKey: String {
+        publicKey
+    }
+    
+    func rawTransaction(amount: UInt64, address: String) throws -> Transaction {
+        let receiverAddress = try Address(address: address)
+        let receiverAddressScript = receiverAddress.scriptPubkey()
+        let txBuilderResult: TxBuilderResult
+        let utxos = try? wallet.listUnspent()
+        let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
+        
+        txBuilderResult = try TxBuilder()
+            .addUtxos(outpoints: outpoints)
+            .addRecipient(script: receiverAddressScript, amount: amount)
+            .enableRbf()
+            .finish(wallet: wallet)
+        
+        let psbt = txBuilderResult.psbt
+        let txDetails = txBuilderResult.transactionDetails
+        print("txDetails: \(txDetails)")
+        
+        let signed = try wallet.sign(psbt: psbt, signOptions: .none)
+        print("Tx id: \(psbt.txid())")
+        print("funding tx serialized: \(psbt.serialize())")
+        
+        if signed {
+            return psbt.extractTx()
+        } else {
+            throw SendFlowError.error("Tx not finalized")
+        }
+    }
+    
     func send(amount: Decimal, address: String, fee: Int?) -> Combine.Future<TransactionRecord, Error> {
         Future { [unowned self] promise in
             do {
@@ -162,15 +318,19 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                 let receiverAddress = try Address(address: address)
                 let receiverAddressScript = receiverAddress.scriptPubkey()
                 let txBuilderResult: TxBuilderResult
-                
+                let utxos = try? wallet.listUnspent()
+                let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
+
                 if let fee = fee {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .addRecipient(script: receiverAddressScript, amount: satsAmount)
                         .feeRate(satPerVbyte: Float(fee))
                         .enableRbf()
                         .finish(wallet: wallet)
                 } else {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .addRecipient(script: receiverAddressScript, amount: satsAmount)
                         .enableRbf()
                         .finish(wallet: wallet)
@@ -180,12 +340,15 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                 let txDetails = txBuilderResult.transactionDetails
                 print("txDetails: \(txDetails)")
                 
-                let finalized = try wallet.sign(psbt: psbt)
+                let finalized = try wallet.sign(psbt: psbt, signOptions: .none)
                 print("Tx id: \(psbt.txid())")
                 
                 if finalized {
-                    try blockchain.broadcast(psbt: psbt)
-                    let record = TransactionRecord(transaction: txDetails)
+                    try blockchain.broadcast(transaction: psbt.extractTx())
+                    let source: TxSource = .btcOnChain
+                    let data = txDataStorage.fetch(source: source, id: txDetails.txid)
+                    let userData = TxUserData(data: data)
+                    let record = TransactionRecord(transaction: txDetails, userData: userData)
                     promise(.success(record))
                 } else {
                     promise(.failure(SendFlowError.error("Tx not finalized")))
@@ -196,14 +359,50 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         }
     }
     
+    func send(amount: Decimal, address: String) throws -> TransactionRecord {
+        let satsAmount = UInt64((amount * 100_000_000).double)
+        let receiverAddress = try Address(address: address)
+        let receiverAddressScript = receiverAddress.scriptPubkey()
+        let txBuilderResult: TxBuilderResult
+        let utxos = try? wallet.listUnspent()
+        let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
+
+        txBuilderResult = try TxBuilder()
+            .addUtxos(outpoints: outpoints)
+            .addRecipient(script: receiverAddressScript, amount: satsAmount)
+            .enableRbf()
+            .finish(wallet: wallet)
+        
+        let psbt = txBuilderResult.psbt
+        let txDetails = txBuilderResult.transactionDetails
+        print("txDetails: \(txDetails)")
+        
+        let finalized = try wallet.sign(psbt: psbt, signOptions: .none)
+        print("Tx id: \(psbt.txid())")
+        
+        if finalized {
+            try blockchain.broadcast(transaction: psbt.extractTx())
+            let source: TxSource = .btcOnChain
+            let data = txDataStorage.fetch(source: source, id: txDetails.txid)
+            let userData = TxUserData(data: data)
+            let record = TransactionRecord(transaction: txDetails, userData: userData)
+            return(record)
+        } else {
+            throw SendFlowError.error("Tx not finalized")
+        }
+    }
+    
     func sendMax(address: String, fee: Int?) -> Combine.Future<TransactionRecord, Error> {
         Future { [unowned self] promise in
             do {
                 let txBuilderResult: TxBuilderResult
                 let receiverAddress = try Address(address: address)
+                let utxos = try? wallet.listUnspent()
+                let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
 
                 if let fee = fee {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .drainWallet()
                         .drainTo(script: receiverAddress.scriptPubkey())
                         .feeRate(satPerVbyte: Float(fee))
@@ -211,6 +410,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                         .finish(wallet: wallet)
                 } else {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .drainWallet()
                         .drainTo(script: receiverAddress.scriptPubkey())
                         .enableRbf()
@@ -221,12 +421,15 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                 let txDetails = txBuilderResult.transactionDetails
                 print("txDetails: \(txDetails)")
 
-                let finalized = try wallet.sign(psbt: psbt)
+                let finalized = try wallet.sign(psbt: psbt, signOptions: .none)
                 print("Tx id: \(psbt.txid())")
 
                 if finalized {
-                    try blockchain.broadcast(psbt: psbt)
-                    let record = TransactionRecord(transaction: txDetails)
+                    try blockchain.broadcast(transaction: psbt.extractTx())
+                    let source: TxSource = .btcOnChain
+                    let data = txDataStorage.fetch(source: source, id: txDetails.txid)
+                    let userData = TxUserData(data: data)
+                    let record = TransactionRecord(transaction: txDetails, userData: userData)
                     promise(.success(record))
                 } else {
                     promise(.failure(SendFlowError.error("Tx not finalized")))
@@ -241,10 +444,13 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         do {
             let txBuilderResult: TxBuilderResult
             let receiverAddress = try Address(address: address)
-            
+            let utxos = try? wallet.listUnspent()
+            let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
+
             if max {
                 if let fee = fee {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .drainWallet()
                         .drainTo(script: receiverAddress.scriptPubkey())
                         .feeRate(satPerVbyte: Float(fee))
@@ -252,6 +458,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                         .finish(wallet: wallet)
                 } else {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .drainWallet()
                         .drainTo(script: receiverAddress.scriptPubkey())
                         .enableRbf()
@@ -266,12 +473,14 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
                 
                 if let fee = fee {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .addRecipient(script: recieverAddressScript, amount: satsAmount)
                         .feeRate(satPerVbyte: Float(fee))
                         .enableRbf()
                         .finish(wallet: wallet)
                 } else {
                     txBuilderResult = try TxBuilder()
+                        .addUtxos(outpoints: outpoints)
                         .addRecipient(script: recieverAddressScript, amount: satsAmount)
                         .enableRbf()
                         .finish(wallet: wallet)
@@ -285,9 +494,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
     }
     
     func validate(address: String) throws {
-        if !BitcoinAddressValidator.isValid(address: address) {
-            throw SendFlowError.addressIsntValid
-        }
+        _ = try Address(address: address)
     }
 }
 

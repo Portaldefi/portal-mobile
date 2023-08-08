@@ -12,7 +12,7 @@ import Factory
 struct ResponsibleWarningView: View {
     @EnvironmentObject private var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
-    @EnvironmentObject private var sharedState: AccountViewSharedState
+    @EnvironmentObject private var sharedState: ViewState
     @ObservedObject private var viewModel: RecoveryPhraseViewModel
     
     init(viewModel: RecoveryPhraseViewModel) {

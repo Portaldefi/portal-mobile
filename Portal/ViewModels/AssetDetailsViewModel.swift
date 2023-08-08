@@ -12,7 +12,6 @@ import Factory
 
 class AssetDetailsViewModel: ObservableObject {
     let coin: Coin
-    let walletItems: [WalletItem]
     
     @Published var goToReceive = false
     @Published var goSend: Bool = false {
@@ -26,13 +25,10 @@ class AssetDetailsViewModel: ObservableObject {
     
     private let transactionAdapter: ITransactionsAdapter
     private var subscriptions = Set<AnyCancellable>()
-    
-    private var receiveViewModel: ReceiveViewModel?
-    
-    init(coin: Coin, transactionAdapter: ITransactionsAdapter, walletItems: [WalletItem]) {
+        
+    init(coin: Coin, transactionAdapter: ITransactionsAdapter) {
         self.coin = coin
         self.transactionAdapter = transactionAdapter
-        self.walletItems = walletItems
         
         subscribe()
     }
@@ -48,18 +44,6 @@ class AssetDetailsViewModel: ObservableObject {
         subscribe()
     }
     
-    func cleanup() {
-        receiveViewModel = nil
-    }
-    
-    func receviewVM() -> ReceiveViewModel {
-        guard let vm = receiveViewModel else {
-            receiveViewModel = ReceiveViewModel.config(items: walletItems, selectedItem: walletItems.first{ $0.coin == coin })
-            return receiveViewModel!
-        }
-        return vm
-    }
-    
     deinit {
         print("Asset details view model deinit")
     }
@@ -69,7 +53,6 @@ extension AssetDetailsViewModel {
     static func config(coin: Coin) -> AssetDetailsViewModel {
         let adapterManager: IAdapterManager = Container.adapterManager()
         let walletManager: IWalletManager = Container.walletManager()
-        let account = Container.accountViewModel()
 
         guard
             let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
@@ -77,10 +60,10 @@ extension AssetDetailsViewModel {
         else {
             fatalError("coudn't fetch dependencies")
         }
-        return AssetDetailsViewModel(coin: coin, transactionAdapter: transactionsAdapter, walletItems: account.items)
+        return AssetDetailsViewModel(coin: coin, transactionAdapter: transactionsAdapter)
     }
     
     static var mocked: AssetDetailsViewModel {
-        AssetDetailsViewModel(coin: .bitcoin(), transactionAdapter: MockedAdapter(), walletItems: [WalletItem.mockedBtc])
+        AssetDetailsViewModel(coin: .bitcoin(), transactionAdapter: MockedAdapter())
     }
 }

@@ -11,7 +11,7 @@ import Combine
 
 struct LabelsManagerView: View {
     @StateObject var viewModel: LabelsManagerViewModel
-    let onSaveAcion: ([TxLable]) -> ()
+    let onSaveAcion: ([TxLabel]) -> ()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -102,9 +102,9 @@ struct LabelsManagerView_Previews: PreviewProvider {
             viewModel:
                 LabelsManagerViewModel(
                     selectedLabels: [
-                        TxLable(label: "Buisness"),
-                        TxLable(label: "Friend"),
-                        TxLable(label: "Do Not Spend")
+                        TxLabel(label: "Buisness"),
+                        TxLabel(label: "Friend"),
+                        TxLabel(label: "Do Not Spend")
                     ]
                 ), onSaveAcion: { _ in }
         )

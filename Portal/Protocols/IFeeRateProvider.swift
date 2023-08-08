@@ -12,7 +12,8 @@ protocol IFeeRateProvider {
     var feeRatePriorityList: [FeeRatePriority] { get }
     var defaultFeeRatePriority: FeeRatePriority { get }
     var recommendedFeeRate: Future<Int, Never> { get }
-    func feeRate(priority: FeeRatePriority) -> Future<Int, Never>
+    func recommendedFeeRate() async throws -> Int
+    func feeRate(priority: FeeRatePriority) async throws -> Int
 }
 
 extension IFeeRateProvider {
@@ -23,14 +24,26 @@ extension IFeeRateProvider {
     var defaultFeeRatePriority: FeeRatePriority {
         .recommended
     }
-
-    func feeRate(priority: FeeRatePriority) -> Future<Int, Never> {
-        if case let .custom(value, _) = priority {
-            return Future { promise in
-                promise(.success(value))
+    
+    var recommendedFeeRate: Future<Int, Never> {
+        Future { promisse in
+            Task {
+                do {
+                    let rate = try await recommendedFeeRate()
+                    promisse(.success(rate))
+                } catch {
+                    //FIXME: - handle errors
+                    promisse(.success(50))
+                }
             }
+        }
+    }
+
+    func feeRate(priority: FeeRatePriority) async throws -> Int {
+        if case let .custom(value, _) = priority {
+            return value
         } else {
-            return recommendedFeeRate
+            return try await recommendedFeeRate()
         }
     }
 }

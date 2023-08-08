@@ -10,15 +10,18 @@ import PortalUI
 import Factory
 import BitcoinDevKit
 import PopupView
+import Lightning
 
 struct ReviewTransactionView: View {
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel: SendViewViewModel
     @EnvironmentObject private var navigation: NavigationStack
+    
     @State private var step: ReviewStep = .reviewing
     @State private var actionButtonEnabled = true
     @State private var editingAmount = false
+    @State private var locked = false
     
     enum ReviewStep {
         case reviewing, signing, sent
@@ -29,7 +32,7 @@ struct ReviewTransactionView: View {
         case .reviewing:
             return "Review Transaction"
         case .signing:
-            return "Singing..."
+            return "Signing..."
         case .sent:
             return "Sent"
         }
@@ -147,59 +150,64 @@ struct ReviewTransactionView: View {
                 Divider()
                     .frame(height: 1)
                 
-                HStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Transaction Fees")
-                            .font(.Main.fixed(.monoBold, size: 14))
-                            .foregroundColor(Palette.grayScaleAA)
-                        Text(viewModel.feeRate.description)
-                            .font(.Main.fixed(.monoRegular, size: 14))
-                            .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
-                    }
-                    
-                    Spacer()
-                    
-                    if let coin = viewModel.coin {
-                        VStack {
-                            HStack(spacing: 6) {
-                                Text(viewModel.fee)
-                                    .font(.Main.fixed(.monoBold, size: 16))
-                                    .foregroundColor(Palette.grayScaleEA)
-                                
-                                switch coin.type {
-                                case .bitcoin, .lightningBitcoin:
-                                    Text("btc")
-                                        .font(.Main.fixed(.monoMedium, size: 11))
-                                        .foregroundColor(Palette.grayScale6A)
-                                        .frame(width: 34)
-                                case .ethereum, .erc20:
-                                    Text("eth")
-                                        .font(.Main.fixed(.monoMedium, size: 11))
-                                        .foregroundColor(Palette.grayScale6A)
-                                        .frame(width: 34)
-                                }
-                            }
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                switch try? viewModel.validateInput() {
+                case .btcOnChain, .ethOnChain:
+                    HStack(spacing: 0) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Transaction Fees")
+                                .font(.Main.fixed(.monoBold, size: 14))
+                                .foregroundColor(Palette.grayScaleAA)
+                            Text(viewModel.feeRate.description)
+                                .font(.Main.fixed(.monoRegular, size: 14))
+                                .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
                         }
-                    } else {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
-                    }                    
-                }
-                .padding(.vertical, 16)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    if editingAmount {
-                        editingAmount.toggle()
+                        
+                        Spacer()
+                        
+                        if let coin = viewModel.coin {
+                            VStack {
+                                HStack(spacing: 6) {
+                                    Text(viewModel.fee)
+                                        .font(.Main.fixed(.monoBold, size: 16))
+                                        .foregroundColor(Palette.grayScaleEA)
+                                    
+                                    switch coin.type {
+                                    case .bitcoin, .lightningBitcoin:
+                                        Text("btc")
+                                            .font(.Main.fixed(.monoMedium, size: 11))
+                                            .foregroundColor(Palette.grayScale6A)
+                                            .frame(width: 34)
+                                    case .ethereum, .erc20:
+                                        Text("eth")
+                                            .font(.Main.fixed(.monoMedium, size: 11))
+                                            .foregroundColor(Palette.grayScale6A)
+                                            .frame(width: 34)
+                                    }
+                                }
+                                .transition(.move(edge: .bottom).combined(with: .opacity))
+                            }
+                        } else {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                        }
+                    }
+                    .padding(.vertical, 16)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        if editingAmount {
+                            editingAmount.toggle()
+                        }
+                        
+                        if let coin = viewModel.coin, coin == .bitcoin() {
+                            viewModel.showFeesPicker.toggle()
+                        }
                     }
                     
-                    if let coin = viewModel.coin, coin == .bitcoin() {
-                        viewModel.showFeesPicker.toggle()
-                    }
+                    Divider()
+                        .frame(height: 1)
+                case .lightningInvoice, .none:
+                    EmptyView()
                 }
-                
-                Divider()
-                    .frame(height: 1)
                 
                 Spacer()
             }
@@ -227,16 +235,24 @@ struct ReviewTransactionView: View {
                                 .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
                         
+                        if let errorMessage = viewModel.sendError as? NodeError {
+                            Text(errorMessage.description)
+                                .font(.Main.fixed(.monoRegular, size: 16))
+                                .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
+                                .transition(.move(edge: .bottom).combined(with: .opacity))
+                        }
+                        
                         PButton(config: .onlyLabel(viewModel.sendError == nil ? "Send" : "Try again"), style: .filled, size: .big, enabled: viewModel.amountIsValid) {
-                            viewModel.authenticateUser { authentificated in
-                                if authentificated {
+                            
+                            if viewModel.signingTxProtected {
+                                locked = true
+                            } else {
+                                withAnimation {
+                                    step = .signing
+                                }
+                                viewModel.send { success in
                                     withAnimation {
-                                        step = .signing
-                                    }
-                                    viewModel.send { success in
-                                        withAnimation {
-                                            step = success ? .sent : .reviewing
-                                        }
+                                        step = success ? .sent : .reviewing
                                     }
                                 }
                             }
@@ -325,6 +341,19 @@ struct ReviewTransactionView: View {
               .closeOnTap(false)
               .closeOnTapOutside(false)
               .backgroundColor(.black.opacity(0.5))
+        }
+        //LockScreen
+        .fullScreenCover(isPresented: $locked, onDismiss: {
+            withAnimation {
+                step = .signing
+            }
+            viewModel.send { success in
+                withAnimation {
+                    step = success ? .sent : .reviewing
+                }
+            }
+        }) {
+            TxSignConfirmationView()
         }
     }
 }

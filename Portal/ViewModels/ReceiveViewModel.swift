@@ -48,9 +48,14 @@ class ReceiveViewModel: ObservableObject {
     @Published var sharedItem: QRCodeSharedItem?
     
     @Injected(Container.marketData) private var marketData
+    @Injected(Container.settings) private var settings
     @Injected(Container.lightningKitManager) private var lightningKit
     
     private var subscriptions = Set<AnyCancellable>()
+    
+    var fiatCurrency: FiatCurrency {
+        settings.fiatCurrency
+    }
     
     var receiveAddress: String {
         adapter?.receiveAddress ?? "Address"
@@ -82,14 +87,22 @@ class ReceiveViewModel: ObservableObject {
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            price = Decimal(marketData.btcTicker?.price ?? 1)
-        case .ethereum, .erc20:
-            price = Decimal(marketData.ethTicker?.price ?? 1)
+            price = marketData.lastSeenBtcPrice * fiatCurrency.rate
+        case .ethereum:
+            price = marketData.lastSeenEthPrice * fiatCurrency.rate
+            qrAddressType = .onChain
+        case .erc20(let address):
+            if address == "0x326C977E6efc84E512bB9C30f76E30c160eD06FB" {
+                price = marketData.lastSeenLinkPrice * fiatCurrency.rate
+                qrAddressType = .onChain
+            } else {
+                price = 0
+            }
         }
         
         exchanger = Exchanger(
             base: coin,
-            quote: .fiat(FiatCurrency(code: "USD", name: "United States Dollar", rate: 1)),
+            quote: .fiat(fiatCurrency),
             price: price
         )
         
@@ -166,7 +179,7 @@ class ReceiveViewModel: ObservableObject {
         case .bitcoin:
             switch qrAddressType {
             case .lightning:
-                qrCodeString = "lightning=\(invoiceString)"
+                qrCodeString = "lightning:\(invoiceString)"
             case .onChain:
                 qrCodeString = "bitcoin:\(receiveAddress)"
                 
@@ -180,10 +193,16 @@ class ReceiveViewModel: ObservableObject {
                     qrCodeString += components
                 }
                 
-                qrCodeString += "&lightning=\(invoiceString)"
+                qrCodeString += "&lightning:\(invoiceString)"
             }
         case .ethereum:
             qrCodeString = "ethereum:\(receiveAddress)"
+            
+            if let components = pathComponents() {
+                qrCodeString += components
+            }
+        case .erc20:
+            qrCodeString = "link:\(receiveAddress)"
             
             if let components = pathComponents() {
                 qrCodeString += components

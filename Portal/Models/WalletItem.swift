@@ -32,4 +32,8 @@ extension WalletItem {
     static var mockedBtc: WalletItem {
         WalletItem(coin: .bitcoin())
     }
+    
+    static var mocked: WalletItem {
+        WalletItem(coin: .mocked())
+    }
 }
