@@ -186,7 +186,7 @@ extension Erc20Adapter: ISendEthereumAdapter {
     }
     
     func send(tx: SendETHService.Transaction) async throws -> TransactionRecord {
-        .mocked
+        .mocked(confirmed: true)
     }
     
     func callSolidity(contractAddress: EvmKit.Address, data: Data) async throws -> Data {

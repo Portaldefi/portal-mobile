@@ -11,6 +11,7 @@ import PortalUI
 import Factory
 
 struct SendSelectAssetView: View {
+    @ObservedObject private var viewState: ViewState = Container.viewState()
     @Environment(\.presentationMode) private var presentationMode
     @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject var viewModel: SendViewViewModel
@@ -34,6 +35,12 @@ struct SendSelectAssetView: View {
                     .font(.Main.fixed(.monoBold, size: 16))
             }
             .padding(.horizontal, 10)
+            
+            if !viewState.isReachable {
+                NoInternetConnectionView()
+                    .padding(.horizontal, -8)
+                    .padding(.bottom, 6)
+            }
             
             VStack(alignment: .leading, spacing: 16) {
                 Text("Select Asset")
@@ -68,6 +75,8 @@ struct SendSelectAssetView: View {
                             }
                         }
                     }
+                    .disabled(!viewState.isReachable)
+                    .opacity(viewState.isReachable ? 1 : 0.5)
                 }
                 .frame(height: CGFloat(viewModel.walletItems.count) * 72)
             }
@@ -87,6 +96,17 @@ struct SendFromView_Previews: PreviewProvider {
     static var previews: some View {
         let _ = Container.walletManager.register { WalletManager.mocked }
         let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
+        
+        SendSelectAssetView(viewModel: SendViewViewModel.mocked)
+    }
+}
+
+struct SendFromView_No_Connection: PreviewProvider {
+    static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
         
         SendSelectAssetView(viewModel: SendViewViewModel.mocked)
     }

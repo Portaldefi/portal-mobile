@@ -17,6 +17,7 @@ struct ReviewTransactionView: View {
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel: SendViewViewModel
     @EnvironmentObject private var navigation: NavigationStack
+    @ObservedObject private var viewState: ViewState = Container.viewState()
     
     @State private var step: ReviewStep = .reviewing
     @State private var actionButtonEnabled = true
@@ -69,6 +70,11 @@ struct ReviewTransactionView: View {
                     Text(title)
                         .frame(width: 300, height: 62)
                         .font(.Main.fixed(.monoBold, size: 16))
+                }
+                
+                if !viewState.isReachable {
+                    NoInternetConnectionView()
+                        .padding(.horizontal, -16)
                 }
                 
                 HStack(alignment: .top, spacing: 16) {
@@ -242,7 +248,7 @@ struct ReviewTransactionView: View {
                                 .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
                         
-                        PButton(config: .onlyLabel(viewModel.sendError == nil ? "Send" : "Try again"), style: .filled, size: .big, enabled: viewModel.amountIsValid) {
+                        PButton(config: .onlyLabel(viewModel.sendError == nil ? "Send" : "Try again"), style: .filled, size: .big, enabled: viewModel.amountIsValid && viewState.isReachable) {
                             if viewModel.signingTxProtected {
                                 locked = true
                             } else {
@@ -363,6 +369,17 @@ struct ReviewTransactionView_Previews: PreviewProvider {
     static var previews: some View {
         let _ = Container.walletManager.register { WalletManager.mocked }
         let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
+        
+        ReviewTransactionView(viewModel: SendViewViewModel.mocked)
+    }
+}
+
+struct ReviewTransactionView_No_Connection: PreviewProvider {
+    static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
         
         ReviewTransactionView(viewModel: SendViewViewModel.mocked)
     }

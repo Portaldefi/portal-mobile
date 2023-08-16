@@ -10,6 +10,7 @@ import PortalUI
 import BitcoinDevKit
 
 struct TransactionDetailsView: View {
+    @ObservedObject private var viewState: ViewState = Container.viewState()
     @StateObject private var viewModel: TransactionDetailsViewModel
     @Environment(\.presentationMode) private var presentationMode
     
@@ -162,6 +163,11 @@ struct TransactionDetailsView: View {
     
     private func TxSummaryView() -> some View {
         VStack(spacing: 24) {
+            if viewModel.source != .lightning && viewModel.confirmations < 6 && !viewState.isReachable {
+                NoInternetConnectionView()
+                    .padding(.horizontal, -16)
+            }
+            
             if viewModel.source != .lightning {
                 ConfirmationCounterView(confirmations: viewModel.confirmations)
             }
@@ -247,11 +253,22 @@ struct TransactionDetailsView: View {
 
 import Factory
 
-struct TransactionDetailsView_Previews: PreviewProvider {
+struct TransactionDetailsView_Confirmed_Has_Connection: PreviewProvider {
     static var previews: some View {
         let _ = Container.walletManager.register { WalletManager.mocked }
         let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
         
-        TransactionDetailsView(coin: .bitcoin(), tx: TransactionRecord.mocked)
+        TransactionDetailsView(coin: .bitcoin(), tx: TransactionRecord.mocked(confirmed: true))
+    }
+}
+
+struct TransactionDetailsView_NoInternet: PreviewProvider {
+    static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
+
+        TransactionDetailsView(coin: .bitcoin(), tx: TransactionRecord.mocked(confirmed: false))
     }
 }

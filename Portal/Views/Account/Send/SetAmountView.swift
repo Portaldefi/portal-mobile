@@ -12,6 +12,7 @@ import PopupView
 
 struct SetAmountView: View {
     private let warningColor = Color(red: 1, green: 0.321, blue: 0.321)
+    @ObservedObject private var viewState: ViewState = Container.viewState()
     @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewModel: SendViewViewModel
     @FocusState private var focusedField: Bool
@@ -37,6 +38,12 @@ struct SetAmountView: View {
                     Text("Send")
                         .frame(width: 300, height: 62)
                         .font(.Main.fixed(.monoBold, size: 16))
+                }
+                
+                if !viewState.isReachable {
+                    NoInternetConnectionView()
+                        .padding(.horizontal, -16)
+                        .padding(.bottom, 8)
                 }
                 
                 if let exchanger = viewModel.exchanger {
@@ -227,7 +234,12 @@ struct SetAmountView: View {
                         }
                         
                         if let exchanger = viewModel.exchanger {
-                            PButton(config: .onlyLabel("Continue"), style: .filled, size: .big, enabled: viewModel.amountIsValid && exchanger.baseAmountDecimal > 0) {
+                            PButton(
+                                config: .onlyLabel("Continue"),
+                                style: .filled,
+                                size: .big,
+                                enabled: viewModel.amountIsValid && exchanger.baseAmountDecimal > 0 && viewState.isReachable
+                            ) {
                                 navigation.push(.sendReviewTxView(viewModel: viewModel))
                             }
                         }
@@ -277,7 +289,19 @@ struct SetAmountView_Previews: PreviewProvider {
     static var previews: some View {
         let _ = Container.walletManager.register { WalletManager.mocked }
         let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
         
         SetAmountView(viewModel: SendViewViewModel.mocked)
     }
 }
+
+struct SetAmountView_No_Connection: PreviewProvider {
+    static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
+        
+        SetAmountView(viewModel: SendViewViewModel.mocked)
+    }
+}
+

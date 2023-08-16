@@ -17,7 +17,7 @@ class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepos
     var L1Balance: Decimal { 0.003 }
     
     func send(amount: Decimal, address: String) throws -> TransactionRecord {
-        TransactionRecord.mocked
+        TransactionRecord.mocked(confirmed: false)
     }
     
     var state: AdapterState = .synced
@@ -43,11 +43,11 @@ class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepos
     }
     
     func send(amount: Decimal, address: String, fee: Int?) throws -> TransactionRecord {
-        TransactionRecord.mocked
+        TransactionRecord.mocked(confirmed: false)
     }
     
     func sendMax(address: String, fee: Int?) throws -> TransactionRecord {
-        TransactionRecord.mocked
+        TransactionRecord.mocked(confirmed: false)
     }
     
     func rawTransaction(amount: UInt64, address: String) throws -> Transaction {
@@ -67,7 +67,7 @@ class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepos
     }
     
     var transactionRecords: [TransactionRecord] {
-        [TransactionRecord.mocked]
+        [TransactionRecord.mocked(confirmed: true)]
     }
     
     var blockchainHeight: Int32 = 0

@@ -124,8 +124,8 @@ struct SingleTxView: View {
                     .padding(.trailing, 8)
                 }
 
-                if let labels = viewModel.tx.labels, !labels.isEmpty {
-                    WrappedHStack(labels) { label in
+                if !viewModel.tx.labels.isEmpty {
+                    WrappedHStack(viewModel.tx.labels) { label in
                         TxLabelView(searchContext: searchContext, label: label)
                     }
                     .padding(.leading, 35)
@@ -135,7 +135,7 @@ struct SingleTxView: View {
             .padding(.horizontal, 8)
             
             Divider()
-                .overlay(Color(red: 26/255, green: 26/255, blue: 26/255))
+                .overlay(Palette.grayScale1A)
                 .frame(height: 2)
         }
         .contextMenu {
@@ -149,7 +149,7 @@ struct SingleTxView: View {
 
 struct SingleTxView_Previews: PreviewProvider {
     static var previews: some View {
-        SingleTxView(transaction: TransactionRecord.mocked)
+        SingleTxView(transaction: TransactionRecord.mocked(confirmed: true))
             .padding(.horizontal)
             .previewLayout(.sizeThatFits)
     }

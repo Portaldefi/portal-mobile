@@ -16,6 +16,7 @@ struct ViewHeightKey: PreferenceKey {
 }
 
 struct SetRecipientView: View {
+    @ObservedObject private var viewState: ViewState = Container.viewState()
     @State private var showScanner = false
     @State var textEditorHeight : CGFloat = 0
     @ObservedObject var viewModel: SendViewViewModel
@@ -59,6 +60,11 @@ struct SetRecipientView: View {
                     Text("Send")
                         .frame(width: 300, height: 62)
                         .font(.Main.fixed(.monoBold, size: 16))
+                }
+                
+                if !viewState.isReachable {
+                    NoInternetConnectionView()
+                        .padding(.horizontal, -16)
                 }
                 
                 VStack(spacing: 16) {
@@ -164,7 +170,7 @@ struct SetRecipientView: View {
                         config: .onlyLabel("Continue"),
                         style: .filled,
                         size: .big,
-                        enabled: !viewModel.receiverAddress.isEmpty && viewModel.sendError == nil
+                        enabled: !viewModel.receiverAddress.isEmpty && viewModel.sendError == nil && viewState.isReachable
                     ) {
                         do {
                             let result = try viewModel.validateInput()
@@ -235,7 +241,18 @@ struct RecipientView_Previews: PreviewProvider {
     static var previews: some View {
         let _ = Container.walletManager.register { WalletManager.mocked }
         let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
         
         SetRecipientView(viewModel: SendViewViewModel.mocked, rootView: true)
+    }
+}
+
+struct RecipientView_No_Connection: PreviewProvider {
+    static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
+        
+        ReviewTransactionView(viewModel: SendViewViewModel.mocked)
     }
 }

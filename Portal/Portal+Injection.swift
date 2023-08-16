@@ -95,6 +95,10 @@ extension SharedContainer {
         FeeRateProvider(appConfigProvider: Container.configProvider())
     }
     
+    static let reachabilityService = Factory<IReachabilityService>(scope: .singleton) {
+        ReachabilityService()
+    }
+    
     static let accountViewModel = Factory<AccountViewModel>(scope: .singleton) {
         let accountManager = Container.accountManager()
         let walletManager = Container.walletManager()

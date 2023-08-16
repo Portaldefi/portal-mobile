@@ -51,12 +51,14 @@ struct AssetDetailsView: View {
                 Divider()
                     .overlay(Palette.grayScale2A)
                 
-                if let walletItem = item {
-                    WalletItemView(viewModel: walletItem.viewModel)
-                        .padding(.leading, 16)
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 14)
+                if !viewState.isReachable {
+                    NoInternetConnectionView()
                 }
+                                
+                WalletItemView(viewModel: item.viewModel)
+                    .padding(.leading, 16)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 14)
                 
                 ActionButtonsView
                     .padding(.horizontal, 12)
@@ -137,8 +139,29 @@ struct AssetDetailsView: View {
     }
 }
 
-struct TxsView_Previews: PreviewProvider {
+struct NoInternetConnectionView: View {
+    var body: some View {
+        HStack {
+            Text("No Internet Connection")
+                .font(.Main.fixed(.monoSemiBold, size: 14))
+                .foregroundColor(.black)
+                .padding(6)
+        }
+        .frame(maxWidth: .infinity)
+        .background(Color.red)
+    }
+}
+
+struct TxsView_Has_Connection: PreviewProvider {
     static var previews: some View {
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
+        AssetDetailsView(item: WalletItem.mockedBtc, viewModel: AssetDetailsViewModel.mocked)
+    }
+}
+
+struct TxsView_No_Connection: PreviewProvider {
+    static var previews: some View {
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
         AssetDetailsView(item: WalletItem.mockedBtc, viewModel: AssetDetailsViewModel.mocked)
     }
 }

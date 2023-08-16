@@ -33,8 +33,10 @@ class ViewState: ObservableObject {
     @Published private(set) var selectedTab: Tab = .wallet
     @Published var walletLocked = false
     @Published var sceneState: SceneState = .inactive
+    @Published private(set) var isReachable = false
     
     @Injected(Container.settings) var settings
+    @Injected(Container.reachabilityService) private var reachability
     
     var onAssetBalancesUpdate = PassthroughSubject<Void, Never>()
     
@@ -42,6 +44,15 @@ class ViewState: ObservableObject {
         
     init() {
         updateScene(state: .background)
+        reachability.startMonitoring()
+        
+        isReachable = reachability.isReachable.value
+        
+        reachability.isReachable.receive(on: DispatchQueue.main).sink { reachable in
+            print("Network is \(reachable ? "reachable" : "not reachable")")
+            self.isReachable = reachable
+        }
+        .store(in: &subscriptions)
     }
     
     func openTab(_ tab: Tab) {
@@ -66,5 +77,13 @@ class ViewState: ObservableObject {
         case .inactive:
             print("app went to inactive state")
         }
+    }
+}
+
+extension ViewState {
+    static func mocked(hasConnection: Bool) -> ViewState {
+        let _ = Container.reachabilityService.register { ReachabilityService.mocked(hasConnection: hasConnection) }
+        
+        return ViewState()
     }
 }

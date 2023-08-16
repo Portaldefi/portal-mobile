@@ -182,8 +182,12 @@ extension TransactionRecord: Hashable {
 }
 
 extension TransactionRecord {
-    static var mocked: TransactionRecord {
-        TransactionRecord(transaction: TransactionDetails.mockedConfirmed, userData: TxUserData(price: 1000))
+    static func mocked(confirmed: Bool) -> TransactionRecord {
+        if confirmed {
+            return TransactionRecord(transaction: TransactionDetails.mockedConfirmed, userData: TxUserData(price: 1000))
+        } else {
+            return TransactionRecord(transaction: TransactionDetails.unconfirmedSentTransaction(recipient: "recepient", amount: "100", id: "sakfudhiecsx,nsdweodjh@KRHuh"), userData: TxUserData(price: 1000))
+        }
     }
     
     static var mockedLightning: TransactionRecord {

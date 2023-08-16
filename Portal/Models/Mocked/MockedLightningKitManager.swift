@@ -24,7 +24,7 @@ class MockedLightningKitManager: ILightningKitManager {
     }
     
     func pay(invoice: LightningDevKit.Invoice) async throws -> TransactionRecord {
-        TransactionRecord.mocked
+        TransactionRecord.mocked(confirmed: true)
     }
     
     func createInvoice(paymentHash: String, satAmount: UInt64) async -> String? {
@@ -56,11 +56,11 @@ class MockedLightningKitManager: ILightningKitManager {
     }
     
     var transactionsPublisher: AnyPublisher<[TransactionRecord], Never> {
-        Just([.mocked]).eraseToAnyPublisher()
+        Just([.mocked(confirmed: true)]).eraseToAnyPublisher()
     }
     
     func pay(invoice: String) async throws -> TransactionRecord {
-        .mocked
+        .mocked(confirmed: true)
     }
     
     var channelBalance: Decimal {

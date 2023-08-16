@@ -17,40 +17,41 @@ class ReachabilityService: IReachabilityService {
 
     private var wifiStatus: NWPath.Status = .requiresConnection {
         didSet {
-            isReachableOnWifi.value = wifiStatus == .satisfied
+            isReachableOnWifi.send(wifiStatus == .satisfied)
         }
     }
     private var cellularStatus: NWPath.Status = .requiresConnection {
         didSet {
-            isReachableOnCellular.value = cellularStatus == .satisfied
+            isReachableOnCellular.send(cellularStatus == .satisfied)
         }
     }
     private var otherConnectionsStatus: NWPath.Status = .requiresConnection {
         didSet {
-            isReachableOnOtherConnection.value = otherConnectionsStatus == .satisfied
+            isReachableOnOtherConnection.send(otherConnectionsStatus == .satisfied)
         }
     }
     
-    private var isReachableOnWifi = CurrentValueSubject<Bool, Never>(false)
-    private var isReachableOnCellular = CurrentValueSubject<Bool, Never>(false)
-    private var isReachableOnOtherConnection = CurrentValueSubject<Bool, Never>(false)
+    private var isReachableOnWifi = PassthroughSubject<Bool, Never>()
+    private var isReachableOnCellular = PassthroughSubject<Bool, Never>()
+    private var isReachableOnOtherConnection = PassthroughSubject<Bool, Never>()
     private(set) var isReachable = CurrentValueSubject<Bool, Never>(false)
     
     func startMonitoring() {
         monitorForWifi.pathUpdateHandler = { [unowned self] path in
-            self.wifiStatus = path.status
+            wifiStatus = path.status
         }
+        
         monitorForCellular.pathUpdateHandler = { [unowned self] path in
-            self.cellularStatus = path.status
+            cellularStatus = path.status
         }
         
         monitorForOtherConnections.pathUpdateHandler = { [unowned self] path in
-            self.otherConnectionsStatus = path.status
+            otherConnectionsStatus = path.status
         }
         
-        Publishers.Merge3(isReachableOnWifi, isReachableOnCellular, isReachableOnOtherConnection)
-            .sink { [unowned self] output in
-                self.isReachable.value = output
+        Publishers.CombineLatest3(isReachableOnWifi, isReachableOnCellular, isReachableOnOtherConnection)
+            .sink { [unowned self] wifiAvaliable, cellularAvaliable, otherConnectionAvaliable in
+                isReachable.value = wifiAvaliable || cellularAvaliable || otherConnectionAvaliable
             }
             .store(in: &subscriptions)
         
@@ -63,5 +64,28 @@ class ReachabilityService: IReachabilityService {
         monitorForWifi.cancel()
         monitorForCellular.cancel()
         monitorForOtherConnections.cancel()
+        subscriptions.removeAll()
+    }
+}
+
+extension ReachabilityService {
+    static func mocked(hasConnection: Bool) -> IReachabilityService {
+        ReachabilityServiceMocked(hasConnection: hasConnection)
+    }
+}
+
+struct ReachabilityServiceMocked: IReachabilityService {
+    var isReachable = CurrentValueSubject<Bool, Never>(false)
+    
+    func startMonitoring() {
+        
+    }
+    
+    func stopMonitoring() {
+        
+    }
+    
+    init(hasConnection: Bool) {
+        isReachable.send(hasConnection)
     }
 }

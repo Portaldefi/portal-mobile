@@ -33,11 +33,11 @@ final class CoinManager: ICoinManager {
     }
     
     private func subscribe() {
-        storage.coins
-            .sink { [unowned self] coins in
-                syncCoins(coins.map{ $0.code })
-            }
-            .store(in: &subscriptions)
+//        storage.coins
+//            .sink { [unowned self] coins in
+//                syncCoins(coins.map{ $0.code })
+//            }
+//            .store(in: &subscriptions)
         
         accountManager.onActiveAccountUpdate
             .sink { [unowned self] _ in
