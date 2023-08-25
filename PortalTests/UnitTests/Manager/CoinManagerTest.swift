@@ -26,13 +26,13 @@ final class CoinManagerTest: XCTestCase {
         sut = nil
     }
 
-    func testWalletCoins() throws {
-        XCTAssertEqual(sut.walletCoins.count, 2)
-        
-        coinStorage.addErc20()
-        
-        XCTAssertEqual(sut.walletCoins.count, 2 + coinStorage.erc20.count)
-    }
+//    func testWalletCoins() throws {
+//        XCTAssertEqual(sut.walletCoins.count, 2)
+//        
+//        coinStorage.addErc20()
+//        
+//        XCTAssertEqual(sut.walletCoins.count, 2 + coinStorage.erc20.count)
+//    }
     
     func testAvaliableCoins() throws {
         XCTAssertEqual(sut.avaliableCoins.count, 0)

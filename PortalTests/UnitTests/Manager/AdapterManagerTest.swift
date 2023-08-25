@@ -27,13 +27,14 @@ final class AdapterManagerTest: XCTestCase {
         sut = nil
     }
 
-    func testAdapterReady() throws {
-        XCTAssertTrue(sut.adapterReady.value)
-    }
+//    func testAdapterReady() throws {
+//        XCTAssertTrue(sut.adapterReady.value)
+//    }
     
     func testAdapterForWallet() throws {
         let adapter = sut.adapter(for: mockedWallet)
         XCTAssertNotNil(adapter, "Adapter is nil")
+        XCTAssertTrue(sut.adapterReady.value)
     }
     
     func testAdapterForCoin() throws {
