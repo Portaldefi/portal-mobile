@@ -126,7 +126,6 @@ extension FiatCurrency {
             "GYD": "Guyanaese Dollar",
             "HKD": "Hong Kong Dollar",
             "HNL": "Honduran Lempira",
-            "HRK": "Croatian Kuna",
             "HTG": "Haitian Gourde",
             "HUF": "Hungarian Forint",
             "IDR": "Indonesian Rupiah",
