@@ -86,7 +86,7 @@ class LightningStatstViewModel: ObservableObject {
 
 struct LightningStatstView: View {
     @StateObject private var viewModel = LightningStatstViewModel()
-    var peers: [Peer] = [Peer.alice, Peer.bob, Peer.carol]
+    var peers: [Peer] = [Peer.alice, Peer.bob]
     
     func channelView(channel: ChannelDetails) -> some View {
         ZStack {
@@ -161,8 +161,11 @@ struct LightningStatstView: View {
                         .font(.system(size: 16))
                     Spacer()
                 }
+                .padding(.horizontal)
                 
                 HStack {
+                    Spacer()
+
                     VStack(spacing: 15) {
                         Text("Alice")
                             .font(.system(size: 16))
@@ -213,28 +216,28 @@ struct LightningStatstView: View {
                     
                     Spacer()
                     
-                    VStack(spacing: 15) {
-                        Text("Carol")
-                            .font(.system(size: 16))
-
-                        Button {
-                            if viewModel.peers.contains(Peer.carol.peerPubKey) {
-                                viewModel.disconnect(peer: Peer.carol)
-                            } else {
-                                Task {
-                                    await viewModel.connect(peer: Peer.carol)
-                                }
-                            }
-                        } label: {
-                            if viewModel.peers.contains(Peer.carol.peerPubKey) {
-                                Text("Disconnect")
-                                    .font(.system(size: 16))
-                            } else {
-                                Text("Connect")
-                                    .font(.system(size: 16))
-                            }
-                        }
-                    }
+//                    VStack(spacing: 15) {
+//                        Text("Carol")
+//                            .font(.system(size: 16))
+//
+//                        Button {
+//                            if viewModel.peers.contains(Peer.carol.peerPubKey) {
+//                                viewModel.disconnect(peer: Peer.carol)
+//                            } else {
+//                                Task {
+//                                    await viewModel.connect(peer: Peer.carol)
+//                                }
+//                            }
+//                        } label: {
+//                            if viewModel.peers.contains(Peer.carol.peerPubKey) {
+//                                Text("Disconnect")
+//                                    .font(.system(size: 16))
+//                            } else {
+//                                Text("Connect")
+//                                    .font(.system(size: 16))
+//                            }
+//                        }
+//                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
