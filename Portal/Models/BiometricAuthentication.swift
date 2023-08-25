@@ -26,6 +26,7 @@ class BiometricAuthentication: ObservableObject {
             authenticationPolicy,
             error: &policyError
         )
+        print(permissionsGranted)
     }
     
     func authenticateUser(_ completion: @escaping (Bool, LAError?) -> ()) {
@@ -37,6 +38,43 @@ class BiometricAuthentication: ObservableObject {
                 return completion(success, nil)
             }
             completion(success, error)
+        }
+    }
+    
+    func authenticate() {
+        let context = LAContext()
+        var error: NSError?
+
+        // check whether biometric authentication is possible
+//        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+//            // it's possible, so go ahead and use it
+//            let reason = "Biometrics authentication is needed to sign transactions"
+//
+//            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { [weak self] success, authenticationError in
+//                // authentication has now completed
+//                if success {
+//                    // authenticated successfully
+//                    self?.permissionsGranted = true
+//                } else {
+//                    // there was a problem
+//                    self?.permissionsGranted = false
+//                }
+//            }
+//        } else {
+//            // no biometrics
+//        }
+        
+        let reason = "Biometrics authentication is needed to sign transactions"
+
+        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { [weak self] success, authenticationError in
+            // authentication has now completed
+            if success {
+                // authenticated successfully
+                self?.permissionsGranted = true
+            } else {
+                // there was a problem
+                self?.permissionsGranted = false
+            }
         }
     }
 }
