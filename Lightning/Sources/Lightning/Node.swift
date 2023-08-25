@@ -79,8 +79,8 @@ public class Node {
                 rpcProtocol: .http,
                 host: config.host,
                 port: config.port,
-                username: config.username,
-                password: config.password
+                username: "lnd",
+                password: "lnd"
             )
             rpcInterface = regtestBlockchainManager
         case .testnet(let bitcoinTestNetConfig):

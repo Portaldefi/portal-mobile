@@ -23,7 +23,7 @@ class AdapterFactory: IAdapterFactory {
                 return try BitcoinAdapter(wallet: wallet)
             } catch {
                 print(error)
-                fatalError(error.localizedDescription)
+                return nil
             }
         case .ethereum:
             if let ethKit = try? ethereumKitManager.kit(account: wallet.account) {

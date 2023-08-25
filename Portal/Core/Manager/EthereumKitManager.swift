@@ -35,7 +35,7 @@ class EthereumKitManager {
             throw LoginError.seedGenerationFailed
         }
 
-        let chain: Chain = .ethereumGoerli
+        let chain: Chain = .ethereumPlaynet
         
         let address = try Signer.address(seed: seed, chain: chain)
         let signer = try Signer.instance(seed: seed, chain: chain)
@@ -45,10 +45,7 @@ class EthereumKitManager {
         let ethereumKit = try EvmKit.Kit.instance(
             address: address,
             chain: chain,
-            rpcSource: .goerliInfuraWebsocket(
-                projectId: appConfigProvider.infuraCredentials.id,
-                projectSecret: appConfigProvider.infuraCredentials.secret
-            ),
+            rpcSource: .portalPlaynet(),
             transactionSource: .goerliEtherscan(apiKey: appConfigProvider.etherscanKey),
             walletId: account.id,
             minLogLevel: .error

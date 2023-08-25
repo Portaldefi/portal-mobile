@@ -10,6 +10,7 @@ import Factory
 import KeychainAccess
 import CoreData
 import Lightning
+import HsToolKit
 
 extension SharedContainer {
     static let accountManager = Factory<IAccountManager>(scope: .singleton) {
@@ -82,7 +83,7 @@ extension SharedContainer {
     }
     
     static let lightningKitManager = Factory<ILightningKitManager>(scope: .singleton) {
-        let config = BitcoinCoreRpcConfig(username: "polaruser", password: "polarpass", port: 18443, host: "localhost")
+        let config = BitcoinCoreRpcConfig(username: "lnd", password: "lnd", port: 18443, host: "localhost")
         let connectionType: ConnectionType = .regtest(config)
         return LightningKitManager(connectionType: connectionType)
     }

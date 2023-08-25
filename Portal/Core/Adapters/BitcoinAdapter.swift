@@ -31,12 +31,12 @@ final class BitcoinAdapter {
     
     private let wallet: BitcoinDevKit.Wallet
     private let blockchain: BitcoinDevKit.Blockchain
-    private let updateTimer = RepeatingTimer(timeInterval: 10)
+    private let updateTimer = RepeatingTimer(timeInterval: 5)
     private let networkQueue = DispatchQueue(label: "com.portal.network.layer.queue", qos: .userInitiated)
     
     private var adapterState: AdapterState = .synced
     private var _balance = Balance(immature: 0, trustedPending: 0, untrustedPending: 0, confirmed: 0, spendable: 0, total: 0)
-    private var _receiveAddress = AddressInfo(index: 0, address: String())
+    private var _receiveAddress: AddressInfo?
     private var _transactions = [TransactionDetails]()
     
     @Injected(Container.notificationService) var notificationService
@@ -103,10 +103,10 @@ final class BitcoinAdapter {
                 blockchainConfig = BlockchainConfig.esplora(config: espolaConfig)
                 
 //                let rpcConfig = RpcConfig(
-//                    url: "localhost:18454",
-//                    auth: .userPass(username: "polaruser", password: "polarpass"),
+//                    url: "localhost:18443",
+//                    auth: .userPass(username: "lnd", password: "lnd"),
 //                    network: .regtest,
-//                    walletName: "portal.regtest",
+//                    walletName: wallet.account.id,
 //                    syncParams: nil
 //                )
 //
@@ -232,7 +232,7 @@ extension BitcoinAdapter: IAdapter {
     }
     
     func refresh() {
-        sync()
+        syncData()
     }
     
     var blockchainHeight: Int32 {
@@ -264,7 +264,7 @@ extension BitcoinAdapter: IBalanceAdapter {
 
 extension BitcoinAdapter: IDepositAdapter {
     var receiveAddress: String {
-        _receiveAddress.address
+        _receiveAddress?.address.asString() ?? String()
     }
 }
 
