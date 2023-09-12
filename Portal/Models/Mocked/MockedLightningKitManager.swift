@@ -9,6 +9,14 @@ import Combine
 import LightningDevKit
 
 class MockedLightningKitManager: ILightningKitManager {
+    func cooperativeCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {
+        
+    }
+    
+    func forceCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {
+        
+    }
+    
     var transactions = [TransactionRecord]()
     
     func createInvoice(paymentHash: String, satAmount: UInt64) async -> LightningDevKit.Invoice? {
