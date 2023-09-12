@@ -34,10 +34,25 @@ final class FiatCurrencyTest: XCTestCase {
         }
     }
 
-    func testPerformanceExample() throws {
+    func testNamesPerformance() throws {
         // This is an example of a performance test case.
         self.measure {
-            // Put the code you want to measure the time of here.
+            do {
+                try testNames()
+            } catch {
+                XCTFail("Error thrown: \(error)")
+            }
+        }
+    }
+    
+    func testSymbolsPerformance() throws {
+        // This is an example of a performance test case.
+        self.measure {
+            do {
+                try testSymbols()
+            } catch {
+                XCTFail("Error thrown: \(error)")
+            }
         }
     }
 
