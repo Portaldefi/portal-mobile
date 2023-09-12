@@ -13,6 +13,8 @@ protocol ILightningChannels {
     var usableChannels: [ChannelDetails] { get }
     var channelBalance: Decimal { get }
     func openChannel(peer: Peer) async throws
+    func cooperativeCloseChannel(id: [UInt8], counterPartyId: [UInt8])
+    func forceCloseChannel(id: [UInt8], counterPartyId: [UInt8])
 }
 
 protocol ILightningInvoiceHandler {
