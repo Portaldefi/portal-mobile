@@ -8,11 +8,11 @@
 import XCTest
 
 final class PlaynetIntegrationTest: XCTestCase {
-    private var sut: PlaynetIntergrationSample!
+    private var sut: PlaynetLDKIntergrationSample!
     
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        sut = PlaynetIntergrationSample()
+        sut = PlaynetLDKIntergrationSample()
     }
 
     override func tearDownWithError() throws {
@@ -21,7 +21,11 @@ final class PlaynetIntegrationTest: XCTestCase {
     }
 
     func testPlaynetIntegration() async throws {
-        try await sut.testLDKSetupWithPlaynet()
+        do {
+            try await sut.testLDKSetupWithPlaynet()
+        } catch {
+            XCTFail("Playnet integration error thrown: \(error)")
+        }
     }
 
     func testPerformanceExample() throws {
