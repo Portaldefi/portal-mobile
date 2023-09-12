@@ -8,10 +8,24 @@
 import Foundation
 import Combine
 import LightningDevKit
+import BitcoinDevKit
 
 extension Bool {
     var string: String {
         self ? "yes" : "no"
+    }
+}
+
+extension StringProtocol {
+    var hexaData: Data { .init(hexa) }
+    var hexaBytes: [UInt8] { .init(hexa) }
+    private var hexa: UnfoldSequence<UInt8, Index> {
+        sequence(state: startIndex) { startIndex in
+            guard startIndex < endIndex else { return nil }
+            let endIndex = index(startIndex, offsetBy: 2, limitedBy: endIndex) ?? endIndex
+            defer { startIndex = endIndex }
+            return UInt8(self[startIndex..<endIndex], radix: 16)
+        }
     }
 }
 
@@ -570,12 +584,92 @@ public class Node {
         channelManager?.claimFunds(paymentPreimage: preimage)
     }
     
+    public func handleSpendableOutputs(descriptors: [SpendableOutputDescriptor]) {
+        guard let km = keysManager else { return }
+        
+        for descriptor in descriptors {
+            let valueType = descriptor.getValueType()
+            
+            print("Spendable output Descriptor with type: \(valueType)")
+            
+            switch valueType {
+            case .StaticOutput:
+                
+                let staticOutput = descriptor.getValueAsStaticOutput()!
+                
+                let output = staticOutput.getOutput()
+                let outpoint = staticOutput.getOutput()
+                
+                print("Output script pub key: \(output.getScriptPubkey().toHexString())")
+                print("Output value: \(output.getValue())")
+
+                print("Outpoint script pub key: \(outpoint.getScriptPubkey().toHexString())")
+                print("Outpoint value: \(outpoint.getValue())")
+            case .DelayedPaymentOutput:
+                let delayedPaymentOutput = descriptor.getValueAsDelayedPaymentOutput()!.getOutput()
+                                
+                print("Output script pub key: \(delayedPaymentOutput.getScriptPubkey().toHexString())")
+                print("Output value: \(delayedPaymentOutput.getValue())")
+            case .StaticPaymentOutput:
+                let staticPaymentOutput = descriptor.getValueAsStaticPaymentOutput()
+                
+                if let output = staticPaymentOutput?.getOutput() {
+                    print("Output script pub key: \(output.getScriptPubkey().toHexString())")
+                    print("Output value: \(output.getValue())")
+                }
+                if let outpoint = staticPaymentOutput?.getOutput() {
+                    print("Outpoint script pub key: \(outpoint.getScriptPubkey().toHexString())")
+                    print("Outpoint value: \(outpoint.getValue())")
+                }
+            @unknown default:
+                break
+            }
+        }
+        
+        let address = try! Address(address: "bcrt1qwya4n3eeclxlkfaewlas3fgkhw3lslh34tshlt").scriptPubkey()
+        
+        let rawSpendableTx = km.spendSpendableOutputs(descriptors: descriptors, outputs: [], changeDestinationScript: address.toBytes(), feerateSatPer1000Weight: 7500)
+        
+        guard rawSpendableTx.isOk(), let value = rawSpendableTx.getValue() else  {
+            print("Failed to spend output")
+            return
+        }
+        
+        print("Transaction to spend: ")
+        print(value.toHexString())
+        
+        broadcaster?.broadcastTransaction(tx: value)
+    }
+    
     public func processPendingHTLCForwards() {
         channelManager?.processPendingHtlcForwards()
     }
     
     public func subscribeForNodeEvents() async -> AsyncStream<Event> {
         await pendingEventTracker.subscribe()
+    }
+    
+    public func cooperativeCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {
+        guard let cm = channelManager else { return }
+        
+        let result = cm.closeChannelWithTargetFeerate(channelId: id, counterpartyNodeId: counterPartyId, targetFeerateSatsPer1000Weight: 8500)
+        
+        if result.isOk() {
+            print("Channel with id: \(id.toHexString()) is closed")
+        } else if let error = result.getError() {
+            print("Channel with id: \(id.toHexString()) close error: \(error)")
+        }
+    }
+    
+    public func forceCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {
+        guard let cm = channelManager else { return }
+        let result = cm.forceCloseBroadcastingLatestTxn(channelId: id, counterpartyNodeId: counterPartyId)
+        
+        if result.isOk() {
+            print("Channel with id: \(id.toHexString()) is closed")
+        } else if let error = result.getError() {
+            print("Channel with id: \(id.toHexString()) close error: \(error)")
+        }
     }
 }
 
