@@ -43,12 +43,12 @@ class Erc20Adapter {
         let transaction = fullTransaction.transaction
         
         var isNew = false
-        if txDataStorage.fetchTxData(txID: transaction.hash.toHexString()) == nil { isNew = true }
+        if txDataStorage.fetchTxData(txID: transaction.hash.hs.hexString) == nil { isNew = true }
         
         var type: TxType = .unknown
         
         let source: TxSource = .ethOnChain
-        let data = txDataStorage.fetch(source: source, id: transaction.hash.toHexString())
+        let data = txDataStorage.fetch(source: source, id: transaction.hash.hs.hexString)
         let userData = TxUserData(data: data)
         
         switch fullTransaction.decoration {
@@ -74,13 +74,13 @@ class Erc20Adapter {
                 
                 let record = TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transfer.from.eip55, to: transfer.to.eip55, userData: userData)
                 
-                if isNew {
-                    let amount = "\(record.amount?.double ?? 0)"
-                    let message = "You've received \(amount) \(record.coin.code.uppercased())"
-
-                    let pNotification = PNotification(message: message)
-                    notificationService.notify(pNotification)
-                }
+//                if isNew {
+//                    let amount = "\(record.amount?.double ?? 0)"
+//                    let message = "You've received \(amount) \(record.coin.code.uppercased())"
+//
+//                    let pNotification = PNotification(message: message)
+//                    notificationService.notify(pNotification)
+//                }
                 
                 return record
             } else if let transfer = outgoingTransfers.first, outgoingTransfers.count == 1 {
@@ -110,15 +110,15 @@ class Erc20Adapter {
         
         let record =  TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transaction.from?.eip55, to: transaction.to?.eip55, userData: userData)
         
-        if isNew {
-            guard record.type == .received else { return record }
-
-            let amount = "\(record.amount?.double ?? 0)"
-            let message = "You've received \(amount) \(record.coin.code.uppercased())"
-
-            let pNotification = PNotification(message: message)
-            notificationService.notify(pNotification)
-        }
+//        if isNew {
+//            guard record.type == .received else { return record }
+//
+//            let amount = "\(record.amount?.double ?? 0)"
+//            let message = "You've received \(amount) \(record.coin.code.uppercased())"
+//
+//            let pNotification = PNotification(message: message)
+//            notificationService.notify(pNotification)
+//        }
                 
         return record
     }
@@ -168,7 +168,11 @@ extension Erc20Adapter: IBalanceAdapter {
     }
 }
 
-extension Erc20Adapter: ITransactionsAdapter {    
+extension Erc20Adapter: ITransactionsAdapter {
+    var onTxsUpdate: AnyPublisher<Void, Never> {
+        balancePublisher
+    }
+    
     var transactionRecords: [TransactionRecord] {
         transactions(from: nil, limit: nil)
     }
