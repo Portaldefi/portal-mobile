@@ -17,8 +17,9 @@ protocol RpcChainManager {
     func getChaintipHash() async throws -> [UInt8]
     func isMonitoring() async -> Bool
     
-    func getTransaction(with hash: String) async throws -> [UInt8]
+    func getTransaction(with id: String) async throws -> [UInt8]
     func decodeScript(script: [UInt8]) async throws -> [String: Any]
+    func decodeRawTransaction(tx: [UInt8]) async throws -> [String: Any]
     func getDescriptorInfo(descriptor: String) async throws -> String
     func scanTxOutSet(descriptor: String) async throws -> [String: Any]
     func mineBlocks(number: Int, coinbaseDestinationAddress: String) async throws -> [String]
