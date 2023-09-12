@@ -19,9 +19,24 @@ class Broadcaster: BroadcasterInterface {
 
     override func broadcastTransaction(tx: [UInt8]) {
         print("Broadcasting Transaction: \(tx.toHexString())")
-
+        
         Task {
-            try? await self.chainInterface.submitTransaction(transaction: tx)
+            if
+                let json = try? await chainInterface.decodeRawTransaction(tx: tx),
+                let result = json["result"] as? [String: Any],
+                let txId = result["txid"] as? String  {
+                print(txId)
+                    
+                if let transaction = try? await chainInterface.getTransaction(with: txId) {
+                    print("transaction: \(transaction.toHexString())")
+                } else {
+                    let txID = try? await self.chainInterface.submitTransaction(transaction: tx)
+                    print("Submitted tx with id: \(String(describing: txID))")
+                }
+            } else {
+                let txID = try? await self.chainInterface.submitTransaction(transaction: tx)
+                print("Submitted tx with id: \(String(describing: txID))")
+            }
         }
     }
 }
