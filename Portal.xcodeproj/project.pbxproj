@@ -71,8 +71,9 @@
 		754812E42A94A96A00896F34 /* TxFeesText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754812E32A94A96A00896F34 /* TxFeesText.swift */; };
 		754812E62A94AA6300896F34 /* BTCQRCodeAddressTypeTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754812E52A94AA6300896F34 /* BTCQRCodeAddressTypeTest.swift */; };
 		754812E82A94CD1B00896F34 /* TxTypeTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754812E72A94CD1B00896F34 /* TxTypeTest.swift */; };
-		754812EA2A96618F00896F34 /* PlaynetIntergrationSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754812E92A96618F00896F34 /* PlaynetIntergrationSample.swift */; };
+		754812EA2A96618F00896F34 /* PlaynetLDKIntergrationSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754812E92A96618F00896F34 /* PlaynetLDKIntergrationSample.swift */; };
 		754812ED2A98738100896F34 /* PlaynetIntegrationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754812EC2A98738100896F34 /* PlaynetIntegrationTest.swift */; };
+		754812F52A990C0800896F34 /* PlaynetBDKIntegrationSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754812F42A990C0800896F34 /* PlaynetBDKIntegrationSample.swift */; };
 		754F61C229815A480079621C /* LightningKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61C129815A480079621C /* LightningKitManager.swift */; };
 		754F61DF298178060079621C /* INotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754F61DE298178050079621C /* INotificationService.swift */; };
 		755105F3294C6B4300525A16 /* EvmKit in Frameworks */ = {isa = PBXBuildFile; productRef = 755105F2294C6B4300525A16 /* EvmKit */; };
@@ -359,8 +360,13 @@
 		754812E32A94A96A00896F34 /* TxFeesText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxFeesText.swift; sourceTree = "<group>"; };
 		754812E52A94AA6300896F34 /* BTCQRCodeAddressTypeTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTCQRCodeAddressTypeTest.swift; sourceTree = "<group>"; };
 		754812E72A94CD1B00896F34 /* TxTypeTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxTypeTest.swift; sourceTree = "<group>"; };
-		754812E92A96618F00896F34 /* PlaynetIntergrationSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaynetIntergrationSample.swift; sourceTree = "<group>"; };
+		754812E92A96618F00896F34 /* PlaynetLDKIntergrationSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaynetLDKIntergrationSample.swift; sourceTree = "<group>"; };
 		754812EC2A98738100896F34 /* PlaynetIntegrationTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaynetIntegrationTest.swift; sourceTree = "<group>"; };
+		754812F02A98D8A700896F34 /* UnitTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = UnitTests.xctestplan; sourceTree = "<group>"; };
+		754812F12A98D96B00896F34 /* IntegrationTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = IntegrationTests.xctestplan; sourceTree = "<group>"; };
+		754812F22A98F4FD00896F34 /* UITests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = UITests.xctestplan; sourceTree = "<group>"; };
+		754812F32A98F51C00896F34 /* PerformanceTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = PerformanceTests.xctestplan; sourceTree = "<group>"; };
+		754812F42A990C0800896F34 /* PlaynetBDKIntegrationSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaynetBDKIntegrationSample.swift; sourceTree = "<group>"; };
 		754F61C129815A480079621C /* LightningKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightningKitManager.swift; sourceTree = "<group>"; };
 		754F61DE298178050079621C /* INotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = INotificationService.swift; sourceTree = "<group>"; };
 		755105F5294CA4AB00525A16 /* EthereumKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EthereumKitManager.swift; sourceTree = "<group>"; };
@@ -716,7 +722,8 @@
 		754812EB2A98736B00896F34 /* IntegrationTests */ = {
 			isa = PBXGroup;
 			children = (
-				754812E92A96618F00896F34 /* PlaynetIntergrationSample.swift */,
+				754812E92A96618F00896F34 /* PlaynetLDKIntergrationSample.swift */,
+				754812F42A990C0800896F34 /* PlaynetBDKIntegrationSample.swift */,
 				754812EC2A98738100896F34 /* PlaynetIntegrationTest.swift */,
 			);
 			path = IntegrationTests;
@@ -796,6 +803,10 @@
 		755501C42A6131230027D5FD /* PortalTests */ = {
 			isa = PBXGroup;
 			children = (
+				754812F22A98F4FD00896F34 /* UITests.xctestplan */,
+				754812F02A98D8A700896F34 /* UnitTests.xctestplan */,
+				754812F12A98D96B00896F34 /* IntegrationTests.xctestplan */,
+				754812F32A98F51C00896F34 /* PerformanceTests.xctestplan */,
 				754812EB2A98736B00896F34 /* IntegrationTests */,
 				755501CC2A6131540027D5FD /* UnitTests */,
 			);
@@ -1341,12 +1352,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				754812F52A990C0800896F34 /* PlaynetBDKIntegrationSample.swift in Sources */,
 				755502182A7107730027D5FD /* FiatCurrencyTest.swift in Sources */,
 				754812E82A94CD1B00896F34 /* TxTypeTest.swift in Sources */,
 				755502072A617F880027D5FD /* BitcoinAdapterTest.swift in Sources */,
 				7555021A2A7118A80027D5FD /* CoinTest.swift in Sources */,
 				755502012A617DFD0027D5FD /* CoinManagerTest.swift in Sources */,
-				754812EA2A96618F00896F34 /* PlaynetIntergrationSample.swift in Sources */,
+				754812EA2A96618F00896F34 /* PlaynetLDKIntergrationSample.swift in Sources */,
 				754812E02A9393DC00896F34 /* QRCodeItemTest.swift in Sources */,
 				755502032A617E1F0027D5FD /* LightningKitManager.swift in Sources */,
 				755501F72A6177F90027D5FD /* NotificationServiceTest.swift in Sources */,
