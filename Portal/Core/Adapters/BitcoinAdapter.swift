@@ -155,6 +155,8 @@ final class BitcoinAdapter {
             } catch {
                 print("BITCOIN NETWORK SYNC ERROR: \(error)")
                 self.update(state: .notSynced(error: error))
+                print("Recyncing...")
+                self.syncData()
             }
         }
     }
@@ -185,7 +187,23 @@ final class BitcoinAdapter {
     
     private func updateTransactions() throws {
         let transactions = try wallet.listTransactions(includeRaw: true)
-        guard transactions != _transactions else { return }
+        
+        guard !transactions.isEmpty else { return }
+        
+        var shouldUpdate = false
+        
+        if transactions.count != _transactions.count {
+            shouldUpdate = true
+        } else if transactions.count == _transactions.count {
+            for i in 0...transactions.count - 1 {
+                if transactions[i].confirmationTime != _transactions[i].confirmationTime {
+                    shouldUpdate = true
+                    break
+                }
+            }
+        }
+        
+        guard shouldUpdate else { return }
         
         _transactions = transactions
         
@@ -202,23 +220,25 @@ final class BitcoinAdapter {
             
             txRecords.append(record)
             
-            if isNew {
-                guard record.type == .received else { return }
-                
-                let satAmount = record.amount?.double ?? 0
-                let btcAmount = satAmount / 100_000_000
-                let message = "You've received \(btcAmount) \(record.coin.code.uppercased())"
-                
-                let pNotification = PNotification(message: message)
-                notificationService.notify(pNotification)
-            }
+//            if isNew {
+//                guard record.type == .received else { return }
+//                
+//                let satAmount = record.amount?.double ?? 0
+//                let btcAmount = satAmount / 100_000_000
+//                let message = "You've received \(btcAmount) \(record.coin.code.uppercased())"
+//                
+//                let pNotification = PNotification(message: message)
+//                notificationService.notify(pNotification)
+//            }
         }
                 
         transactionsSubject.send(txRecords)
     }
     
     private func updateBlockHeight() throws {
-        blockChainHeight = Int32(try blockchain.getHeight())
+        let blockHeight = Int32(try blockchain.getHeight())
+        print("BDK LATEST BLOCK: \(blockHeight)")
+        blockChainHeight = blockHeight
     }
 }
 
@@ -268,7 +288,11 @@ extension BitcoinAdapter: IDepositAdapter {
     }
 }
 
-extension BitcoinAdapter: ITransactionsAdapter {    
+extension BitcoinAdapter: ITransactionsAdapter {
+    var onTxsUpdate: AnyPublisher<Void, Never> {
+        balanceUpdated
+    }
+    
     var transactionRecords: [TransactionRecord] {
         var txRecords = [TransactionRecord]()
         
@@ -283,16 +307,16 @@ extension BitcoinAdapter: ITransactionsAdapter {
             
             txRecords.append(record)
             
-            if isNew {
-                if record.type == .received {
-                    let satAmount = record.amount?.double ?? 0
-                    let btcAmount = satAmount / 100_000_000
-                    let message = "You've received \(btcAmount) \(record.coin.code.uppercased())"
-                    
-                    let pNotification = PNotification(message: message)
-                    notificationService.notify(pNotification)
-                }
-            }
+//            if isNew {
+//                if record.type == .received {
+//                    let satAmount = record.amount?.double ?? 0
+//                    let btcAmount = satAmount / 100_000_000
+//                    let message = "You've received \(btcAmount) \(record.coin.code.uppercased())"
+//                    
+//                    let pNotification = PNotification(message: message)
+//                    notificationService.notify(pNotification)
+//                }
+//            }
         }
         
         return (txRecords + ldkManager.transactions).sorted(by: { $0.timestamp ?? 1 > $1.timestamp ?? 0 })
@@ -308,11 +332,11 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         let receiverAddress = try Address(address: address)
         let receiverAddressScript = receiverAddress.scriptPubkey()
         let txBuilderResult: TxBuilderResult
-        let utxos = try? wallet.listUnspent()
-        let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
+//        let utxos = try? wallet.listUnspent()
+//        let outpoints = utxos?.filter{ !$0.isSpent && $0.keychain == .external }.map { $0.outpoint } ?? []
         
         txBuilderResult = try TxBuilder()
-            .addUtxos(outpoints: outpoints)
+//            .addUtxos(outpoints: outpoints)
             .addRecipient(script: receiverAddressScript, amount: amount)
             .enableRbf()
             .finish(wallet: wallet)
