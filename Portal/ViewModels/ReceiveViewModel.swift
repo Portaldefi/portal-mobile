@@ -111,7 +111,9 @@ class ReceiveViewModel: ObservableObject {
         Publishers.CombineLatest3($onAmountChange, $description, $qrAddressType)
             .flatMap { _ in Just(()) }
             .receive(on: RunLoop.main)
-            .sink { [unowned self] _ in
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                
                 switch qrAddressType {
                 case .onChain:
                     let addressString = adapter?.receiveAddress ?? "Unknown address"
@@ -122,7 +124,7 @@ class ReceiveViewModel: ObservableObject {
                     qrCode = nil
                     
                     Task {
-                        let invoice = await lightningKit.createInvoice(amount: exchanger.baseAmountString, description: description)
+                        let invoice = await self.lightningKit.createInvoice(amount: exchanger.baseAmountString, description: self.description)
                         
                         DispatchQueue.main.async {
                             self.invoiceString = invoice ?? String()
@@ -134,7 +136,7 @@ class ReceiveViewModel: ObservableObject {
                     qrCode = nil
                     
                     Task {
-                        let invoice = await lightningKit.createInvoice(amount: exchanger.baseAmountString, description: description)
+                        let invoice = await self.lightningKit.createInvoice(amount: exchanger.baseAmountString, description: self.description)
                         
                         DispatchQueue.main.async {
                             self.invoiceString = invoice ?? String()
