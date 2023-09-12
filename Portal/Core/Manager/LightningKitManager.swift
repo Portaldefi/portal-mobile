@@ -133,11 +133,11 @@ class LightningKitManager: ILightningKitManager {
                 print("ERROR: \(error.localizedDescription)")
             }
             
-            let btcAmount = Double(payment.amount) / Double(100_000_000)
-            let message = "You've received \(btcAmount) BTC"
-            
-            let notification = PNotification(message: message)
-            notificationService.notify(notification)
+//            let btcAmount = Double(payment.amount) / Double(100_000_000)
+//            let message = "You've received \(btcAmount) BTC"
+//            
+//            let notification = PNotification(message: message)
+//            notificationService.notify(notification)
             
         case .PaymentSent:
             print("PaymentSent")
@@ -170,7 +170,10 @@ class LightningKitManager: ILightningKitManager {
             instance.processPendingHTLCForwards()
         case .SpendableOutputs:
             print("SpendableOutputs")
-
+            if let outputDescriptor = event.getValueAsSpendableOutputs()?.getOutputs() {
+                print("outputDescriptor \(outputDescriptor)")
+                instance.handleSpendableOutputs(descriptors: outputDescriptor)
+            }
         case .PaymentForwarded:
             print("PaymentForwarded")
 
@@ -275,6 +278,14 @@ extension LightningKitManager: ILightningInvoiceHandler {
 }
 
 extension LightningKitManager: ILightningChannels {
+    func cooperativeCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {
+        instance.cooperativeCloseChannel(id: id, counterPartyId: counterPartyId)
+    }
+    
+    func forceCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {
+        instance.forceCloseChannel(id: id, counterPartyId: counterPartyId)
+    }
+    
     var allChannels: [ChannelDetails] {
         instance.allChannels
     }
