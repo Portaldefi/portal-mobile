@@ -45,8 +45,8 @@ class EthereumKitManager {
         let ethereumKit = try EvmKit.Kit.instance(
             address: address,
             chain: chain,
-            rpcSource: .portalPlaynet(),
-            transactionSource: .goerliEtherscan(apiKey: appConfigProvider.etherscanKey),
+            rpcSource: .portalPlaynetWebSocket(url: "ws://localhost:8546"),
+            transactionSource: .playnetDevMode(url: "http://localhost:8545"),
             walletId: account.id,
             minLogLevel: .error
         )
