@@ -82,6 +82,16 @@ class LightningStatstViewModel: ObservableObject {
             }
         }
     }
+    
+    func cooperativeCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {
+        print("=====Cooperativly closing channel=====\nwith id: \(id.toHexString())\ncounterparty id: \(counterPartyId.toHexString())\n=====")
+        ldkManager.cooperativeCloseChannel(id: id, counterPartyId: counterPartyId)
+    }
+    
+    func forceCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {
+        print("=====Force closing channel=====\nwith id: \(id.toHexString())\ncounterparty id: \(counterPartyId.toHexString())\n=====")
+        ldkManager.forceCloseChannel(id: id, counterPartyId: counterPartyId)
+    }
 }
 
 struct LightningStatstView: View {
@@ -146,6 +156,41 @@ struct LightningStatstView: View {
                     Spacer()
                     Text("\(channel.getOutboundCapacityMsat()/1000) sats")
                 }
+                
+                VStack(spacing: 12) {
+                    Button {
+                        guard let channelId = channel.getChannelId() else { return }
+                        viewModel.cooperativeCloseChannel(id: channelId, counterPartyId: channel.getCounterparty().getNodeId())
+                    } label: {
+                        if viewModel.isOpeningChannel {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                        } else {
+                            Text("Cooperative Close")
+                                .font(.system(size: 16))
+                        }
+                    }
+                    .disabled(viewModel.isOpeningChannel)
+                    
+                    Button {
+
+                    } label: {
+                        if viewModel.isOpeningChannel {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                        } else {
+                            if let delay = channel.getForceCloseSpendDelay() {
+                                Text("Force Close (\(delay) blocks delay)")
+                                    .font(.system(size: 16))
+                            } else {
+                                Text("Force Close")
+                                    .font(.system(size: 16))
+                            }
+                        }
+                    }
+                    .disabled(viewModel.isOpeningChannel)
+                }
+                .padding(.vertical, 6)
             }
             .font(.system(size: 18))
             .padding()
