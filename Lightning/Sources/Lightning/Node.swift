@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 import LightningDevKit
-import BitcoinDevKit
 
 extension Bool {
     var string: String {
@@ -584,7 +583,7 @@ public class Node {
         channelManager?.claimFunds(paymentPreimage: preimage)
     }
     
-    public func handleSpendableOutputs(descriptors: [SpendableOutputDescriptor]) {
+    public func handleSpendableOutputs(descriptors: [SpendableOutputDescriptor], changeDestinationScript: [UInt8]) {
         guard let km = keysManager else { return }
         
         for descriptor in descriptors {
@@ -625,10 +624,13 @@ public class Node {
                 break
             }
         }
-        
-        let address = try! Address(address: "bcrt1qwya4n3eeclxlkfaewlas3fgkhw3lslh34tshlt").scriptPubkey()
-        
-        let rawSpendableTx = km.spendSpendableOutputs(descriptors: descriptors, outputs: [], changeDestinationScript: address.toBytes(), feerateSatPer1000Weight: 7500)
+                
+        let rawSpendableTx = km.spendSpendableOutputs(
+            descriptors: descriptors,
+            outputs: [],
+            changeDestinationScript: changeDestinationScript,
+            feerateSatPer1000Weight: 7500
+        )
         
         guard rawSpendableTx.isOk(), let value = rawSpendableTx.getValue() else  {
             print("Failed to spend output")

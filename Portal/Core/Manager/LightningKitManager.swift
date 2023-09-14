@@ -170,9 +170,14 @@ class LightningKitManager: ILightningKitManager {
             instance.processPendingHTLCForwards()
         case .SpendableOutputs:
             print("SpendableOutputs")
-            if let outputDescriptor = event.getValueAsSpendableOutputs()?.getOutputs() {
+            
+            if let outputDescriptor = event.getValueAsSpendableOutputs()?.getOutputs(),
+               let btcDepositAdapter = Container.bitcoinDepositAdapter(),
+               let changeDestinationScript = try? Address(address: btcDepositAdapter.receiveAddress).scriptPubkey().toBytes() {
+                
                 print("outputDescriptor \(outputDescriptor)")
-                instance.handleSpendableOutputs(descriptors: outputDescriptor)
+                
+                instance.handleSpendableOutputs(descriptors: outputDescriptor, changeDestinationScript: changeDestinationScript)
             }
         case .PaymentForwarded:
             print("PaymentForwarded")
