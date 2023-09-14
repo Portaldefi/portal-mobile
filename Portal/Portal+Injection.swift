@@ -100,6 +100,22 @@ extension SharedContainer {
         ReachabilityService()
     }
     
+    static let bitcoinDepositAdapter = Factory<IDepositAdapter?>(scope: .shared) {
+        let accountManager = Container.accountManager()
+        let walletManager = Container.walletManager()
+        let adapterManager = Container.adapterManager()
+        
+        guard let activeAccount = accountManager.activeAccount else { return nil }
+        
+        let wallets = walletManager.wallets(account: activeAccount)
+        
+        guard let btcWallet = wallets.first(where: { $0.coin == .bitcoin() }), let depositAdapter = adapterManager.depositAdapter(for: btcWallet) else { return nil }
+        
+        print("btc deposit adapter address: \(depositAdapter.receiveAddress)")
+        
+        return depositAdapter
+    }
+    
     static let accountViewModel = Factory<AccountViewModel>(scope: .singleton) {
         let accountManager = Container.accountManager()
         let walletManager = Container.walletManager()
