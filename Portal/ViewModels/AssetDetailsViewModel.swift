@@ -30,6 +30,11 @@ class AssetDetailsViewModel: ObservableObject {
         self.coin = coin
         self.transactionAdapter = transactionAdapter
         
+//        transactionAdapter.onTxsUpdate.sink { [unowned self] _ in
+//            self.updateTransactions()
+//        }
+//        .store(in: &subscriptions)
+        
         updateTransactions()
     }
         

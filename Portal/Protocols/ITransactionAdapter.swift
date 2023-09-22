@@ -10,4 +10,5 @@ import Combine
 
 protocol ITransactionsAdapter {
     var transactionRecords: [TransactionRecord] { get }
+    var onTxsUpdate: AnyPublisher<Void, Never> { get }
 }
