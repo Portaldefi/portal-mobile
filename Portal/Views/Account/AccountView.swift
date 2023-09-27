@@ -15,6 +15,7 @@ struct AccountView: View {
     @ObservedObject private var viewState: ViewState = Container.viewState()
     
     var body: some View {
+        let _ = Self._printChanges()
         VStack(spacing: 0) {
             Group {
                 AccountView()
@@ -75,7 +76,7 @@ struct AccountView: View {
         .sheet(isPresented: $viewModel.goToSend, onDismiss: {
             viewModel.updateValues()
         }) {
-            SendRootView(withAssetPicker: true).lockableView()
+            SendRootView(withAssetPicker: true).environment(Container.sendViewModel()).lockableView()
         }
         .fullScreenCover(isPresented: $viewState.showBackUpFlow) {
             AccountBackupRootView().environmentObject(viewState).lockableView()
