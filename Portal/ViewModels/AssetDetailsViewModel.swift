@@ -10,21 +10,21 @@ import Combine
 import BitcoinDevKit
 import Factory
 
-class AssetDetailsViewModel: ObservableObject {
-    let coin: Coin
+@Observable class AssetDetailsViewModel {
+    @ObservationIgnored let coin: Coin
     
-    @Published var goToReceive = false
-    @Published var goSend: Bool = false {
+    public var goToReceive = false
+    public var goSend: Bool = false {
         willSet {
             if newValue != goSend && newValue == false {
                 Container.Scope.cached.reset()
             }
         }
     }
-    @Published private(set) var transactions: [TransactionRecord] = []
+    public var transactions: [TransactionRecord] = []
     
-    private let transactionAdapter: ITransactionsAdapter
-    private var subscriptions = Set<AnyCancellable>()
+    @ObservationIgnored private let transactionAdapter: ITransactionsAdapter
+    @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
         
     init(coin: Coin, transactionAdapter: ITransactionsAdapter) {
         self.coin = coin
