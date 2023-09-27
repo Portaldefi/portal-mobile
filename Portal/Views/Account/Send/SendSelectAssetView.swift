@@ -14,11 +14,13 @@ struct SendSelectAssetView: View {
     @ObservedObject private var viewState: ViewState = Container.viewState()
     @Environment(\.presentationMode) private var presentationMode
     @EnvironmentObject private var navigation: NavigationStack
-    @ObservedObject var viewModel: SendViewViewModel
+    @Environment(SendViewViewModel.self) var viewModel: SendViewViewModel
     @State private var notEnoughFunds = false
     @State private var notEnoughFundsMessage = String()
             
     var body: some View {
+        let _ = Self._printChanges()
+
         VStack(spacing: 0) {
             ZStack {
                 HStack {
@@ -98,7 +100,7 @@ struct SendFromView_Previews: PreviewProvider {
         let _ = Container.adapterManager.register { AdapterManager.mocked }
         let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
         
-        SendSelectAssetView(viewModel: SendViewViewModel.mocked)
+        SendSelectAssetView().environment(SendViewViewModel.mocked)
     }
 }
 
@@ -108,6 +110,6 @@ struct SendFromView_No_Connection: PreviewProvider {
         let _ = Container.adapterManager.register { AdapterManager.mocked }
         let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
         
-        SendSelectAssetView(viewModel: SendViewViewModel.mocked)
+        SendSelectAssetView().environment(SendViewViewModel.mocked)
     }
 }
