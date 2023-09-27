@@ -15,7 +15,7 @@ import Lightning
 struct ReviewTransactionView: View {
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
-    @ObservedObject private var viewModel: SendViewViewModel
+    @Environment(SendViewViewModel.self) var viewModel: SendViewViewModel
     @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewState: ViewState = Container.viewState()
     
@@ -48,11 +48,13 @@ struct ReviewTransactionView: View {
         }
     }
     
-    init(viewModel: SendViewViewModel) {
-        self.viewModel = viewModel
-    }
+//    init(viewModel: SendViewViewModel) {
+//        self.viewModel = viewModel
+//    }
     
     var body: some View {
+        @Bindable var bindableViewModel = viewModel
+
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
                 ZStack {
@@ -299,7 +301,7 @@ struct ReviewTransactionView: View {
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .onReceive(
             viewModel
-                .$unconfirmedTx
+                .unconfirmedTx
                 .compactMap{$0}
                 .delay(for: 1, scheduler: RunLoop.main)
         ) { transaction in
@@ -307,12 +309,12 @@ struct ReviewTransactionView: View {
             navigation.push(.transactionDetails(coin: coin, tx: transaction))
         }
         //TxFeesPickerView
-        .popup(isPresented: $viewModel.showFeesPicker) {
-            if let fees = viewModel.recomendedFees, let coin = viewModel.coin {
+        .popup(isPresented: $bindableViewModel.showFeesPicker) {
+            if let fees = bindableViewModel.recomendedFees, let coin = bindableViewModel.coin {
                 TxFeesPickerView(
                     coin: coin,
                     recommendedFees: fees,
-                    feeRate: $viewModel.feeRate,
+                    feeRate: $bindableViewModel.feeRate,
                     onDismiss: {
                         viewModel.showFeesPicker.toggle()
                     }
@@ -371,7 +373,7 @@ struct ReviewTransactionView_Previews: PreviewProvider {
         let _ = Container.adapterManager.register { AdapterManager.mocked }
         let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
         
-        ReviewTransactionView(viewModel: SendViewViewModel.mocked)
+        ReviewTransactionView().environment(SendViewViewModel.mocked)
     }
 }
 
@@ -381,6 +383,6 @@ struct ReviewTransactionView_No_Connection: PreviewProvider {
         let _ = Container.adapterManager.register { AdapterManager.mocked }
         let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
         
-        ReviewTransactionView(viewModel: SendViewViewModel.mocked)
+        ReviewTransactionView().environment(SendViewViewModel.mocked)
     }
 }
