@@ -14,14 +14,16 @@ struct SetAmountView: View {
     private let warningColor = Color(red: 1, green: 0.321, blue: 0.321)
     @ObservedObject private var viewState: ViewState = Container.viewState()
     @EnvironmentObject private var navigation: NavigationStack
-    @ObservedObject private var viewModel: SendViewViewModel
+    @Environment(SendViewViewModel.self) var viewModel: SendViewViewModel
     @FocusState private var focusedField: Bool
     
-    init(viewModel: SendViewViewModel) {
-        self.viewModel = viewModel
-    }
+//    init(viewModel: SendViewViewModel) {
+//        self.viewModel = viewModel
+//    }
     
     var body: some View {
+        @Bindable var bindableViewModel = viewModel
+
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
                 ZStack {
@@ -254,12 +256,12 @@ struct SetAmountView: View {
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
-        .popup(isPresented: $viewModel.showFeesPicker) {
+        .popup(isPresented: $bindableViewModel.showFeesPicker) {
             if let fees = viewModel.recomendedFees, let coin = viewModel.coin {
                 TxFeesPickerView(
                     coin: coin,
                     recommendedFees: fees,
-                    feeRate: $viewModel.feeRate,
+                    feeRate: $bindableViewModel.feeRate,
                     onDismiss: {
                         focusedField = true
                         viewModel.showFeesPicker.toggle()
@@ -291,7 +293,7 @@ struct SetAmountView_Previews: PreviewProvider {
         let _ = Container.adapterManager.register { AdapterManager.mocked }
         let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
         
-        SetAmountView(viewModel: SendViewViewModel.mocked)
+        SetAmountView().environment(SendViewViewModel.mocked)
     }
 }
 
@@ -301,7 +303,7 @@ struct SetAmountView_No_Connection: PreviewProvider {
         let _ = Container.adapterManager.register { AdapterManager.mocked }
         let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
         
-        SetAmountView(viewModel: SendViewViewModel.mocked)
+        SetAmountView().environment(SendViewViewModel.mocked)
     }
 }
 
