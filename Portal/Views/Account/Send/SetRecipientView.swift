@@ -19,7 +19,7 @@ struct SetRecipientView: View {
     @ObservedObject private var viewState: ViewState = Container.viewState()
     @State private var showScanner = false
     @State var textEditorHeight : CGFloat = 0
-    @ObservedObject var viewModel: SendViewViewModel
+    @Environment(SendViewViewModel.self) var viewModel: SendViewViewModel
     @EnvironmentObject private var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
     
@@ -40,6 +40,8 @@ struct SetRecipientView: View {
     }
     
     var body: some View {
+        @Bindable var bindableViewModel = viewModel
+        
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
                 ZStack {
@@ -90,7 +92,7 @@ struct SetRecipientView: View {
                                 )
                             //
                             
-                            TextEditor(text: $viewModel.receiverAddress)
+                            TextEditor(text: $bindableViewModel.receiverAddress)
                                 .hideBackground()
                                 .disableAutocorrection(true)
                                 .textInputAutocapitalization(.never)
@@ -200,7 +202,7 @@ struct SetRecipientView: View {
             .zIndex(1)
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
-        .alert(isPresented: $viewModel.clipboardIsEmpty) {
+        .alert(isPresented: $bindableViewModel.clipboardIsEmpty) {
             Alert(title: Text("Empty Clipboard"), message: Text("You don't have anything in your device clipboard."), dismissButton: .default(Text("OK")))
         }
         .sheet(isPresented: $showScanner) {
@@ -243,7 +245,7 @@ struct RecipientView_Previews: PreviewProvider {
         let _ = Container.adapterManager.register { AdapterManager.mocked }
         let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
         
-        SetRecipientView(viewModel: SendViewViewModel.mocked, rootView: true)
+        SetRecipientView(rootView: true).environment(SendViewViewModel.mocked)
     }
 }
 
@@ -253,6 +255,6 @@ struct RecipientView_No_Connection: PreviewProvider {
         let _ = Container.adapterManager.register { AdapterManager.mocked }
         let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
         
-        ReviewTransactionView(viewModel: SendViewViewModel.mocked)
+        ReviewTransactionView().environment(SendViewViewModel.mocked)
     }
 }
