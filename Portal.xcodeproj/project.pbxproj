@@ -44,6 +44,7 @@
 		75388B822A39DB3A00B879A2 /* SettingsViewNavigationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75388B812A39DB3A00B879A2 /* SettingsViewNavigationConfig.swift */; };
 		75388B842A3A15AF00B879A2 /* PincodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75388B832A3A15AF00B879A2 /* PincodeView.swift */; };
 		753A199E2AB0A2B100155812 /* EvmKit in Frameworks */ = {isa = PBXBuildFile; productRef = 753A199D2AB0A2B100155812 /* EvmKit */; };
+		753A19A12AB990D200155812 /* DevUtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 753A19A02AB990D200155812 /* DevUtilityView.swift */; };
 		75421841298BD2A80028D5DF /* Lightning in Frameworks */ = {isa = PBXBuildFile; productRef = 75421840298BD2A80028D5DF /* Lightning */; };
 		75421843298BD5720028D5DF /* Peer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75421842298BD5720028D5DF /* Peer.swift */; };
 		75421846299262E10028D5DF /* ReceiveSelectAssetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75421845299262E10028D5DF /* ReceiveSelectAssetView.swift */; };
@@ -333,6 +334,7 @@
 		75388B7F2A39D78B00B879A2 /* SettingsRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRootView.swift; sourceTree = "<group>"; };
 		75388B812A39DB3A00B879A2 /* SettingsViewNavigationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewNavigationConfig.swift; sourceTree = "<group>"; };
 		75388B832A3A15AF00B879A2 /* PincodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PincodeView.swift; sourceTree = "<group>"; };
+		753A19A02AB990D200155812 /* DevUtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevUtilityView.swift; sourceTree = "<group>"; };
 		7542183C298955410028D5DF /* Lightning */ = {isa = PBXFileReference; lastKnownFileType = text; path = Lightning; sourceTree = SOURCE_ROOT; };
 		75421842298BD5720028D5DF /* Peer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Peer.swift; sourceTree = "<group>"; };
 		75421845299262E10028D5DF /* ReceiveSelectAssetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveSelectAssetView.swift; sourceTree = "<group>"; };
@@ -1041,6 +1043,7 @@
 			children = (
 				756DDD9228A28DE7002EDC60 /* RootView.swift */,
 				756A313E28902C6F004978E2 /* MainView.swift */,
+				753A19A02AB990D200155812 /* DevUtilityView.swift */,
 				75883A10292618330089D714 /* Onboarding */,
 				755170882948BFB700CC84D7 /* Account */,
 				755170962948CEEE00CC84D7 /* AccountBackup */,
@@ -1602,6 +1605,7 @@
 				75388B802A39D78B00B879A2 /* SettingsRootView.swift in Sources */,
 				75D8C5AB28D8907D00228298 /* AdapterFactory.swift in Sources */,
 				7545BC3C28C9E5B900ED92C3 /* MarketDataService.swift in Sources */,
+				753A19A12AB990D200155812 /* DevUtilityView.swift in Sources */,
 				75B7531529F1636000F2A93D /* WordView.swift in Sources */,
 				75421843298BD5720028D5DF /* Peer.swift in Sources */,
 			);
@@ -1794,7 +1798,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1837,7 +1841,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
