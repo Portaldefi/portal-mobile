@@ -18,22 +18,22 @@ struct SendViewNavigationConfig: NavigationConfigurator {
         case .sendSelectAsset(let viewModel):
             return ViewElement(
                 id: screen.id,
-                wrappedElement: AnyView(SendSelectAssetView(viewModel: viewModel))
+                wrappedElement: AnyView(SendSelectAssetView().environment(viewModel))
             )
         case .sendSetRecipient(let viewModel):
             return ViewElement(
                 id: screen.id,
-                wrappedElement: AnyView(SetRecipientView(viewModel: viewModel, rootView: false))
+                wrappedElement: AnyView(SetRecipientView(rootView: false).environment(viewModel))
             )
         case .sendSetAmount(let viewModel):
             return ViewElement(
                 id: screen.id,
-                wrappedElement: AnyView(SetAmountView(viewModel: viewModel))
+                wrappedElement: AnyView(SetAmountView().environment(viewModel))
             )
         case .sendReviewTxView(let viewModel):
             return ViewElement(
                 id: screen.id,
-                wrappedElement: AnyView(ReviewTransactionView(viewModel: viewModel))
+                wrappedElement: AnyView(ReviewTransactionView().environment(viewModel))
             )
         default:
             fatalError("unsupported navigation case")
