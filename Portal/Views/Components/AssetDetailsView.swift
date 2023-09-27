@@ -13,7 +13,7 @@ import Factory
 struct AssetDetailsView: View {
     @EnvironmentObject private var navigation: NavigationStack
     @ObservedObject private var viewState: ViewState = Container.viewState()
-    @ObservedObject private var viewModel: AssetDetailsViewModel
+    @State private var viewModel: AssetDetailsViewModel
     
     @State private var showTxDetails = false
     @State private var selectedTx: TransactionRecord?
@@ -22,10 +22,11 @@ struct AssetDetailsView: View {
     
     init(item: WalletItem, viewModel: AssetDetailsViewModel) {
         self.item = item
-        self.viewModel = viewModel
+        self._viewModel = State(initialValue: viewModel)
     }
     
     var body: some View {
+        let _ = Self._printChanges()
         VStack(spacing: 0) {
             Group {
                 HStack {
@@ -110,7 +111,7 @@ struct AssetDetailsView: View {
         .sheet(isPresented: $viewModel.goSend, onDismiss: {
             viewModel.updateTransactions()
         }) {
-            SendRootView(withAssetPicker: false).lockableView()
+            SendRootView(withAssetPicker: false).environment(Container.sendViewModel()).lockableView()
         }
     }
     
