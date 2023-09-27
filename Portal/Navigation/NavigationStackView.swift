@@ -22,6 +22,7 @@ enum Screen {
     case setPinCode
     case assetDetails(item: WalletItem)
     case createAccount
+    case devUtility
     case restoreAccount
     case restoreConfirmation(viewModel: RestoreAccountViewModel)
     case nameAccount(words: [String]?)
@@ -88,6 +89,8 @@ extension Screen {
             return "set_pincode_ID"
         case .setupSecuritySettings:
             return "set_security_settings_ID"
+        case .devUtility:
+            return "dev_utility_ID"
         }
     }
 }

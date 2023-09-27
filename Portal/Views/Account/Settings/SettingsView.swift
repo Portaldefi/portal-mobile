@@ -35,6 +35,18 @@ struct SettingsView: View {
             List {
                 Section(header: EmptyView()) {
                     HStack{
+                        Text("Dev Utility")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Image(systemName: "chevron.forward")
+                    }
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    navigation.push(.devUtility)
+                }
+                
+                Section(header: EmptyView()) {
+                    HStack{
                         Text("Security")
                             .frame(maxWidth: .infinity, alignment: .leading)
                         Image(systemName: "chevron.forward")
