@@ -16,32 +16,50 @@ enum UserInputResult {
     case btcOnChain(address: String), lightningInvoice(amount: String), ethOnChain(address: String)
 }
 
-class SendViewViewModel: ObservableObject {
+@Observable class SendViewViewModel {
     private var sendService: ISendAssetService?
     private var subscriptions = Set<AnyCancellable>()
     private(set) var walletItems: [WalletItem]  = []
     
-    @Published var receiverAddress = String()
-    @Published var coin: Coin?
-    @Published var qrCodeItem: QRCodeItem?
-    @Published var clipboardIsEmpty = false
-    @Published var feeRate: TxFees = .normal
-    @Published var amountIsValid: Bool = true
-    @Published var showFeesPicker = false
+    public var receiverAddress = String() {
+        didSet {
+            sendService?.receiverAddress.send(receiverAddress)
+            guard sendError != nil else { return }
+            withAnimation {
+                sendError = nil
+            }
+        }
+    }
+    public var coin: Coin? {
+        didSet {
+            guard let coin = coin else { return }
+            syncSendService(coin: coin)
+            syncExchanger(coin: coin)
+        }
+    }
+    public var qrCodeItem: QRCodeItem?
+    public var clipboardIsEmpty = false
+    public var feeRate: TxFees = .normal {
+        didSet {
+            sendService?.feeRateType.send(feeRate)
+        }
+    }
+    public var amountIsValid: Bool = true
+    public var showFeesPicker = false
     
-    @Published private(set) var balanceString = String()
-    @Published private(set) var valueString = String()
-    @Published private(set) var useAllFundsEnabled = true
+    private(set) var balanceString = String()
+    private(set) var valueString = String()
+    private(set) var useAllFundsEnabled = true
     
-    @Published private(set) var unconfirmedTx: TransactionRecord?
-    @Published private(set) var recomendedFees: RecomendedFees?
-    @Published private(set) var exchanger: Exchanger?
-    @Published private(set) var sendError: Error?
-    @Published var confirmSigning = false
+    private(set) var unconfirmedTx = PassthroughSubject<TransactionRecord, Never>()
+    private(set) var recomendedFees: RecomendedFees?
+    private(set) var exchanger: Exchanger?
+    private(set) var sendError: Error?
+    var confirmSigning = false
 
-    @Injected(Container.accountViewModel) private var account
-    @Injected(Container.marketData) private var marketData
-    @Injected(Container.settings) private var settings
+    private var account = Container.accountViewModel()
+    private var marketData = Container.marketData()
+    private var settings = Container.settings()
     
     var fiatCurrency: FiatCurrency {
         settings.fiatCurrency.value
@@ -72,26 +90,11 @@ class SendViewViewModel: ObservableObject {
         subscribeForUpdates()
     }
     
+    deinit {
+        print("SendViewModel DEINITED")
+    }
+    
     private func subscribeForUpdates() {
-        $coin
-            .sink { [weak self] newCoin in
-                guard let self = self, let coin = newCoin else { return }
-                
-                self.syncSendService(coin: coin)
-                self.syncExchanger(coin: coin)
-            }
-            .store(in: &subscriptions)
-        
-        $receiverAddress
-            .sink { [unowned self] address in
-                self.sendService?.receiverAddress.send(address)
-                guard sendError != nil else { return }
-                withAnimation {
-                    self.sendError = nil
-                }
-            }
-            .store(in: &subscriptions)
-        
         account
             .$items
             .sink { items in
@@ -113,12 +116,6 @@ class SendViewViewModel: ObservableObject {
                 case .ethereum, .erc20:
                     self.valueString = (sendService.balance * self.marketData.lastSeenEthPrice * self.fiatCurrency.rate).double.usdFormatted()
                 }
-            }
-            .store(in: &subscriptions)
-        
-        $feeRate
-            .sink { [unowned self] rate in
-                self.sendService?.feeRateType.send(rate)
             }
             .store(in: &subscriptions)
     }
@@ -225,7 +222,7 @@ class SendViewViewModel: ObservableObject {
         do {
             let transaction = !useAllFundsEnabled ? try await service.sendMax() : try await service.send()
             DispatchQueue.main.async {
-                self.unconfirmedTx = transaction
+                self.unconfirmedTx.send(transaction)
             }
             return true
         } catch {
