@@ -189,7 +189,7 @@ class AccountViewModel: ObservableObject {
     private func updateValue() {
         let value = items.map{ convertToBtcBalance(item: $0) * marketData.lastSeenBtcPrice * fiatCurrency.rate }.reduce(0, { $0 + $1 }).double.usdFormatted()
         
-        if totalValue != value {
+        if value != "NaN" && totalValue != value {
             DispatchQueue.main.async {
                 self.totalValue = value
             }
