@@ -7,7 +7,7 @@
 
 import Foundation
 
-class PeerStore: ObservableObject {
+class PeerStore {
     static func clearPeersDocumentsDirectory() {
         do {
             let fileURL = try fileUrl()
