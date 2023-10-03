@@ -10,9 +10,9 @@ import PortalUI
 import Factory
 
 struct ResponsibleWarningView: View {
-    @EnvironmentObject private var navigation: NavigationStack
+    @Environment(NavigationStack.self) var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
-    @EnvironmentObject private var sharedState: ViewState
+    @Environment(ViewState.self)private var sharedState
     @ObservedObject private var viewModel: RecoveryPhraseViewModel
     
     init(viewModel: RecoveryPhraseViewModel) {

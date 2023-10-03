@@ -16,11 +16,11 @@ struct ViewHeightKey: PreferenceKey {
 }
 
 struct SetRecipientView: View {
-    @ObservedObject private var viewState: ViewState = Container.viewState()
+    var viewState: ViewState = Container.viewState()
     @State private var showScanner = false
     @State var textEditorHeight : CGFloat = 0
     @Environment(SendViewViewModel.self) var viewModel: SendViewViewModel
-    @EnvironmentObject private var navigation: NavigationStack
+    @Environment(NavigationStack.self) var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
     
     let rootView: Bool
@@ -43,6 +43,8 @@ struct SetRecipientView: View {
         @Bindable var bindableViewModel = viewModel
         
         ZStack(alignment: .bottom) {
+            let _ = Self._printChanges()
+
             VStack(spacing: 0) {
                 ZStack {
                     HStack {

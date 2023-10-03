@@ -10,9 +10,9 @@ import PortalUI
 import Factory
 
 struct AccountView: View {
-    @EnvironmentObject private var navigation: NavigationStack
-    @ObservedObject private var viewModel: AccountViewModel = Container.accountViewModel()
-    @ObservedObject private var viewState: ViewState = Container.viewState()
+    @Environment(NavigationStack.self) var navigation: NavigationStack
+    @State private var viewModel: AccountViewModel = Container.accountViewModel()
+    @Bindable private var viewState: ViewState = Container.viewState()
     
     var body: some View {
         let _ = Self._printChanges()
@@ -76,10 +76,11 @@ struct AccountView: View {
         .sheet(isPresented: $viewModel.goToSend, onDismiss: {
             viewModel.updateValues()
         }) {
-            SendRootView(withAssetPicker: true).environment(Container.sendViewModel()).lockableView()
+            let vm = SendViewViewModel(items: viewModel.items)
+            SendRootView(withAssetPicker: true).environment(vm).lockableView()
         }
         .fullScreenCover(isPresented: $viewState.showBackUpFlow) {
-            AccountBackupRootView().environmentObject(viewState).lockableView()
+            AccountBackupRootView().environment(viewState).lockableView()
         }
         .fullScreenCover(isPresented: $viewModel.goToSettings) {
             SettingsRootView().lockableView()

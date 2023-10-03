@@ -13,9 +13,9 @@ struct QRCodeGeneratorView: View {
     let rootView: Bool
     
     @Environment(\.presentationMode) private var presentationMode
-    @EnvironmentObject private var navigation: NavigationStack
+    @Environment(NavigationStack.self) var navigation: NavigationStack
     @StateObject var viewModel: ReceiveViewModel
-    @ObservedObject private var viewState: ViewState = Container.viewState()
+    var viewState: ViewState = Container.viewState()
     
     var body: some View {
         GeometryReader { geo in

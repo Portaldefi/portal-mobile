@@ -16,8 +16,8 @@ struct ReviewTransactionView: View {
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
     @Environment(SendViewViewModel.self) var viewModel: SendViewViewModel
-    @EnvironmentObject private var navigation: NavigationStack
-    @ObservedObject private var viewState: ViewState = Container.viewState()
+    @Environment(NavigationStack.self) var navigation: NavigationStack
+    private var viewState: ViewState = Container.viewState()
     
     @State private var step: ReviewStep = .reviewing
     @State private var actionButtonEnabled = true

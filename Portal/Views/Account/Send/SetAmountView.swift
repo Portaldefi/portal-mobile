@@ -12,8 +12,8 @@ import PopupView
 
 struct SetAmountView: View {
     private let warningColor = Color(red: 1, green: 0.321, blue: 0.321)
-    @ObservedObject private var viewState: ViewState = Container.viewState()
-    @EnvironmentObject private var navigation: NavigationStack
+    private var viewState: ViewState = Container.viewState()
+    @Environment(NavigationStack.self) var navigation: NavigationStack
     @Environment(SendViewViewModel.self) var viewModel: SendViewViewModel
     @FocusState private var focusedField: Bool
     

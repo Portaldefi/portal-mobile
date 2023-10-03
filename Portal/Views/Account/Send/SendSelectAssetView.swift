@@ -11,9 +11,9 @@ import PortalUI
 import Factory
 
 struct SendSelectAssetView: View {
-    @ObservedObject private var viewState: ViewState = Container.viewState()
+    private var viewState: ViewState = Container.viewState()
     @Environment(\.presentationMode) private var presentationMode
-    @EnvironmentObject private var navigation: NavigationStack
+    @Environment(NavigationStack.self) var navigation: NavigationStack
     @Environment(SendViewViewModel.self) var viewModel: SendViewViewModel
     @State private var notEnoughFunds = false
     @State private var notEnoughFundsMessage = String()

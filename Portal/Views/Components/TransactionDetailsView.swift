@@ -10,7 +10,7 @@ import PortalUI
 import BitcoinDevKit
 
 struct TransactionDetailsView: View {
-    @ObservedObject private var viewState: ViewState = Container.viewState()
+    private var viewState: ViewState = Container.viewState()
     @StateObject private var viewModel: TransactionDetailsViewModel
     @Environment(\.presentationMode) private var presentationMode
     

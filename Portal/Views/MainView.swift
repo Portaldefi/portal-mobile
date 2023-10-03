@@ -11,7 +11,7 @@ import Factory
 
 struct Mainview: View {
     private let views: [AnyView]
-    @ObservedObject private var viewState: ViewState = Container.viewState()
+    private var viewState: ViewState = Container.viewState()
     @Environment(\.scenePhase) private var scenePhase
     
     init() {
