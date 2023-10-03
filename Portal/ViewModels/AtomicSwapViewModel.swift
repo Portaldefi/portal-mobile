@@ -30,7 +30,7 @@ class AtomicSwapViewModel: ObservableObject {
     @Published var swapState: SwapState = .create
     @Published var order: Order?
     
-    @ObservedObject var viewState = Container.viewState()
+    private var viewState = Container.viewState()
     
     private let ethereumKit: IBalanceAdapter & ISendEthereumAdapter
     private let lightningKit: ILightningChannels
