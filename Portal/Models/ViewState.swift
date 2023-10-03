@@ -39,13 +39,12 @@ import Foundation
     }
     public private(set) var isReachable = false
     
-    private var settings = Container.settings()
-    private var reachability = Container.reachabilityService()
-    
-    public var onAssetBalancesUpdate = PassthroughSubject<Void, Never>()
-    public var onSceneStateChange = PassthroughSubject<SceneState, Never>()
-    
+    @ObservationIgnored private var settings = Container.settings()
+    @ObservationIgnored private var reachability = Container.reachabilityService()
     @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
+    
+    @ObservationIgnored public var onAssetBalancesUpdate = PassthroughSubject<Void, Never>()
+    @ObservationIgnored public var onSceneStateChange = PassthroughSubject<SceneState, Never>()
         
     init() {
         updateScene(state: .background)
