@@ -11,7 +11,7 @@ import BitcoinDevKit
 import Factory
 
 @Observable class AssetDetailsViewModel {
-    @ObservationIgnored let coin: Coin
+    let coin: Coin
     
     public var goToReceive = false
     public var goSend: Bool = false {
