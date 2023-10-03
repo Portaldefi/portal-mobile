@@ -11,8 +11,7 @@ import PortalUI
 import Factory
 
 struct AssetDetailsView: View {
-    @EnvironmentObject private var navigation: NavigationStack
-    @ObservedObject private var viewState: ViewState = Container.viewState()
+    @Environment(NavigationStack.self) var navigation: NavigationStack
     @State private var viewModel: AssetDetailsViewModel
     
     @State private var showTxDetails = false
@@ -20,14 +19,16 @@ struct AssetDetailsView: View {
     
     let item: WalletItem
     
+    private var viewState: ViewState = Container.viewState()
+        
     init(item: WalletItem, viewModel: AssetDetailsViewModel) {
         self.item = item
         self._viewModel = State(initialValue: viewModel)
     }
     
     var body: some View {
-        let _ = Self._printChanges()
         VStack(spacing: 0) {
+            let _ = Self._printChanges()
             Group {
                 HStack {
                     HStack(spacing: 8) {

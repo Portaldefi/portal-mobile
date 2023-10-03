@@ -11,8 +11,8 @@ import PortalUI
 struct CreateAccountView: View {
     @FocusState private var isFocused: Bool
     @ObservedObject private var viewModel: CreateAccountViewModel
-    @EnvironmentObject private var navigation: NavigationStack
-    
+    @Environment(NavigationStack.self) var navigation: NavigationStack
+
     init(words: [String]? = nil) {
         UITableView.appearance().backgroundColor = .clear
 

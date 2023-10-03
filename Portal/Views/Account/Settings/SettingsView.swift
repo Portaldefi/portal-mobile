@@ -11,8 +11,8 @@ import PortalUI
 struct SettingsView: View {
     @Environment(\.presentationMode) private var presentationMode
     @StateObject var viewModel = SettingsViewViewModel()
-    @EnvironmentObject private var navigation: NavigationStack
-    
+    @Environment(NavigationStack.self) var navigation: NavigationStack
+
     var body: some View {
         VStack {
             HStack {

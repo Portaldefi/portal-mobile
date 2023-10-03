@@ -9,7 +9,7 @@ import SwiftUI
 import PortalUI
 
 struct SecuritySettingsView: View {
-    @EnvironmentObject private var navigation: NavigationStack
+    @Environment(NavigationStack.self) var navigation: NavigationStack
     @StateObject var viewModel = SecuritySettingsViewModel()
     let canGoBack: Bool
 

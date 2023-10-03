@@ -21,7 +21,7 @@ struct PinButtonStyle: ButtonStyle {
 
 struct SetPincodeView: View {
     @StateObject private var viewModel = SetPincodeViewModel()
-    @EnvironmentObject private var navigation: NavigationStack
+    @Environment(NavigationStack.self) var navigation: NavigationStack
 
     var body: some View {
         VStack(spacing: 0) {
