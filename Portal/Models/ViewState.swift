@@ -9,7 +9,7 @@ import Combine
 import Factory
 import Foundation
 
-class ViewState: ObservableObject {
+@Observable class ViewState {
     enum Tab: Int {
         case wallet = 0
 //        case swap
@@ -21,26 +21,31 @@ class ViewState: ObservableObject {
         case inactive, active, background
     }
     
-    @Published var showBackUpFlow = false
-    @Published var hideTabBar = false
-    @Published var showQRCodeScannerFromTabBar: Bool = false {
+    public var showBackUpFlow = false
+    public var hideTabBar = false
+    public var showQRCodeScannerFromTabBar: Bool = false {
         willSet {
             if newValue != showQRCodeScannerFromTabBar && newValue == false {
                 Container.Scope.cached.reset()
             }
         }
-    }    
-    @Published private(set) var selectedTab: Tab = .wallet
-    @Published var walletLocked = false
-    @Published var sceneState: SceneState = .inactive
-    @Published private(set) var isReachable = false
+    }
+    private(set) var selectedTab: Tab = .wallet
+    public var walletLocked = false
+    public var sceneState: SceneState = .inactive {
+        didSet {
+            onSceneStateChange.send(sceneState)
+        }
+    }
+    public private(set) var isReachable = false
     
-    @Injected(Container.settings) var settings
-    @Injected(Container.reachabilityService) private var reachability
+    private var settings = Container.settings()
+    private var reachability = Container.reachabilityService()
     
-    var onAssetBalancesUpdate = PassthroughSubject<Void, Never>()
+    public var onAssetBalancesUpdate = PassthroughSubject<Void, Never>()
+    public var onSceneStateChange = PassthroughSubject<SceneState, Never>()
     
-    private var subscriptions = Set<AnyCancellable>()
+    @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
         
     init() {
         updateScene(state: .background)
