@@ -11,15 +11,15 @@ import SwiftUI
 import PortalUI
 import Factory
 
-class AccountViewModel: ObservableObject {
-    @Published private(set) var accountName = String()
-    @Published private(set) var totalBalance: String = "0"
-    @Published private(set) var totalValue: String = "0"
+@Observable class AccountViewModel {
+    private(set) var accountName = String()
+    private(set) var totalBalance: String = "0"
+    private(set) var totalValue: String = "0"
     
     private(set) var fiatCurrency = FiatCurrency(code: "USD")
     private(set) var portolioCurrency = Coin.bitcoin()
     
-    @Published private(set) var items: [WalletItem] = [] {
+    private(set) var items: [WalletItem] = [] {
         didSet {
             updateValues()
             
@@ -33,16 +33,16 @@ class AccountViewModel: ObservableObject {
         }
     }
     
-    @Published var selectedItem: WalletItem?
-    @Published var goToSend = false {
+    var selectedItem: WalletItem?
+    var goToSend = false {
         willSet {
             if newValue != goToSend && newValue == false {
                 Container.Scope.cached.reset()
             }
         }
     }
-    @Published var goToReceive = false
-    @Published var goToSettings = false
+    var goToReceive = false
+    var goToSettings = false
     
     private let accountManager: IAccountManager
     private let walletManager: IWalletManager
@@ -215,7 +215,7 @@ extension AccountViewModel {
         viewModel.totalBalance = "0.00055"
         viewModel.totalValue = "2.15"
         viewModel.items = [WalletItem.mockedBtc]
-        viewModel.objectWillChange.send()
+//        viewModel.objectWillChange.send()
         
         return viewModel
     }
