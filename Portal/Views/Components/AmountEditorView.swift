@@ -21,7 +21,7 @@ class AmontEditorViewModel: ObservableObject {
         self.title = title
         self.exchanger = exchanger
         self.initialAmount = exchanger.amount.string
-        self.exchanger.amount.$string.flatMap{Just(!$0.isEmpty && $0 != self.initialAmount)}.assign(to: &$saveButtonEnabled)
+        self.exchanger.amount.stringSubject.flatMap{Just(!$0.isEmpty && $0 != self.initialAmount)}.assign(to: &$saveButtonEnabled)
     }
     
     func onCancel() {
