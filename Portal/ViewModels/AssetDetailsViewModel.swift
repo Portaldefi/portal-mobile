@@ -23,7 +23,7 @@ import Factory
     }
     public var transactions: [TransactionRecord] = []
     
-    @ObservationIgnored private let transactionAdapter: ITransactionsAdapter
+    private let transactionAdapter: ITransactionsAdapter
     @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
         
     init(coin: Coin, transactionAdapter: ITransactionsAdapter) {
