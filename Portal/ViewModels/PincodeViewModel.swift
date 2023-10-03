@@ -63,7 +63,7 @@ class PincodeViewModel: ObservableObject {
         }
         .store(in: &subscriptions)
         
-        viewState.$sceneState.filter{ $0 == .active }.subscribe(on: RunLoop.main).sink { [weak self] _ in
+        viewState.onSceneStateChange.filter{ $0 == .active }.subscribe(on: RunLoop.main).sink { [weak self] _ in
             guard let self = self else { return }
             print(self.requiredBiometrics)
             guard self.requiredBiometrics && self.settings.biometricsEnabled.value && self.viewState.walletLocked else { return }
