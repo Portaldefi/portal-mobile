@@ -33,16 +33,16 @@ import Factory
         }
     }
     
-    var selectedItem: WalletItem?
-    var goToSend = false {
+    public var selectedItem: WalletItem?
+    public var goToSend = false {
         willSet {
             if newValue != goToSend && newValue == false {
                 Container.Scope.cached.reset()
             }
         }
     }
-    var goToReceive = false
-    var goToSettings = false
+    public var goToReceive = false
+    public var goToSettings = false
     
     private let accountManager: IAccountManager
     private let walletManager: IWalletManager
@@ -51,7 +51,7 @@ import Factory
     private let localStorage: ILocalStorage
     private let settings: IPortalSettings
     
-    private var subscriptions = Set<AnyCancellable>()
+    @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
         
     var accountDataIsBackedUp: Bool {
         localStorage.isAccountBackedUp
