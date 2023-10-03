@@ -105,7 +105,7 @@ extension NavigationConfigurator {
 }
 
 struct NavigationStackView<Root>: View where Root: View {
-    @ObservedObject private var navigationStack: NavigationStack
+    private var navigationStack: NavigationStack
     
     private let rootViewID = "Root"
     private let rootView: Root
@@ -147,7 +147,7 @@ struct NavigationStackView<Root>: View where Root: View {
                     .transition(navigationType == .push ? rootViewtransitions.push : rootViewtransitions.pop)
             }
         }
-        .environmentObject(navigationStack)
+        .environment(navigationStack)
     }
 }
 
