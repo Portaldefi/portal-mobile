@@ -30,7 +30,7 @@ class SubmarineSwapViewModel: ObservableObject {
     @Published var swapState: SwapState = .new
     @Published var order: Order?
     
-    @ObservedObject var viewState = Container.viewState()
+    private var viewState = Container.viewState()
     
     private let bitcoinKit: IBalanceAdapter & ISendBitcoinAdapter
     private let lightningKit: ILightningChannels
