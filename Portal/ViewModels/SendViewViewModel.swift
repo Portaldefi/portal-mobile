@@ -17,9 +17,8 @@ enum UserInputResult {
 }
 
 @Observable class SendViewViewModel {
-    private var sendService: ISendAssetService?
-    private var subscriptions = Set<AnyCancellable>()
-    private(set) var walletItems: [WalletItem]  = []
+    @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
+    @ObservationIgnored private var sendService: ISendAssetService?
     
     public var receiverAddress = String() {
         didSet {
@@ -47,17 +46,16 @@ enum UserInputResult {
     public var amountIsValid: Bool = true
     public var showFeesPicker = false
     
+    private(set) var walletItems: [WalletItem]  = []
     private(set) var balanceString = String()
     private(set) var valueString = String()
     private(set) var useAllFundsEnabled = true
-    
     private(set) var unconfirmedTx = PassthroughSubject<TransactionRecord, Never>()
     private(set) var recomendedFees: RecomendedFees?
     private(set) var exchanger: Exchanger?
     private(set) var sendError: Error?
-    var confirmSigning = false
+    private(set) var confirmSigning = false
 
-    private var account = Container.accountViewModel()
     private var marketData = Container.marketData()
     private var settings = Container.settings()
     
@@ -86,8 +84,9 @@ enum UserInputResult {
         return exchanger.baseAmountDecimal > 0 && sendService?.fee != 0
     }
     
-    init() {
+    init(items: [WalletItem]? = []) {
         subscribeForUpdates()
+        if let initItems = items { walletItems = initItems }
     }
     
     deinit {
@@ -95,13 +94,6 @@ enum UserInputResult {
     }
     
     private func subscribeForUpdates() {
-        account
-            .$items
-            .sink { items in
-                self.walletItems = items
-            }
-            .store(in: &subscriptions)
-        
         marketData
             .onMarketDataUpdate
             .receive(on: RunLoop.main)
@@ -119,7 +111,7 @@ enum UserInputResult {
             }
             .store(in: &subscriptions)
     }
-    
+        
     private func syncExchanger(coin: Coin) {
         let price: Decimal
         
