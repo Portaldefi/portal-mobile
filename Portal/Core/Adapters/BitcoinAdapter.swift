@@ -93,24 +93,24 @@ final class BitcoinAdapter {
                 )
                 blockchainConfig = BlockchainConfig.electrum(config: electrumConfig)
             case .regtest:
-                let espolaConfig = EsploraConfig(
-                    baseUrl: espolaRegTestURL,
-                    proxy: nil,
-                    concurrency: nil,
-                    stopGap: 10,
-                    timeout: nil
-                )
-                blockchainConfig = BlockchainConfig.esplora(config: espolaConfig)
-                
-//                let rpcConfig = RpcConfig(
-//                    url: "localhost:18443",
-//                    auth: .userPass(username: "lnd", password: "lnd"),
-//                    network: .regtest,
-//                    walletName: wallet.account.id,
-//                    syncParams: nil
+//                let espolaConfig = EsploraConfig(
+//                    baseUrl: espolaRegTestURL,
+//                    proxy: nil,
+//                    concurrency: nil,
+//                    stopGap: 10,
+//                    timeout: nil
 //                )
-//
-//                blockchainConfig = BlockchainConfig.rpc(config: rpcConfig)
+//                blockchainConfig = BlockchainConfig.esplora(config: espolaConfig)
+                
+                let rpcConfig = RpcConfig(
+                    url: "localhost:18443",
+                    auth: .userPass(username: "lnd", password: "lnd"),
+                    network: .regtest,
+                    walletName: wallet.account.id,
+                    syncParams: nil
+                )
+
+                blockchainConfig = BlockchainConfig.rpc(config: rpcConfig)
             }
                         
             blockchain = try Blockchain(config: blockchainConfig)
