@@ -31,14 +31,15 @@ import Foundation
         }
     }
     private(set) var selectedTab: Tab = .wallet
+    public private(set) var isReachable = false
     public var walletLocked = false
-    public var sceneState: SceneState = .inactive {
+    
+    @ObservationIgnored private(set) var sceneState: SceneState = .inactive {
         didSet {
             onSceneStateChange.send(sceneState)
         }
     }
-    public private(set) var isReachable = false
-    
+        
     @ObservationIgnored private var settings = Container.settings()
     @ObservationIgnored private var reachability = Container.reachabilityService()
     @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
