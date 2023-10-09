@@ -18,40 +18,65 @@ struct QRCodeSharedItem: Identifiable {
     let item: String
 }
 
-class ReceiveViewModel: ObservableObject {
+@Observable class ReceiveViewModel {
     enum RecieveStep {
         case selectAsset, generateQR
     }
     
-    private var adapter: IDepositAdapter?
+    @ObservationIgnored private var adapter: IDepositAdapter?
+    
     private let context = CIContext()
     private let filter = CIFilter.qrCodeGenerator()
     
-    @Published var editingAmount = false
+    public var editingAmount = false
     
-    @Published var description = String()
-    @Published var editingDescription = false
-    @Published var showConfirmationOnCopy = false
-    @Published var showNetworkSelector = false
-    @Published var showFullQRCodeString = false
-    @Published var onAmountChange = false
+    public var description = String() {
+        didSet {
+            description$.send(description)
+        }
+    }
+    @ObservationIgnored private var description$ = CurrentValueSubject<String, Never>(String())
+
+    public var editingDescription = false
+    public var showConfirmationOnCopy = false
+    public var showNetworkSelector = false
+    public var showFullQRCodeString = false
+    public var onAmountChange = false {
+        didSet {
+            onAmountChange$.send(onAmountChange)
+        }
+    }
+    @ObservationIgnored private var onAmountChange$ = CurrentValueSubject<Bool, Never>(false)
     
-    @Published private(set) var qrCode: UIImage?
-    @Published private(set) var walletItems = [WalletItem]()
+    private(set) var qrCode: UIImage?
+    private(set) var walletItems = [WalletItem]()
     
-    @Published var sharedAddress: IdentifiableString?
-    @Published var selectedItem: WalletItem?
-    @Published var exchanger: Exchanger?
-    @Published var qrAddressType: BTCQRCodeAddressType = .lightning
-    @Published var invoiceString = String()
-    @Published var sharedItems: [QRCodeSharedItem] = []
-    @Published var sharedItem: QRCodeSharedItem?
+    public var sharedAddress: IdentifiableString?
     
-    @Injected(Container.marketData) private var marketData
-    @Injected(Container.settings) private var settings
-    @Injected(Container.lightningKitManager) private var lightningKit
+    @ObservationIgnored public var selectedItem: WalletItem? {
+        didSet {
+            guard let item = selectedItem else { return }
+            updateExchanger(coin: item.coin)
+            updateAdapter(coin: item.coin)
+        }
+    }
+    @ObservationIgnored public var exchanger: Exchanger?
+    @ObservationIgnored public var qrAddressType: BTCQRCodeAddressType = .lightning {
+        didSet {
+            qrAddressType$.send(qrAddressType)
+        }
+    }
+    @ObservationIgnored private var qrAddressType$ = CurrentValueSubject<BTCQRCodeAddressType, Never>(.lightning)
     
-    private var subscriptions = Set<AnyCancellable>()
+    public var invoiceString = String()
+    public var sharedItems: [QRCodeSharedItem] = []
+    public var sharedItem: QRCodeSharedItem?
+    
+    @ObservationIgnored private var marketData = Container.marketData()
+    @ObservationIgnored private var settings = Container.settings()
+    @ObservationIgnored private var lightningKit = Container.lightningKitManager()
+    
+    @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
     
     var fiatCurrency: FiatCurrency {
         settings.fiatCurrency.value
@@ -65,16 +90,9 @@ class ReceiveViewModel: ObservableObject {
         self.walletItems = items
         self.selectedItem = selectedItem
         
-        $selectedItem
-            .compactMap{ $0 }
-            .receive(on: RunLoop.main)
-            .sink { [unowned self] item in
-                self.updateExchanger(coin: item.coin)
-                self.updateAdapter(coin: item.coin)
-
-                self.generateQRCode(coin: item.coin)
-        }
-        .store(in: &subscriptions)
+        guard let item = selectedItem else { return }
+        updateExchanger(coin: item.coin)
+        updateAdapter(coin: item.coin)
     }
     
     private func updateExchanger(coin: Coin?) {
@@ -108,7 +126,7 @@ class ReceiveViewModel: ObservableObject {
         
         guard let exchanger = exchanger else { return }
         
-        Publishers.CombineLatest3($onAmountChange, $description, $qrAddressType)
+        Publishers.CombineLatest3(onAmountChange$, description$, qrAddressType$)
             .flatMap { _ in Just(()) }
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
