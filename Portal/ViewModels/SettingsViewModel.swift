@@ -28,6 +28,7 @@ class SettingsViewViewModel: ObservableObject {
         }
         set {
             settings.updateFiatCurrency(newValue)
+            objectWillChange.send()
         }
     }
     
