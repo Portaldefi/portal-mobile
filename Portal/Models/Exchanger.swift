@@ -8,33 +8,29 @@
 import SwiftUI
 import Combine
 
-@Observable class Exchanger {
+class Exchanger: ObservableObject {
     let base: Coin
     let quote: AccountCurrency
     let price: Decimal
-            
-    public var amount = TextLimiter(initialText: "0", limit: 10)
-    public var side: Side = .base {
-        didSet {
-            sideSubject.send(side)
-        }
-    }
     
-    private(set) var baseAmountString = "0"
-    private(set) var quoteAmountString = "0"
-    private(set) var baseAmountDecimal: Decimal = 0
+    private var subscriptions = Set<AnyCancellable>()
+        
+    @Published var amount = TextLimiter(initialText: "0", limit: 10)
     
-    private var sideSubject = CurrentValueSubject<Side, Never>(.base)
+    @Published private(set) var baseAmountString = "0"
+    @Published private(set) var quoteAmountString = "0"
+    @Published private(set) var baseAmountDecimal: Decimal = 0
     
-    @ObservationIgnored private var quoteAmountDecimal: Decimal = 0
-    @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
-            
+    private var quoteAmountDecimal: Decimal = 0
+    
+    @Published var side: Side = .base
+        
     init(base: Coin, quote: AccountCurrency, price: Decimal) {
         self.base = base
         self.quote = quote
         self.price = price
                 
-        Publishers.CombineLatest(amount.updated, sideSubject)
+        Publishers.CombineLatest(amount.updated, $side)
             .sink { [unowned self] amount, side in
                 let decimalAmount = Decimal(string: amount) ?? 0
                 
