@@ -8,10 +8,9 @@
 import SwiftUI
 import Combine
 
-@Observable class TextLimiter {
+class TextLimiter: ObservableObject {
     private let limit: Int
-    @ObservationIgnored var updated = CurrentValueSubject<String, Never>(String())
-    @ObservationIgnored var stringSubject = PassthroughSubject<String, Never>()
+    var updated = CurrentValueSubject<String, Never>(String())
     
     init(initialText: String, limit: Int) {
         self.limit = limit
@@ -19,13 +18,13 @@ import Combine
         fullString = initialText
     }
     
-    private(set) var fullString = "0"
+    @Published private(set) var fullString = "0"
     
-    var string = "0" {
+    @Published var string = "0" {
         didSet {
             updateFullString()
             updateString()
-            stringSubject.send(string)
+            
             updated.send(fullString)
         }
     }
