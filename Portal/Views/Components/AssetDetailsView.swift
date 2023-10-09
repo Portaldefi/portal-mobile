@@ -13,7 +13,6 @@ import Factory
 struct AssetDetailsView: View {
     @Environment(NavigationStack.self) var navigation: NavigationStack
     @State private var viewModel: AssetDetailsViewModel
-    
     @State private var showTxDetails = false
     @State private var selectedTx: TransactionRecord?
     
