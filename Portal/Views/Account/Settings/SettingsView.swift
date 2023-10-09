@@ -69,7 +69,7 @@ struct SettingsView: View {
                 if !viewModel.fiatCurrencies.isEmpty {
                     Section(header: Text("Base asset")) {
                         Picker(selection: $viewModel.fiatCurrency, label: EmptyView(), content: {
-                            ForEach(viewModel.fiatCurrencies, id: \.name) {
+                            ForEach(viewModel.fiatCurrencies, id: \.code) {
                                 Text("\($0.symbol) \($0.name)").tag($0)
                             }
                         })
@@ -77,19 +77,19 @@ struct SettingsView: View {
                     }
                 }
                 
-                Section(header: Text("Wallet Coins")) {
-                    ForEach(viewModel.coins, id: \.self) { coin in
-                        MultipleSelectionRow(
-                            title: coin.name,
-                            imageUrl: coin.icon,
-                            isSelected: viewModel.selectedCoins.contains(coin)
-                        ) {
-                            DispatchQueue.main.async {
-                                viewModel.updatedWallet(coin)
-                            }
-                        }
-                    }
-                }
+//                Section(header: Text("Wallet Coins")) {
+//                    ForEach(viewModel.coins, id: \.self) { coin in
+//                        MultipleSelectionRow(
+//                            title: coin.name,
+//                            imageUrl: coin.icon,
+//                            isSelected: viewModel.selectedCoins.contains(coin)
+//                        ) {
+//                            DispatchQueue.main.async {
+//                                viewModel.updatedWallet(coin)
+//                            }
+//                        }
+//                    }
+//                }
             }
             .padding(.horizontal, 6)
             

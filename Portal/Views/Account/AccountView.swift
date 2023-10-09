@@ -38,32 +38,37 @@ struct AccountView: View {
                 .frame(height: 1)
                 .overlay(Palette.grayScale10)
             
-            ScrollView {
-                VStack(spacing: 0) {
-                    ForEach(viewModel.items) { item in
-                        ZStack(alignment: .trailing) {
-                            WalletItemView(viewModel: item.viewModel)
-                                .padding(.leading, 12)
-                                .padding(.trailing, 10)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    navigation.push(.assetDetails(item: item))
-                                    withAnimation {
-                                        viewState.hideTabBar = true
+            if viewModel.items.isEmpty {
+                ProgressView()
+                    .progressViewStyle(.circular)
+            } else {
+                ScrollView {
+                    VStack(spacing: 0) {
+                        ForEach(viewModel.items) { item in
+                            ZStack(alignment: .trailing) {
+                                WalletItemView(viewModel: item.viewModel)
+                                    .padding(.leading, 12)
+                                    .padding(.trailing, 10)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        navigation.push(.assetDetails(item: item))
+                                        withAnimation {
+                                            viewState.hideTabBar = true
+                                        }
                                     }
-                                }
-                            Asset.chevronRightIcon
-                                .foregroundColor(Palette.grayScale4A)
-                                .offset(x: 2)
+                                Asset.chevronRightIcon
+                                    .foregroundColor(Palette.grayScale4A)
+                                    .offset(x: 2)
+                            }
+                            Divider()
+                                .frame(height: 1)
+                                .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
                         }
-                        Divider()
-                            .frame(height: 1)
-                            .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
                     }
+                    .padding(.horizontal, 8)
                 }
-                .padding(.horizontal, 8)
+                .background(Palette.grayScale20)
             }
-            .background(Palette.grayScale20)
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         .sheet(isPresented: $viewState.showQRCodeScannerFromTabBar) {

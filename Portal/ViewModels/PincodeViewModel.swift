@@ -58,8 +58,12 @@ class PincodeViewModel: ObservableObject {
         }
         .store(in: &subscriptions)
         
-        settings.biometricsEnabled.receive(on: RunLoop.main).sink { [weak self] enabled in
-            self?.requiredBiometrics = enabled
+        settings.biometricsEnabled.receive(on: RunLoop.main).sink { [unowned self] enabled in
+            self.requiredBiometrics = enabled
+            
+            if self.viewState.sceneState == .active || self.viewState.sceneState == .background && enabled && self.settings.biometricsEnabled.value && self.viewState.walletLocked {
+                self.biometricAuth()
+            }
         }
         .store(in: &subscriptions)
         
@@ -68,73 +72,77 @@ class PincodeViewModel: ObservableObject {
             print(self.requiredBiometrics)
             guard self.requiredBiometrics && self.settings.biometricsEnabled.value && self.viewState.walletLocked else { return }
 
-            self.biometrics.authenticateUser { success, error in
-                DispatchQueue.main.async {
-                    if success {
-                        self.unlock()
-                    } else {
-                        if let error = error {
-                            switch error {
-                            case LAError.appCancel:
-                                // The app canceled authentication by
-                                // invalidating the LAContext
-                                print("The app canceled authentication by invalidating the LAContext")
-                                self.requiredBiometrics = false
-                            case LAError.authenticationFailed:
-                                // The user did not provide
-                                // valid credentials
-                                print("The user did not provide valid credentials")
-                            case LAError.invalidContext:
-                                // The LAContext was invalid
-                                print("The LAContext was invalid")
-                                self.requiredBiometrics = false
-                            case LAError.notInteractive:
-                                // Interaction was not allowed so the
-                                // authentication failed
-                                print("Interaction was not allowed so the authentication failed")
-                            case LAError.passcodeNotSet:
-                                // The user has not set a passcode
-                                // on this device
-                                print("The user has not set a passcode on this device")
-                            case LAError.systemCancel:
-                                // The system canceled authentication,
-                                // for example to show another app
-                                print("The system canceled authentication, for example to show another app")
-                            case LAError.userCancel:
-                                // The user canceled the
-                                // authentication dialog
-                                print("The user cancΩeled the authentication dialog")
-                                self.requiredBiometrics = false
-                            case LAError.userFallback:
-                                // The user selected to use a fallback
-                                // authentication method
-                                print("The user selected to use a fallback authentication method")
-                            case LAError.biometryLockout:
-                                // Too many failed attempts locked
-                                // biometric authentication
-                                print("Too many failed attempts locked biometric authentication")
-                                self.requiredBiometrics = false
-                            case LAError.biometryNotAvailable:
-                                // The user's device does not support
-                                // biometric authentication
-                                print("The user's device does not support biometric authentication")
-                                self.settings.updateBiometricsSetting(enabled: false)
-                                self.requiredBiometrics = false
-                            case LAError.biometryNotEnrolled:
-                                // The user has not configured
-                                // biometric authentication
-                                print("The user has not configured biometric authentication")
-                                self.settings.updateBiometricsSetting(enabled: false)
-                                self.requiredBiometrics = false
-                            default:
-                                print("Unknown authentification error")
-                            }
+            self.biometricAuth()
+        }
+        .store(in: &subscriptions)
+    }
+    
+    private func biometricAuth() {
+        biometrics.authenticateUser { success, error in
+            DispatchQueue.main.async {
+                if success {
+                    self.unlock()
+                } else {
+                    if let error = error {
+                        switch error {
+                        case LAError.appCancel:
+                            // The app canceled authentication by
+                            // invalidating the LAContext
+                            print("The app canceled authentication by invalidating the LAContext")
+                            self.requiredBiometrics = false
+                        case LAError.authenticationFailed:
+                            // The user did not provide
+                            // valid credentials
+                            print("The user did not provide valid credentials")
+                        case LAError.invalidContext:
+                            // The LAContext was invalid
+                            print("The LAContext was invalid")
+                            self.requiredBiometrics = false
+                        case LAError.notInteractive:
+                            // Interaction was not allowed so the
+                            // authentication failed
+                            print("Interaction was not allowed so the authentication failed")
+                        case LAError.passcodeNotSet:
+                            // The user has not set a passcode
+                            // on this device
+                            print("The user has not set a passcode on this device")
+                        case LAError.systemCancel:
+                            // The system canceled authentication,
+                            // for example to show another app
+                            print("The system canceled authentication, for example to show another app")
+                        case LAError.userCancel:
+                            // The user canceled the
+                            // authentication dialog
+                            print("The user cancΩeled the authentication dialog")
+                            self.requiredBiometrics = false
+                        case LAError.userFallback:
+                            // The user selected to use a fallback
+                            // authentication method
+                            print("The user selected to use a fallback authentication method")
+                        case LAError.biometryLockout:
+                            // Too many failed attempts locked
+                            // biometric authentication
+                            print("Too many failed attempts locked biometric authentication")
+                            self.requiredBiometrics = false
+                        case LAError.biometryNotAvailable:
+                            // The user's device does not support
+                            // biometric authentication
+                            print("The user's device does not support biometric authentication")
+                            self.settings.updateBiometricsSetting(enabled: false)
+                            self.requiredBiometrics = false
+                        case LAError.biometryNotEnrolled:
+                            // The user has not configured
+                            // biometric authentication
+                            print("The user has not configured biometric authentication")
+                            self.settings.updateBiometricsSetting(enabled: false)
+                            self.requiredBiometrics = false
+                        default:
+                            print("Unknown authentification error")
                         }
                     }
                 }
             }
         }
-        .store(in: &subscriptions)
     }
     
     deinit {

@@ -26,7 +26,6 @@ class BiometricAuthentication: ObservableObject {
             authenticationPolicy,
             error: &policyError
         )
-        print(permissionsGranted)
     }
     
     func authenticateUser(_ completion: @escaping (Bool, LAError?) -> ()) {
@@ -38,6 +37,19 @@ class BiometricAuthentication: ObservableObject {
                 return completion(success, nil)
             }
             completion(success, error)
+        }
+    }
+    
+    func isBiometricEnrolled() -> Bool {
+        // Check if the device supports biometric authentication and if it's enrolled
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &policyError) {
+            return true
+        } else {
+            // Handle the case where biometric authentication is not available
+            if let error = policyError {
+                print("Biometric error: \(error.localizedDescription)")
+            }
+            return false
         }
     }
     
