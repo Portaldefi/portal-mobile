@@ -9,6 +9,33 @@ import SwiftUI
 import PortalUI
 import Combine
 
+//@Observable class AmontEditorViewModel {
+//    let title: String
+//        
+//    var saveButtonEnabled = false
+//    @ObservationIgnored var exchanger: Exchanger
+//    
+//    private let initialAmount: String
+//    
+//    @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
+//    
+//    init(title: String, exchanger: Exchanger) {
+//        self.title = title
+//        self.exchanger = exchanger
+//        self.initialAmount = exchanger.amount.string
+//        
+//        self.exchanger.amount.$string.flatMap{Just(!$0.isEmpty && $0 != self.initialAmount)}.sink { newValue in
+//            self.saveButtonEnabled = newValue
+//        }
+//        .store(in: &subscriptions)
+//    }
+//    
+//    func onCancel() {
+//        exchanger.amount.string = initialAmount
+//    }
+//}
+
+
 class AmontEditorViewModel: ObservableObject {
     let title: String
         
@@ -21,7 +48,7 @@ class AmontEditorViewModel: ObservableObject {
         self.title = title
         self.exchanger = exchanger
         self.initialAmount = exchanger.amount.string
-        self.exchanger.amount.stringSubject.flatMap{Just(!$0.isEmpty && $0 != self.initialAmount)}.assign(to: &$saveButtonEnabled)
+        self.exchanger.amount.$string.flatMap{Just(!$0.isEmpty && $0 != self.initialAmount)}.assign(to: &$saveButtonEnabled)
     }
     
     func onCancel() {
