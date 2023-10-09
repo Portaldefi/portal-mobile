@@ -11,7 +11,7 @@ import PortalUI
 struct ReceiveSelectAssetView: View {
     @Environment(\.presentationMode) private var presentationMode
     @Environment(NavigationStack.self) var navigation: NavigationStack
-    @ObservedObject var viewModel: ReceiveViewModel
+    @State var viewModel: ReceiveViewModel
             
     var body: some View {
         VStack(spacing: 0) {
