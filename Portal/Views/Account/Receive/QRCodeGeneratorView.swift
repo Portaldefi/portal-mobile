@@ -14,7 +14,7 @@ struct QRCodeGeneratorView: View {
     
     @Environment(\.presentationMode) private var presentationMode
     @Environment(NavigationStack.self) var navigation: NavigationStack
-    @StateObject var viewModel: ReceiveViewModel
+    @Bindable var viewModel: ReceiveViewModel
     var viewState: ViewState = Container.viewState()
     
     var body: some View {
@@ -255,6 +255,7 @@ struct QRCodeGeneratorView: View {
         }
         //Amount field
         .popup(isPresented: $viewModel.editingAmount) {
+            let _ = Self._printChanges()
             if let exchanger = viewModel.exchanger {
                 AmountEditorView(
                     title: "Add Amount",
