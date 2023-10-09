@@ -27,12 +27,12 @@ class Broadcaster: BroadcasterInterface {
                 let txId = result["txid"] as? String  {
                 print(txId)
                     
-                if let transaction = try? await chainInterface.getTransaction(with: txId) {
-                    print("transaction: \(transaction.toHexString())")
-                } else {
+//                if let transaction = try? await chainInterface.getTransaction(with: txId) {
+//                    print("transaction: \(transaction.toHexString())")
+//                } else {
                     let txID = try? await self.chainInterface.submitTransaction(transaction: tx)
                     print("Submitted tx with id: \(String(describing: txID))")
-                }
+//                }
             } else {
                 let txID = try? await self.chainInterface.submitTransaction(transaction: tx)
                 print("Submitted tx with id: \(String(describing: txID))")
