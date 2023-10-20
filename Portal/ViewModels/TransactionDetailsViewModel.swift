@@ -75,7 +75,7 @@ class TransactionDetailsViewModel: ObservableObject {
     var recipientString: String? {
         switch source {
         case .btcOnChain:
-            return ""//storage.object(forKey: transaction.id + "recipient") as? String
+            return transaction.to//storage.object(forKey: transaction.id + "recipient") as? String
         case .ethOnChain:
             return transaction.to
         case .lightning:
@@ -86,7 +86,7 @@ class TransactionDetailsViewModel: ObservableObject {
     var senderString: String? {
         switch source {
         case .btcOnChain:
-            return ""//storage.object(forKey: transaction.id + "recipient") as? String
+            return transaction.from//storage.object(forKey: transaction.id + "recipient") as? String
         case .ethOnChain:
             return transaction.from
         case .lightning:
