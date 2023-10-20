@@ -106,7 +106,7 @@ struct AssetDetailsView: View {
             let item = account.items.first{ $0.coin == viewModel.coin }
             let receiveViewModel = ReceiveViewModel.config(items: account.items, selectedItem: item)
             
-            ReceiveRootView(viewModel: receiveViewModel, withAssetPicker: false).lockableView()
+           ReceiveRootView(viewModel: receiveViewModel, withAssetPicker: false).lockableView()
         }
         .sheet(isPresented: $viewModel.goSend, onDismiss: {
             viewModel.updateTransactions()
