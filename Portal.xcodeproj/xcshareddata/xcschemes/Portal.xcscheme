@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1400"
-   version = "1.7">
+   version = "2.1">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
@@ -20,6 +20,16 @@
                ReferencedContainer = "container:Portal.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <TestPlanReference
+               reference = "container:PortalTests/UnitTests.xctestplan">
+            </TestPlanReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -30,17 +40,17 @@
       codeCoverageEnabled = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:PortalTests/UnitTests/UnitTests.xctestplan"
-            default = "YES">
-         </TestPlanReference>
-         <TestPlanReference
-            reference = "container:PortalTests/IntegrationTests/IntegrationTests.xctestplan">
-         </TestPlanReference>
-         <TestPlanReference
             reference = "container:PortalTests/UITests.xctestplan">
          </TestPlanReference>
          <TestPlanReference
             reference = "container:PortalTests/PerformanceTests.xctestplan">
+         </TestPlanReference>
+         <TestPlanReference
+            reference = "container:PortalTests/UnitTests.xctestplan"
+            default = "YES">
+         </TestPlanReference>
+         <TestPlanReference
+            reference = "container:PortalTests/IntegrationTests.xctestplan">
          </TestPlanReference>
       </TestPlans>
       <Testables>
@@ -52,6 +62,17 @@
                BlueprintIdentifier = "755501C22A6131230027D5FD"
                BuildableName = "PortalTests.xctest"
                BlueprintName = "PortalTests"
+               ReferencedContainer = "container:Portal.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "75D0F97A2AD821600099C7F2"
+               BuildableName = "PortalUnitTests.xctest"
+               BlueprintName = "PortalUnitTests"
                ReferencedContainer = "container:Portal.xcodeproj">
             </BuildableReference>
          </TestableReference>
