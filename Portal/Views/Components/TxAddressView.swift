@@ -22,7 +22,7 @@ struct TxAddressView: View {
                 .font(.Main.fixed(.monoRegular, size: 16))
                 .foregroundColor(Palette.grayScaleF4)
         }
-        .frame(height: 52)
+        .frame(minHeight: 52)
     }
 }
 
