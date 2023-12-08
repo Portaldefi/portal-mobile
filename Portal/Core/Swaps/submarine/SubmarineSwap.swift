@@ -233,7 +233,7 @@ class SubmarineSwap {
 }
 
 extension SubmarineSwap: WebSocketDelegate {
-    func didReceive(event: WebSocketEvent, client: WebSocket) {
+    func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocket) {
         switch event {
         case .connected:
             print("websocket is connected")
