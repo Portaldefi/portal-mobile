@@ -118,15 +118,6 @@
       }
     },
     {
-      "identity" : "grpc-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/grpc/grpc-swift",
-      "state" : {
-        "revision" : "84bac657e9930d26e9124bac082f26586dc2d209",
-        "version" : "1.19.1"
-      }
-    },
-    {
       "identity" : "hdwalletkit.swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/horizontalsystems/HdWalletKit.Swift.git",
@@ -185,8 +176,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/lightningdevkit/ldk-swift/",
       "state" : {
-        "revision" : "3eea818577a52e379edf7af102eb85f6aa654d41",
-        "version" : "0.0.114"
+        "revision" : "32dba4c6fc5ddbec839bb030b9b9a53e4457e2a6",
+        "version" : "0.0.118"
       }
     },
     {
@@ -214,6 +205,24 @@
       "state" : {
         "branch" : "main",
         "revision" : "4f2a32b58108cff60c9e226b26d62acc72282dc7"
+      }
+    },
+    {
+      "identity" : "promisekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mxcl/PromiseKit.git",
+      "state" : {
+        "revision" : "8a98e31a47854d3180882c8068cc4d9381bf382d",
+        "version" : "6.22.1"
+      }
+    },
+    {
+      "identity" : "promises",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/promises.git",
+      "state" : {
+        "revision" : "e70e889c0196c76d22759eb50d6a0270ca9f1d9e",
+        "version" : "2.3.1"
       }
     },
     {
@@ -262,12 +271,12 @@
       }
     },
     {
-      "identity" : "swift-log",
+      "identity" : "swift-http-types",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-log.git",
+      "location" : "https://github.com/apple/swift-http-types",
       "state" : {
-        "revision" : "532d8b529501fb73a2455b179e0bbb6d49b652ed",
-        "version" : "1.5.3"
+        "revision" : "99d066e29effa8845e4761dd3f2f831edfdf8925",
+        "version" : "1.0.0"
       }
     },
     {
@@ -284,8 +293,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-nio-extras.git",
       "state" : {
-        "revision" : "fb70a0f5e984f23be48b11b4f1909f3bee016178",
-        "version" : "1.19.1"
+        "revision" : "798c962495593a23fdea0c0c63fd55571d8dff51",
+        "version" : "1.20.0"
       }
     },
     {
@@ -293,8 +302,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-nio-http2.git",
       "state" : {
-        "revision" : "a8ccf13fa62775277a5d56844878c828bbb3be1a",
-        "version" : "1.27.0"
+        "revision" : "9c22e4f810ce780453f563fba98e1a1039f83d56",
+        "version" : "1.28.1"
       }
     },
     {
@@ -302,8 +311,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-nio-ssl.git",
       "state" : {
-        "revision" : "9d0d5d8798a576fbf674a823734e65e15ca5f2ec",
-        "version" : "2.23.1"
+        "revision" : "320bd978cceb8e88c125dcbb774943a92f6286e9",
+        "version" : "2.25.0"
       }
     },
     {
@@ -316,12 +325,30 @@
       }
     },
     {
-      "identity" : "swift-protobuf",
+      "identity" : "swiftbtc",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-protobuf.git",
+      "location" : "https://github.com/cuhte3/SwiftBTC",
       "state" : {
-        "revision" : "cf62cdaea48b77f1a631e5cb3aeda6047c2cba1d",
-        "version" : "1.23.0"
+        "revision" : "ef7c2e13b771aeef02776e10b97351a77faf270a",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "web3.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cuhte3/Web3.swift.git",
+      "state" : {
+        "revision" : "f2c3c863ee25cd606defd5d987c8d3f1a4f2bc15",
+        "version" : "0.8.5"
+      }
+    },
+    {
+      "identity" : "websocket-kit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/vapor/websocket-kit",
+      "state" : {
+        "revision" : "53fe0639a98903858d0196b699720decb42aee7b",
+        "version" : "2.14.0"
       }
     }
   ],
