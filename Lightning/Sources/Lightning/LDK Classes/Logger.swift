@@ -8,8 +8,8 @@
 import Foundation
 import LightningDevKit
 
-class Logger: LightningDevKit.Logger {
-    override func log(record: Bindings.Record) {
+public class Logger: LightningDevKit.Logger {
+    public override func log(record: Bindings.Record) {
         let messageLevel = record.getLevel()
         let arguments = record.getArgs()
                 

@@ -33,11 +33,11 @@ public class Node {
     let pendingEventTracker = PendingEventTracker()
     let connectionType: ConnectionType
     
-    var keysManager: KeysManager?
+    public var keysManager: KeysManager?
     var rpcInterface: RpcChainManager?
     var broadcaster: Broadcaster?
     var channelManagerConstructor: ChannelManagerConstructor?
-    var channelManager: ChannelManager?
+    public var channelManager: ChannelManager?
     var persister: Persister?
     var peerManager: PeerManager?
     var tcpPeerHandler: TCPPeerHandler?
@@ -45,7 +45,7 @@ public class Node {
     var cancellables = Set<AnyCancellable>()
         
     // We declare this here because `ChannelManagerConstructor` and `ChainMonitor` will share a reference to them
-    let logger = Logger()
+    public let logger = Logger()
     let feeEstimator = FeeEstimator()
     let filter = Filter()
     
@@ -376,7 +376,7 @@ public class Node {
     }
     
     //MARK: - Create invoice
-    public func createInvoice(paymentHash: String, satAmount: UInt64) async -> Invoice? {
+    public func createInvoice(paymentHash: String, satAmount: UInt64) async -> Bolt11Invoice? {
         guard let channelManager = channelManager, let keyInterface = keysManager else {
             return nil
         }
@@ -407,7 +407,7 @@ public class Node {
     }
     
     //MARK: - Pay invoice
-    public func pay(invoice: Invoice) async throws -> LightningPayment {
+    public func pay(invoice: Bolt11Invoice) async throws -> LightningPayment {
         guard let manager = channelManager else {
             throw NodeError.noPayer
         }
@@ -418,16 +418,15 @@ public class Node {
             guard let event = await pendingEventTracker.await(events: [.paymentFailed, .paymentSent], timeout: 5) else {
                 throw NodeError.error("Not received paymentFailed or paymentSent event. Timeout error")
             }
-            
-            print("Pay invoice expected event: \(event.getValueType())")
-            
+                        
             switch event.getValueType() {
             case .PaymentSent:
                 guard let paymentSent = event.getValueAsPaymentSent() else {
                     throw NodeError.error("getValueAsPaymentSent is nil")
                 }
                 
-                let paymentID = paymentSent.getPaymentId().toHexString()
+                //WARNING
+                let paymentID = paymentSent.getPaymentId()!.toHexString()
                 let preimage = paymentSent.getPaymentPreimage().toHexString()
                 let fee = (paymentSent.getFeePaidMsat() ?? 0)/1000
                 let timestamp = Int(Date().timeIntervalSince1970)
@@ -494,7 +493,7 @@ public class Node {
     }
     
     public func broacastTransaction(tx: [UInt8]) {
-        broadcaster?.broadcastTransaction(tx: tx)
+        broadcaster?.broadcastTransactions(txs: [tx])
     }
     
     public func getFundingTransactionScriptPubKey(outputScript: [UInt8]) async -> String? {
@@ -567,8 +566,8 @@ public class Node {
         }
     }
     //MARK: - Decode invoice
-    public func decode(invoice: String) throws -> Invoice {
-        let decodedInvoice = Invoice.fromStr(s: invoice)
+    public func decode(invoice: String) throws -> Bolt11Invoice {
+        let decodedInvoice = Bolt11Invoice.fromStr(s: invoice)
         guard decodedInvoice.isOk() else {
             throw NodeError.Invoice.decodingError
         }
@@ -629,7 +628,8 @@ public class Node {
             descriptors: descriptors,
             outputs: [],
             changeDestinationScript: changeDestinationScript,
-            feerateSatPer1000Weight: 7500
+            feerateSatPer1000Weight: 7500,
+            locktime: nil
         )
         
         guard rawSpendableTx.isOk(), let value = rawSpendableTx.getValue() else  {
@@ -640,7 +640,7 @@ public class Node {
         print("Transaction to spend: ")
         print(value.toHexString())
         
-        broadcaster?.broadcastTransaction(tx: value)
+        broadcaster?.broadcastTransactions(txs: [value])
     }
     
     public func processPendingHTLCForwards() {
@@ -654,7 +654,7 @@ public class Node {
     public func cooperativeCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {
         guard let cm = channelManager else { return }
         
-        let result = cm.closeChannelWithTargetFeerate(channelId: id, counterpartyNodeId: counterPartyId, targetFeerateSatsPer1000Weight: 8500)
+        let result = cm.closeChannel(channelId: id, counterpartyNodeId: counterPartyId)
         
         if result.isOk() {
             print("Channel with id: \(id.toHexString()) is closed")
@@ -751,7 +751,6 @@ extension Node {
     }
     
     private func initProbabilisticScorer(networkGraph: NetworkGraph, logger: Logger) -> ProbabilisticScorer {
-        let scoringParams = ProbabilisticScoringParameters.initWithDefault()
         
         // commented out unil https://github.com/lightningdevkit/ldk-swift/pull/103 merged to fix the crash of the scorer
         
@@ -766,7 +765,7 @@ extension Node {
 //        }
 //
 //        guard let scorer = read.getValue() else {
-            return ProbabilisticScorer(params: scoringParams, networkGraph: networkGraph, logger: logger)
+        return ProbabilisticScorer(decayParams: .initWithDefault(), networkGraph: networkGraph, logger: logger)
 //        }
 //
 //        return scorer
@@ -778,10 +777,12 @@ extension Node {
            let networkGraph = fileManager.getSerializedNetworkGraph() {
             let channelMonitors = fileManager.getSerializedChannelMonitors()
             do {
+                let networkGraphResult = NetworkGraph.read(ser: networkGraph, arg: logger)
+                
                 return try ChannelManagerConstructor(
                     channelManagerSerialized: channelManager,
                     channelMonitorsSerialized: channelMonitors,
-                    netGraphSerialized: networkGraph,
+                    networkGraph: NetworkGraphArgument.instance(networkGraphResult.getValue()!),
                     filter: filter,
                     params: params
                 )

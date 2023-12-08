@@ -19,7 +19,7 @@ class ChannelPersister: Persist {
             try persistChannelMonitor(channelMonitor, for: channelId.write().toHexString())
         } catch {
             print("\(#function) error: \(error)")
-            return .PermanentFailure
+            return ChannelMonitorUpdateStatus.UnrecoverableError
         }
         
         return .Completed
@@ -34,7 +34,7 @@ class ChannelPersister: Persist {
             try persistChannelMonitor(channelMonitor, for: idBytes.toHexString())
         } catch {
             print("\(#function) error: \(error)")
-            return .PermanentFailure
+            return ChannelMonitorUpdateStatus.UnrecoverableError
         }
         
         return .Completed

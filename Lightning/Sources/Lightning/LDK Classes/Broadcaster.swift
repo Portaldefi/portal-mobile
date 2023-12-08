@@ -11,31 +11,31 @@ import LightningDevKit
 
 class Broadcaster: BroadcasterInterface {
     private let chainInterface: RpcChainManager
-      
+    
     init(rpcInterface: RpcChainManager) {
         self.chainInterface = rpcInterface
         super.init()
     }
-
-    override func broadcastTransaction(tx: [UInt8]) {
-        print("Broadcasting Transaction: \(tx.toHexString())")
-        
+    
+    override func broadcastTransactions(txs: [[UInt8]]) {
         Task {
-            if
-                let json = try? await chainInterface.decodeRawTransaction(tx: tx),
-                let result = json["result"] as? [String: Any],
-                let txId = result["txid"] as? String  {
-                print(txId)
+            for tx in txs {
+                if
+                    let json = try? await chainInterface.decodeRawTransaction(tx: tx),
+                    let result = json["result"] as? [String: Any],
+                    let txId = result["txid"] as? String  {
+                    print(txId)
                     
-//                if let transaction = try? await chainInterface.getTransaction(with: txId) {
-//                    print("transaction: \(transaction.toHexString())")
-//                } else {
+                    //                if let transaction = try? await chainInterface.getTransaction(with: txId) {
+                    //                    print("transaction: \(transaction.toHexString())")
+                    //                } else {
                     let txID = try? await self.chainInterface.submitTransaction(transaction: tx)
                     print("Submitted tx with id: \(String(describing: txID))")
-//                }
-            } else {
-                let txID = try? await self.chainInterface.submitTransaction(transaction: tx)
-                print("Submitted tx with id: \(String(describing: txID))")
+                    //                }
+                } else {
+                    let txID = try? await self.chainInterface.submitTransaction(transaction: tx)
+                    print("Submitted tx with id: \(String(describing: txID))")
+                }
             }
         }
     }
