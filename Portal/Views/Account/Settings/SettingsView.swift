@@ -7,11 +7,13 @@
 
 import SwiftUI
 import PortalUI
+import Factory
 
 struct SettingsView: View {
     @Environment(\.presentationMode) private var presentationMode
     @StateObject var viewModel = SettingsViewViewModel()
     @Environment(NavigationStack.self) var navigation: NavigationStack
+    @Injected(Container.configProvider) var config
 
     var body: some View {
         VStack {
@@ -33,16 +35,18 @@ struct SettingsView: View {
             .padding(.horizontal, 16)
             
             List {
-                Section(header: EmptyView()) {
-                    HStack{
-                        Text("Dev Utility")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Image(systemName: "chevron.forward")
+                if config.network == .playnet {
+                    Section(header: EmptyView()) {
+                        HStack{
+                            Text("Dev Utility")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Image(systemName: "chevron.forward")
+                        }
                     }
-                }
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    navigation.push(.devUtility)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        navigation.push(.devUtility)
+                    }
                 }
                 
                 Section(header: EmptyView()) {
