@@ -35,7 +35,7 @@ class SubmarineSeekerTemplate: ISubmarineSwap {
         print("[SWAP] Open in seeker submarine")
 
         let blockchainHeight = bitcoinKit.blockchainHeight
-        let secretSeekerPublicKey = bitcoinKit.pubKey
+        let secretSeekerPublicKey = "bitcoinKit.pubKey"
         print("[SWAP] seeker pubKey: \(secretSeekerPublicKey)")
         let secretHolderPublicKey = ""//swap.secretSeeker.pubKey
         print("[SWAP] holder pubKey: \(secretHolderPublicKey)")
