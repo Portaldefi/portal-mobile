@@ -9,10 +9,18 @@ import Foundation
 import LightningDevKit
 
 public class Logger: LightningDevKit.Logger {
+    let logLevels: [Bindings.Level]
+    
+    init(logLevels: [Bindings.Level]) {
+        self.logLevels = logLevels
+    }
+    
     public override func log(record: Bindings.Record) {
         let messageLevel = record.getLevel()
         let arguments = record.getArgs()
                 
+        guard logLevels.contains(messageLevel) else { return }
+        
         switch messageLevel {
         case .Debug:
             print("LDK LOG - Debug:")
