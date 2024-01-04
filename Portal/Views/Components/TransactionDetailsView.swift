@@ -96,28 +96,7 @@ struct TransactionDetailsView: View {
                 .padding(.horizontal, 16)
             }
             
-            if viewModel.editingNotes {
-                TextEditorView(
-                    title: "Note",
-                    placeholder: "Write a note",
-                    initialText: viewModel.notes,
-                    onCancelAction: {
-                        withAnimation {
-                            viewModel.editingNotes.toggle()
-                        }
-                    }, onSaveAction: { notes in
-                        viewModel.notes = notes
-                        
-                        withAnimation {
-                            viewModel.editingNotes.toggle()
-                        }
-                    }
-                )
-                .cornerRadius(8)
-                .offset(y: 5)
-                .transition(.move(edge: .bottom))
-                .zIndex(1)
-            } else if viewModel.editingLabels {
+            if viewModel.editingLabels {
                 LabelsManagerView(
                     viewModel: .init(selectedLabels: viewModel.labels),
                     onSaveAcion: {
@@ -128,11 +107,35 @@ struct TransactionDetailsView: View {
                     }
                 )
                 .transition(.move(edge: .bottom))
+                .animation(.easeInOut(duration: 0.55), value: viewModel.editingLabels)
                 .zIndex(1)
                 .ignoresSafeArea(.keyboard)
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
+        .popup(isPresented: $viewModel.editingNotes) {
+            TextEditorView(
+                title: "Note",
+                placeholder: "Write a note",
+                initialText: viewModel.notes,
+                onCancelAction: {
+                    viewModel.editingNotes.toggle()
+                }, onSaveAction: { notes in
+                    viewModel.notes = notes
+                    viewModel.editingNotes.toggle()
+                }
+            )
+            .cornerRadius(8, corners: [.topLeft, .topRight])
+            .padding(.bottom, 32)
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.easeInOut(duration: 0.55))
+                .closeOnTap(false)
+                .closeOnTapOutside(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
     }
     
     private func NavigationView() -> some View {
