@@ -76,6 +76,7 @@ struct SingleTxView: View {
                                     font: .Main.fixed(.monoMedium, size: 16),
                                     highlightFont: .Main.fixed(.monoBold, size: 16)
                                 )
+                                .layoutPriority(1)
                             }
                             HStack {
                                 Text("\(viewModel.tx.type == .received ? "+" : "-")")
