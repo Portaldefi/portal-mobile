@@ -61,17 +61,16 @@ struct QRCodeGeneratorView: View {
                             
                             Spacer()
                             
-                            if let coin = viewModel.selectedItem?.viewModel.coin, coin.type == .bitcoin {
-                                Button {
-                                    viewModel.showNetworkSelector.toggle()
-                                } label: {
+                            if let coin = viewModel.selectedItem?.coin {
+                                switch coin.type {
+                                case .lightningBitcoin:
                                     HStack(spacing: 6.8) {
                                         Asset.helpIcon
                                             .resizable()
                                             .frame(width: 20, height: 20)
                                             .foregroundColor(Palette.grayScale8A)
                                         
-                                        Text(viewModel.qrAddressType.title)
+                                        Text("Bolt11")
                                             .font(.Main.fixed(.monoBold, size: 16))
                                             .foregroundColor(Palette.grayScaleCA)
                                         
@@ -82,6 +81,10 @@ struct QRCodeGeneratorView: View {
                                             .rotationEffect(.degrees(270))
                                             .padding(.leading, 2)
                                     }
+                                    .opacity(0.65)
+                                    .disabled(true)
+                                default:
+                                    EmptyView()
                                 }
                             }
                         }
@@ -89,45 +92,6 @@ struct QRCodeGeneratorView: View {
                         .padding(.bottom, 16)
                         
                         if viewState.isReachable {
-                            if viewModel.qrAddressType == .onChain {
-                                VStack(spacing: 16) {
-                                    HStack {
-                                        Text("You’ll need to wait for 3 confirmation, to be able to use these funds.")
-                                            .multilineTextAlignment(.leading)
-                                            .font(.Main.fixed(.monoBold, size: 12))
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 8)
-                                    }
-                                    .background(
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .stroke(Palette.grayScale4A, lineWidth: 1)
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .foregroundColor(Palette.grayScale2A)
-                                        }
-                                    )
-                                    .padding(.horizontal, 24)
-                                    
-                                    HStack {
-                                        Text("Send more than 0.00002 BTC and up to 0.039 BTC to this address. A setup fee of 0.4% will be applied for > 0.00086 BTC")
-                                            .multilineTextAlignment(.leading)
-                                            .font(.Main.fixed(.monoBold, size: 12))
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 8)
-                                    }
-                                    .background(
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .stroke(Palette.grayScale4A, lineWidth: 1)
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .foregroundColor(Palette.grayScale2A)
-                                        }
-                                    )
-                                    .padding(.horizontal, 24)
-                                }
-                                .padding(.bottom, 16)
-                            }
-                            
                             if let qr = viewModel.qrCode {
                                 Image(uiImage: qr)
                                     .interpolation(.none)
@@ -136,7 +100,6 @@ struct QRCodeGeneratorView: View {
                                     .frame(width: geo.size.width - 80, height: geo.size.width - 80)
                             } else {
                                 ProgressView().progressViewStyle(.circular)
-                                    .frame(width: geo.size.width - 80, height: geo.size.width - 80)
                             }
                             
                             HStack {
@@ -183,23 +146,150 @@ struct QRCodeGeneratorView: View {
                             VStack(spacing: 0) {
                                 Divider()
                                     .frame(height: 1)
-                                if let exchanger = viewModel.exchanger {
-                                    AmountView(exchanger: exchanger)
-                                }
-                                Divider()
-                                    .frame(height: 1)
-                                DescriptionView()
-                                Divider()
-                                    .frame(height: 1)
                                 
-                                switch viewModel.qrAddressType {
-                                case .lightning, .unified:
-                                    ExpirationView()
-                                    Divider()
-                                        .frame(height: 1)
-                                default:
-                                    EmptyView()
+                                if let exchanger = viewModel.exchanger {
+                                    if viewModel.description.isEmpty, exchanger.baseAmountDecimal == 0 {
+                                        Button {
+                                            viewModel.editingAmount.toggle()
+                                        } label: {
+                                            HStack {
+                                                PButton(config: .labelAndIconLeft(label: "Add Amount", icon: Asset.pencilIcon), style: .free, size: .small, applyGradient: true, enabled: true) {
+                                                    viewModel.editingAmount.toggle()
+                                                }
+                                                .frame(width: 125)
+                                                
+                                                Spacer()
+                                            }
+                                            .frame(height: 62)
+                                            .padding(.horizontal, 24)
+                                        }
+                                        
+                                        Divider()
+                                            .frame(height: 1)
+                                        
+                                        Button {
+                                            viewModel.editingDescription.toggle()
+                                        } label: {
+                                            HStack {
+                                                PButton(config: .labelAndIconLeft(label: "Add Description", icon: Asset.pencilIcon), style: .free, size: .small, applyGradient: true, enabled: true) {
+                                                    viewModel.editingDescription.toggle()
+                                                }
+                                                .frame(width: 170)
+                                                
+                                                Spacer()
+                                            }
+                                            .frame(height: 62)
+                                            .padding(.horizontal, 24)
+                                        }
+                                    } else if viewModel.description.isEmpty, exchanger.baseAmountDecimal > 0 {
+                                        
+                                        Button {
+                                            viewModel.editingAmount.toggle()
+                                        } label: {
+                                            AmountValueView(exchanger: exchanger)
+                                                .padding(.leading, 16)
+                                                .padding(.trailing, 8)
+                                        }
+                                        
+                                        Divider()
+                                            .frame(height: 1)
+                                        
+                                        Button {
+                                            viewModel.editingDescription.toggle()
+                                        } label: {
+                                            HStack {
+                                                PButton(config: .labelAndIconLeft(label: "Add Description", icon: Asset.pencilIcon), style: .free, size: .small, applyGradient: true, enabled: true) {
+                                                    viewModel.editingDescription.toggle()
+                                                }
+                                                .frame(width: 170)
+                                                
+                                                Spacer()
+                                            }
+                                            .frame(height: 62)
+                                            .padding(.horizontal, 24)
+                                        }
+                                    } else if !viewModel.description.isEmpty, exchanger.baseAmountDecimal == 0 {
+                                        
+                                        Button {
+                                            viewModel.editingDescription.toggle()
+                                        } label: {
+                                            EditableTextFieldView(description: "Description", text: viewModel.description)
+                                                .padding(.leading, 16)
+                                                .padding(.trailing, 8)
+                                        }
+                                        
+                                        Divider()
+                                            .frame(height: 1)
+                                        
+                                        Button {
+                                            viewModel.editingAmount.toggle()
+                                        } label: {
+                                            HStack {
+                                                PButton(config: .labelAndIconLeft(label: "Add Amount", icon: Asset.pencilIcon), style: .free, size: .small, applyGradient: true, enabled: true) {
+                                                    viewModel.editingAmount.toggle()
+                                                }
+                                                .frame(width: 125)
+                                                
+                                                Spacer()
+                                            }
+                                            .frame(height: 62)
+                                            .padding(.horizontal, 24)
+                                        }
+                                    } else {
+                                        Button {
+                                            viewModel.editingAmount.toggle()
+                                        } label: {
+                                            AmountValueView(exchanger: exchanger)
+                                                .padding(.leading, 16)
+                                                .padding(.trailing, 8)
+                                        }
+                                        
+                                        Divider()
+                                            .frame(height: 1)
+                                        
+                                        Button {
+                                            viewModel.editingDescription.toggle()
+                                        } label: {
+                                            EditableTextFieldView(description: "Description", text: viewModel.description)
+                                                .padding(.leading, 16)
+                                                .padding(.trailing, 8)
+                                        }
+                                    }
+                                } else {
+                                    if viewModel.description.isEmpty {
+                                        Button {
+                                            viewModel.editingAmount.toggle()
+                                        } label: {
+                                            HStack {
+                                                PButton(config: .labelAndIconLeft(label: "Add Amount", icon: Asset.pencilIcon), style: .free, size: .small, applyGradient: true, enabled: true) {
+                                                    viewModel.editingAmount.toggle()
+                                                }
+                                                .frame(width: 125)
+                                                
+                                                Spacer()
+                                            }
+                                            .frame(height: 62)
+                                            .padding(.horizontal, 24)
+                                        }
+                                        
+                                        Divider()
+                                            .frame(height: 1)
+                                    } else {
+                                        Button {
+                                            viewModel.editingDescription.toggle()
+                                        } label: {
+                                            EditableTextFieldView(description: "Description", text: viewModel.description)
+                                                .padding(.leading, 16)
+                                                .padding(.trailing, 8)
+                                        }
+                                        
+                                        Divider()
+                                            .frame(height: 1)
+                                    }
                                 }
+                                
+                                Divider()
+                                    .frame(height: 1)
                             }
                             .padding(.horizontal, 24)
                         } else {
@@ -242,7 +332,7 @@ struct QRCodeGeneratorView: View {
                 .frame(width: 32, height: 32)
                 .padding(.horizontal, 12)
                 
-                Text("Address copied!")
+                Text("Address copied")
                     .font(.Main.fixed(.monoBold, size: 16))
                     .foregroundColor(.white)
                 Spacer()
@@ -274,7 +364,13 @@ struct QRCodeGeneratorView: View {
                 EmptyView()
             }
         } customize: {
-            $0.type(.toast).position(.bottom).closeOnTap(false).closeOnTapOutside(false).backgroundColor(.black.opacity(0.5))
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.easeInOut(duration: 0.55))
+                .closeOnTap(false)
+                .closeOnTapOutside(false)
+                .backgroundColor(.black.opacity(0.5))
         }
         //Description field
         .popup(isPresented: $viewModel.editingDescription) {
@@ -293,7 +389,13 @@ struct QRCodeGeneratorView: View {
             .cornerRadius(20, corners: [.topLeft, .topRight])
             .padding(.bottom, 32)
         } customize: {
-            $0.type(.toast).position(.bottom).closeOnTap(false).closeOnTapOutside(false).backgroundColor(.black.opacity(0.5))
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.easeInOut(duration: 0.55))
+                .closeOnTap(false)
+                .closeOnTapOutside(false)
+                .backgroundColor(.black.opacity(0.5))
         }
         //Network Selector popup
         .popup(isPresented: $viewModel.showNetworkSelector) {
@@ -384,9 +486,9 @@ struct QRCodeGeneratorView: View {
         }
     }
     
-    private func DescriptionView() -> some View {
+    private func DescriptionView(description: String) -> some View {
         Group {
-            if viewModel.description.isEmpty {
+            if description.isEmpty {
                 Button {
                     viewModel.editingDescription.toggle()
                 } label: {
