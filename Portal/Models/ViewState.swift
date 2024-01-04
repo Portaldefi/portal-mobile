@@ -12,8 +12,7 @@ import Foundation
 @Observable class ViewState {
     enum Tab: Int {
         case wallet = 0
-//        case swap
-        case lightning
+        case swap
         case activity
     }
     
@@ -53,9 +52,10 @@ import Foundation
         
         isReachable = reachability.isReachable.value
         
-        reachability.isReachable.receive(on: DispatchQueue.main).sink { reachable in
+        reachability.isReachable.receive(on: DispatchQueue.main).sink { [unowned self] reachable in
             print("Network is \(reachable ? "reachable" : "not reachable")")
-            self.isReachable = reachable
+            guard isReachable != reachable else { return }
+            isReachable = reachable
         }
         .store(in: &subscriptions)
     }
@@ -70,13 +70,24 @@ import Foundation
             print("app went to background state")
             
             guard sceneState != .background else { return }
+            print("updating scene state to background")
             sceneState = .background
             
             walletLocked = settings.pincodeEnabled.value || settings.biometricsEnabled.value
+            
+//            let isLocked = settings.pincodeEnabled.value || settings.biometricsEnabled.value
+//            guard walletLocked != isLocked else { return }
+//            
+//            var transaction = Transaction()
+//            transaction.disablesAnimations = true
+//            withTransaction(transaction) {
+//                walletLocked = isLocked
+//            }
         case .active:
             print("app went to active state")
             
             guard sceneState != .active else { return }
+            print("updating scene state to active")
             
             sceneState = .active
         case .inactive:
