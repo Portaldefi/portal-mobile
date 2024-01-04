@@ -143,9 +143,9 @@ extension Erc20Adapter: IAdapter {
 }
 
 extension Erc20Adapter: IBalanceAdapter {
-    var L1Balance: Decimal {
-        balance
-    }
+//    var L1Balance: Decimal {
+//        balance
+//    }
     
     var state: AdapterState {
         convertToAdapterState(evmSyncState: eip20Kit.syncState)
