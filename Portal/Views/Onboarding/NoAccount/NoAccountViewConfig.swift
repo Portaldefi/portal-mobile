@@ -11,10 +11,10 @@ struct NoAccountViewConfig: NavigationConfigurator {
     func configure(_ screen: Screen) -> ViewElement? {
         switch screen {
         case .createAccount:
-            let viewModel = CreateAccountViewModel()
+//            let viewModel = CreateAccountViewModel()
             return ViewElement(
                 id: screen.id,
-                wrappedElement: AnyView(SetSecuritySettingsView(viewModel: viewModel))
+                wrappedElement: AnyView(CreateAccountView())
             )
         case .restoreAccount:
             return ViewElement(
@@ -32,7 +32,8 @@ struct NoAccountViewConfig: NavigationConfigurator {
                 id: screen.id,
                 wrappedElement: AnyView(SetSecuritySettingsView(viewModel: viewModel))
             )
-        case .setSecuritySettings(let viewModel):
+        case .setSecuritySettings:
+            let viewModel = CreateAccountViewModel()
             return ViewElement(
                 id: screen.id,
                 wrappedElement: AnyView(SetSecuritySettingsView(viewModel: viewModel))
