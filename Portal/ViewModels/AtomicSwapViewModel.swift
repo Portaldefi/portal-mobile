@@ -49,7 +49,7 @@ class AtomicSwapViewModel: ObservableObject {
     }
     
     var L1Balance: String {
-        "\(ethereumKit.L1Balance)"
+        ""//"\(ethereumKit.L1Balance)"
     }
     
     var L2Balance: String {
