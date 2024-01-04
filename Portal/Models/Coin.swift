@@ -27,7 +27,9 @@ struct Coin: Identifiable {
     
     var network: String {
         switch type {
-        case .bitcoin, .lightningBitcoin:
+        case .bitcoin:
+            return "Bitcoin"
+        case .lightningBitcoin:
             return "Lightning"
         case .ethereum, .erc20:
             return "Ethereum"
@@ -35,12 +37,13 @@ struct Coin: Identifiable {
     }
     
     var unit: String {
-        switch type {
-        case .bitcoin, .ethereum, .erc20:
-            return code
-        case .lightningBitcoin:
-            return "sats"
-        }
+        code
+//        switch type {
+//        case .bitcoin, .ethereum, .erc20:
+//            return code
+//        case .lightningBitcoin:
+//            return "sats"
+//        }
     }
     
     var description: String {
@@ -84,6 +87,10 @@ struct Coin: Identifiable {
         Coin(type: .bitcoin, code: "BTC", name: "Bitcoin", decimal: 18, iconUrl: "https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/96/Bitcoin-BTC-icon.png")
     }
     
+    static func lightningBitcoin() -> Self {
+        Coin(type: .lightningBitcoin, code: "BTC", name: "Bitcoin", decimal: 18, iconUrl: "https://www.prediki.com/media/displays/b866877b599146428cc7a2b9d5ce1b18/wiki_medium.png")
+    }
+    
     static func ethereum() -> Self {
         Coin(type: .ethereum, code: "ETH", name: "Ethereum", decimal: 18, iconUrl: "https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/96/Ethereum-ETH-icon.png")
     }
@@ -99,7 +106,7 @@ struct Coin: Identifiable {
 
 extension Coin: Hashable {
     public static func ==(lhs: Coin, rhs: Coin) -> Bool {
-        lhs.code == rhs.code && lhs.name == rhs.name && lhs.unit == rhs.unit
+        lhs.code == rhs.code && lhs.name == rhs.name && lhs.unit == rhs.unit && lhs.type == rhs.type
     }
 
     public func hash(into hasher: inout Hasher) {
