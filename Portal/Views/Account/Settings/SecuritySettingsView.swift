@@ -119,6 +119,7 @@ struct SecuritySettingsView: View {
             biometricsEnrolled = viewModel.biometrics.isBiometricEnrolled()
         }
         .onReceive(viewModel.biometricsEnrolledPublisher) { enabled in
+            guard biometricsEnrolled != enabled else { return }
             biometricsEnrolled = enabled
         }
     }
