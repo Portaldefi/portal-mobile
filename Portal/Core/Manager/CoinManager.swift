@@ -50,6 +50,7 @@ final class CoinManager: ICoinManager {
         walletCoins.removeAll()
         
         walletCoins.append(.bitcoin())
+        walletCoins.append(.lightningBitcoin())
         walletCoins.append(.ethereum())
         
         for code in coinCodes {
