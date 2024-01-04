@@ -12,9 +12,6 @@ import HsCryptoKit
 import Factory
 
 final class BitcoinAdapter {
-    private let publicKey: String
-    private let ldkManager = Container.lightningKitManager()
-    
     private enum DereviationPathBranch: Int {
         case external = 0, `internal`
     }
@@ -66,14 +63,7 @@ final class BitcoinAdapter {
         let changeDerivationPath = try Self.dereviationPath(index: accountIndex, branch: .internal)
         let changeDerivedKey = try bip32RootKey.derive(path: changeDerivationPath)
         let changeDescriptor = try Self.descriptor(derivedKey: changeDerivedKey.asString(), network: network)
-        
-        let keyBytes = derivedKey.asString().bytes
-        let keyData = Data(keyBytes)
-        
-        let compressedKey = Crypto.publicKey(privateKey: keyData, compressed: true)
-        self.publicKey = compressedKey.toHexString()
 
-        
         if let dbPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.absoluteString {
             let sqliteConfig = SqliteDbConfiguration(path: dbPath + "portal.sqlite" + "\(account.id)")
             let dbConfig = DatabaseConfig.sqlite(config: sqliteConfig)
@@ -93,24 +83,26 @@ final class BitcoinAdapter {
                 )
                 blockchainConfig = BlockchainConfig.electrum(config: electrumConfig)
             case .regtest:
-//                let espolaConfig = EsploraConfig(
-//                    baseUrl: espolaRegTestURL,
-//                    proxy: nil,
-//                    concurrency: nil,
-//                    stopGap: 10,
-//                    timeout: nil
-//                )
-//                blockchainConfig = BlockchainConfig.esplora(config: espolaConfig)
-                
-                let rpcConfig = RpcConfig(
-                    url: "localhost:18443",
-                    auth: .userPass(username: "lnd", password: "lnd"),
-                    network: .regtest,
-                    walletName: wallet.account.id,
-                    syncParams: nil
+                let espolaConfig = EsploraConfig(
+                    baseUrl: espolaRegTestURL,
+                    proxy: nil,
+                    concurrency: nil,
+                    stopGap: 10,
+                    timeout: nil
                 )
+                blockchainConfig = BlockchainConfig.esplora(config: espolaConfig)
+                
+                //RPC Config is broken
+                
+//                let rpcConfig = RpcConfig(
+//                    url: "localhost:18443",
+//                    auth: .userPass(username: "lnd", password: "lnd"),
+//                    network: .regtest,
+//                    walletName: wallet.account.id,
+//                    syncParams: nil
+//                )
 
-                blockchainConfig = BlockchainConfig.rpc(config: rpcConfig)
+//                blockchainConfig = BlockchainConfig.rpc(config: rpcConfig)
             }
                         
             blockchain = try Blockchain(config: blockchainConfig)
@@ -127,10 +119,6 @@ final class BitcoinAdapter {
             updateTimer.eventHandler = { [unowned self] in
                 self.syncData()
             }
-            
-            Task {
-                try await ldkManager.start()
-            }
         } else {
             throw BtcAdapterError.dbNotFound
         }
@@ -143,13 +131,13 @@ final class BitcoinAdapter {
         
         networkQueue.async {
             do {
-                print("SYNCING WITH BITCOIN NETWORK...")
+//                print("SYNCING WITH BITCOIN NETWORK...")
                 let start = DispatchTime.now()
                 try self.wallet.sync(blockchain: self.blockchain, progress: nil)
                 let end = DispatchTime.now()
                 let nanoTime = end.uptimeNanoseconds - start.uptimeNanoseconds
                 let timeInterval = Double(nanoTime)/1_000_000_000
-                print("SYNCED in \(timeInterval) seconds")
+//                print("SYNCED in \(timeInterval) seconds")
                 try self.update()
                 self.update(state: .synced)
             } catch {
@@ -237,7 +225,7 @@ final class BitcoinAdapter {
     
     private func updateBlockHeight() throws {
         let blockHeight = Int32(try blockchain.getHeight())
-        print("BDK LATEST BLOCK: \(blockHeight)")
+//        print("BDK LATEST BLOCK: \(blockHeight)")
         blockChainHeight = blockHeight
     }
 }
@@ -265,12 +253,8 @@ extension BitcoinAdapter: IBalanceAdapter {
         adapterState
     }
     
-    var L1Balance: Decimal {
-        Decimal(_balance.spendable + _balance.untrustedPending)/coinRate
-    }
-    
     var balance: Decimal {
-        ldkManager.channelBalance/1000/coinRate
+        Decimal(_balance.spendable + _balance.untrustedPending)/coinRate
     }
     
     var balanceStateUpdated: AnyPublisher<Void, Never> {
@@ -319,15 +303,11 @@ extension BitcoinAdapter: ITransactionsAdapter {
 //            }
         }
         
-        return (txRecords + ldkManager.transactions).sorted(by: { $0.timestamp ?? 1 > $1.timestamp ?? 0 })
+        return (txRecords).sorted(by: { $0.timestamp ?? 1 > $1.timestamp ?? 0 })
     }
 }
 
 extension BitcoinAdapter: ISendBitcoinAdapter {
-    var pubKey: String {
-        publicKey
-    }
-    
     func rawTransaction(amount: UInt64, address: String) throws -> Transaction {
         let receiverAddress = try Address(address: address)
         let receiverAddressScript = receiverAddress.scriptPubkey()
