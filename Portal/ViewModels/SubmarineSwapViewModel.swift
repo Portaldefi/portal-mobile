@@ -49,7 +49,7 @@ class SubmarineSwapViewModel: ObservableObject {
     }
     
     var L1Balance: String {
-        "\(bitcoinKit.L1Balance)"
+        ""//"\(bitcoinKit.L1Balance)"
     }
     
     var L2Balance: String {
