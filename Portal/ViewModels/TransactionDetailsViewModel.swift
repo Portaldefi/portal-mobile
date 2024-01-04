@@ -50,14 +50,12 @@ class TransactionDetailsViewModel: ObservableObject {
     var amountString: String {
         guard let amount = transaction.amount else { return "0" }
         switch coin.type {
-        case .bitcoin:
+        case .bitcoin, .lightningBitcoin:
             return Double(amount.double/100_000_000).toString(decimal: 8)
         case .ethereum:
             return amount.double.toString(decimal: 8)
         case .erc20:
             return amount.double.toString(decimal: 8)
-        default:
-            return "0"
         }
     }
     
@@ -66,9 +64,9 @@ class TransactionDetailsViewModel: ObservableObject {
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            return (transaction.userData.price * (amount/100_000_000) * fiatCurrency.rate).double.usdFormatted()
+            return (transaction.userData.price * (amount/100_000_000) * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
         case .ethereum, .erc20:
-            return (transaction.userData.price * amount * fiatCurrency.rate).double.usdFormatted()
+            return (transaction.userData.price * amount * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
         }
     }
     
@@ -121,7 +119,7 @@ class TransactionDetailsViewModel: ObservableObject {
         case .bitcoin:
             return URL(string: "https://blockstream.info/testnet/tx/\(transaction.id)")
         case .ethereum:
-            return URL(string: "https://goerli.etherscan.io/tx/\(transaction.id)")
+            return URL(string: "https://sepolia.etherscan.io/tx/\(transaction.id)")
         default:
             return nil
         }
