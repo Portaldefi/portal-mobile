@@ -9,9 +9,7 @@ import Foundation
 import Combine
 import BitcoinDevKit
 
-class BalanceAdapterMocked: IBalanceAdapter {
-//    var L1Balance: Decimal { 0.003 }    
-    
+class BalanceAdapterMocked: IBalanceAdapter {    
     var state: AdapterState = .synced
     var balance: Decimal = 0.00055
     var balanceStateUpdated: AnyPublisher<Void, Never> {
