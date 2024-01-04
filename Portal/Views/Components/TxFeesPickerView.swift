@@ -181,45 +181,45 @@ struct TxFeesPickerView: View {
                 
                 Divider()
                 
-                Button {
-                    feeRate = .custom
-                    onDismiss()
-                } label: {
-                    HStack {
-                        HStack(spacing: 12) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Palette.grayScale2A, lineWidth: 2)
-                                    .frame(width: 24, height: 24)
-                                
-                                RoundedRectangle(cornerRadius: 12)
-                                    .foregroundColor(Palette.grayScale10)
-                                    .frame(width: 22, height: 22)
-                                
-                                if feeRate == .custom {
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(
-                                            RadialGradient.main
-                                        )
-                                        .frame(width: 22, height: 22)
-                                }
-                            }
-                            
-                            Text("Custom")
-                                .font(.Main.fixed(.monoBold, size: 16))
-                                .foregroundColor(Palette.grayScaleF4)
-                        }
-                        
-                        Spacer()
-                        
-                        Asset.chevronRightIcon
-                            .foregroundColor(Palette.grayScale4A)
-                    }
-                    .frame(height: 72)
-                    .padding(.horizontal, 16)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
+//                Button {
+//                    feeRate = .custom
+//                    onDismiss()
+//                } label: {
+//                    HStack {
+//                        HStack(spacing: 12) {
+//                            ZStack {
+//                                RoundedRectangle(cornerRadius: 12)
+//                                    .stroke(Palette.grayScale2A, lineWidth: 2)
+//                                    .frame(width: 24, height: 24)
+//                                
+//                                RoundedRectangle(cornerRadius: 12)
+//                                    .foregroundColor(Palette.grayScale10)
+//                                    .frame(width: 22, height: 22)
+//                                
+//                                if feeRate == .custom {
+//                                    RoundedRectangle(cornerRadius: 12)
+//                                        .fill(
+//                                            RadialGradient.main
+//                                        )
+//                                        .frame(width: 22, height: 22)
+//                                }
+//                            }
+//                            
+//                            Text("Custom")
+//                                .font(.Main.fixed(.monoBold, size: 16))
+//                                .foregroundColor(Palette.grayScaleF4)
+//                        }
+//                        
+//                        Spacer()
+//                        
+//                        Asset.chevronRightIcon
+//                            .foregroundColor(Palette.grayScale4A)
+//                    }
+//                    .frame(height: 72)
+//                    .padding(.horizontal, 16)
+//                    .contentShape(Rectangle())
+//                }
+//                .buttonStyle(.plain)
             }
             .background {
                 RoundedRectangle(cornerRadius: 16)
