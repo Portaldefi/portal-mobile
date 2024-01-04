@@ -20,6 +20,18 @@ extension String {
         )
     }
     
+    var groupedByFour: String {
+        String(
+            self
+                .reversed()
+                .enumerated()
+                .reduce(String()) {
+                    $1.offset % 4 == 0 && $1.offset != 0 && $1.offset != count - 1 || $1.offset == count - 2 && self.count % 4 != 0 ? $0 + " \($1.element)" : $0 + "\($1.element)"
+                }
+                .reversed()
+        )
+    }
+    
     var groupedByThreeFromLeft: String {
         self
             .enumerated()
@@ -29,8 +41,8 @@ extension String {
     }
     
     var turnicated: String {
-        let prefix = String(self.prefix(12)).groupedByThree
-        let suffix = String(self.suffix(12)).groupedByThree
+        let prefix = String(self.prefix(12)).groupedByFour
+        let suffix = String(self.suffix(12)).groupedByFour
         return (prefix + "..." + suffix).uppercased()
     }
     
