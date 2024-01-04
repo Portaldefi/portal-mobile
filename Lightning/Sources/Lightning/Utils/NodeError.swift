@@ -27,10 +27,10 @@ public enum NodeError: Error {
     }
     
     public enum Channels: Error {
-        case apiMisuse
-        case router
-        case channelUnavailable
-        case feeRatesTooHigh
+        case apiMisuse(String)
+        case router(String)
+        case channelUnavailable(String)
+        case feeRatesTooHigh(String)
         case incompatibleShutdownScript
         case unknown
         case channelManagerNotFound
