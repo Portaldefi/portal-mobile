@@ -18,7 +18,7 @@ struct TransactionRecord: Identifiable {
     let blockHeight: Int?
     let from: String?
     let to: String?
-    let amount: Decimal?
+    var amount: Decimal?
     let fee: Decimal?
     let source: TxSource
     let preimage: String?
@@ -52,7 +52,7 @@ struct TransactionRecord: Identifiable {
             case .sent:
                 self.amount = Decimal(sent - received)
             case .received:
-                self.amount = Decimal(received - sent)
+                self.amount = Decimal(received - sent)                
             case .swapped, .unknown:
                 fatalError("should not happen")
             }
@@ -75,12 +75,37 @@ struct TransactionRecord: Identifiable {
             self.blockHeight = nil
         }
         
-        self.from = nil
-        self.to = nil
+        if let tx = transaction.transaction {
+            var recipients = String()
+            
+            for input in tx.input() {
+                guard let address = try? Address.fromScript(script: input.scriptSig, network: .regtest) else { continue }
+                print("Input \(address.asString())")
+            }
+            
+            for output in tx.output() {
+                guard let address = try? Address.fromScript(script: output.scriptPubkey, network: .regtest) else { continue }
+                recipients.append(recipients.isEmpty ? "\(address.asString())" : "\n\(address.asString())")
+            }
+            
+            self.from = nil
+            self.to = recipients
+        } else {
+            self.from = nil
+            self.to = nil
+        }
+        
         self.source = .btcOnChain
         
         if let fee = transaction.fee {
             self.fee = Decimal(fee)/100_000_000
+            
+//            switch type {
+//            case .sent:
+//                self.amount!-=self.fee!
+//            default:
+//                break
+//            }
         } else {
             self.fee = nil
         }
@@ -191,7 +216,7 @@ extension TransactionRecord {
     }
     
     static var mockedLightning: TransactionRecord {
-        _ = Invoice.fromStr(s: "lntb150u1pjpm2rwpp5qtqkpsfupwnl5cm0jvd7v8asa3qd5y8kc2l2e3ua6v5dlszkzgyqdqqcqzpgxqyz5vqsp5kspjm0vlt6xhp5q6e78cp66e2fdx0lzg57ktf6kf30423qagstcq9qyyssq4l53zjvsqyc76ps7drxe2xjes2uvphh4ujr8dxpggx0sxcxtaa8q8f26k786gwrnususx5kcufr5gv5ktvj9d4vu9v8a2jehjhkv90spd6j4r3").getValue()!
+        _ = Bolt11Invoice.fromStr(s: "lntb150u1pjpm2rwpp5qtqkpsfupwnl5cm0jvd7v8asa3qd5y8kc2l2e3ua6v5dlszkzgyqdqqcqzpgxqyz5vqsp5kspjm0vlt6xhp5q6e78cp66e2fdx0lzg57ktf6kf30423qagstcq9qyyssq4l53zjvsqyc76ps7drxe2xjes2uvphh4ujr8dxpggx0sxcxtaa8q8f26k786gwrnususx5kcufr5gv5ktvj9d4vu9v8a2jehjhkv90spd6j4r3").getValue()!
 
         let payment = LightningPayment(
             nodeId: "hdyvu5uumvyt7j5twkpp55eham28a4cnwz3epal2geeceskmjs6pxp",
