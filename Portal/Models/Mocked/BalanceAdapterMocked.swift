@@ -10,7 +10,7 @@ import Combine
 import BitcoinDevKit
 
 class BalanceAdapterMocked: IBalanceAdapter {
-    var L1Balance: Decimal { 0.003 }    
+//    var L1Balance: Decimal { 0.003 }    
     
     var state: AdapterState = .synced
     var balance: Decimal = 0.00055
@@ -28,7 +28,7 @@ class SendAssetMockedService: ISendAssetService {
     var fee: Decimal = 0.0001
     var amount = CurrentValueSubject<Decimal, Never>(0.001)
     var feeRateType = CurrentValueSubject<TxFees, Never>(.normal)
-    var receiverAddress: CurrentValueSubject<String, Never> = CurrentValueSubject<String, Never>("tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3")
+    var receiver: CurrentValueSubject<String, Never> = CurrentValueSubject<String, Never>("tb1q3ds30e5p59x9ryee4e2kxz9vxg5ur0tjsv0ug3")
     var feeRateProvider: IFeeRateProvider = MockeFeeRateProvider()
     var recomendedFees = CurrentValueSubject<RecomendedFees?, Never>(nil)
     

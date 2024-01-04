@@ -19,7 +19,7 @@ class MockedLightningKitManager: ILightningKitManager {
     
     var transactions = [TransactionRecord]()
     
-    func createInvoice(paymentHash: String, satAmount: UInt64) async -> LightningDevKit.Invoice? {
+    func createInvoice(paymentHash: String, satAmount: UInt64) async -> LightningDevKit.Bolt11Invoice? {
         nil
     }
     
@@ -31,7 +31,7 @@ class MockedLightningKitManager: ILightningKitManager {
         []
     }
     
-    func pay(invoice: LightningDevKit.Invoice) async throws -> TransactionRecord {
+    func pay(invoice: Bolt11Invoice) async throws -> TransactionRecord {
         TransactionRecord.mocked(confirmed: true)
     }
     
@@ -59,6 +59,10 @@ class MockedLightningKitManager: ILightningKitManager {
     
     var usableChannels: [LightningDevKit.ChannelDetails] = []
     
+    func openChannel(peer: Peer, amount: UInt64) async throws {
+        
+    }
+    
     func openChannel(peer: Peer) async throws {
         
     }
@@ -75,8 +79,8 @@ class MockedLightningKitManager: ILightningKitManager {
         Decimal(10000)
     }
     
-    func decode(invoice: String) throws -> Invoice {
-        if let invoice = Invoice.fromStr(s: "lntb255m1p3l3qgadqqnp4qffgdax9g9ux3496d809u6le05nffsccvyuhdyvu5uumvyt7j5twkpp55eham28a4cnwz3epal2geeceskmjs6pxph987shgj3ydnv0nnqvssp5u8meh0nx9jaz68n97h3c22vxvmla2yynjgtcccpu5f4pjt7u7eps9qyysgqcqpcxqzlgsjl4nkpvgu4x54unwafr3s0h2mjtakw9cdklsa28qqdhmsxuqphhytyxlzwfx08nuwez5qvrvcfvkdgwdurtn67cr4l9wkdd6yu8rqgp88xwlu").getValue() {
+    func decode(invoice: String) throws -> Bolt11Invoice {
+        if let invoice = Bolt11Invoice.fromStr(s: "lntb255m1p3l3qgadqqnp4qffgdax9g9ux3496d809u6le05nffsccvyuhdyvu5uumvyt7j5twkpp55eham28a4cnwz3epal2geeceskmjs6pxph987shgj3ydnv0nnqvssp5u8meh0nx9jaz68n97h3c22vxvmla2yynjgtcccpu5f4pjt7u7eps9qyysgqcqpcxqzlgsjl4nkpvgu4x54unwafr3s0h2mjtakw9cdklsa28qqdhmsxuqphhytyxlzwfx08nuwez5qvrvcfvkdgwdurtn67cr4l9wkdd6yu8rqgp88xwlu").getValue() {
             return invoice
         } else {
             throw SendFlowError.error("Decode invoice error")
