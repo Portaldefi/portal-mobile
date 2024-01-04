@@ -15,7 +15,7 @@ struct SwapView: View, IKeyboardReadable {
     @State private var viewModel = SwapViewModel()
     
     @Injected(Container.viewState) private var viewState
-        
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
@@ -47,9 +47,9 @@ struct SwapView: View, IKeyboardReadable {
                     .onTapGesture {
                         focusedField = .none
                     }
-
+                
             }
-                        
+            
             VStack(spacing: 0) {
                 Divider()
                     .frame(height: 1)
@@ -169,312 +169,230 @@ struct SwapView: View, IKeyboardReadable {
     
     func AssetSelectorView() -> some View {
         ZStack {
-//            switch viewModel.swapState {
-//            case .create, .canceled, .commited:
+            RoundedRectangle(cornerRadius: 8)
+                .foregroundColor(.black)
+                .background {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color(red: 0.227, green: 0.227, blue: 0.227), lineWidth: 2)
+                }
+            
+            VStack(spacing: 0) {
+                switch viewModel.exchangerSide {
+                case .base:
+                    VStack(spacing: 8) {
+                        HStack(spacing: 0) {
+                            TextField("0", text: $viewModel.baseAmount)
+                                .keyboardType(.decimalPad)
+                                .focused($focusedField, equals: .base)
+                                .fixedSize(horizontal: true, vertical: true)
+                                .disableAutocorrection(true)
+                                .textInputAutocapitalization(.never)
+                                .font(.Main.fixed(.monoBold, size: 26))
+                            
+                            Spacer()
+                            
+                            SwapCoinView(coin: viewModel.base)
+                            //                                    .onTapGesture {
+                            //                                        viewModel.showPicker.toggle()
+                            //                                    }
+                        }
+                        .frame(height: 32)
+                        .padding(.leading, 24)
+                        .padding(.trailing, 16)
+                        
+                        HStack(spacing: 0) {
+                            if let decimal = Decimal(string: viewModel.baseAmount), decimal > 0 {
+                                Text("\(viewModel.baseAmountValue) usd")
+                                    .font(.Main.fixed(.monoMedium, size: 16))
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                                    .frame(height: 16)
+                            }
+                            
+                            Spacer()
+                            
+                            HStack {
+                                Text("Balance:")
+                                    .font(.Main.fixed(.monoMedium, size: 14))
+                                    .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
+                                
+                                Text(viewModel.baseBalanceString)
+                                    .font(.Main.fixed(.monoMedium, size: 14))
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                            }
+                            .frame(height: 14)
+                        }
+                        .padding(.leading, 24)
+                        .padding(.trailing, 16)
+                    }
+                    .frame(height: 88)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    
+                    VStack(spacing: 8) {
+                        HStack(spacing: 0) {
+                            TextField("0", text: $viewModel.quoteAmount)
+                                .keyboardType(.decimalPad)
+                                .focused($focusedField, equals: .quote)
+                                .fixedSize(horizontal: true, vertical: true)
+                                .disableAutocorrection(true)
+                                .textInputAutocapitalization(.never)
+                                .font(.Main.fixed(.monoBold, size: 26))
+                            
+                            Spacer()
+                            
+                            SwapCoinView(coin: viewModel.quote)
+                        }
+                        .frame(height: 32)
+                        .padding(.leading, 24)
+                        .padding(.trailing, 16)
+                        
+                        HStack(spacing: 0) {
+                            if let decimal = Decimal(string: viewModel.quoteAmount), decimal > 0 {
+                                Text("\(viewModel.quoteAmountValue) usd")
+                                    .font(.Main.fixed(.monoMedium, size: 16))
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                                    .frame(height: 16)
+                            }
+                            
+                            Spacer()
+                            
+                            HStack {
+                                Text("Balance:")
+                                    .font(.Main.fixed(.monoMedium, size: 14))
+                                    .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
+                                
+                                Text(viewModel.quoteBalanceString)
+                                    .font(.Main.fixed(.monoMedium, size: 14))
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                            }
+                            .frame(height: 14)
+                        }
+                        .padding(.leading, 24)
+                        .padding(.trailing, 16)
+                    }
+                    .frame(height: 88)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                case .quote:
+                    VStack(spacing: 8) {
+                        HStack(spacing: 0) {
+                            TextField("0", text: $viewModel.quoteAmount)
+                                .keyboardType(.decimalPad)
+                                .focused($focusedField, equals: .quote)
+                                .fixedSize(horizontal: true, vertical: true)
+                                .disableAutocorrection(true)
+                                .textInputAutocapitalization(.never)
+                                .font(.Main.fixed(.monoBold, size: 26))
+                            
+                            Spacer()
+                            
+                            SwapCoinView(coin: viewModel.quote)
+                            //                                    .onTapGesture {
+                            //                                        viewModel.showPicker.toggle()
+                            //                                    }
+                        }
+                        .frame(height: 32)
+                        .padding(.leading, 24)
+                        .padding(.trailing, 16)
+                        
+                        HStack(spacing: 0) {
+                            if let decimal = Decimal(string: viewModel.quoteAmount), decimal > 0 {
+                                Text("\(viewModel.quoteAmountValue) usd")
+                                    .font(.Main.fixed(.monoMedium, size: 16))
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                                    .frame(height: 16)
+                            }
+                            
+                            Spacer()
+                            
+                            HStack {
+                                Text("Balance:")
+                                    .font(.Main.fixed(.monoMedium, size: 14))
+                                    .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
+                                
+                                Text(viewModel.quoteBalanceString)
+                                    .font(.Main.fixed(.monoMedium, size: 14))
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                            }
+                            .frame(height: 14)
+                        }
+                        .padding(.leading, 24)
+                        .padding(.trailing, 16)
+                    }
+                    .frame(height: 88)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    
+                    VStack(spacing: 8) {
+                        HStack(spacing: 0) {
+                            TextField("0", text: $viewModel.baseAmount)
+                                .keyboardType(.decimalPad)
+                                .focused($focusedField, equals: .base)
+                                .fixedSize(horizontal: true, vertical: true)
+                                .disableAutocorrection(true)
+                                .textInputAutocapitalization(.never)
+                                .font(.Main.fixed(.monoBold, size: 26))
+                            
+                            Spacer()
+                            
+                            SwapCoinView(coin: viewModel.base)
+                        }
+                        .frame(height: 32)
+                        .padding(.leading, 24)
+                        .padding(.trailing, 16)
+                        
+                        HStack(spacing: 0) {
+                            if let decimal = Decimal(string: viewModel.baseAmount), decimal > 0 {
+                                Text("\(viewModel.baseAmountValue) usd")
+                                    .font(.Main.fixed(.monoMedium, size: 16))
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                                    .frame(height: 16)
+                            }
+                            
+                            Spacer()
+                            
+                            HStack {
+                                Text("Balance:")
+                                    .font(.Main.fixed(.monoMedium, size: 14))
+                                    .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
+                                
+                                Text(viewModel.baseBalanceString)
+                                    .font(.Main.fixed(.monoMedium, size: 14))
+                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
+                            }
+                            .frame(height: 14)
+                        }
+                        .padding(.leading, 24)
+                        .padding(.trailing, 16)
+                    }
+                    .frame(height: 88)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
+            }
+            
+            Divider()
+                .frame(height: 2)
+                .foregroundColor(Color(red: 0.227, green: 0.227, blue: 0.227))
+            
+            ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(red: 0.125, green: 0.125, blue: 0.125))
                     .background {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color(red: 0.227, green: 0.227, blue: 0.227), lineWidth: 2)
                     }
                 
-                VStack(spacing: 0) {
-                    switch viewModel.exchangerSide {
-                    case .base:
-                        VStack(spacing: 8) {
-                            HStack(spacing: 0) {
-                                TextField("0", text: $viewModel.baseAmount)
-                                    .keyboardType(.decimalPad)
-                                    .focused($focusedField, equals: .base)
-                                    .fixedSize(horizontal: true, vertical: true)
-                                    .disableAutocorrection(true)
-                                    .textInputAutocapitalization(.never)
-                                    .font(.Main.fixed(.monoBold, size: 26))
-                                
-                                Spacer()
-                                
-                                SwapCoinView(coin: viewModel.base)
-//                                    .onTapGesture {
-//                                        viewModel.showPicker.toggle()
-//                                    }
+                Asset.switchIcon.resizable().frame(width: 22, height: 22).rotationEffect(.degrees(90))
+                    .onTapGesture {
+                        withAnimation(.spring(response: 0.45, dampingFraction: 0.65, blendDuration: 0)) {
+                            switch viewModel.exchangerSide {
+                            case .base:
+                                viewModel.exchangerSide = .quote
+                            case .quote:
+                                viewModel.exchangerSide = .base
                             }
-                            .frame(height: 32)
-                            .padding(.leading, 24)
-                            .padding(.trailing, 16)
-                            
-                            HStack(spacing: 0) {
-                                if let decimal = Decimal(string: viewModel.baseAmount), decimal > 0 {
-                                    Text("\(viewModel.baseAmountValue) usd")
-                                        .font(.Main.fixed(.monoMedium, size: 16))
-                                        .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                        .frame(height: 16)
-                                }
-                                
-                                Spacer()
-                                
-                                HStack {
-                                    Text("Balance:")
-                                        .font(.Main.fixed(.monoMedium, size: 14))
-                                        .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
-                                    
-                                    Text(viewModel.baseBalanceString)
-                                        .font(.Main.fixed(.monoMedium, size: 14))
-                                        .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                }
-                                .frame(height: 14)
-                            }
-                            .padding(.leading, 24)
-                            .padding(.trailing, 16)
                         }
-                        .frame(height: 88)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                        
-                        VStack(spacing: 8) {
-                            HStack(spacing: 0) {
-                                TextField("0", text: $viewModel.quoteAmount)
-                                    .keyboardType(.decimalPad)
-                                    .focused($focusedField, equals: .quote)
-                                    .fixedSize(horizontal: true, vertical: true)
-                                    .disableAutocorrection(true)
-                                    .textInputAutocapitalization(.never)
-                                    .font(.Main.fixed(.monoBold, size: 26))
-                                
-                                Spacer()
-                                
-                                SwapCoinView(coin: viewModel.quote)
-                            }
-                            .frame(height: 32)
-                            .padding(.leading, 24)
-                            .padding(.trailing, 16)
-                            
-                            HStack(spacing: 0) {
-                                if let decimal = Decimal(string: viewModel.quoteAmount), decimal > 0 {
-                                    Text("\(viewModel.quoteAmountValue) usd")
-                                        .font(.Main.fixed(.monoMedium, size: 16))
-                                        .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                        .frame(height: 16)
-                                }
-                                
-                                Spacer()
-                                
-                                HStack {
-                                    Text("Balance:")
-                                        .font(.Main.fixed(.monoMedium, size: 14))
-                                        .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
-                                    
-                                    Text(viewModel.quoteBalanceString)
-                                        .font(.Main.fixed(.monoMedium, size: 14))
-                                        .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                }
-                                .frame(height: 14)
-                            }
-                            .padding(.leading, 24)
-                            .padding(.trailing, 16)
-                        }
-                        .frame(height: 88)
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                    case .quote:
-                        VStack(spacing: 8) {
-                            HStack(spacing: 0) {
-                                TextField("0", text: $viewModel.quoteAmount)
-                                    .keyboardType(.decimalPad)
-                                    .focused($focusedField, equals: .quote)
-                                    .fixedSize(horizontal: true, vertical: true)
-                                    .disableAutocorrection(true)
-                                    .textInputAutocapitalization(.never)
-                                    .font(.Main.fixed(.monoBold, size: 26))
-                                
-                                Spacer()
-                                
-                                SwapCoinView(coin: viewModel.quote)
-//                                    .onTapGesture {
-//                                        viewModel.showPicker.toggle()
-//                                    }
-                            }
-                            .frame(height: 32)
-                            .padding(.leading, 24)
-                            .padding(.trailing, 16)
-                            
-                            HStack(spacing: 0) {
-                                if let decimal = Decimal(string: viewModel.quoteAmount), decimal > 0 {
-                                    Text("\(viewModel.quoteAmountValue) usd")
-                                        .font(.Main.fixed(.monoMedium, size: 16))
-                                        .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                        .frame(height: 16)
-                                }
-                                
-                                Spacer()
-                                
-                                HStack {
-                                    Text("Balance:")
-                                        .font(.Main.fixed(.monoMedium, size: 14))
-                                        .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
-                                    
-                                    Text(viewModel.quoteBalanceString)
-                                        .font(.Main.fixed(.monoMedium, size: 14))
-                                        .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                }
-                                .frame(height: 14)
-                            }
-                            .padding(.leading, 24)
-                            .padding(.trailing, 16)
-                        }
-                        .frame(height: 88)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                        
-                        VStack(spacing: 8) {
-                            HStack(spacing: 0) {
-                                TextField("0", text: $viewModel.baseAmount)
-                                    .keyboardType(.decimalPad)
-                                    .focused($focusedField, equals: .base)
-                                    .fixedSize(horizontal: true, vertical: true)
-                                    .disableAutocorrection(true)
-                                    .textInputAutocapitalization(.never)
-                                    .font(.Main.fixed(.monoBold, size: 26))
-                                
-                                Spacer()
-                                
-                                SwapCoinView(coin: viewModel.base)
-                            }
-                            .frame(height: 32)
-                            .padding(.leading, 24)
-                            .padding(.trailing, 16)
-                            
-                            HStack(spacing: 0) {
-                                if let decimal = Decimal(string: viewModel.baseAmount), decimal > 0 {
-                                    Text("\(viewModel.baseAmountValue) usd")
-                                        .font(.Main.fixed(.monoMedium, size: 16))
-                                        .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                        .frame(height: 16)
-                                }
-                                
-                                Spacer()
-                                
-                                HStack {
-                                    Text("Balance:")
-                                        .font(.Main.fixed(.monoMedium, size: 14))
-                                        .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
-                                    
-                                    Text(viewModel.baseBalanceString)
-                                        .font(.Main.fixed(.monoMedium, size: 14))
-                                        .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                }
-                                .frame(height: 14)
-                            }
-                            .padding(.leading, 24)
-                            .padding(.trailing, 16)
-                        }
-                        .frame(height: 88)
-                        .transition(.move(edge: .top).combined(with: .opacity))
                     }
-                }
-                
-                Divider()
-                    .frame(height: 2)
-                    .foregroundColor(Color(red: 0.227, green: 0.227, blue: 0.227))
-                
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .foregroundColor(Color(red: 0.125, green: 0.125, blue: 0.125))
-                        .background {
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(red: 0.227, green: 0.227, blue: 0.227), lineWidth: 2)
-                        }
-                    
-                    Asset.switchIcon.resizable().frame(width: 22, height: 22).rotationEffect(.degrees(90))
-                        .onTapGesture {
-                            withAnimation(.spring(response: 0.45, dampingFraction: 0.65, blendDuration: 0)) {
-                                switch viewModel.exchangerSide {
-                                case .base:
-                                    viewModel.exchangerSide = .quote
-                                case .quote:
-                                    viewModel.exchangerSide = .base
-                                }
-                            }
-                        }
-                }
-                .frame(width: 32, height: 32)
-//            case .open, .commit:
-//                VStack {
-//                    VStack(spacing: 8) {
-//                        HStack(spacing: 0) {
-//                            TextField("0", text: .constant(viewModel.baseAmount))
-//                                .keyboardType(.decimalPad)
-//                                .fixedSize(horizontal: true, vertical: true)
-//                                .disableAutocorrection(true)
-//                                .textInputAutocapitalization(.never)
-//                                .font(.Main.fixed(.monoBold, size: 26))
-//
-//                            Spacer()
-//
-//                            SwapCoinView(coin: viewModel.base)
-//                        }
-//                        .frame(height: 32)
-//                        .padding(.leading, 20)
-//                        .padding(.trailing, 8)
-//
-//                        HStack(spacing: 0) {
-//                            if let decimal = Decimal(string: viewModel.baseAmount), decimal > 0 {
-//                                Text("\(viewModel.baseAmountValue) usd")
-//                                    .font(.Main.fixed(.monoMedium, size: 16))
-//                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-//                                    .frame(height: 16)
-//                            }
-//
-//                            Spacer()
-//                        }
-//                        .padding(.leading, 20)
-//                        .padding(.trailing, 8)
-//                    }
-//                    .frame(height: 65)
-//
-//                    HStack {
-//                        PButton(config: .onlyLabel("~ swapping for"), style: .free, size: .small, applyGradient: true, enabled: true) {
-//
-//                        }
-//                        .frame(width: 160)
-//
-//                        Spacer()
-//                    }
-//                    .padding(.leading, 30)
-//
-//                    VStack(spacing: 8) {
-//                        HStack(spacing: 0) {
-//                            TextField("0", text: .constant(viewModel.quoteAmount))
-//                                .keyboardType(.decimalPad)
-//                                .fixedSize(horizontal: true, vertical: true)
-//                                .disableAutocorrection(true)
-//                                .textInputAutocapitalization(.never)
-//                                .font(.Main.fixed(.monoBold, size: 26))
-//
-//                            Spacer()
-//
-//                            SwapCoinView(coin: viewModel.quote)
-//                        }
-//                        .frame(height: 32)
-//                        .padding(.leading, 20)
-//                        .padding(.trailing, 8)
-//
-//                        HStack(spacing: 0) {
-//                            if let decimal = Decimal(string: viewModel.quoteAmount), decimal > 0 {
-//                                Text("\(viewModel.quoteAmountValue) usd")
-//                                    .font(.Main.fixed(.monoMedium, size: 16))
-//                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-//                                    .frame(height: 16)
-//                            }
-//
-//                            Spacer()
-//                        }
-//                        .padding(.leading, 20)
-//                        .padding(.trailing, 8)
-//                    }
-//                    .frame(height: 65)
-//                }
-//
-//                Spacer()
-//            }
+            }
+            .frame(width: 32, height: 32)
         }
-        
     }
 }
 
