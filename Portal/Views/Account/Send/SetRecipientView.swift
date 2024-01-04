@@ -18,9 +18,9 @@ struct ViewHeightKey: PreferenceKey {
 struct SetRecipientView: View {
     var viewState: ViewState = Container.viewState()
     @State private var showScanner = false
-    @State var textEditorHeight : CGFloat = 0
-    @Environment(SendViewViewModel.self) var viewModel: SendViewViewModel
-    @Environment(NavigationStack.self) var navigation: NavigationStack
+    @State private var textEditorHeight : CGFloat = 0
+    @Environment(SendViewViewModel.self) private var viewModel: SendViewViewModel
+    @Environment(NavigationStack.self) private var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
     
     let rootView: Bool
@@ -102,6 +102,7 @@ struct SetRecipientView: View {
                                 .foregroundColor(textEditorInputColor)
                                 .frame(height: max(40, textEditorHeight))
                                 .padding(8)
+                                .disabled(true)
                             
                             if viewModel.receiverAddress.isEmpty {
                                 Text("Enter address")
