@@ -15,7 +15,6 @@ class WalletItemViewModel: ObservableObject {
     
     private var subscriptions = Set<AnyCancellable>()
     private var marketData: IMarketDataRepository
-    private let updateBalanceTimer = RepeatingTimer(timeInterval: 1)
         
     private(set) var balance: Decimal
     
@@ -42,15 +41,14 @@ class WalletItemViewModel: ObservableObject {
         self.marketData = marketData
         
         self.balance = balanceAdapter.balance
-        self.balanceString = "\(balanceAdapter.balance)"
-                
-        self.updateBalanceTimer.eventHandler = {
-            DispatchQueue.main.async {
-                self.updateBalance()
-            }
-        }
+        self.balanceString = "\(balanceAdapter.balance.formatted())"
         
-        self.updateBalanceTimer.resume()
+        balanceAdapter.balanceUpdated.receive(on: RunLoop.main).sink { _ in
+            self.balance = balanceAdapter.balance
+            self.balanceString = "\(balanceAdapter.balance.formatted())"
+            self.updateValue()
+        }
+        .store(in: &subscriptions)
         
         self
             .marketData
@@ -76,7 +74,7 @@ class WalletItemViewModel: ObservableObject {
     private func updateBalance() {
         if balance != balanceAdapter.balance {
             balance = balanceAdapter.balance
-            balanceString = "\(balanceAdapter.balance)"
+            balanceString = "\(balanceAdapter.balance.formatted())"
             updateValue()
         }
     }
@@ -86,11 +84,11 @@ class WalletItemViewModel: ObservableObject {
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            _valueString = (marketData.lastSeenBtcPrice * balance * fiatCurrency.rate).double.usdFormatted()
+            _valueString = (marketData.lastSeenBtcPrice * balance * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
         case .ethereum:
-            _valueString = (marketData.lastSeenEthPrice * balance * fiatCurrency.rate).double.usdFormatted()
+            _valueString = (marketData.lastSeenEthPrice * balance * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
         case .erc20:
-            _valueString = (marketData.lastSeenLinkPrice * balance * fiatCurrency.rate).double.usdFormatted()
+            _valueString = (marketData.lastSeenLinkPrice * balance * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
         }
                 
         if valueString != _valueString {
