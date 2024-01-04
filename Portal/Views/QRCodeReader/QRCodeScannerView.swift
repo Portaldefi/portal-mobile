@@ -50,21 +50,56 @@ struct QRCodeScannerView: View {
                             if case let .success(result) = response {
                                 let items = QRCodeParser.current.parse(result.string)
                                 let supportedItems = items.filter{ $0.type != .unsupported }
-                                if let item = supportedItems.first {
-                                    switch config {
-                                    case .send, .universal:
-                                        withAnimation(.easeInOut(duration: 0.25)) {
-                                            detectedItems = items
-                                            scanState = .detected
-                                        }
-                                    case .importing:
-                                        detectedItems.removeAll()
-                                        scanState = .detecting
-                                        detected(item)
-                                    }
-                                } else {
+                                
+                                guard !supportedItems.isEmpty else {
                                     scanState = .unsupported
                                     showAlertView.toggle()
+                                    return
+                                }
+                                
+                                switch config {
+                                case .send(let coin):
+                                    switch coin.type {
+                                    case .bitcoin:
+                                        guard let item = supportedItems.first(where: { $0.title == "Bitcoin Address"}) else {
+                                            scanState = .unsupported
+                                            showAlertView.toggle()
+                                            return
+                                        }
+                                        withAnimation(.easeInOut(duration: 0.25)) {
+                                            detectedItems = [item]
+                                            scanState = .detected
+                                        }
+                                    case .lightningBitcoin:
+                                        guard let item = supportedItems.first(where: { $0.title == "Bitcoin Payment Request"}) else {
+                                            scanState = .unsupported
+                                            showAlertView.toggle()
+                                            return
+                                        }
+                                        withAnimation(.easeInOut(duration: 0.25)) {
+                                            detectedItems = [item]
+                                            scanState = .detected
+                                        }
+                                    case .ethereum, .erc20:
+                                        guard let item = supportedItems.first(where: { $0.title == "Ethereum Address"}) else {
+                                            scanState = .unsupported
+                                            showAlertView.toggle()
+                                            return
+                                        }
+                                        withAnimation(.easeInOut(duration: 0.25)) {
+                                            detectedItems = [item]
+                                            scanState = .detected
+                                        }
+                                    }
+                                case .universal:
+                                    withAnimation(.easeInOut(duration: 0.25)) {
+                                        detectedItems = supportedItems
+                                        scanState = .detected
+                                    }
+                                case .importing:
+                                    detectedItems.removeAll()
+                                    scanState = .detecting
+                                    detected(supportedItems.first!)
                                 }
                             } else if case let .failure(error) = response {
                                 switch error {
