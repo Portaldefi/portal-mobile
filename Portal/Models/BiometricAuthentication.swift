@@ -7,86 +7,36 @@
 
 import Foundation
 import LocalAuthentication
-import Combine
 
-class BiometricAuthentication: ObservableObject {
-    private let context = LAContext()
-    private let authenticationPolicy: LAPolicy = .deviceOwnerAuthenticationWithBiometrics
-    
-    @Published private(set) var biometryType: LABiometryType
-    @Published private(set) var permissionsGranted: Bool
+class BiometricAuthentication {
     private var policyError: NSError?
-    
-    private var subscriptions = Set<AnyCancellable>()
-    
-    init() {
-        biometryType = context.biometryType
-        
-        permissionsGranted = context.canEvaluatePolicy(
-            authenticationPolicy,
-            error: &policyError
-        )
-    }
-    
-    func authenticateUser(_ completion: @escaping (Bool, LAError?) -> ()) {
-        context.evaluatePolicy(
-            authenticationPolicy,
-            localizedReason: "Authenticate to continue"
-        ) { success, error in
-            guard let error = error as? LAError else {
-                return completion(success, nil)
-            }
-            completion(success, error)
-        }
-    }
-    
-    func isBiometricEnrolled() -> Bool {
-        // Check if the device supports biometric authentication and if it's enrolled
-        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &policyError) {
-            return true
-        } else {
-            // Handle the case where biometric authentication is not available
-            if let error = policyError {
-                print("Biometric error: \(error.localizedDescription)")
-            }
-            return false
-        }
-    }
-    
-    func authenticate() {
-        let context = LAContext()
-        var error: NSError?
 
-        // check whether biometric authentication is possible
-//        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-//            // it's possible, so go ahead and use it
-//            let reason = "Biometrics authentication is needed to sign transactions"
-//
-//            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { [weak self] success, authenticationError in
-//                // authentication has now completed
-//                if success {
-//                    // authenticated successfully
-//                    self?.permissionsGranted = true
-//                } else {
-//                    // there was a problem
-//                    self?.permissionsGranted = false
-//                }
-//            }
-//        } else {
-//            // no biometrics
-//        }
+    private func canEvaluatePolicy() -> Bool {
+        LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &policyError)
+    }
+
+    func authenticateUser(completion: @escaping (Bool, LAError?) -> Void) {
+        guard canEvaluatePolicy() else {
+            completion(false, LAError(.biometryNotEnrolled))
+            return
+        }
         
         let reason = "Biometrics authentication is needed to sign transactions"
 
-        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { [weak self] success, authenticationError in
-            // authentication has now completed
-            if success {
-                // authenticated successfully
-                self?.permissionsGranted = true
-            } else {
-                // there was a problem
-                self?.permissionsGranted = false
+        LAContext().evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, error in
+            DispatchQueue.main.async {
+                if success {
+                    completion(true, nil)
+                } else if let error = error as? LAError {
+                    completion(false, error)
+                } else {
+                    completion(false, LAError(.authenticationFailed))
+                }
             }
         }
+    }
+
+    func isBiometricEnrolled() -> Bool {
+        canEvaluatePolicy()
     }
 }
