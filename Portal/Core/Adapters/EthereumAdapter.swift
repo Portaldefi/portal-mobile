@@ -41,7 +41,7 @@ class EthereumAdapter {
         case is OutgoingDecoration:
             type = .sent
         default:
-            type = .unknown
+            type = .sent
         }
         
         var amount: Decimal?
@@ -165,11 +165,7 @@ extension EthereumAdapter: IAdapter {
 }
 
 //MARK: - IBalanceAdapter
-extension EthereumAdapter: IBalanceAdapter {
-    var L1Balance: Decimal {
-        balance
-    }
-    
+extension EthereumAdapter: IBalanceAdapter {    
     var state: AdapterState {
         convertToAdapterState(evmSyncState: syncState)
     }
