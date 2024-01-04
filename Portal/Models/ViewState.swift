@@ -74,15 +74,6 @@ import Foundation
             sceneState = .background
             
             walletLocked = settings.pincodeEnabled.value || settings.biometricsEnabled.value
-            
-//            let isLocked = settings.pincodeEnabled.value || settings.biometricsEnabled.value
-//            guard walletLocked != isLocked else { return }
-//            
-//            var transaction = Transaction()
-//            transaction.disablesAnimations = true
-//            withTransaction(transaction) {
-//                walletLocked = isLocked
-//            }
         case .active:
             print("app went to active state")
             
