@@ -12,9 +12,14 @@ struct LockScreenModifier: ViewModifier {
     @Bindable var viewState = Container.viewState()
 
     func body(content: Content) -> some View {
-        content.fullScreenCover(isPresented: $viewState.walletLocked) {
-            PincodeView()
+        ZStack {
+            content
+            if viewState.walletLocked {
+                PincodeView()
+                    .transition(.identity)
+            }
         }
+        .interactiveDismissDisabled(viewState.walletLocked)
     }
 }
 
