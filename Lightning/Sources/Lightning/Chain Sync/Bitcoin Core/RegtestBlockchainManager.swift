@@ -219,6 +219,22 @@ extension RegtestBlockchainManager {
 
 // MARK: Common ChainManager Functions
 extension RegtestBlockchainManager: RpcChainManager {
+    func getRawTransaction(txId: String) async throws -> Data {
+        Data()
+    }
+    
+    func getBlockHashHex(height: Int64) async throws -> String {
+        String()
+    }
+        
+    func getTxMerkleProof(txId: String) async throws -> Int32 {
+        0
+    }
+    
+    func getTransactionWithId(id: String) async throws -> [String : Any] {
+        return try await self.callRpcMethod(method: "gettransaction", params: [id])
+    }
+    
     func decodeRawTransaction(tx: [UInt8]) async throws -> [String : Any] {
         let txHex = bytesToHexString(bytes: tx)
         return try await self.callRpcMethod(method: "decoderawtransaction", params: [txHex])
