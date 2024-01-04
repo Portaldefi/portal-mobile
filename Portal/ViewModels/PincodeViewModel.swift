@@ -37,6 +37,8 @@ class PincodeViewModel: ObservableObject {
     init() {
         print("Pincode vm init")
         
+        self.requiredBiometrics = settings.biometricsEnabled.value
+        
         $pin.dropFirst().filter{ $0.count == self.pinLength }.delay(for: 0.2, scheduler: RunLoop.main).sink { [unowned self] pin in
             withAnimation {
                 guard let securedPin = storage.string(for: "PIN"), pin == securedPin else {
@@ -58,10 +60,15 @@ class PincodeViewModel: ObservableObject {
         }
         .store(in: &subscriptions)
         
-        settings.biometricsEnabled.receive(on: RunLoop.main).sink { [unowned self] enabled in
+        settings.biometricsEnabled.dropFirst().receive(on: RunLoop.main).sink { [unowned self] enabled in
             self.requiredBiometrics = enabled
             
-            if self.viewState.sceneState == .active || self.viewState.sceneState == .background && enabled && self.settings.biometricsEnabled.value && self.viewState.walletLocked {
+            print("self.viewState.sceneState == .background \(self.viewState.sceneState == .background)")
+            print("enabled = \(enabled)")
+            print("self.settings.biometricsEnabled.value = \(self.settings.biometricsEnabled.value)")
+            print("self.viewState.walletLocked = \(self.viewState.walletLocked)")
+            
+            if self.viewState.sceneState == .background && enabled && self.settings.biometricsEnabled.value && self.viewState.walletLocked {
                 self.biometricAuth()
             }
         }
@@ -69,15 +76,22 @@ class PincodeViewModel: ObservableObject {
         
         viewState.onSceneStateChange.filter{ $0 == .active }.subscribe(on: RunLoop.main).sink { [weak self] _ in
             guard let self = self else { return }
-            print(self.requiredBiometrics)
+            print("self.requiredBiometrics = \(self.requiredBiometrics)")
+            print("self.settings.biometricsEnabled.value = \(self.settings.biometricsEnabled.value)")
+            print("self.viewState.walletLocked = \(self.viewState.walletLocked)")
+
             guard self.requiredBiometrics && self.settings.biometricsEnabled.value && self.viewState.walletLocked else { return }
 
             self.biometricAuth()
         }
         .store(in: &subscriptions)
+        
+        guard viewState.sceneState == .active && requiredBiometrics && settings.biometricsEnabled.value && viewState.walletLocked else { return }
+
+        biometricAuth()
     }
     
-    private func biometricAuth() {
+    func biometricAuth() {
         biometrics.authenticateUser { success, error in
             DispatchQueue.main.async {
                 if success {
