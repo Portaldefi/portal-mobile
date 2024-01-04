@@ -16,7 +16,9 @@ class SecuritySettingsViewModel: ObservableObject {
     var biometricsEnrolledPublisher: AnyPublisher<Bool, Never> {
         Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
-            .map { [unowned self] _ in self.biometrics.isBiometricEnrolled() }
+            .map { [unowned self] _ in
+                biometrics.isBiometricEnrolled()
+            }
             .removeDuplicates()
             .eraseToAnyPublisher()
     }
@@ -30,10 +32,20 @@ class SecuritySettingsViewModel: ObservableObject {
     }
     @Published var biometricEnabled = false {
         didSet {
-            if biometricEnabled && !biometrics.permissionsGranted {
-                biometrics.authenticate()
+            guard biometricEnabled != settings.biometricsEnabled.value else { return }
+            
+            if biometricEnabled {
+                biometrics.authenticateUser { [unowned self] success, error in
+                    if success {
+                        settings.updateBiometricsSetting(enabled: success)
+                    } else {
+                        biometricEnabled = false
+                    }
+                }
+            } else {
+                guard settings.biometricsEnabled.value else { return }
+                settings.updateBiometricsSetting(enabled: false)
             }
-            settings.updateBiometricsSetting(enabled: biometricEnabled)
         }
     }
         
