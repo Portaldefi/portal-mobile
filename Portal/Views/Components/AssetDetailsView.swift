@@ -12,6 +12,7 @@ import Factory
 
 struct AssetDetailsView: View {
     @Environment(NavigationStack.self) var navigation: NavigationStack
+    @State private var showChannelDetails = false
     @State private var viewModel: AssetDetailsViewModel
     @State private var showTxDetails = false
     @State private var selectedTx: TransactionRecord?
@@ -30,21 +31,29 @@ struct AssetDetailsView: View {
             let _ = Self._printChanges()
             Group {
                 HStack {
-                    HStack(spacing: 8) {
-                        PButton(config: .onlyIcon(Asset.caretLeftIcon), style: .free, size: .medium, enabled: true) {
-                            navigation.pop()
-                            withAnimation {
-                                viewState.hideTabBar = false
-                            }
+                    Button {
+                        navigation.pop()
+                        withAnimation {
+                            viewState.hideTabBar = false
                         }
-                        .frame(width: 20)
-                        
-                        Text("All Assets")
-                            .font(.Main.fixed(.monoBold, size: 16))
+                    } label: {
+                        HStack(spacing: 8) {
+                            Asset.caretLeftIcon
+                            Text("All Assets")
+                                .font(.Main.fixed(.bold, size: 16))
+                                .foregroundColor(Palette.grayScale8A)
+                        }
                     }
+                    .buttonStyle(.plain)
+                    
                     Spacer()
-                    Asset.gearIcon
-                        .foregroundColor(Palette.grayScale6A)
+                    
+                    if item.coin == .lightningBitcoin() {
+                        PButton(config: .onlyIcon(Asset.gearIcon), style: .free, size: .medium, color: Palette.grayScale6A, enabled: true) {
+                            showChannelDetails.toggle()
+                        }
+                        .frame(width: 30, height: 30)
+                    }
                 }
                 .frame(height: 48)
                 .padding(.horizontal, 20)
@@ -112,6 +121,11 @@ struct AssetDetailsView: View {
             viewModel.updateTransactions()
         }) {
             SendRootView(withAssetPicker: false).environment(Container.sendViewModel()).lockableView()
+        }
+        .sheet(isPresented: $showChannelDetails, onDismiss: {
+            //viewModel.updateTransactions()
+        }) {
+            ChannelView()
         }
     }
     
