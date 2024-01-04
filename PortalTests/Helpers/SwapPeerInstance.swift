@@ -10,14 +10,14 @@ class SwapParticipant: BaseClass {
     private let onSwapAccessQueue = DispatchQueue(label: "swap.sdk.onSwapAccessQueueTest")
     
     private let ldnPeerProps = LdkNode.LNDProps(
-        pubKey: "0244007fef025b3cbdb0c342e480410818d60c4e22ce4d6a416296899c0689ed9f", address: "127.0.0.1", port: 9002
+        pubKey: "03debebcf97019c836cab78633ecc228d4545d125ea5717bce86159ab5bf043488", address: "127.0.0.1", port: 9001
     )
     
     var isConnected: Bool {
         sdk.isConnected
     }
     
-    let invocieToPayForBob = "lnbcrt250u1pjk7fsxpp5w9rx3qfk3u8aytwgvecpczy5gp0jm227x5cqjv7l7njagu5j09jsdqqcqzzsxqyz5vqsp5ghkk38jn9kpacs5z78yxsqe3a4uhzkqww92z8p2x9zl65rzt34jq9qyyssq7az3f0vp4r3cw2fzc8yu33f3j3jmcxg33h3ftfp0fx8cy8ufvtus74c2xqdl9z4r7yvmwy2xwxrcstsz9t2en726acplxzpj20pmg3qp26ql4l"
+    let invocieToPayForBob = "lnbcrt1m1pjc27dcpp5tk66sa2g0388gy6zshlqjc46sh98ej3s2smnsnwt4e8agf740ctsdqqcqzzsxqyz5vqsp50u42zark4sqqrupwee83ka3rzelfrmrdmlvc90yqr4g5p4srcsks9qyyssq8gzvgyt5par7wn3chd63hrrst5jlq5gxcyn550qvjlyx0hc869u84sp2h2kct479wle5f92y9e80ypuhk0s9e69j5ymefmdma0tn0dcp926zur"
     
     private lazy var onSwap: ([Any]) -> Void = { [unowned self] args in
         if let data = args as? [Swap], let swap = data.first {
@@ -42,7 +42,7 @@ class SwapParticipant: BaseClass {
             print("\(id) payed invoice result: \(result.id)")
         }
                 
-        let network = SwapSdkConfig.Network(hostname: "localhost", port: 61280)
+        let network = SwapSdkConfig.Network(networkProtocol: .http, hostname: "localhost", port: 61280)
                 
         guard let filePath = Bundle(for: EvmLightningSwapPlaynetTest.self).path(forResource: "contracts", ofType: "json") else {
             throw NSError(domain: "FileNotFound", code: 404, userInfo: nil)
