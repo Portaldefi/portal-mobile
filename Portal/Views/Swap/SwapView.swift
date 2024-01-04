@@ -10,79 +10,28 @@ import PortalUI
 import Factory
 import Combine
 
-struct SwapCoinView: View {
-    let coin: Coin?
-    
-    var body: some View {
-        HStack(spacing: 6) {
-            if let coin = coin {
-                CoinImageView(size: 16, url: coin.icon)
-                Text(coin.code.uppercased())
-                    .font(.Main.fixed(.bold, size: 18))
-                    .foregroundColor(.white)
-            } else {
-                Text("select")
-                    .font(.Main.fixed(.bold, size: 12))
-                    .foregroundColor(.white)
-                    .frame(height: 32)
-            }
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background {
-            RoundedRectangle(cornerRadius: 8)
-                .foregroundColor(Color(red: 0.125, green: 0.125, blue: 0.125))
-        }
-    }
-}
-
-protocol KeyboardReadable {
-    var keyboardPublisher: AnyPublisher<Bool, Never> { get }
-}
-
-extension KeyboardReadable {
-    var keyboardPublisher: AnyPublisher<Bool, Never> {
-        Publishers.Merge(
-            NotificationCenter.default
-                .publisher(for: UIResponder.keyboardWillShowNotification)
-                .map { _ in true },
-            
-            NotificationCenter.default
-                .publisher(for: UIResponder.keyboardWillHideNotification)
-                .map { _ in false }
-        )
-        .eraseToAnyPublisher()
-    }
-}
-
-struct SwapView: View, KeyboardReadable {
+struct SwapView: View, IKeyboardReadable {
     @FocusState private var focusedField: Exchanger.Side?
-    @StateObject private var viewModel = AtomicSwapViewModel()
+    @State private var viewModel = SwapViewModel()
     
-    var starters = ["Ask", "Bid"]
-    
+    @Injected(Container.viewState) private var viewState
+        
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
-                HStack(spacing: 10) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Swap")
-                            .font(.Main.fixed(.bold, size: 24))
-                            .foregroundColor(Palette.grayScaleF4)
-                    }
-                    
-                    Text(viewModel.description)
-                        .font(.Main.fixed(.bold, size: 16))
-                        .foregroundColor(.yellow)
-                        .opacity(0)
+                HStack {
+                    Text("Swap")
+                        .font(.Main.fixed(.bold, size: 24))
+                        .foregroundColor(Palette.grayScaleF4)
                     
                     Spacer()
                     
                     Picker("Order side", selection: $viewModel.orderSide) {
-                        Text("ask").tag(Order.OrderSide.ask)
-                        Text("bid").tag(Order.OrderSide.bid)
+                        Text("ASK").tag(Order.OrderSide.ask)
+                        Text("BID").tag(Order.OrderSide.bid)
                     }
                     .pickerStyle(.segmented)
+                    .frame(width: 110)
                 }
                 .frame(height: 49)
                 .padding(.horizontal, 16)
@@ -92,66 +41,6 @@ struct SwapView: View, KeyboardReadable {
                 AssetSelectorView()
                     .frame(height: 178)
                     .padding(16)
-                
-                if let order = viewModel.order {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 8)
-                            .foregroundColor(.black.opacity(0.5))
-                        
-                        VStack {
-                            HStack {
-                                Text("order id:")
-                                    .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
-                                Spacer()
-                                Text(order.id)
-                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                            }
-                            
-                            HStack {
-                                Text("uid:")
-                                    .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
-                                Spacer()
-                                Text(order.uid)
-                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                            }
-                            
-                            HStack {
-                                Text("hash:")
-                                    .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
-                                Spacer()
-                                Text(order.hash)
-                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                            }
-                            
-                            HStack {
-                                Text("base:")
-                                    .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
-                                Spacer()
-                                Text(order.baseAsset)
-                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                            }
-                            
-                            HStack {
-                                Text("quote:")
-                                    .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
-                                Spacer()
-                                Text(order.quoteAsset)
-                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                            }
-                            
-                            HStack {
-                                Text("status:")
-                                    .foregroundColor(Color(red: 0.792, green: 0.792, blue: 0.792))
-                                Spacer()
-                                Text(order.status.rawValue)
-                                    .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                            }
-                        }
-                        .font(.Main.fixed(.monoMedium, size: 12))
-                        .padding(10)
-                    }
-                    .padding(20)
-                }
                 
                 Rectangle()
                     .foregroundColor(Color(red: 0.118, green: 0.118, blue: 0.118))
@@ -167,37 +56,28 @@ struct SwapView: View, KeyboardReadable {
                     .overlay(Palette.grayScale4A)
                 
                 switch viewModel.swapState {
-                case .create, .canceled:
-                    VStack(alignment: .leading, spacing: 16) {
-                        PButton(config: .onlyLabel("Submit"), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
-                            Task {
-                                try await viewModel.submitLimitOrder()
-                            }
-                        }
+                case .placeOrder:
+                    PButton(config: .onlyLabel("Swap"), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
+                        focusedField = .none
+                        viewModel.submitLimitOrder()
                     }
                     .padding(16)
-                case .matching:
-                    VStack {
-                        HStack(spacing: 16) {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle())
-                            Text("Waiting for Match...")
-                                .font(.Main.fixed(.monoBold, size: 16))
-                                .foregroundColor(Palette.grayScaleF4)
+                case .matchingOrder:
+                    HStack(spacing: 16) {
+                        Spacer()
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                        Text("Matching...")
+                            .font(.Main.fixed(.monoBold, size: 16))
+                            .foregroundColor(Palette.grayScaleF4)
+                        Spacer()
+                        PButton(config: .onlyLabel("Cancel"), style: .filled, size: .medium, enabled: true) {
+                            viewModel.cancelOrder()
                         }
-                        .frame(height: 60)
-                        
-//                        VStack(alignment: .leading, spacing: 16) {
-//                            PButton(config: .onlyLabel("Commit"), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
-//                                Task {
-//                                    await viewModel.commitSwap()
-//                                }
-//                            }
-//
-//                        }
                     }
+                    .frame(height: 60)
                     .padding(16)
-                case .matched:
+                case .orderMatched:
                     HStack(spacing: 12) {
                         Image(systemName: "checkmark.circle.fill")
                             .resizable()
@@ -209,71 +89,61 @@ struct SwapView: View, KeyboardReadable {
                     }
                     .frame(height: 60)
                     .padding(16)
-                case .open:
-                    VStack {
-//                        HStack(spacing: 16) {
-//                            ProgressView()
-//                                .progressViewStyle(CircularProgressViewStyle())
-//                            Text("Waiting for Match...")
-//                                .font(.Main.fixed(.monoBold, size: 16))
-//                                .foregroundColor(Palette.grayScaleF4)
-//                        }
-//                        .frame(height: 60)
-                        
-                        VStack(alignment: .leading, spacing: 16) {
-                            PButton(config: .onlyLabel("Open"), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
-                                Task {
-                                    await viewModel.openSwap()
-                                }
-                            }
-
-                        }
-                    }
-                    .padding(16)
-
-                case .commit:
-                    VStack {
-                        HStack(spacing: 16) {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle())
-                            Text("Swapping...")
-                                .font(.Main.fixed(.monoBold, size: 16))
-                                .foregroundColor(Palette.grayScaleF4)
-                        }
-                        .frame(height: 60)
-                        
-                        VStack(alignment: .leading, spacing: 16) {
-                            PButton(config: .onlyLabel("Commit"), style: .filled, size: .big, enabled: false) {
-                                Task {
-                                    await viewModel.commitSwap()
-                                }
-                            }
-
-                        }
-                    }
-                    .padding(16)
-                case .commiting:
+                case .swapping:
                     HStack(spacing: 16) {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle())
                         Text("Swapping...")
                             .font(.Main.fixed(.monoBold, size: 16))
                             .foregroundColor(Palette.grayScaleF4)
+                        Spacer()
+                        VStack {
+                            Text("Timeout")
+                                .font(.Main.fixed(.monoBold, size: 12))
+                                .foregroundColor(Palette.grayScaleEA)
+                            Text(viewModel.timeoutString)
+                                .font(.Main.fixed(.monoBold, size: 14))
+                                .foregroundColor(Palette.grayScaleEA)
+                        }
                     }
                     .frame(height: 60)
                     .padding(16)
-                case .commited:
-                    HStack(spacing: 12) {
-                        Image(systemName: "checkmark.circle.fill")
+                case .swapSucceed:
+                    VStack {
+                        HStack(spacing: 12) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .resizable()
+                                .frame(width: 28, height: 28)
+                                .foregroundColor(Color.green)
+                            Text("Swap Succeeded!")
+                                .font(.Main.fixed(.monoBold, size: 16))
+                                .foregroundColor(Palette.grayScaleF4)
+                        }
+                        .padding(16)
+                        
+                        PButton(config: .onlyLabel("Ok"), style: .filled, size: .big, enabled: true) {
+                            viewModel.clear()
+                        }
+                    }
+                    .padding(16)
+                case .swapError(let error):
+                    VStack {
+                        Image(systemName: "exclamationmark.triangle")
                             .resizable()
                             .frame(width: 28, height: 28)
                             .foregroundColor(Color.green)
-                        Text("Swapped!")
-                            .font(.Main.fixed(.monoBold, size: 16))
-                            .foregroundColor(Palette.grayScaleF4)
+                        
+                        Text(error)
+                            .font(.Main.fixed(.monoRegular, size: 16))
+                            .foregroundColor(Color(red: 255/255, green: 82/255, blue: 82/255))
+                            .padding(16)
+                        
+                        PButton(config: .onlyLabel("Dismiss"), style: .filled, size: .big, enabled: true) {
+                            viewModel.clear()
+                        }
                     }
-                    .frame(height: 60)
                     .padding(16)
+                    .frame(minHeight: 60)
                 }
             }
             .background(
@@ -284,19 +154,16 @@ struct SwapView: View, KeyboardReadable {
             .padding(.bottom, viewModel.bottomOffset)
         }
         .padding(.horizontal, 6)
-        .sheet(isPresented: $viewModel.goToReview, content: {
-            SwapReviewView(base: viewModel.base!, baseAmount: viewModel.baseAmount, quote: viewModel.quote!, quoteAmount: viewModel.quoteAmount)
-        })
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(red: 0.118, green: 0.118, blue: 0.118))
         .onReceive(keyboardPublisher) { newIsKeyboardVisible in
-//            if newIsKeyboardVisible {
-//                viewModel.viewState.hideTabBar.toggle()
-//                viewModel.bottomOffset = 0
-//            } else {
-//                viewModel.viewState.hideTabBar.toggle()
-//                viewModel.bottomOffset = 65
-//            }
+            if newIsKeyboardVisible {
+                viewState.hideTabBar = true
+                viewModel.bottomOffset = 0
+            } else {
+                viewState.hideTabBar = false
+                viewModel.bottomOffset = 65
+            }
         }
     }
     
@@ -327,9 +194,9 @@ struct SwapView: View, KeyboardReadable {
                                 Spacer()
                                 
                                 SwapCoinView(coin: viewModel.base)
-                                    .onTapGesture {
-                                        viewModel.showPicker.toggle()
-                                    }
+//                                    .onTapGesture {
+//                                        viewModel.showPicker.toggle()
+//                                    }
                             }
                             .frame(height: 32)
                             .padding(.leading, 24)
@@ -345,18 +212,16 @@ struct SwapView: View, KeyboardReadable {
                                 
                                 Spacer()
                                 
-                                if viewModel.base != nil {
-                                    HStack {
-                                        Text("Balance:")
-                                            .font(.Main.fixed(.monoMedium, size: 14))
-                                            .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
-                                        
-                                        Text(viewModel.L1Balance)
-                                            .font(.Main.fixed(.monoMedium, size: 14))
-                                            .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                    }
-                                    .frame(height: 14)
+                                HStack {
+                                    Text("Balance:")
+                                        .font(.Main.fixed(.monoMedium, size: 14))
+                                        .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
+                                    
+                                    Text(viewModel.baseBalanceString)
+                                        .font(.Main.fixed(.monoMedium, size: 14))
+                                        .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
                                 }
+                                .frame(height: 14)
                             }
                             .padding(.leading, 24)
                             .padding(.trailing, 16)
@@ -392,18 +257,16 @@ struct SwapView: View, KeyboardReadable {
                                 
                                 Spacer()
                                 
-                                if viewModel.base != nil {
-                                    HStack {
-                                        Text("Balance:")
-                                            .font(.Main.fixed(.monoMedium, size: 14))
-                                            .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
-                                        
-                                        Text(viewModel.L2Balance)
-                                            .font(.Main.fixed(.monoMedium, size: 14))
-                                            .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                    }
-                                    .frame(height: 14)
+                                HStack {
+                                    Text("Balance:")
+                                        .font(.Main.fixed(.monoMedium, size: 14))
+                                        .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
+                                    
+                                    Text(viewModel.quoteBalanceString)
+                                        .font(.Main.fixed(.monoMedium, size: 14))
+                                        .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
                                 }
+                                .frame(height: 14)
                             }
                             .padding(.leading, 24)
                             .padding(.trailing, 16)
@@ -424,9 +287,9 @@ struct SwapView: View, KeyboardReadable {
                                 Spacer()
                                 
                                 SwapCoinView(coin: viewModel.quote)
-                                    .onTapGesture {
-                                        viewModel.showPicker.toggle()
-                                    }
+//                                    .onTapGesture {
+//                                        viewModel.showPicker.toggle()
+//                                    }
                             }
                             .frame(height: 32)
                             .padding(.leading, 24)
@@ -442,18 +305,16 @@ struct SwapView: View, KeyboardReadable {
                                 
                                 Spacer()
                                 
-                                if viewModel.base != nil {
-                                    HStack {
-                                        Text("Balance:")
-                                            .font(.Main.fixed(.monoMedium, size: 14))
-                                            .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
-                                        
-                                        Text(viewModel.L2Balance)
-                                            .font(.Main.fixed(.monoMedium, size: 14))
-                                            .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                    }
-                                    .frame(height: 14)
+                                HStack {
+                                    Text("Balance:")
+                                        .font(.Main.fixed(.monoMedium, size: 14))
+                                        .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
+                                    
+                                    Text(viewModel.quoteBalanceString)
+                                        .font(.Main.fixed(.monoMedium, size: 14))
+                                        .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
                                 }
+                                .frame(height: 14)
                             }
                             .padding(.leading, 24)
                             .padding(.trailing, 16)
@@ -489,18 +350,16 @@ struct SwapView: View, KeyboardReadable {
                                 
                                 Spacer()
                                 
-                                if viewModel.base != nil {
-                                    HStack {
-                                        Text("Balance:")
-                                            .font(.Main.fixed(.monoMedium, size: 14))
-                                            .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
-                                        
-                                        Text(viewModel.L1Balance)
-                                            .font(.Main.fixed(.monoMedium, size: 14))
-                                            .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
-                                    }
-                                    .frame(height: 14)
+                                HStack {
+                                    Text("Balance:")
+                                        .font(.Main.fixed(.monoMedium, size: 14))
+                                        .foregroundColor(Color(red: 0.29, green: 0.29, blue: 0.29))
+                                    
+                                    Text(viewModel.baseBalanceString)
+                                        .font(.Main.fixed(.monoMedium, size: 14))
+                                        .foregroundColor(Color(red: 0.416, green: 0.416, blue: 0.416))
                                 }
+                                .frame(height: 14)
                             }
                             .padding(.leading, 24)
                             .padding(.trailing, 16)
