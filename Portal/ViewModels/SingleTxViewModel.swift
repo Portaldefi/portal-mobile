@@ -40,11 +40,11 @@ class SingleTxViewModel: ObservableObject {
         guard let amount = tx.amount else { return "0" }
         switch tx.coin.type {
         case .bitcoin, .lightningBitcoin:
-            return (amount/100_000_000 * tx.userData.price * fiatCurrency.rate).double.usdFormatted()
+            return (amount/100_000_000 * tx.userData.price * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
         case .ethereum:
-            return (amount * tx.userData.price * fiatCurrency.rate).double.usdFormatted()
+            return (amount * tx.userData.price * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
         case .erc20:
-            return (amount * tx.userData.price * fiatCurrency.rate).double.usdFormatted()
+            return (amount * tx.userData.price * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
         }
     }
         
