@@ -46,7 +46,7 @@ class SettingsViewViewModel: ObservableObject {
     }
     
     var portfolioCurrencies: [Coin] {
-        [.bitcoin(), .ethereum()]
+        [.bitcoin()]
     }
     
     var coins: [Coin] {
