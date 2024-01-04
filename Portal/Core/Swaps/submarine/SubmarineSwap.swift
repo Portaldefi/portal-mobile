@@ -73,7 +73,7 @@ class SubmarineSwap {
         
         let path = "api/v1/updates/\(client.id)"
         
-        guard let socketUrl = URL(string: "ws://\(host):\(port)/\(path)") else {
+        guard let socketUrl = URL(string: "wss://\(host):\(port)/\(path)") else {
             return nil
         }
         
@@ -106,7 +106,7 @@ class SubmarineSwap {
     }
     
     private func submitLimitOrder(userId: String, side: Order.OrderSide, hash: String) async throws -> Order {
-        let urlString = "http://\(host):\(port)/api/v1/orderbook/limit"
+        let urlString = "https://\(host):\(port)/api/v1/orderbook/limit"
         
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
@@ -154,7 +154,7 @@ class SubmarineSwap {
     }
     
     private func removeLimitOrder() async throws -> Order {
-        let urlString = "http://\(host):\(port)/api/v1/orderbook/limit"
+        let urlString = "https://\(host):\(port)/api/v1/orderbook/limit"
         
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
