@@ -12,7 +12,8 @@ import Combine
 
 struct ActivityView: View {
     @StateObject private var viewModel = ActivityViewModel()
-    
+    @Bindable private var viewState: ViewState = Container.viewState()
+
     private var keyboardPublisher: AnyPublisher<Bool, Never> {
         Publishers.Merge(
             NotificationCenter.default
@@ -215,6 +216,9 @@ struct ActivityView: View {
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
+        .sheet(isPresented: $viewState.showQRCodeScannerFromTabBar) {
+            QRCodeReaderRootView(config: .universal).lockableView()
+        }
         .sheet(item: $viewModel.selectedTx, onDismiss: {
             DispatchQueue.main.async {
                 viewModel.updateTransactions()
