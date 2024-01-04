@@ -6,10 +6,10 @@
 //
 
 import Foundation
-import GRPC
+//import GRPC
 import NIO
 import NIOSSL
-import NIOHPACK
+//import NIOHPACK
 import Factory
 import UIKit
 
@@ -35,8 +35,8 @@ import UIKit
     var confirmationAlertType: ConfirmationAlertType?
     var errorAlertType: ErrorAlertType?
     
-    @ObservationIgnored var lndAliceClient: Lnrpc_LightningNIOClient?
-    @ObservationIgnored var lndBobClient: Lnrpc_LightningNIOClient?
+//    @ObservationIgnored var lndAliceClient: Lnrpc_LightningNIOClient?
+//    @ObservationIgnored var lndBobClient: Lnrpc_LightningNIOClient?
     
     init() {
         do {
@@ -72,7 +72,7 @@ import UIKit
     }
     
     private func callEthRpcMethod(method: String, params: Any) async throws -> [String: Any] {
-        let url = URL(string: "http://localhost:8545")!
+        let url = URL(string: "http://localhost:8546")!
         let payload: [String: Any] = [
             "jsonrpc": "2.0",
             "method": method,
@@ -153,49 +153,49 @@ import UIKit
     }
     
     func aliceCreateInvoice(amount: Int) async {
-        guard let aliceLND = lndAliceClient else { return }
-        
-        var invoice = Lnrpc_Invoice()
-        invoice.value = Int64(amount)
-        
-        do {
-            let response = try await aliceLND.addInvoice(invoice).response.get()
-            print("Alice invoice payment_request: \(response.paymentRequest)")
-            
-            UIPasteboard.general.string = response.paymentRequest
-            
-            DispatchQueue.main.async {
-                self.confirmationAlertType = .aliceCreatesInvoice(response.paymentRequest)
-                self.showConfirmationAlert = true
-            }
-        } catch {
-            print("error: \(error)")
-            self.errorAlertType = .aliceCreatingInvoice(error.localizedDescription)
-            self.showErrorAlert = true
-        }
+//        guard let aliceLND = lndAliceClient else { return }
+//        
+//        var invoice = Lnrpc_Invoice()
+//        invoice.value = Int64(amount)
+//        
+//        do {
+//            let response = try await aliceLND.addInvoice(invoice).response.get()
+//            print("Alice invoice payment_request: \(response.paymentRequest)")
+//            
+//            UIPasteboard.general.string = response.paymentRequest
+//            
+//            DispatchQueue.main.async {
+//                self.confirmationAlertType = .aliceCreatesInvoice(response.paymentRequest)
+//                self.showConfirmationAlert = true
+//            }
+//        } catch {
+//            print("error: \(error)")
+//            self.errorAlertType = .aliceCreatingInvoice(error.localizedDescription)
+//            self.showErrorAlert = true
+//        }
     }
     
     func bobCreateInvoice(amount: Int) async {
-        guard let bobLND = lndBobClient else { return }
-        
-        var invoice = Lnrpc_Invoice()
-        invoice.value = Int64(amount)
-        
-        do {
-            let response = try await bobLND.addInvoice(invoice).response.get()
-            print("Bob invoice payment_request: \(response.paymentRequest)")
-            
-            UIPasteboard.general.string = response.paymentRequest
-            
-            DispatchQueue.main.async {
-                self.confirmationAlertType = .bobCreatesInvoice(response.paymentRequest)
-                self.showConfirmationAlert = true
-            }
-        } catch {
-            print("error: \(error)")
-            self.errorAlertType = .aliceCreatingInvoice(error.localizedDescription)
-            self.showErrorAlert = true
-        }
+//        guard let bobLND = lndBobClient else { return }
+//        
+//        var invoice = Lnrpc_Invoice()
+//        invoice.value = Int64(amount)
+//        
+//        do {
+//            let response = try await bobLND.addInvoice(invoice).response.get()
+//            print("Bob invoice payment_request: \(response.paymentRequest)")
+//            
+//            UIPasteboard.general.string = response.paymentRequest
+//            
+//            DispatchQueue.main.async {
+//                self.confirmationAlertType = .bobCreatesInvoice(response.paymentRequest)
+//                self.showConfirmationAlert = true
+//            }
+//        } catch {
+//            print("error: \(error)")
+//            self.errorAlertType = .aliceCreatingInvoice(error.localizedDescription)
+//            self.showErrorAlert = true
+//        }
     }
     
     func getNewAddress(showAlert: Bool = true) async throws -> String {
@@ -251,167 +251,167 @@ import UIKit
     }
     
     func fetchAlicePubKey() async {
-        guard let aliceLND = lndAliceClient else { return }
-        do {
-            let response = try await aliceLND.getInfo(Lnrpc_GetInfoRequest()).response.get()
-            print("Alice pubKey: \(response.identityPubkey)")
-        } catch {
-            print("error: \(error)")
-        }
+//        guard let aliceLND = lndAliceClient else { return }
+//        do {
+//            let response = try await aliceLND.getInfo(Lnrpc_GetInfoRequest()).response.get()
+//            print("Alice pubKey: \(response.identityPubkey)")
+//        } catch {
+//            print("error: \(error)")
+//        }
     }
     
     func fetchBobPubKey() async {
-        guard let bobLND = lndBobClient else { return }
-        do {
-            let response = try await bobLND.getInfo(Lnrpc_GetInfoRequest()).response.get()
-            print("Alice pubKey: \(response.identityPubkey)")
-        } catch {
-            print("error: \(error)")
-        }
+//        guard let bobLND = lndBobClient else { return }
+//        do {
+//            let response = try await bobLND.getInfo(Lnrpc_GetInfoRequest()).response.get()
+//            print("Alice pubKey: \(response.identityPubkey)")
+//        } catch {
+//            print("error: \(error)")
+//        }
     }
     
     private func setupAliceLnd() throws {
-        if let url = Bundle.main.url(forResource: "alice", withExtension: "macaroon") {
-            // Read the file into a Data object
-            let data = try Data(contentsOf: url)
-            
-            // Convert the Data object to a hexadecimal string
-            let hexString = data.map { String(format: "%02x", $0) }.joined()
-            
-            // Print or use the hexadecimal string
-            print(hexString)
-            
-            let rpcCredentials = RpcCredentials(
-                host: "localhost",
-                port: 10001,
-                certificate: """
------BEGIN CERTIFICATE-----
-MIIDgzCCAyigAwIBAgIQd/+RzONBosoLvpMuHCG7PjAKBggqhkjOPQQDAjA4MR8w
-HQYDVQQKExZsbmQgYXV0b2dlbmVyYXRlZCBjZXJ0MRUwEwYDVQQDEwxjdWh0ZTMu
-bG9jYWwwHhcNMjMwOTE5MDY1OTU1WhcNMjQxMTEzMDY1OTU1WjA4MR8wHQYDVQQK
-ExZsbmQgYXV0b2dlbmVyYXRlZCBjZXJ0MRUwEwYDVQQDEwxjdWh0ZTMubG9jYWww
-WTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARka2TH1RcNJcdf4SWNSvfkIMMucYvq
-xRUXs9rlC1BIGu5toHfzucMSBLm27+4ECBESlsxjhehxgwTUskJEBmn/o4ICEjCC
-Ag4wDgYDVR0PAQH/BAQDAgKkMBMGA1UdJQQMMAoGCCsGAQUFBwMBMA8GA1UdEwEB
-/wQFMAMBAf8wHQYDVR0OBBYEFOu3U2OnzOoDx/twZv7ZHKCRpiIyMIIBtQYDVR0R
-BIIBrDCCAaiCDGN1aHRlMy5sb2NhbIIJbG9jYWxob3N0ggR1bml4ggp1bml4cGFj
-a2V0ggdidWZjb25uhwR/AAABhxAAAAAAAAAAAAAAAAAAAAABhxD+gAAAAAAAAAAA
-AAAAAAABhxD+gAAAAAAAANSQnf/+X8RYhxD+gAAAAAAAANSQnf/+X8RXhxD+gAAA
-AAAAANSQnf/+X8RZhxD+gAAAAAAAAPTUiP/+fRiqhxD+gAAAAAAAABg6YieDBpWz
-hwTAqAEDhxD9jBXHd2b1ABiMhr6/W+EPhxAkA2IAiHDWkRgiC4h5vIZbhxAkA2IA
-iHDWkSG+CaQusdxThxAkA2IAiHDWkQAAAAAAAAAGhxD+gAAAAAAAAIgg8f/+B/jY
-hxD+gAAAAAAAALgHQ6efkAIFhxD+gAAAAAAAALGWAib0PcYqhxD+gAAAAAAAAM6B
-Cxy9LAaehxD+gAAAAAAAAB5lJIMmwQomhxD+gAAAAAAAAG6kgjCZs97UhxD+gAAA
-AAAAAOqR8hrabur6hxD+gAAAAAAAAAwvv6bowfr7hxD+gAAAAAAAADiqS4TJGG7n
-MAoGCCqGSM49BAMCA0kAMEYCIQDyYTY1GULcwF+LzUngnvyBar/kQLTBYopI5qjj
-NUQgSQIhAMm2Y6IWL35Yrr/tkX8OFKaStyvKkqVRwUPkwToGpnuP
------END CERTIFICATE-----
-""",
-                macaroon: hexString
-            )
-
-            let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-            
-            let certificateBytes: [UInt8] = Array(rpcCredentials.certificate.utf8)
-            let certificate = try NIOSSLCertificate(bytes: certificateBytes, format: .pem)
-            let tlsConfig = ClientConnection.Configuration.TLS(
-                trustRoots: .certificates([certificate])
-            )
-            
-            let callOptions = CallOptions(
-                customMetadata: HPACKHeaders([("macaroon", rpcCredentials.macaroon)])
-            )
-            
-            
-            let config = ClientConnection.Configuration(
-                target: .hostAndPort(rpcCredentials.host, rpcCredentials.port),
-                eventLoopGroup: group,
-                connectivityStateDelegate: self,
-                tls: tlsConfig
-            )
-            
-            let connection = ClientConnection(configuration: config)
-            
-            lndAliceClient = Lnrpc_LightningNIOClient(channel: connection, defaultCallOptions: callOptions)
-        } else {
-            throw LNApiError.noAliceMacaroon
-        }
+//        if let url = Bundle.main.url(forResource: "alice", withExtension: "macaroon") {
+//            // Read the file into a Data object
+//            let data = try Data(contentsOf: url)
+//            
+//            // Convert the Data object to a hexadecimal string
+//            let hexString = data.map { String(format: "%02x", $0) }.joined()
+//            
+//            // Print or use the hexadecimal string
+//            print(hexString)
+//            
+//            let rpcCredentials = RpcCredentials(
+//                host: "localhost",
+//                port: 10001,
+//                certificate: """
+//-----BEGIN CERTIFICATE-----
+//MIIDgzCCAyigAwIBAgIQd/+RzONBosoLvpMuHCG7PjAKBggqhkjOPQQDAjA4MR8w
+//HQYDVQQKExZsbmQgYXV0b2dlbmVyYXRlZCBjZXJ0MRUwEwYDVQQDEwxjdWh0ZTMu
+//bG9jYWwwHhcNMjMwOTE5MDY1OTU1WhcNMjQxMTEzMDY1OTU1WjA4MR8wHQYDVQQK
+//ExZsbmQgYXV0b2dlbmVyYXRlZCBjZXJ0MRUwEwYDVQQDEwxjdWh0ZTMubG9jYWww
+//WTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARka2TH1RcNJcdf4SWNSvfkIMMucYvq
+//xRUXs9rlC1BIGu5toHfzucMSBLm27+4ECBESlsxjhehxgwTUskJEBmn/o4ICEjCC
+//Ag4wDgYDVR0PAQH/BAQDAgKkMBMGA1UdJQQMMAoGCCsGAQUFBwMBMA8GA1UdEwEB
+///wQFMAMBAf8wHQYDVR0OBBYEFOu3U2OnzOoDx/twZv7ZHKCRpiIyMIIBtQYDVR0R
+//BIIBrDCCAaiCDGN1aHRlMy5sb2NhbIIJbG9jYWxob3N0ggR1bml4ggp1bml4cGFj
+//a2V0ggdidWZjb25uhwR/AAABhxAAAAAAAAAAAAAAAAAAAAABhxD+gAAAAAAAAAAA
+//AAAAAAABhxD+gAAAAAAAANSQnf/+X8RYhxD+gAAAAAAAANSQnf/+X8RXhxD+gAAA
+//AAAAANSQnf/+X8RZhxD+gAAAAAAAAPTUiP/+fRiqhxD+gAAAAAAAABg6YieDBpWz
+//hwTAqAEDhxD9jBXHd2b1ABiMhr6/W+EPhxAkA2IAiHDWkRgiC4h5vIZbhxAkA2IA
+//iHDWkSG+CaQusdxThxAkA2IAiHDWkQAAAAAAAAAGhxD+gAAAAAAAAIgg8f/+B/jY
+//hxD+gAAAAAAAALgHQ6efkAIFhxD+gAAAAAAAALGWAib0PcYqhxD+gAAAAAAAAM6B
+//Cxy9LAaehxD+gAAAAAAAAB5lJIMmwQomhxD+gAAAAAAAAG6kgjCZs97UhxD+gAAA
+//AAAAAOqR8hrabur6hxD+gAAAAAAAAAwvv6bowfr7hxD+gAAAAAAAADiqS4TJGG7n
+//MAoGCCqGSM49BAMCA0kAMEYCIQDyYTY1GULcwF+LzUngnvyBar/kQLTBYopI5qjj
+//NUQgSQIhAMm2Y6IWL35Yrr/tkX8OFKaStyvKkqVRwUPkwToGpnuP
+//-----END CERTIFICATE-----
+//""",
+//                macaroon: hexString
+//            )
+//
+//            let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+//            
+//            let certificateBytes: [UInt8] = Array(rpcCredentials.certificate.utf8)
+//            let certificate = try NIOSSLCertificate(bytes: certificateBytes, format: .pem)
+//            let tlsConfig = ClientConnection.Configuration.TLS(
+//                trustRoots: .certificates([certificate])
+//            )
+//            
+//            let callOptions = CallOptions(
+//                customMetadata: HPACKHeaders([("macaroon", rpcCredentials.macaroon)])
+//            )
+//            
+//            
+//            let config = ClientConnection.Configuration(
+//                target: .hostAndPort(rpcCredentials.host, rpcCredentials.port),
+//                eventLoopGroup: group,
+//                connectivityStateDelegate: self,
+//                tls: tlsConfig
+//            )
+//            
+//            let connection = ClientConnection(configuration: config)
+//            
+//            lndAliceClient = Lnrpc_LightningNIOClient(channel: connection, defaultCallOptions: callOptions)
+//        } else {
+//            throw LNApiError.noAliceMacaroon
+//        }
     }
     
     private func setupBobLnd() throws {
-        if let url = Bundle.main.url(forResource: "bob", withExtension: "macaroon") {
-            // Read the file into a Data object
-            let data = try Data(contentsOf: url)
-            
-            // Convert the Data object to a hexadecimal string
-            let hexString = data.map { String(format: "%02x", $0) }.joined()
-            
-            // Print or use the hexadecimal string
-            print(hexString)
-            
-            let rpcCredentials = RpcCredentials(
-                host: "localhost",
-                port: 10002,
-                certificate: """
------BEGIN CERTIFICATE-----
-MIIDgzCCAyigAwIBAgIQd/+RzONBosoLvpMuHCG7PjAKBggqhkjOPQQDAjA4MR8w
-HQYDVQQKExZsbmQgYXV0b2dlbmVyYXRlZCBjZXJ0MRUwEwYDVQQDEwxjdWh0ZTMu
-bG9jYWwwHhcNMjMwOTE5MDY1OTU1WhcNMjQxMTEzMDY1OTU1WjA4MR8wHQYDVQQK
-ExZsbmQgYXV0b2dlbmVyYXRlZCBjZXJ0MRUwEwYDVQQDEwxjdWh0ZTMubG9jYWww
-WTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARka2TH1RcNJcdf4SWNSvfkIMMucYvq
-xRUXs9rlC1BIGu5toHfzucMSBLm27+4ECBESlsxjhehxgwTUskJEBmn/o4ICEjCC
-Ag4wDgYDVR0PAQH/BAQDAgKkMBMGA1UdJQQMMAoGCCsGAQUFBwMBMA8GA1UdEwEB
-/wQFMAMBAf8wHQYDVR0OBBYEFOu3U2OnzOoDx/twZv7ZHKCRpiIyMIIBtQYDVR0R
-BIIBrDCCAaiCDGN1aHRlMy5sb2NhbIIJbG9jYWxob3N0ggR1bml4ggp1bml4cGFj
-a2V0ggdidWZjb25uhwR/AAABhxAAAAAAAAAAAAAAAAAAAAABhxD+gAAAAAAAAAAA
-AAAAAAABhxD+gAAAAAAAANSQnf/+X8RYhxD+gAAAAAAAANSQnf/+X8RXhxD+gAAA
-AAAAANSQnf/+X8RZhxD+gAAAAAAAAPTUiP/+fRiqhxD+gAAAAAAAABg6YieDBpWz
-hwTAqAEDhxD9jBXHd2b1ABiMhr6/W+EPhxAkA2IAiHDWkRgiC4h5vIZbhxAkA2IA
-iHDWkSG+CaQusdxThxAkA2IAiHDWkQAAAAAAAAAGhxD+gAAAAAAAAIgg8f/+B/jY
-hxD+gAAAAAAAALgHQ6efkAIFhxD+gAAAAAAAALGWAib0PcYqhxD+gAAAAAAAAM6B
-Cxy9LAaehxD+gAAAAAAAAB5lJIMmwQomhxD+gAAAAAAAAG6kgjCZs97UhxD+gAAA
-AAAAAOqR8hrabur6hxD+gAAAAAAAAAwvv6bowfr7hxD+gAAAAAAAADiqS4TJGG7n
-MAoGCCqGSM49BAMCA0kAMEYCIQDyYTY1GULcwF+LzUngnvyBar/kQLTBYopI5qjj
-NUQgSQIhAMm2Y6IWL35Yrr/tkX8OFKaStyvKkqVRwUPkwToGpnuP
------END CERTIFICATE-----
-""",
-                macaroon: hexString
-            )
-
-            let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-            
-            let certificateBytes: [UInt8] = Array(rpcCredentials.certificate.utf8)
-            let certificate = try NIOSSLCertificate(bytes: certificateBytes, format: .pem)
-            let tlsConfig = ClientConnection.Configuration.TLS(
-                trustRoots: .certificates([certificate])
-            )
-            
-            let callOptions = CallOptions(
-                customMetadata: HPACKHeaders([("macaroon", rpcCredentials.macaroon)])
-            )
-            
-            
-            let config = ClientConnection.Configuration(
-                target: .hostAndPort(rpcCredentials.host, rpcCredentials.port),
-                eventLoopGroup: group,
-                connectivityStateDelegate: self,
-                tls: tlsConfig
-            )
-            
-            let connection = ClientConnection(configuration: config)
-            
-            lndAliceClient = Lnrpc_LightningNIOClient(channel: connection, defaultCallOptions: callOptions)
-        } else {
-            throw LNApiError.noAliceMacaroon
-        }
+//        if let url = Bundle.main.url(forResource: "bob", withExtension: "macaroon") {
+//            // Read the file into a Data object
+//            let data = try Data(contentsOf: url)
+//            
+//            // Convert the Data object to a hexadecimal string
+//            let hexString = data.map { String(format: "%02x", $0) }.joined()
+//            
+//            // Print or use the hexadecimal string
+//            print(hexString)
+//            
+//            let rpcCredentials = RpcCredentials(
+//                host: "localhost",
+//                port: 10002,
+//                certificate: """
+//-----BEGIN CERTIFICATE-----
+//MIIDgzCCAyigAwIBAgIQd/+RzONBosoLvpMuHCG7PjAKBggqhkjOPQQDAjA4MR8w
+//HQYDVQQKExZsbmQgYXV0b2dlbmVyYXRlZCBjZXJ0MRUwEwYDVQQDEwxjdWh0ZTMu
+//bG9jYWwwHhcNMjMwOTE5MDY1OTU1WhcNMjQxMTEzMDY1OTU1WjA4MR8wHQYDVQQK
+//ExZsbmQgYXV0b2dlbmVyYXRlZCBjZXJ0MRUwEwYDVQQDEwxjdWh0ZTMubG9jYWww
+//WTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARka2TH1RcNJcdf4SWNSvfkIMMucYvq
+//xRUXs9rlC1BIGu5toHfzucMSBLm27+4ECBESlsxjhehxgwTUskJEBmn/o4ICEjCC
+//Ag4wDgYDVR0PAQH/BAQDAgKkMBMGA1UdJQQMMAoGCCsGAQUFBwMBMA8GA1UdEwEB
+///wQFMAMBAf8wHQYDVR0OBBYEFOu3U2OnzOoDx/twZv7ZHKCRpiIyMIIBtQYDVR0R
+//BIIBrDCCAaiCDGN1aHRlMy5sb2NhbIIJbG9jYWxob3N0ggR1bml4ggp1bml4cGFj
+//a2V0ggdidWZjb25uhwR/AAABhxAAAAAAAAAAAAAAAAAAAAABhxD+gAAAAAAAAAAA
+//AAAAAAABhxD+gAAAAAAAANSQnf/+X8RYhxD+gAAAAAAAANSQnf/+X8RXhxD+gAAA
+//AAAAANSQnf/+X8RZhxD+gAAAAAAAAPTUiP/+fRiqhxD+gAAAAAAAABg6YieDBpWz
+//hwTAqAEDhxD9jBXHd2b1ABiMhr6/W+EPhxAkA2IAiHDWkRgiC4h5vIZbhxAkA2IA
+//iHDWkSG+CaQusdxThxAkA2IAiHDWkQAAAAAAAAAGhxD+gAAAAAAAAIgg8f/+B/jY
+//hxD+gAAAAAAAALgHQ6efkAIFhxD+gAAAAAAAALGWAib0PcYqhxD+gAAAAAAAAM6B
+//Cxy9LAaehxD+gAAAAAAAAB5lJIMmwQomhxD+gAAAAAAAAG6kgjCZs97UhxD+gAAA
+//AAAAAOqR8hrabur6hxD+gAAAAAAAAAwvv6bowfr7hxD+gAAAAAAAADiqS4TJGG7n
+//MAoGCCqGSM49BAMCA0kAMEYCIQDyYTY1GULcwF+LzUngnvyBar/kQLTBYopI5qjj
+//NUQgSQIhAMm2Y6IWL35Yrr/tkX8OFKaStyvKkqVRwUPkwToGpnuP
+//-----END CERTIFICATE-----
+//""",
+//                macaroon: hexString
+//            )
+//
+//            let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+//            
+//            let certificateBytes: [UInt8] = Array(rpcCredentials.certificate.utf8)
+//            let certificate = try NIOSSLCertificate(bytes: certificateBytes, format: .pem)
+//            let tlsConfig = ClientConnection.Configuration.TLS(
+//                trustRoots: .certificates([certificate])
+//            )
+//            
+//            let callOptions = CallOptions(
+//                customMetadata: HPACKHeaders([("macaroon", rpcCredentials.macaroon)])
+//            )
+//            
+//            
+//            let config = ClientConnection.Configuration(
+//                target: .hostAndPort(rpcCredentials.host, rpcCredentials.port),
+//                eventLoopGroup: group,
+//                connectivityStateDelegate: self,
+//                tls: tlsConfig
+//            )
+//            
+//            let connection = ClientConnection(configuration: config)
+//            
+//            lndAliceClient = Lnrpc_LightningNIOClient(channel: connection, defaultCallOptions: callOptions)
+//        } else {
+//            throw LNApiError.noAliceMacaroon
+//        }
     }
 }
 
-extension DevUtilityService: ConnectivityStateDelegate {
-    func connectivityStateDidChange(from oldState: GRPC.ConnectivityState, to newState: GRPC.ConnectivityState) {
-        
-    }
-}
+//extension DevUtilityService: ConnectivityStateDelegate {
+//    func connectivityStateDidChange(from oldState: GRPC.ConnectivityState, to newState: GRPC.ConnectivityState) {
+//        
+//    }
+//}
 
 extension DevUtilityService {
     enum RpcError: Error {
