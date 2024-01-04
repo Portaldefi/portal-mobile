@@ -22,9 +22,7 @@ struct QRCodeSharedItem: Identifiable {
     enum RecieveStep {
         case selectAsset, generateQR
     }
-    
-    @ObservationIgnored private var adapter: IDepositAdapter?
-    
+        
     private let context = CIContext()
     private let filter = CIFilter.qrCodeGenerator()
     
@@ -57,7 +55,6 @@ struct QRCodeSharedItem: Identifiable {
         didSet {
             guard let item = selectedItem else { return }
             updateExchanger(coin: item.coin)
-            updateAdapter(coin: item.coin)
         }
     }
     @ObservationIgnored public var exchanger: Exchanger?
@@ -68,7 +65,7 @@ struct QRCodeSharedItem: Identifiable {
     }
     @ObservationIgnored private var qrAddressType$ = CurrentValueSubject<BTCQRCodeAddressType, Never>(.lightning)
     
-    public var invoiceString = String()
+    public var qrCodeString = String()
     public var sharedItems: [QRCodeSharedItem] = []
     public var sharedItem: QRCodeSharedItem?
     
@@ -82,8 +79,12 @@ struct QRCodeSharedItem: Identifiable {
         settings.fiatCurrency.value
     }
     
-    var receiveAddress: String {
-        adapter?.receiveAddress ?? "Address"
+    var hasUsableChannels: Bool {
+        !lightningKit.usableChannels.isEmpty
+    }
+    
+    var hasChannelBalance: Bool {
+        lightningKit.channelBalance > 0
     }
     
     init(items: [WalletItem], selectedItem: WalletItem?) {
@@ -92,10 +93,12 @@ struct QRCodeSharedItem: Identifiable {
         
         guard let item = selectedItem else { return }
         updateExchanger(coin: item.coin)
-        updateAdapter(coin: item.coin)
     }
     
     private func updateExchanger(coin: Coin?) {
+        subscriptions.removeAll()
+        description = String()
+        
         guard let coin = coin else {
             exchanger = nil
             return
@@ -130,42 +133,21 @@ struct QRCodeSharedItem: Identifiable {
             .flatMap { _ in Just(()) }
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
-                guard let self = self else { return }
+                guard let self = self, let coin = selectedItem?.coin else { return }
                 
-                switch qrAddressType {
-                case .onChain:
-                    let addressString = adapter?.receiveAddress ?? "Unknown address"
-                    let displayedAddress = addressString.groupedByThree.uppercased()
+                switch coin.type {
+                case .bitcoin, .ethereum, .erc20:
+                    let addressString = depositAdapter()?.receiveAddress ?? "Unknown address"
+                    let displayedAddress = addressString.groupedByFour.uppercased()
                     self.sharedItems = [QRCodeSharedItem(name: "On Chain Address", displayedItem: displayedAddress, item: addressString)]
-                    self.generateQRCode(coin: exchanger.base)
-                case .lightning:
-                    qrCode = nil
-                    
+                    self.generateQRCode(coin: exchanger.base, code: addressString)
+                case .lightningBitcoin:
                     Task {
                         let invoice = await self.lightningKit.createInvoice(amount: exchanger.baseAmountString, description: self.description)
                         
                         DispatchQueue.main.async {
-                            self.invoiceString = invoice ?? String()
-                            self.generateQRCode(coin: exchanger.base)
-                            self.sharedItems = [QRCodeSharedItem(name: "Lightning Invoice", displayedItem: self.invoiceString.turnicated.uppercased(), item: self.invoiceString)]
-                        }
-                    }
-                case .unified:
-                    qrCode = nil
-                    
-                    Task {
-                        let invoice = await self.lightningKit.createInvoice(amount: exchanger.baseAmountString, description: self.description)
-                        
-                        DispatchQueue.main.async {
-                            self.invoiceString = invoice ?? String()
-                            self.generateQRCode(coin: exchanger.base)
-                            
-                            let addressString = self.adapter?.receiveAddress ?? "Unknown address"
-                            let displayedAddress = addressString.groupedByThree.uppercased()
-                            let addressItem = QRCodeSharedItem(name: "On Chain Address", displayedItem: displayedAddress, item: addressString)
-                            let invoiceItem = QRCodeSharedItem(name: "Lightning Invoice", displayedItem: self.invoiceString.turnicated.uppercased(), item: self.invoiceString)
-                            
-                            self.sharedItems = [addressItem, invoiceItem]
+                            self.generateQRCode(coin: exchanger.base, code: invoice ?? String())
+                            self.sharedItems = [QRCodeSharedItem(name: "Lightning Invoice", displayedItem: invoice?.turnicated.uppercased() ?? String(), item: invoice ?? String())]
                         }
                     }
                 }
@@ -173,63 +155,53 @@ struct QRCodeSharedItem: Identifiable {
             .store(in: &subscriptions)
     }
     
-    private func updateAdapter(coin: Coin?) {
-        guard let coin = coin else {
-            adapter = nil
-            return
-        }
-
-        let adapterManager: IAdapterManager = Container.adapterManager()
-        let walletManager: IWalletManager = Container.walletManager()
-                
-        guard
-            let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
-            let depositAdapter = adapterManager.depositAdapter(for: wallet)
-        else {
-            fatalError("coudn't fetch dependencies")
-        }
+    private func depositAdapter() -> IDepositAdapter? {
+        guard let item = selectedItem else { return nil }
         
-        self.adapter = depositAdapter
+        switch item.coin.type {
+        case .bitcoin, .ethereum, .erc20:
+            let adapterManager: IAdapterManager = Container.adapterManager()
+            let walletManager: IWalletManager = Container.walletManager()
+                    
+            guard
+                let wallet = walletManager.activeWallets.first(where: { $0.coin == item.coin }),
+                let depositAdapter = adapterManager.depositAdapter(for: wallet)
+            else {
+                return nil
+            }
+            return depositAdapter
+        default:
+            return nil
+        }
     }
-    
-    private func generateQRCode(coin: Coin) {
+        
+    private func generateQRCode(coin: Coin, code: String) {
         var qrCodeString: String
         
         switch coin.type {
         case .bitcoin:
-            switch qrAddressType {
-            case .lightning:
-                qrCodeString = "lightning:\(invoiceString)"
-            case .onChain:
-                qrCodeString = "bitcoin:\(receiveAddress)"
-                
-                if let components = pathComponents() {
-                    qrCodeString += components
-                }
-            case .unified:
-                qrCodeString = "bitcoin:\(receiveAddress)"
-                
-                if let components = pathComponents() {
-                    qrCodeString += components
-                }
-                
-                qrCodeString += "&lightning:\(invoiceString)"
+            qrCodeString = "bitcoin:\(code)"
+            
+            if let components = pathComponents() {
+                qrCodeString += components
             }
+        case .lightningBitcoin:
+            qrCodeString = "lightning:\(code)"
         case .ethereum:
-            qrCodeString = "ethereum:\(receiveAddress)"
+            qrCodeString = "ethereum:\(code)"
             
             if let components = pathComponents() {
                 qrCodeString += components
             }
         case .erc20:
-            qrCodeString = "link:\(receiveAddress)"
+            qrCodeString = "\(coin.name.lowercased()):\(code)"
             
             if let components = pathComponents() {
                 qrCodeString += components
             }
-        default:
-            qrCodeString = String()
         }
+        
+        self.qrCodeString = qrCodeString
         
         print("QR CODE STRING: \n\(qrCodeString)\n")
         
@@ -281,24 +253,14 @@ struct QRCodeSharedItem: Identifiable {
         
         switch coin.type {
         case .bitcoin:
-            switch qrAddressType {
-            case .lightning:
-                description = "\n\nThis is a lightning invoice."
-                sharedAddress = IdentifiableString(text: receiveAddress + description)
-            case .onChain:
-                description = "\n\nThis is a bitcoin network address. Only send BTC to this address. Do not send lightning network assets to his address."
-                sharedAddress = IdentifiableString(text: receiveAddress + description)
-            case .unified:
-                description = "\n\nThis is a bitcoin network address. Only send BTC to this address. Do not send lightning network assets to his address."
-                let description2 = "\n\nThis is a lightning invoice."
-                sharedAddress = IdentifiableString(text: receiveAddress + description + description2)
-            }
+            description = "\n\nThis is a bitcoin network address. Only send BTC to this address. Do not send lightning network assets to his address."
+            sharedAddress = IdentifiableString(text: qrCodeString + description)
         case .lightningBitcoin:
             description = "\n\nThis is a lightning invoice."
-            sharedAddress = IdentifiableString(text: receiveAddress + description)
+            sharedAddress = IdentifiableString(text: qrCodeString + description)
         case .ethereum, .erc20:
             description = "\n\nThis is an ethereum network address."
-            sharedAddress = IdentifiableString(text: receiveAddress + description)
+            sharedAddress = IdentifiableString(text: qrCodeString + description)
         }
     }
     
