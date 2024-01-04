@@ -7,6 +7,31 @@
 
 import SwiftUI
 
+struct CreateChannelRootView: View {
+    private let navigationStack: NavigationStackView<AnyView>
+    
+    init(channelIsFunded: Bool) {
+        let rootView: AnyView
+        
+        if channelIsFunded {
+            rootView = AnyView(AwaitsFundingChannelView())
+        } else {
+            rootView = AnyView(SelectPeerView())
+        }
+                
+        let navigationConfigurator = CreateChannelViewNavigationConfig()
+        
+        navigationStack = NavigationStackView<AnyView>(
+            configurator: navigationConfigurator,
+            rootView: rootView
+        )
+    }
+
+    var body: some View {
+        navigationStack.zIndex(1)
+    }
+}
+
 struct ReceiveRootView: View {
     private let navigationStack: NavigationStackView<AnyView>
     
