@@ -22,7 +22,7 @@ enum UserInputResult {
     
     public var receiverAddress = String() {
         didSet {
-            sendService?.receiverAddress.send(receiverAddress)
+            sendService?.receiver.send(receiverAddress)
             guard sendError != nil else { return }
             withAnimation {
                 sendError = nil
@@ -58,6 +58,7 @@ enum UserInputResult {
 
     private var marketData = Container.marketData()
     private var settings = Container.settings()
+    private var lightningKit = Container.lightningKitManager()
     
     var fiatCurrency: FiatCurrency {
         settings.fiatCurrency.value
@@ -65,6 +66,14 @@ enum UserInputResult {
     
     var signingTxProtected: Bool {
         settings.pincodeEnabled.value || settings.biometricsEnabled.value
+    }
+    
+    var hasUsableChannels: Bool {
+        !lightningKit.usableChannels.isEmpty
+    }
+    
+    var hasChannelBalance: Bool {
+        lightningKit.channelBalance > 0
     }
         
     var fee: String {
@@ -101,12 +110,10 @@ enum UserInputResult {
                 guard let self = self, let sendService = self.sendService, let coin = self.coin else { return }
                 
                 switch coin.type {
-                case .bitcoin:
-                    self.valueString = (sendService.balance * self.marketData.lastSeenBtcPrice * self.fiatCurrency.rate).double.usdFormatted()
-                case .lightningBitcoin:
-                    fatalError("not implemented")
+                case .bitcoin, .lightningBitcoin:
+                    self.valueString = (sendService.balance * self.marketData.lastSeenBtcPrice * self.fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
                 case .ethereum, .erc20:
-                    self.valueString = (sendService.balance * self.marketData.lastSeenEthPrice * self.fiatCurrency.rate).double.usdFormatted()
+                    self.valueString = (sendService.balance * self.marketData.lastSeenEthPrice * self.fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
                 }
             }
             .store(in: &subscriptions)
@@ -162,14 +169,23 @@ enum UserInputResult {
                 fatalError("coudn't fetch dependencies")
             }
             
-            sendService = SendBTCService(sendAdapter: sendAdapter)
+            sendService = SendBTCService(adapter: sendAdapter)
             
             if let service = sendService {
                 balanceString = String(describing: service.spendable)
-                valueString = (service.balance * marketData.lastSeenBtcPrice * fiatCurrency.rate).double.usdFormatted()
+                valueString = (service.balance * marketData.lastSeenBtcPrice * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
             }
         case .lightningBitcoin:
-            fatalError("not implemented yet")
+            guard let sendAdapter = adapter as? ISendLightningAdapter else {
+                fatalError("coudn't fetch dependencies")
+            }
+            
+            sendService = SendLightningService(adapter: sendAdapter)
+            
+            if let service = sendService {
+                balanceString = String(describing: service.spendable)
+                valueString = (service.balance * marketData.lastSeenBtcPrice * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
+            }
         case .ethereum, .erc20:
             guard let sendAdapter = adapter as? ISendEthereumAdapter else {
                 fatalError("coudn't fetch dependencies")
@@ -179,11 +195,11 @@ enum UserInputResult {
             let ethFeeRateProvider = EthereumFeeRateProvider(feeRateProvider: feeRateProvider)
             
             let ethManager = Container.ethereumKitManager()
-            sendService = SendETHService(coin: coin, sendAdapter: sendAdapter, feeRateProvider: ethFeeRateProvider, manager: ethManager)
+            sendService = SendETHService(coin: coin, adapter: sendAdapter, feeRateProvider: ethFeeRateProvider, manager: ethManager)
             
             if let service = sendService {
                 balanceString = String(describing: service.spendable)
-                valueString = (service.balance * marketData.lastSeenEthPrice * fiatCurrency.rate).double.usdFormatted()
+                valueString = (service.balance * marketData.lastSeenEthPrice * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
             }
         }
         
