@@ -13,7 +13,7 @@ protocol ISendAssetService {
     var spendable: Decimal { get }
     var fee: Decimal { get }
     var amount: CurrentValueSubject<Decimal, Never> { get }
-    var receiverAddress: CurrentValueSubject<String, Never> { get }
+    var receiver: CurrentValueSubject<String, Never> { get }
     var feeRateType: CurrentValueSubject<TxFees, Never> { get }
     var recomendedFees: CurrentValueSubject<RecomendedFees?, Never> { get }
     

@@ -22,11 +22,11 @@ protocol IAppConfigProvider {
     var coinPaprikaApiKey: String { get }
     var btcCoreRpcUrl: String { get }
     var currencyCodes: [String] { get }
-    var testMode: Bool { get }
     var feeRateAdjustedForCurrencyCodes: [String] { get }
     var rafaToken: String { get }
     var rafaUser: String { get }
     var rafaPass: String { get }
     var rafaSocketUrl: String { get }
     var forexUrl: String { get }
+    var network: AppConfigProvider.Network { get }
 }

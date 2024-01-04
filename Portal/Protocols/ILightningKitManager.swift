@@ -13,16 +13,17 @@ protocol ILightningChannels {
     var usableChannels: [ChannelDetails] { get }
     var channelBalance: Decimal { get }
     func openChannel(peer: Peer) async throws
+    func openChannel(peer: Peer, amount: UInt64) async throws
     func cooperativeCloseChannel(id: [UInt8], counterPartyId: [UInt8])
     func forceCloseChannel(id: [UInt8], counterPartyId: [UInt8])
 }
 
 protocol ILightningInvoiceHandler {
     func createInvoice(amount: String, description: String) async -> String?
-    func decode(invoice: String) throws -> Invoice
+    func decode(invoice: String) throws -> Bolt11Invoice
     func pay(invoice: String) async throws -> TransactionRecord
-    func pay(invoice: Invoice) async throws -> TransactionRecord
-    func createInvoice(paymentHash: String, satAmount: UInt64) async -> Invoice?
+    func pay(invoice: Bolt11Invoice) async throws -> TransactionRecord
+    func createInvoice(paymentHash: String, satAmount: UInt64) async -> Bolt11Invoice?
 }
 
 protocol ILightningPeerHandler {
