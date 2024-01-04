@@ -10,10 +10,12 @@ import Foundation
 class AdapterFactory: IAdapterFactory {
     private let appConfigProvider: IAppConfigProvider
     private let ethereumKitManager: EthereumKitManager
+    private let lightningKitManager: ILightningKitManager
 
-    init(appConfigProvider: IAppConfigProvider, ethereumKitManager: EthereumKitManager) {
+    init(appConfigProvider: IAppConfigProvider, ethereumKitManager: EthereumKitManager, lightningKitManager: ILightningKitManager) {
         self.appConfigProvider = appConfigProvider
         self.ethereumKitManager = ethereumKitManager
+        self.lightningKitManager = lightningKitManager
     }
     
     func adapter(wallet: Wallet) -> IAdapter? {
@@ -22,9 +24,11 @@ class AdapterFactory: IAdapterFactory {
             do {
                 return try BitcoinAdapter(wallet: wallet)
             } catch {
-                print(error)
+                print("Error getting Bitcoin adapter: \(error)")
                 return nil
             }
+        case .lightningBitcoin:
+            return LightningAdapter(wallet: wallet, manager: lightningKitManager)
         case .ethereum:
             if let ethKit = try? ethereumKitManager.kit(account: wallet.account) {
                 return EthereumAdapter(evmKit: ethKit, signer: ethereumKitManager.signer)
@@ -46,8 +50,6 @@ class AdapterFactory: IAdapterFactory {
             } else {
                 return nil
             }
-        default:
-            return nil
         }
     }
 }
