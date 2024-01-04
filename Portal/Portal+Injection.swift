@@ -59,7 +59,14 @@ extension SharedContainer {
         let appConfigProvider = Container.configProvider()
         let ethereumKitManager = Container.ethereumKitManager()
         let walletManager = Container.walletManager()
-        let adapterFactory = AdapterFactory(appConfigProvider: appConfigProvider, ethereumKitManager: ethereumKitManager)
+        let lightningKitManager = Container.lightningKitManager()
+        
+        let adapterFactory = AdapterFactory(
+            appConfigProvider: appConfigProvider,
+            ethereumKitManager: ethereumKitManager,
+            lightningKitManager: lightningKitManager
+        )
+        
         return AdapterManager(adapterFactory: adapterFactory, walletManager: walletManager)
     }
     
@@ -67,7 +74,7 @@ extension SharedContainer {
         EthereumKitManager(appConfigProvider: Container.configProvider())
     }
     
-    static let configProvider = Factory<AppConfigProvider>(scope: .singleton) {
+    static let configProvider = Factory<IAppConfigProvider>(scope: .singleton) {
         AppConfigProvider()
     }
     
@@ -83,8 +90,17 @@ extension SharedContainer {
     }
     
     static let lightningKitManager = Factory<ILightningKitManager>(scope: .singleton) {
-        let config = BitcoinCoreRpcConfig(username: "lnd", password: "lnd", port: 18443, host: "localhost")
-        let connectionType: ConnectionType = .regtest(config)
+        let config = Container.configProvider()
+        let connectionType: ConnectionType
+        
+        switch config.network {
+        case .playnet, .mainnet:
+            let config = BitcoinCoreRpcConfig(username: "lnd", password: "lnd", port: 18443, host: "localhost")
+            connectionType = .regtest(config)
+        case .testnet:
+            connectionType = .testnet(.blockStream)
+        }
+        
         return LightningKitManager(connectionType: connectionType)
     }
     
@@ -145,6 +161,10 @@ extension SharedContainer {
     
     static let settings = Factory<IPortalSettings>(scope: .singleton) {
         PortalSettings()
+    }
+    
+    static let pincodeViewModel = Factory<PincodeViewModel>(scope: .shared) {
+        PincodeViewModel()
     }
     
     static let marketData = Factory<IMarketDataRepository>(scope: .singleton) {
