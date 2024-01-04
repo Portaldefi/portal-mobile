@@ -190,10 +190,9 @@ extension MarketDataService: IMarketDataRepository {
 }
 
 extension MarketDataService: WebSocketDelegate {
-    func didReceive(event: WebSocketEvent, client: WebSocket) {
+    func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocket) {
         switch event {
         case .connected:
-            print("websocket is connected")
             do{
                 let dataDict = try JSONSerialization.data(withJSONObject: socketData, options: .prettyPrinted)
                 socket?.write(data: dataDict)
