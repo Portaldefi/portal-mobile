@@ -37,6 +37,24 @@
       }
     },
     {
+      "identity" : "bugsnag-cocoa",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/bugsnag/bugsnag-cocoa",
+      "state" : {
+        "revision" : "49f60b8dc2e94e7ede1114e2c39ba6ac0b576f42",
+        "version" : "6.28.0"
+      }
+    },
+    {
+      "identity" : "bugsnag-cocoa-performance",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/bugsnag/bugsnag-cocoa-performance",
+      "state" : {
+        "revision" : "c048d3efd64f16406a060c2ed1c823699fa7f840",
+        "version" : "1.2.0"
+      }
+    },
+    {
       "identity" : "codescanner",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/cuhte3/CodeScanner",
@@ -181,6 +199,15 @@
       }
     },
     {
+      "identity" : "mixpanel-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mixpanel/mixpanel-swift",
+      "state" : {
+        "branch" : "master",
+        "revision" : "c6336881a077d283db6f6d6e2f242977250230bd"
+      }
+    },
+    {
       "identity" : "objectmapper",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tristanhimmelman/ObjectMapper.git",
@@ -204,7 +231,7 @@
       "location" : "https://github.com/FabricLabs/portal-ui-swift",
       "state" : {
         "branch" : "main",
-        "revision" : "4f2a32b58108cff60c9e226b26d62acc72282dc7"
+        "revision" : "f276199ee93fc322e1132d47384a34cf901e4e6f"
       }
     },
     {
