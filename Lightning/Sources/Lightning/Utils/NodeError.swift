@@ -15,6 +15,7 @@ public enum NodeError: Error {
     case keySeedNotFound
     case alreadyRunning
     case noChainManager
+    case noChainMonitor
     case noRpcInterface
     case channelMaterialNotFound
     case noPayer
@@ -100,6 +101,8 @@ public enum NodeError: Error {
             return string
         case .disconectPeer:
             return "Failed disconnect from peer"
+        case .noChainMonitor:
+            return "ChainMonitor is not init"
         }
     }
 }
