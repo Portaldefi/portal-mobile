@@ -324,25 +324,31 @@ public class Node {
     }
     
     func updateBestBlock() async throws {
-        guard let channelManager = channelManager, let chainMonitor = chainMonitor else {
-            let error = NSError(domain: "Channel manager", code: 1, userInfo: nil)
-            throw error
+        guard let channelManager = channelManager else {
+            throw NodeError.noChannelManager
+        }
+        
+        guard let chainMonitor = chainMonitor else {
+            throw NodeError.noChainMonitor
+        }
+        
+        guard let rpcInterface = rpcInterface else {
+            throw NodeError.noRpcInterface
         }
         
         // get the best block data
-        let best_height = try await rpcInterface?.getChaintipHeight()
-        let best_hash = try await rpcInterface?.getChaintipHash()
-        let best_header = try await rpcInterface?.getBlockHeader(hash: best_hash!.toHexString())
+        let bestHeight = try await rpcInterface.getChaintipHeight()
+        let bestHash = try await rpcInterface.getChaintipHash()
+        let bestHeader = try await rpcInterface.getBlockHeader(hash: bestHash.toHexString())
         
         
-        channelManager.asConfirm().bestBlockUpdated(header: best_header!, height: UInt32(truncating: best_height! as NSNumber))
-        chainMonitor.asConfirm().bestBlockUpdated(header: best_header!, height: UInt32(truncating: best_height! as NSNumber))
+        channelManager.asConfirm().bestBlockUpdated(header: bestHeader, height: UInt32(truncating: bestHeight as NSNumber))
+        chainMonitor.asConfirm().bestBlockUpdated(header: bestHeader, height: UInt32(truncating: bestHeight as NSNumber))
     }
     
     func transactionsConfirmed(txList: [[String:Any]]) throws {
         guard let channelManager = channelManager, let chainMonitor = chainMonitor else {
-            let error = NSError(domain: "Channel manager", code: 1, userInfo: nil)
-            throw error
+            throw NodeError.noChannelManager
         }
         
         var txArray = [(UInt,[UInt8])]()
@@ -367,9 +373,12 @@ public class Node {
     }
     
     func transactionUnconfirmed(txId: [UInt8]) throws {
-        guard let channelManager = channelManager, let chainMonitor = chainMonitor else {
-            let error = NSError(domain: "Channel manager", code: 1, userInfo: nil)
-            throw error
+        guard let channelManager = channelManager else {
+            throw NodeError.noChannelManager
+        }
+        
+        guard let chainMonitor = chainMonitor else {
+            throw NodeError.noChainMonitor
         }
         
         print("Transactions unconfirmed")
@@ -380,14 +389,23 @@ public class Node {
     }
     
     func getTransactionDict(txIdHex: String, tx: [String: Any]) async throws -> [String:Any] {
+        guard let rpcInterface = rpcInterface else {
+            throw NodeError.noRpcInterface
+        }
+        
         var txDict = [String:Any]()
         
-        if let txId = tx["txid"] as? String, let status = tx["status"] as? [String: Any], let blockHeight = status["block_height"] as? Int64, let blockHash = status["block_hash"] as? String {
+        if
+            let txId = tx["txid"] as? String,
+            let status = tx["status"] as? [String: Any],
+            let blockHeight = status["block_height"] as? Int64,
+            let blockHash = status["block_hash"] as? String
+        {
             txDict["txIdHex"] = txId
             txDict["height"] = blockHeight
-            txDict["txRaw"] = try await rpcInterface?.getRawTransaction(txId: txId)
-            txDict["headerHex"] = try await rpcInterface?.getBlockHeader(hash: blockHash)
-            let merkleProof = try await rpcInterface?.getTxMerkleProof(txId: txIdHex)
+            txDict["txRaw"] = try await rpcInterface.getRawTransaction(txId: txId)
+            txDict["headerHex"] = try await rpcInterface.getBlockHeader(hash: blockHash)
+            let merkleProof = try await rpcInterface.getTxMerkleProof(txId: txIdHex)
             txDict["txPos"] = merkleProof
             return txDict
         } else {
