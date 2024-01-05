@@ -9,45 +9,44 @@ import Foundation
 import Combine
 import LightningDevKit
 
-extension Bool {
-    var string: String {
-        self ? "yes" : "no"
-    }
-}
-
-extension StringProtocol {
-    var hexaData: Data { .init(hexa) }
-    var hexaBytes: [UInt8] { .init(hexa) }
-    private var hexa: UnfoldSequence<UInt8, Index> {
-        sequence(state: startIndex) { startIndex in
-            guard startIndex < endIndex else { return nil }
-            let endIndex = index(startIndex, offsetBy: 2, limitedBy: endIndex) ?? endIndex
-            defer { startIndex = endIndex }
-            return UInt8(self[startIndex..<endIndex], radix: 16)
-        }
-    }
-}
-
 public class Node {
-    let fileManager = LightningFileManager()
-    let pendingEventTracker = PendingEventTracker()
     let connectionType: ConnectionType
+    let pendingEventTracker = PendingEventTracker()
+    let feeEstimator = FeeEstimator()
+    let chainFilter = ChainFilter()
     
+    public let fileManager = LightningFileManager()
     public var keysManager: KeysManager?
+    public var channelManager: ChannelManager?
+    public let logger = Logger(logLevels: [.Warn, .Error, .Info, .Debug])
+    public var pendingPayments = [LightningPayment]()
+
     var rpcInterface: RpcChainManager?
     var broadcaster: Broadcaster?
     var channelManagerConstructor: ChannelManagerConstructor?
-    public var channelManager: ChannelManager?
     var persister: Persister?
     var peerManager: PeerManager?
     var tcpPeerHandler: TCPPeerHandler?
-        
-    var cancellables = Set<AnyCancellable>()
-        
-    // We declare this here because `ChannelManagerConstructor` and `ChainMonitor` will share a reference to them
-    public let logger = Logger()
-    let feeEstimator = FeeEstimator()
-    let filter = Filter()
+    var chainMonitor: ChainMonitor?
+    
+    private var cancellables = Set<AnyCancellable>()
+    
+    private var network: Bindings.Network {
+        switch connectionType {
+        case .testnet:
+            return .Testnet
+        case .regtest:
+            return .Regtest
+        }
+    }
+    private var currency: Bindings.Currency {
+        switch connectionType {
+        case .testnet:
+            return .BitcoinTestnet
+        case .regtest:
+            return .Regtest
+        }
+    }
     
     // all user channels
     public var allChannels: [ChannelDetails] {
@@ -112,8 +111,8 @@ public class Node {
         
         // (6) Initialize a ChainMonitor. As the name describes, this is what we will use to watch on-chain activity
         // related to our channels.
-        let chainMonitor = ChainMonitor(
-            chainSource: filter,
+        chainMonitor = ChainMonitor(
+            chainSource: chainFilter,
             broadcaster: broadcaster!,
             logger: logger,
             feeest: feeEstimator,
@@ -136,7 +135,7 @@ public class Node {
             nodeSigner: keysInterface.asNodeSigner(),
             signerProvider: keysInterface.asSignerProvider(),
             feeEstimator: feeEstimator,
-            chainMonitor: chainMonitor,
+            chainMonitor: chainMonitor!,
             txBroadcaster: broadcaster!,
             logger: logger,
             enableP2PGossip: true,
@@ -180,28 +179,30 @@ public class Node {
         
         peerManager = channelManagerConstructor.peerManager
         tcpPeerHandler = channelManagerConstructor.getTCPPeerHandler()
-        
-        let blockchainListener = ChainListener(channelManager: channelManager, chainMonitor: chainMonitor)
-        rpcInterface.registerListener(blockchainListener)
                 
         // (9) Do requisite chain sync to start.
-        
-        let bestBlockHeight = channelManager.currentBestBlock().height()
-        
+                
         if case .regtest = connectionType, let rpcInterface = rpcInterface as? RegtestBlockchainManager {
             // If we're using Bitcoin Core
+            let bestBlockHeight = channelManager.currentBestBlock().height()
+
+            let blockchainListener = ChainListener(channelManager: channelManager, chainMonitor: chainMonitor!)
+            rpcInterface.registerListener(blockchainListener)
+            
             try await rpcInterface.preloadMonitor(anchorHeight: .block(bestBlockHeight))
         }
-        
-        if case .testnet = connectionType, let rpcInterface = rpcInterface as? BlockStreamChainManager {
-            // If we're using BlockStream
-            try await rpcInterface.preloadMonitor(anchorHeight: .block(bestBlockHeight))
-        }
-        
+                
         // we will tell the ChainMonitor to connect blocks up to the latest chain tip.
         
         // (10) Initialize Persister, which is primarily responsible for persisting `ChannelManager`, `Scorer`, and `NetworkGraph` to disk.
         persister = Persister(eventTracker: pendingEventTracker)
+        
+        if case .testnet = connectionType, let _ = rpcInterface as? BlockStreamChainManager {
+            // If we're using BlockStream
+            try? await sync()
+        }
+        
+        channelManagerConstructor.chainSyncCompleted(persister: persister!)
         
         let isMonitoring = await rpcInterface.isMonitoring()
 
@@ -210,9 +211,190 @@ public class Node {
         } else {
             print("Monitor already running")
         }
-     
+             
         print("LDK is Running with key: \(channelManager.getOurNodeId().toHexString())")
     }
+    
+    /// unconfirm or confirm all the transactions that can be reorg and confirm all transation and outputs
+    /// that come from the Filter object.
+    func sync() async throws {
+        guard let channelManager = channelManager else {
+            throw NodeError.noChannelManager
+        }
+        
+        guard let rpcInterface = rpcInterface else {
+            throw NodeError.noRpcInterface
+        }
+        
+        guard let chainMonitor = chainMonitor else {
+            throw NodeError.noChainMonitor
+        }
+        
+        let bestBlockHeight = channelManager.currentBestBlock().height()
+        let chainTip = try await rpcInterface.getChaintipHeight()
+
+        guard chainTip > bestBlockHeight else { return }
+        
+        var reorgTxIds = [[UInt8]]()
+        var confirmedTxs = [[String:Any]]()
+        
+        /// get all txIds that could be reorginized
+        
+        for tx in channelManager.asConfirm().getRelevantTxids() {
+            reorgTxIds.append(tx.0)
+        }
+        
+        for tx in chainMonitor.asConfirm().getRelevantTxids() {
+            reorgTxIds.append(tx.0)
+        }
+        
+        /// unconfirm any transactions that that have been reorginized or add them to the confirmed list
+        
+        if !reorgTxIds.isEmpty {
+            for txId in reorgTxIds {
+                let txIdHex = Utils.bytesToHex32Reversed(bytes: Utils.array_to_tuple32(array: txId))
+                let tx = try await rpcInterface.getTransactionWithId(id: txIdHex)
+                
+                if let status = tx["status"] as? [String: Any], let confirmed = status["confirmed"] as? Bool  {
+                    if confirmed {
+                        let txDict = try await getTransactionDict(txIdHex: txIdHex, tx: tx)
+                        confirmedTxs.append(txDict)
+                    } else {
+                        try transactionUnconfirmed(txId:txId)
+                    }
+                }
+            }
+        }
+        
+        /// add the txIds from the filter object.
+        
+        for tx in chainFilter.watchedTransactions {
+            guard let txId = tx.0 else { continue }
+            let txIdHex = Utils.bytesToHex32Reversed(bytes: Utils.array_to_tuple32(array: txId))
+            let tx = try? await rpcInterface.getTransactionWithId(id: txIdHex)
+            if let tx = tx, let status = tx["status"] as? [String: Any], let confirmed = status["confirmed"] as? Bool, confirmed {
+                if(!confirmedTxs.contains(where: { $0["txIdHex"] as! String == txIdHex })) {
+                    let txDict = try await getTransactionDict(txIdHex: txIdHex, tx: tx)
+                    confirmedTxs.append(txDict)
+                }
+            }
+        }
+        
+        /// add txIds that spent the outputs
+        
+//        for output in chainFilter.watchedOutputs {
+//            let outpoint = output.getOutpoint()
+//            let txId = outpoint.getTxid()
+//            let txIdHex = Utils.bytesToHex32Reversed(bytes: Utils.array_to_tuple32(array: txId!))
+//            let outputIndex = outpoint.getIndex()
+//            
+//                if let res = btc.outSpend(txId: txIdHex, index: outputIndex) {
+//                    if res.spent {
+//                        let tx = try? await rpcInterface?.getTransactionWithId(id: txIdHex)
+//                        if let tx = tx, let status = tx["status"] as? [String: Any], let confirmed = status["confirmed"] as? Bool, confirmed {
+//                            if(!confirmedTxs.contains(where: { $0["txIdHex"] as! String == res.txid! })) {
+//                                let txDict = getTransactionDict(txIdHex: res.txid!, tx: tx)
+//                                confirmedTxs.append(txDict)
+//                            }
+//                        }
+//                    }
+//                }
+//        }
+        
+        /// group txIds by blockheight
+        
+        let groupByBlockHeight = Dictionary(grouping: confirmedTxs) { txDict in
+            txDict["height"] as! Int64
+        }
+        
+        /// confirm txids
+        
+        for (_, txList) in groupByBlockHeight.sorted(by: { $0.key < $1.key }) {
+            
+            // sort txIds by output order
+            let sortedTxList = txList.sorted(by: {
+                return ($0["txPos"] as! Int32) < ($1["txPos"] as! Int32)
+            })
+            
+            try transactionsConfirmed(txList: sortedTxList)
+        }
+        
+        // sync the ChannelManager and ChainManager
+        try await updateBestBlock()
+    }
+    
+    func updateBestBlock() async throws {
+        guard let channelManager = channelManager, let chainMonitor = chainMonitor else {
+            let error = NSError(domain: "Channel manager", code: 1, userInfo: nil)
+            throw error
+        }
+        
+        // get the best block data
+        let best_height = try await rpcInterface?.getChaintipHeight()
+        let best_hash = try await rpcInterface?.getChaintipHash()
+        let best_header = try await rpcInterface?.getBlockHeader(hash: best_hash!.toHexString())
+        
+        
+        channelManager.asConfirm().bestBlockUpdated(header: best_header!, height: UInt32(truncating: best_height! as NSNumber))
+        chainMonitor.asConfirm().bestBlockUpdated(header: best_header!, height: UInt32(truncating: best_height! as NSNumber))
+    }
+    
+    func transactionsConfirmed(txList: [[String:Any]]) throws {
+        guard let channelManager = channelManager, let chainMonitor = chainMonitor else {
+            let error = NSError(domain: "Channel manager", code: 1, userInfo: nil)
+            throw error
+        }
+        
+        var txArray = [(UInt,[UInt8])]()
+        
+        for tx in txList {
+            let txPos = UInt(tx["txPos"] as! Int32)
+            let txRaw = [UInt8](tx["txRaw"] as! Data)
+            txArray.append((txPos,txRaw))
+        }
+        
+        let headerHex = txList[0]["headerHex"] as! [UInt8]
+        let height = UInt32(truncating: txList[0]["height"] as! NSNumber)
+        
+        // confirm transaction for bothe the ChannelMonitor and ChainMonitor
+        
+        print("Confirming txs")
+        
+        channelManager.asConfirm().transactionsConfirmed(header: headerHex, txdata: txArray, height: height)
+        chainMonitor.asConfirm().transactionsConfirmed(header: headerHex, txdata: txArray, height: height)
+        
+        print("Transactions confirmed")
+    }
+    
+    func transactionUnconfirmed(txId: [UInt8]) throws {
+        guard let channelManager = channelManager, let chainMonitor = chainMonitor else {
+            let error = NSError(domain: "Channel manager", code: 1, userInfo: nil)
+            throw error
+        }
+        
+        print("Transactions unconfirmed")
+        
+        // set transaction as unconfirmed for both ChannelManger and ChainManager
+        channelManager.asConfirm().transactionUnconfirmed(txid: txId)
+        chainMonitor.asConfirm().transactionUnconfirmed(txid: txId)
+    }
+    
+    func getTransactionDict(txIdHex: String, tx: [String: Any]) async throws -> [String:Any] {
+        var txDict = [String:Any]()
+        
+        if let txId = tx["txid"] as? String, let status = tx["status"] as? [String: Any], let blockHeight = status["block_height"] as? Int64, let blockHash = status["block_hash"] as? String {
+            txDict["txIdHex"] = txId
+            txDict["height"] = blockHeight
+            txDict["txRaw"] = try await rpcInterface?.getRawTransaction(txId: txId)
+            txDict["headerHex"] = try await rpcInterface?.getBlockHeader(hash: blockHash)
+            let merkleProof = try await rpcInterface?.getTxMerkleProof(txId: txIdHex)
+            txDict["txPos"] = merkleProof
+            return txDict
+        } else {
+            throw NodeError.noPayer
+        }
+    }
+
     
     //MARK: - Connect to peer
     public func connectPeer(pubKey: String, hostname: String, port: UInt16) async throws {
@@ -228,6 +410,7 @@ public class Node {
         
         if !connected {
             print("failed to connect")
+            throw NodeError.connectPeer
         } else {
             let nanoTime = end.uptimeNanoseconds - start.uptimeNanoseconds
             let timeInterval = Double(nanoTime)/1_000_000_000
@@ -290,10 +473,10 @@ public class Node {
                 
                 let reason = channelClosedEvent.getReason()
                 
-                if let _ = reason.getValueAsCounterpartyForceClosed() {
-                    throw NodeError.Channels.forceClosed
-                } else if let _ = reason.getValueAsProcessingError() {
-                    throw NodeError.Channels.closedWithError
+                if let value = reason.getValueAsCounterpartyForceClosed() {
+                    throw NodeError.error(value.getPeerMsg().getA())
+                } else if let value = reason.getValueAsProcessingError() {
+                    throw NodeError.error(value.getErr())
                 } else {
                     throw NodeError.Channels.unknown
                 }
@@ -353,7 +536,7 @@ public class Node {
             channelmanager: channelManager,
             nodeSigner: keyInterface.asNodeSigner(),
             logger: logger,
-            network: .Regtest,
+            network: currency,
             amtMsat: mSatAmount,
             description: description,
             invoiceExpiryDeltaSecs: 86400,
@@ -387,7 +570,7 @@ public class Node {
             channelmanager: channelManager,
             nodeSigner: keyInterface.asNodeSigner(),
             logger: logger,
-            network: .Regtest,
+            network: currency,
             amtMsat: mSatAmount,
             description: String(),
             durationSinceEpoch: UInt64(Date().timeIntervalSince1970),
@@ -416,7 +599,7 @@ public class Node {
         
         if result.isOk() {
             guard let event = await pendingEventTracker.await(events: [.paymentFailed, .paymentSent], timeout: 5) else {
-                throw NodeError.error("Not received paymentFailed or paymentSent event. Timeout error")
+                throw NodeError.error("Payment path failed. Timeout error")
             }
                         
             switch event.getValueType() {
@@ -425,7 +608,6 @@ public class Node {
                     throw NodeError.error("getValueAsPaymentSent is nil")
                 }
                 
-                //WARNING
                 let paymentID = paymentSent.getPaymentId()!.toHexString()
                 let preimage = paymentSent.getPaymentPreimage().toHexString()
                 let fee = (paymentSent.getFeePaidMsat() ?? 0)/1000
@@ -440,24 +622,52 @@ public class Node {
                     timestamp: timestamp,
                     fee: fee
                 )
-                                
-                switch fileManager.persist(payment: payment) {
-                case .success:
-                    print("payment \(paymentID) persisted")
-                case .failure(let error):
-                    print("Unable to persist payment \(paymentID): \(error.localizedDescription)")
-                }
                 
+                pendingPayments.append(payment)
+                                                
                 return payment
             case .PaymentFailed:
                 guard let paymentFailed = event.getValueAsPaymentFailed() else {
                     throw NodeError.error("getValueAsPaymentFailed is nil")
                 }
                 
-                let errorMessage = "Payment failed:\nid: \(paymentFailed.getPaymentId().toHexString())\nhash: \(paymentFailed.getPaymentHash().toHexString())"
-                print(errorMessage)
-                
-                throw NodeError.error(errorMessage)
+                if let reason = paymentFailed.getReason() {
+                    switch reason {
+                    case .PaymentExpired:
+                        let errorMessage = "Payment failed:\n Invoice expired"
+                        print(errorMessage)
+                        throw NodeError.error(errorMessage)
+                    case .RecipientRejected:
+                        let errorMessage = "Payment failed:\n Recipient rejected"
+                        print(errorMessage)
+                        throw NodeError.error(errorMessage)
+                    case .RouteNotFound:
+                        let errorMessage = "Payment failed:\n Route not found"
+                        print(errorMessage)
+                        throw NodeError.error(errorMessage)
+                    case .UnexpectedError:
+                        let errorMessage = "Payment failed:\n Unexpected error"
+                        print(errorMessage)
+                        throw NodeError.error(errorMessage)
+                    case .RetriesExhausted:
+                        let errorMessage = "Payment failed:\n Retries exhausted"
+                        print(errorMessage)
+                        throw NodeError.error(errorMessage)
+                    case .UserAbandoned:
+                        let errorMessage = "Payment failed:\n User abandoned"
+                        print(errorMessage)
+                        throw NodeError.error(errorMessage)
+                    @unknown default:
+                        let errorMessage = "Payment failed:\n Unknown error"
+                        print(errorMessage)
+                        throw NodeError.error(errorMessage)
+                    }
+                } else {
+                    let errorMessage = "Payment failed:\nid: \(paymentFailed.getPaymentId().toHexString())\nhash: \(paymentFailed.getPaymentHash().toHexString())"
+                    print(errorMessage)
+                    
+                    throw NodeError.error(errorMessage)
+                }
             default:
                 print(event.getValueType())
                 throw NodeError.Channels.wrongLDKEvent
@@ -497,6 +707,7 @@ public class Node {
     }
     
     public func getFundingTransactionScriptPubKey(outputScript: [UInt8]) async -> String? {
+        print("output script: \(outputScript)")
         guard let rpcInterface = rpcInterface,
               let decodedScript = try? await rpcInterface.decodeScript(script: outputScript),
               let address = decodedScript["address"] as? String else {
@@ -696,7 +907,7 @@ extension Node {
 // MARK: Publishers
 extension Node {
     public var connectedPeers: AnyPublisher<[String], Never> {
-        Timer.publish(every: 1, on: .main, in: .default)
+        Timer.publish(every: 5, on: .main, in: .default)
             .autoconnect()
             .prepend(Date())
             .filter { [weak self] _ in self?.peerManager != nil }
@@ -721,12 +932,17 @@ extension Node {
             .sink(receiveCompletion: { error in
                 print("Error subscribing to blockchain monitor")
             }, receiveValue: { [unowned self] _ in
-                if let channelManagerConstructor = channelManagerConstructor, let persister = persister {
-                    channelManagerConstructor.chainSyncCompleted(persister: persister)
-                    let bestBLockHeight = channelManagerConstructor.channelManager.currentBestBlock().height()
-                    print("LDK CHANNEL MANAGER BEST BLOCK: \(bestBLockHeight)\n")
-                } else {
-                    print("Chain Tip Reconcilation Failed.")
+                Task {
+                    if case .testnet = connectionType {
+                        try? await sync()
+                    }
+                    
+//                    if let channelManagerConstructor = channelManagerConstructor, let persister = persister {
+//                        let bestBLockHeight = channelManagerConstructor.channelManager.currentBestBlock().height()
+//                        print("LDK CHANNEL MANAGER BEST BLOCK: \(bestBLockHeight)\n")
+//                    } else {
+//                        print("Chain Tip Reconcilation Failed.")
+//                    }
                 }
             })
             .store(in: &cancellables)
@@ -734,17 +950,17 @@ extension Node {
     
     private func initNetworkGraph() -> NetworkGraph {
         guard let serializedGraph = fileManager.getSerializedNetworkGraph() else {
-            return NetworkGraph(network: .Regtest, logger: logger)
+            return NetworkGraph(network: network, logger: logger)
         }
         
         let read = NetworkGraph.read(ser: serializedGraph, arg: logger)
         
         guard read.isOk() else {
-            return NetworkGraph(network: .Regtest, logger: logger)
+            return NetworkGraph(network: network, logger: logger)
         }
         
         guard let networkGraph = read.getValue() else {
-            return NetworkGraph(network: .Regtest, logger: logger)
+            return NetworkGraph(network: network, logger: logger)
         }
         
         return networkGraph
@@ -783,7 +999,7 @@ extension Node {
                     channelManagerSerialized: channelManager,
                     channelMonitorsSerialized: channelMonitors,
                     networkGraph: NetworkGraphArgument.instance(networkGraphResult.getValue()!),
-                    filter: filter,
+                    filter: chainFilter,
                     params: params
                 )
             } catch {
@@ -795,16 +1011,7 @@ extension Node {
     }
     
     private func initializeChannelMaterialAndNetworkGraph(currentTipHash: [UInt8], currentTipHeight: UInt32, networkGraph: NetworkGraph, params: ChannelManagerConstructionParameters) async throws -> ChannelManagerConstructor {
-        let network: Bindings.Network
-        
-        switch connectionType {
-        case .testnet:
-            network = .Testnet
-        default:
-            network = .Regtest
-        }
-                        
-        return ChannelManagerConstructor(
+        ChannelManagerConstructor(
             network: network,
             currentBlockchainTipHash: currentTipHash,
             currentBlockchainTipHeight: currentTipHeight,
