@@ -26,6 +26,7 @@ import Factory
             Publishers.Sequence(sequence: items)
                 .flatMap { $0.balanceUpdated }
                 .receive(on: RunLoop.main)
+                .print("Update balance values")
                 .sink { [unowned self] _ in
                     self.updateValues()
                 }
@@ -43,6 +44,8 @@ import Factory
     }
     public var goToReceive = false
     public var goToSettings = false
+    public var goToLightningChannelSetup = false
+    public var goToLightningChannelAwaits = false
     
     private let accountManager: IAccountManager
     private let walletManager: IWalletManager
@@ -55,6 +58,22 @@ import Factory
         
     var accountDataIsBackedUp: Bool {
         localStorage.isAccountBackedUp
+    }
+    
+    var hasUsableLightningChannel: Bool {
+        guard let adapter = adapterManager.adapter(for: .lightningBitcoin()) as? ILightningChannels else {
+            return false
+        }
+        
+        return !adapter.usableChannels.isEmpty
+    }
+    
+    var hasLightningChannel: Bool {
+        guard let adapter = adapterManager.adapter(for: .lightningBitcoin()) as? ILightningChannels else {
+            return false
+        }
+        
+        return adapter.channelBalance > 0
     }
             
     init(
@@ -74,9 +93,9 @@ import Factory
         
         subscribeForUpdates()
         
-        if let account = accountManager.activeAccount {
-            accountName = account.name
-        }
+//        if let account = accountManager.activeAccount {
+//            accountName = account.name
+//        }
     }
         
     private func subscribeForUpdates() {
@@ -93,7 +112,7 @@ import Factory
             .onMarketDataUpdate
             .receive(on: RunLoop.main)
             .sink { [unowned self] _ in
-                guard !self.goToSend && !self.goToReceive && !self.goToSettings else { return }
+                guard !self.goToSend && !self.goToReceive && !self.goToSettings && !self.goToLightningChannelSetup else { return }
                 self.updateValue()
             }
             .store(in: &subscriptions)
@@ -187,7 +206,11 @@ import Factory
     }
     
     private func updateValue() {
-        let value = items.map{ convertToBtcBalance(item: $0) * marketData.lastSeenBtcPrice * fiatCurrency.rate }.reduce(0, { $0 + $1 }).double.usdFormatted()
+        let value = items
+            .map{ convertToBtcBalance(item: $0) * marketData.lastSeenBtcPrice * fiatCurrency.rate }
+            .reduce(0, { $0 + $1 })
+            .double
+            .formattedString(.fiat(fiatCurrency))
         
         if value != "NaN" && totalValue != value {
             DispatchQueue.main.async {
