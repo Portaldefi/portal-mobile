@@ -12,31 +12,40 @@ import LightningDevKit
 final class LightningAdapter {
     private let coinRate: Decimal = pow(10, 8)
     private let manager: ILightningKitManager
+    private let updateTimer = RepeatingTimer(timeInterval: 5)
     private let stateUpdatedSubject = PassthroughSubject<Void, Never>()
     private let balanceUpdatedSubject = PassthroughSubject<Void, Never>()
+    private var _channelBalance: Decimal = 0
     
     private var adapterState: AdapterState = .synced
     
     init(wallet: Wallet, manager: ILightningKitManager) {
         self.manager = manager
+        
+        updateTimer.eventHandler = { [unowned self] in
+            self.syncData()
+        }
+    }
+    
+    private func syncData() {
+        guard _channelBalance != channelBalance else { return }
+        _channelBalance = channelBalance
+        balanceUpdatedSubject.send()
     }
 }
 
 extension LightningAdapter: IAdapter {
     func start() {
+        updateTimer.resume()
+        
         Task {
             try await manager.start()
-        }
-        
-        Thread.sleep(forTimeInterval: 2)
-        
-        if !manager.usableChannels.isEmpty {
-            balanceUpdatedSubject.send(())
         }
     }
     
     func stop() {
         //TODO: - implement stop
+        updateTimer.suspend()
     }
     
     func refresh() {
