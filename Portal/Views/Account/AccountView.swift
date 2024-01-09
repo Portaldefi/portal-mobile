@@ -51,9 +51,22 @@ struct AccountView: View {
                                     .padding(.trailing, 10)
                                     .contentShape(Rectangle())
                                     .onTapGesture {
-                                        navigation.push(.assetDetails(item: item))
-                                        withAnimation {
-                                            viewState.hideTabBar = true
+                                        if item.coin == .lightningBitcoin() {
+                                            if viewModel.hasUsableLightningChannel {
+                                                navigation.push(.assetDetails(item: item))
+                                                withAnimation {
+                                                    viewState.hideTabBar = true
+                                                }
+                                            } else if viewModel.hasLightningChannel {
+                                                viewModel.goToLightningChannelAwaits.toggle()
+                                            } else {
+                                                viewModel.goToLightningChannelSetup.toggle()
+                                            }
+                                        } else {
+                                            navigation.push(.assetDetails(item: item))
+                                            withAnimation {
+                                                viewState.hideTabBar = true
+                                            }
                                         }
                                     }
                                 Asset.chevronRightIcon
@@ -84,6 +97,14 @@ struct AccountView: View {
             let vm = SendViewViewModel(items: viewModel.items)
             SendRootView(withAssetPicker: true).environment(vm).lockableView()
         }
+        .sheet(isPresented: $viewModel.goToLightningChannelSetup, onDismiss: {
+            
+        }) {
+            CreateChannelRootView(channelIsFunded: viewModel.hasLightningChannel).lockableView()
+        }
+        .sheet(isPresented: $viewModel.goToLightningChannelAwaits) {
+            AwaitsFundingChannelView().lockableView()
+        }
         .fullScreenCover(isPresented: $viewState.showBackUpFlow) {
             AccountBackupRootView().environment(viewState).lockableView()
         }
@@ -98,7 +119,7 @@ struct AccountView: View {
                 HStack {
                     RoundedRectangle(cornerRadius: 4)
                         .frame(width: 16, height: 16)
-                    Text(viewState.isReachable ? "All systems ok!" : "No internet connection")
+                    Text(viewState.isReachable ? "Online" : "No internet connection")
                         .font(.Main.fixed(.monoRegular, size: 14))
 
                 }
@@ -158,6 +179,7 @@ struct AccountView: View {
                         iconSize: 26
                     )
                 ),
+                color: .white,
                 enabled: true
             ) {
                 viewModel.goToReceive.toggle()
