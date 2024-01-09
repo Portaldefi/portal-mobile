@@ -42,9 +42,9 @@ class SwapParticipant: BaseClass {
             print("\(id) payed invoice result: \(result.id)")
         }
                 
-        let network = SwapSdkConfig.Network(networkProtocol: .http, hostname: "localhost", port: 61280)
+        let network = SwapSdkConfig.Network(networkProtocol: .unencrypted, hostname: "localhost", port: 61280)
                 
-        guard let filePath = Bundle(for: EvmLightningSwapPlaynetTest.self).path(forResource: "contracts", ofType: "json") else {
+        guard let filePath = Bundle(for: EvmLightningSwapPlaynetTest.self).path(forResource: "playnetContract", ofType: "json") else {
             throw NSError(domain: "FileNotFound", code: 404, userInfo: nil)
         }
 
