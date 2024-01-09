@@ -82,10 +82,14 @@ class LightningKitManager: ILightningKitManager {
                 }
             }
             
+            var connectionAttempts = 0
+            
             activePeersPublisher.sink { [unowned self] peerIDs in
                 guard let peer = peer else { return }
-                                
-                if !peerIDs.contains(peer.peerPubKey) {
+                
+                if connectionAttempts < 5, !peerIDs.contains(peer.peerPubKey) {
+                    connectionAttempts+=1
+
                     Task {
                         try? await instance.connectPeer(
                             pubKey: peer.peerPubKey,
@@ -94,6 +98,12 @@ class LightningKitManager: ILightningKitManager {
                         )
                         try? await Task.sleep(nanoseconds: 1_000_000_000)
                     }
+                } else if peerIDs.contains(peer.peerPubKey)  {
+                    connectionAttempts = 0
+                } else {
+                    guard connectionAttempts == 5 else { return }
+                    print("Cannot connect to peer: \(peer.peerPubKey), \(connectionAttempts) attemps failed")
+                    connectionAttempts+=1
                 }
             }
             .store(in: &subscriptions)
