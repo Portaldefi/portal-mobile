@@ -23,6 +23,7 @@ class WalletItemViewModel: ObservableObject {
     @Published var fiatCurrency = FiatCurrency(code: "USD")
     
     @Injected(Container.settings) private var settings
+    @Injected(Container.lightningKitManager) private(set) var lightningKit
     
     var value: Decimal {
         switch coin.type {
