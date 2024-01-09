@@ -60,12 +60,20 @@ struct SendSelectAssetView: View {
                                         .padding(.trailing, 14)
                                         .contentShape(Rectangle())
                                         .onTapGesture {
-                                            guard item.viewModel.balance > 0 else {
-                                                notEnoughFundsMessage = "\(item.viewModel.coin.code) on \(item.viewModel.coin.description)"
-                                                return notEnoughFunds.toggle()
+                                            if item.coin == .lightningBitcoin(), !viewModel.hasUsableChannels {
+                                                if viewModel.hasChannelBalance {
+                                                    
+                                                } else {
+                                                    
+                                                }
+                                            } else {
+                                                guard item.viewModel.balance > 0 else {
+                                                    notEnoughFundsMessage = "\(item.viewModel.coin.code) on \(item.viewModel.coin.description)"
+                                                    return notEnoughFunds.toggle()
+                                                }
+                                                viewModel.coin = item.viewModel.coin
+                                                navigation.push(.sendSetRecipient(viewModel: viewModel))
                                             }
-                                            viewModel.coin = item.viewModel.coin
-                                            navigation.push(.sendSetRecipient(viewModel: viewModel))
                                         }
                                     Asset.chevronRightIcon
                                         .foregroundColor(Palette.grayScale4A)
