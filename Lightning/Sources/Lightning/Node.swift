@@ -437,7 +437,7 @@ public class Node {
     }
     //MARK: - Disconnect from peer
     public func disconnectPeer(pubKey: String) throws {
-        print("Connecting to peer \(pubKey)")
+        print("Disconnect peer \(pubKey)")
         
         guard let peerManager = peerManager else {
             throw NodeError.disconectPeer
