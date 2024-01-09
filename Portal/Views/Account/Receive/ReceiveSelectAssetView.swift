@@ -47,8 +47,16 @@ struct ReceiveSelectAssetView: View {
                                         .padding(.trailing, 14)
                                         .contentShape(Rectangle())
                                         .onTapGesture {
-                                            viewModel.selectedItem = item
-                                            navigation.push(.receiveGenerateQRCode(viewModel: viewModel))
+                                            if item.coin == .lightningBitcoin(), !viewModel.hasUsableChannels {
+                                                if viewModel.hasChannelBalance {
+                                                    
+                                                } else {
+                                                    
+                                                }
+                                            } else {
+                                                viewModel.selectedItem = item
+                                                navigation.push(.receiveGenerateQRCode(viewModel: viewModel))
+                                            }
                                         }
                                                                         
                                     Asset.chevronRightIcon
