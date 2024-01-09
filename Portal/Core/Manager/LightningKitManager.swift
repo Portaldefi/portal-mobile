@@ -344,21 +344,15 @@ class LightningKitManager: ILightningKitManager {
                 throw ServiceError.msg("unknown error")
             }
         }
-                
-        let pendingPayments = manager.listRecentPayments().filter { payment in
-            let value = payment.getValueType()
-            return value == .Pending
-        }
-                
-        let paymentWithSameAmount = pendingPayments.first { payment in
-            let value = payment.getValueAsPending()!
-            print("Invoice amount: \(String(describing: invoice.amountMilliSatoshis()))")
-            print("Pending payment amount: \(value.getTotalMsat())")
-            return value.getTotalMsat() == invoice.amountMilliSatoshis()
-        }
+                                
+        let recentPayment = manager.listRecentPayments()
+            .filter { $0.getValueType() == .Pending }
+            .first {
+                $0.getValueAsPending()!.getPaymentHash() == invoice.paymentHash()
+            }
         
-        guard let pendingPayment = paymentWithSameAmount else {
-            throw ServiceError.msg("Cannot find a pending payment with same ammount")
+        guard let pendingPayment = recentPayment else {
+            throw ServiceError.msg("Cannot find a pending payment")
         }
         
         let type = pendingPayment.getValueAsPending()!
