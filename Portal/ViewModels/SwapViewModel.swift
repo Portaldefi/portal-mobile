@@ -20,9 +20,16 @@ import Factory
     
     var base: Coin = .lightningBitcoin()
     var quote: Coin = .ethereum()
-    
-    private var isTestNet: Bool {
-        config.network == .testnet
+        
+    private var contractFileName: String {
+        switch config.network {
+        case .playnet:
+            return "playnetContract"
+        case .testnet:
+            return "sepoliaContract"
+        case .mainnet:
+            fatalError("Not impemented")
+        }
     }
     
     private let swapTimeoutTimer = RepeatingTimer(timeInterval: 1)
@@ -161,9 +168,12 @@ import Factory
                 
         do {
             try setupSDK(ethPrivKey: privKey, lightningClient: lightningKitManager)
-            _ = sdk?.start()
+            
+            sdk?.start().catch({ error in
+                self.swapState = .swapError("SDK start error: \(error)")
+            })
         } catch {
-            swapState = .swapError("swap sdk, error: \(error)")
+            swapState = .swapError("SDK setup error: \(error)")
         }
         
         self.setupSubscriptions()
@@ -177,7 +187,9 @@ import Factory
             }
             .store(in: &subscriptions)
         
-        sdk?.on("swap.received", { [unowned self] _ in
+        guard let sdk = sdk else { return }
+        
+        sdk.on("swap.received", { [unowned self] _ in
             DispatchQueue.main.async {
                 self.swapState = .orderMatched
             }
@@ -186,21 +198,21 @@ import Factory
             }
         })
         
-        sdk?.on("swap.completed", { [unowned self] _ in
+        sdk.on("swap.completed", { [unowned self] _ in
             DispatchQueue.main.async {
                 self.swapState = .swapSucceed
             }
         })
         
-        sdk?.on("error", { [unowned self] args in
+        sdk.on("error", { [unowned self] args in
             DispatchQueue.main.async {
-                self.swapState = .swapError("Swap error: \(args.first!)")
+                self.swapState = .swapError("Swap error: \(args.first ?? "Unknown")")
             }
         })
     }
     
     func setupSDK(ethPrivKey: String, lightningClient: ILightningClient) throws {
-        guard let filePath = Bundle.main.path(forResource: "contracts", ofType: "json") else {
+        guard let filePath = Bundle.main.path(forResource: contractFileName, ofType: "json") else {
             throw NSError(domain: "FileNotFound", code: 404, userInfo: nil)
         }
 
@@ -217,17 +229,9 @@ import Factory
         let ethereum: SwapSdkConfig.Blockchains.Ethereum
         let network: SwapSdkConfig.Network
         
-        if isTestNet {
-            network = SwapSdkConfig.Network(networkProtocol: .https, hostname: "node.playnet.portaldefi.zone", port: 1337)
-
-            ethereum = SwapSdkConfig.Blockchains.Ethereum(
-                url: "wss://sepolia.gateway.tenderly.co",
-                chainId: "0xaa36a7",
-                contracts: contracts,
-                privKey: ethPrivKey
-            )
-        } else {
-            network = SwapSdkConfig.Network(networkProtocol: .http, hostname: "localhost", port: 61280)
+        switch config.network {
+        case .playnet:
+            network = SwapSdkConfig.Network(networkProtocol: .unencrypted, hostname: "localhost", port: 61280)
 
             ethereum = SwapSdkConfig.Blockchains.Ethereum(
                 url: "ws://localhost:8545",
@@ -235,6 +239,17 @@ import Factory
                 contracts: contracts,
                 privKey: ethPrivKey
             )
+        case .testnet:
+            network = SwapSdkConfig.Network(networkProtocol: .encrypted, hostname: "node.playnet.portaldefi.zone", port: 1337)
+
+            ethereum = SwapSdkConfig.Blockchains.Ethereum(
+                url: "wss://sepolia.gateway.tenderly.co",
+                chainId: "0xaa36a7",
+                contracts: contracts,
+                privKey: ethPrivKey
+            )
+        case .mainnet:
+            fatalError("Not implemented")
         }
         
         let lightning = SwapSdkConfig.Blockchains.Lightning(client: lightningClient)
