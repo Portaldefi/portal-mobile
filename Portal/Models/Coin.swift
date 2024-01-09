@@ -9,8 +9,11 @@
 import Foundation
 import SwiftUI
 import PortalUI
+import Factory
 
 struct Coin: Identifiable {
+    @Injected(Container.configProvider) var config
+    
     enum CoinType: Equatable {
         case bitcoin
         case lightningBitcoin
@@ -28,22 +31,37 @@ struct Coin: Identifiable {
     var network: String {
         switch type {
         case .bitcoin:
-            return "Bitcoin"
+            switch config.network {
+            case .mainnet:
+                return "Bitcoin"
+            case .testnet:
+                return "Testnet"
+            case .playnet:
+                return "Regtest"
+            }
         case .lightningBitcoin:
-            return "Lightning"
+            switch config.network {
+            case .mainnet:
+                return "Lightning"
+            case .testnet:
+                return "Lightning"
+            case .playnet:
+                return "Lightning"
+            }
         case .ethereum, .erc20:
-            return "Ethereum"
+            switch config.network {
+            case .mainnet:
+                return "Ethereum"
+            case .testnet:
+                return "Sepolia"
+            case .playnet:
+                return "Developer"
+            }
         }
     }
     
     var unit: String {
         code
-//        switch type {
-//        case .bitcoin, .ethereum, .erc20:
-//            return code
-//        case .lightningBitcoin:
-//            return "sats"
-//        }
     }
     
     var description: String {
