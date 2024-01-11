@@ -37,11 +37,11 @@ class EthereumAdapter {
         
         switch fullTransaction.decoration {
         case is IncomingDecoration:
-            type = .received
+            type = .received(coin: .ethereum())
         case is OutgoingDecoration:
-            type = .sent
+            type = .sent(coin: .ethereum())
         default:
-            type = .sent
+            type = .sent(coin: .ethereum())
         }
         
         var amount: Decimal?

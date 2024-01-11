@@ -3,6 +3,7 @@ import Lightning
 import BitcoinDevKit
 import EvmKit
 import LightningDevKit
+import PortalSwapSDK
 
 enum TxSource {
     case btcOnChain, ethOnChain, lightning
@@ -11,7 +12,6 @@ enum TxSource {
 import Factory
 
 struct TransactionRecord: Identifiable {
-    let coin: Coin
     let id: String
     let type: TxType
     let timestamp: Int?
@@ -40,30 +40,29 @@ struct TransactionRecord: Identifiable {
     
     init(transaction: BitcoinDevKit.TransactionDetails, userData: TxUserData) {
         self.id = transaction.txid
-        self.coin = .bitcoin()
         
         let sent = transaction.sent
         let received = transaction.received
         
         if sent > 0, received > 0 {
-            self.type = sent > received ? .sent : .received
+            self.type = sent > received ? .sent(coin: .bitcoin()) : .received(coin: .bitcoin())
             
             switch type {
             case .sent:
                 self.amount = Decimal(sent - received)
             case .received:
                 self.amount = Decimal(received - sent)                
-            case .swapped, .unknown:
+            case .swap, .unknown:
                 fatalError("should not happen")
             }
         } else if sent == 0, received > 0 {
-            self.type = .received
+            self.type = .received(coin: .bitcoin())
             self.amount = Decimal(transaction.received)
         } else if sent > 0, received == 0 {
-            self.type = .sent
+            self.type = .sent(coin: .bitcoin())
             self.amount = Decimal(transaction.sent)
         } else {
-            self.type = .sent
+            self.type = .sent(coin: .bitcoin())
             self.amount = 0
         }
         
@@ -117,7 +116,6 @@ struct TransactionRecord: Identifiable {
     
     init(coin: Coin, transaction: EvmKit.Transaction, amount: Decimal?, type: TxType, userData: TxUserData) {
         self.id = transaction.hash.hs.hexString
-        self.coin = coin
         self.type = type
         self.amount = amount
         self.to = transaction.to?.hex
@@ -142,7 +140,6 @@ struct TransactionRecord: Identifiable {
     init(token: Erc20Token, transaction: EvmKit.Transaction, amount: Decimal?, type: TxType, from: String?, to: String?, userData: TxUserData) {
         self.id = transaction.hash.hs.hexString
         self.type = type
-        self.coin = Coin(type: .erc20(address: token.contractAddress), code: token.code, name: token.name, decimal: token.decimal, iconUrl: token.name)
         self.amount = amount
         self.to = to ?? "-"
         self.from = from ?? "-"
@@ -166,8 +163,7 @@ struct TransactionRecord: Identifiable {
         
     init(payment: LightningPayment, userData: TxUserData) {
         self.id = payment.paymentId
-        self.coin = .bitcoin()
-        self.type = payment.type == .sent ? .sent : .received
+        self.type = payment.type == .sent ? .sent(coin: .lightningBitcoin()) : .received(coin: .lightningBitcoin())
         self.source = .lightning
         self.timestamp = payment.timestamp
         
@@ -192,6 +188,21 @@ struct TransactionRecord: Identifiable {
         self.nodeId = payment.nodeId
         self.blockHeight = nil
         
+        self.userData = userData
+    }
+    
+    init(swap: DBSwap, userData: TxUserData) {
+        self.id = swap.swapID!
+        self.type = .swap(base: .lightningBitcoin(), quote: .ethereum())
+        self.source = .ethOnChain
+        self.timestamp = Int(swap.timestamp)
+        self.from = "Lightning"
+        self.to = "Ethereum"
+        self.amount = Decimal(swap.secretHolder!.quantity)
+        self.fee = nil
+        self.preimage = nil
+        self.nodeId = nil
+        self.blockHeight = nil
         self.userData = userData
     }
 }

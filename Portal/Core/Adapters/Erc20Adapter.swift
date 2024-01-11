@@ -18,6 +18,16 @@ struct Erc20Token {
     let code: String
     let contractAddress: String
     let decimal: Int
+    
+    var coin: Coin {
+        Coin(
+            type: .erc20(address: contractAddress),
+            code: code,
+            name: name,
+            decimal: decimal,
+            iconUrl: "https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/96/Ethereum-ETH-icon.png"
+        )
+    }
 }
 
 class Erc20Adapter {
@@ -53,9 +63,9 @@ class Erc20Adapter {
         
         switch fullTransaction.decoration {
         case is IncomingDecoration:
-            type = .received
+            type = .received(coin: token.coin)
         case is OutgoingDecoration:
-            type = .sent
+            type = .sent(coin: token.coin)
         case let decoration as UnknownTransactionDecoration:
             let address = evmKit.address
             let internalTransactions = decoration.internalTransactions.filter { $0.to == address }
@@ -66,7 +76,7 @@ class Erc20Adapter {
             var amount: Decimal?
             
             if let transfer = incomingTransfers.first, incomingTransfers.count == 1 {
-                type = .received
+                type = .received(coin: token.coin)
                 
                 if let significand = Decimal(string: transfer.value.description) {
                     amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
@@ -84,7 +94,7 @@ class Erc20Adapter {
                 
                 return record
             } else if let transfer = outgoingTransfers.first, outgoingTransfers.count == 1 {
-                type = .sent
+                type = .sent(coin: token.coin)
                 
                 if let significand = Decimal(string: transfer.value.description) {
                     amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
@@ -93,10 +103,10 @@ class Erc20Adapter {
                 return TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transfer.from.eip55, to: transfer.to.eip55, userData: userData)
             }
         case is OutgoingEip20Decoration:
-            type = .sent
+            type = .sent(coin: token.coin)
 
         case is ApproveEip20Decoration:
-            type = .sent
+            type = .sent(coin: token.coin)
 
         default:
             type = .unknown

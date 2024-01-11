@@ -70,9 +70,9 @@ struct ActivityView: View {
                                 }
                             }
                             
-                            Button(action: { viewModel.updateTxTypeFilter(filter: .send) }) {
+                            Button(action: { viewModel.updateTxTypeFilter(filter: .sent) }) {
                                 Text("Sent")
-                                if viewModel.txTypeFilter == .send {
+                                if viewModel.txTypeFilter == .sent {
                                     Image(systemName: "checkmark")
                                 }
                             }
@@ -84,9 +84,9 @@ struct ActivityView: View {
                                 }
                             }
                             
-                            Button(action: { viewModel.updateTxTypeFilter(filter: .swapped) }) {
+                            Button(action: { viewModel.updateTxTypeFilter(filter: .swap) }) {
                                 Text("Swaps")
-                                if viewModel.txTypeFilter == .swapped {
+                                if viewModel.txTypeFilter == .swap {
                                     Image(systemName: "checkmark")
                                 }
                             }
@@ -224,7 +224,12 @@ struct ActivityView: View {
                 viewModel.updateTransactions()
             }
         }) { tx in
-            TransactionDetailsView(coin: tx.coin, tx: tx).lockableView()
+            switch tx.type {
+            case .sent(let coin), .received(let coin), .swap(let coin, _):
+                TransactionDetailsView(coin: coin, tx: tx).lockableView()
+            case .unknown:
+                EmptyView()
+            }
         }
     }
 }
