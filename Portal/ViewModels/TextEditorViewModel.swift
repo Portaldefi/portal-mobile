@@ -16,7 +16,7 @@ class TextEditorViewModel: ObservableObject {
     let onCancelAcion: () -> ()
     let onSaveAcion: (String) -> ()
     
-    @Published var text: String
+    @Published var text = TextLimiter(initialText: "Write a note", limit: 140)
     @Published var saveButtonEnabled = false
     
     init(title: String,
@@ -31,12 +31,11 @@ class TextEditorViewModel: ObservableObject {
         self.onCancelAcion = onCancelAction
         self.onSaveAcion = onSaveAction
         
-        text = initialText
+        text.string = initialText
         
-        $text.flatMap {
-            Just($0 != initialText)
-        }
-        .assign(to: &$saveButtonEnabled)
+        text.updated
+            .flatMap { Just($0 != initialText) }
+            .assign(to: &$saveButtonEnabled)
     }
 }
 
