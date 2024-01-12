@@ -68,7 +68,7 @@ extension TxDataStorage: ITxUserDataStorage {
                 data.txID = id
                 
                 switch source {
-                case .btcOnChain, .lightning:
+                case .btcOnChain, .lightning, .swap:
                     data.assetUSDPrice = marketData.lastSeenBtcPrice as NSDecimalNumber
                 case .ethOnChain:
                     data.assetUSDPrice = marketData.lastSeenEthPrice as NSDecimalNumber
@@ -80,6 +80,16 @@ extension TxDataStorage: ITxUserDataStorage {
                 
                 return data
             }
+            
+            if data.assetUSDPrice == 0 {
+                switch source {
+                case .btcOnChain, .lightning, .swap:
+                    data.assetUSDPrice = marketData.lastSeenBtcPrice as NSDecimalNumber
+                case .ethOnChain:
+                    data.assetUSDPrice = marketData.lastSeenEthPrice as NSDecimalNumber
+                }
+            }
+            
             return data
         }
     }
