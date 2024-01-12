@@ -14,10 +14,10 @@ enum TxType: Equatable {
         switch self {
         case .unknown:
             return "Unknown"
-        case .sent:
-            return "Sent"
-        case .received:
-            return "Received"
+        case .sent(let coin):
+            return "Sent \(coin.code)"
+        case .received(let coin):
+            return "Received \(coin.code)"
         case .swap(let base, let quote):
             return "\(base.code) to \(quote.code)"
         }
