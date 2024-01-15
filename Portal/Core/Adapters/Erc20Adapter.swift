@@ -82,7 +82,15 @@ class Erc20Adapter {
                     amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
                 }
                 
-                let record = TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transfer.from.eip55, to: transfer.to.eip55, userData: userData)
+                let record = EvmTransactionRecord(
+                    coin: token.coin,
+                    transaction: transaction,
+                    type: type,
+                    amount: amount,
+                    sender: transfer.from.eip55,
+                    receiver: transfer.to.eip55,
+                    userData: userData
+                )
                 
 //                if isNew {
 //                    let amount = "\(record.amount?.double ?? 0)"
@@ -100,7 +108,7 @@ class Erc20Adapter {
                     amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
                 }
                 
-                return TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transfer.from.eip55, to: transfer.to.eip55, userData: userData)
+                return EvmTransactionRecord(coin: token.coin, transaction: transaction, type: type, amount: amount, sender: transfer.from.eip55, receiver: transfer.to.eip55, userData: userData)
             }
         case is OutgoingEip20Decoration:
             type = .sent(coin: token.coin)
@@ -118,7 +126,7 @@ class Erc20Adapter {
             amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
         }
         
-        let record =  TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transaction.from?.eip55, to: transaction.to?.eip55, userData: userData)
+        let record = EvmTransactionRecord(coin: token.coin, transaction: transaction, type: type, amount: amount, sender: transaction.from?.eip55, receiver: transaction.to?.eip55, userData: userData)
         
 //        if isNew {
 //            guard record.type == .received else { return record }
