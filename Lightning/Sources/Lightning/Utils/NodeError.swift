@@ -11,6 +11,7 @@ public enum NodeError: Error {
     case connectPeer
     case disconectPeer
     case noChannelManager
+    case networkGraphDataCorrupt
     case keyInterfaceFailure
     case keySeedNotFound
     case alreadyRunning
@@ -103,6 +104,8 @@ public enum NodeError: Error {
             return "Failed disconnect from peer"
         case .noChainMonitor:
             return "ChainMonitor is not init"
+        case .networkGraphDataCorrupt:
+            return "Network graph data is corrupt"
         }
     }
 }
