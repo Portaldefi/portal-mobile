@@ -46,7 +46,7 @@ struct TextEditorView: View {
                     Spacer()
                     
                     PButton(config: .onlyLabel("Save"), style: .free, size: .small, applyGradient: true, enabled: viewModel.saveButtonEnabled) {
-                        viewModel.onSaveAcion(viewModel.text)
+                        viewModel.onSaveAcion(viewModel.text.string)
                     }
                     .frame(width: 39)
                 }
@@ -55,14 +55,14 @@ struct TextEditorView: View {
             .frame(height: 62)
             
             ZStack(alignment: .topLeading) {
-                TextEditor(text: $viewModel.text)
+                TextEditor(text: $viewModel.text.string)
                     .lineLimit(5)
                     .focused($firstResponder)
                     .font(.Main.fixed(.monoBold, size: 16))
                     .foregroundColor(Palette.grayScaleF4)
                     .padding(8)
 
-                if viewModel.text.isEmpty {
+                if viewModel.text.string.isEmpty {
                     Text(viewModel.placeHolder)
                         .font(.Main.fixed(.monoBold, size: 14))
                         .foregroundColor(Palette.grayScale6A)

@@ -46,40 +46,48 @@ struct TransactionDetailsView: View {
                             
                             Divider()
                             
-                            if viewModel.source != .lightning {
+                            switch viewModel.source {
+                            case .btcOnChain, .ethOnChain:
                                 TxIDView(txID: viewModel.txIdString, explorerURL: viewModel.explorerUrl)
                                 
                                 Divider()
-                            } else {
-                                HStack(alignment: .firstTextBaseline) {
-                                    Text("Payment Preimage")
-                                        .font(.Main.fixed(.monoBold, size: 14))
-                                        .foregroundColor(Palette.grayScaleAA)
-                                    Spacer()
-                                    VStack(alignment: .trailing, spacing: 8) {
-                                        Text(viewModel.transaction.preimage!.turnicated(grouppedBy: 4))
-                                            .font(.Main.fixed(.monoRegular, size: 16))
-                                            .foregroundColor(Palette.grayScaleF4)
+                            case .lightning:
+                                switch viewModel.transaction {
+                                case let record as LNTransactionRecord:
+                                    HStack(alignment: .firstTextBaseline) {
+                                        Text("Payment Preimage")
+                                            .font(.Main.fixed(.monoBold, size: 14))
+                                            .foregroundColor(Palette.grayScaleAA)
+                                        Spacer()
+                                        VStack(alignment: .trailing, spacing: 8) {
+                                            Text(record.preimage?.turnicated(grouppedBy: 4) ?? "-")
+                                                .font(.Main.fixed(.monoRegular, size: 16))
+                                                .foregroundColor(Palette.grayScaleF4)
+                                        }
                                     }
-                                }
-                                .frame(height: 52)
-                                
-                                Divider()
-                                
-                                HStack(alignment: .firstTextBaseline) {
-                                    Text("Node ID")
-                                        .font(.Main.fixed(.monoBold, size: 14))
-                                        .foregroundColor(Palette.grayScaleAA)
-                                    Spacer()
-                                    VStack(alignment: .trailing, spacing: 8) {
-                                        Text(viewModel.transaction.nodeId?.turnicated(grouppedBy: 4) ?? "-")
-                                            .font(.Main.fixed(.monoRegular, size: 16))
-                                            .foregroundColor(Palette.grayScaleF4)
+                                    .frame(height: 52)
+                                    
+                                    Divider()
+                                    
+                                    HStack(alignment: .firstTextBaseline) {
+                                        Text("Node ID")
+                                            .font(.Main.fixed(.monoBold, size: 14))
+                                            .foregroundColor(Palette.grayScaleAA)
+                                        Spacer()
+                                        VStack(alignment: .trailing, spacing: 8) {
+                                            Text(record.nodeId?.turnicated(grouppedBy: 4) ?? "-")
+                                                .font(.Main.fixed(.monoRegular, size: 16))
+                                                .foregroundColor(Palette.grayScaleF4)
+                                        }
                                     }
+                                    .frame(height: 52)
+                                    
+                                    Divider()
+                                default:
+                                    EmptyView()
                                 }
-                                .frame(height: 52)
-                                
-                                Divider()
+                            case .swap(let base, let quote):
+                                EmptyView()
                             }
                         }
                         
@@ -166,13 +174,29 @@ struct TransactionDetailsView: View {
     
     private func TxSummaryView() -> some View {
         VStack(spacing: 24) {
-            if viewModel.source != .lightning && viewModel.confirmations < 6 && !viewState.isReachable {
-                NoInternetConnectionView()
-                    .padding(.horizontal, -16)
-            }
-            
-            if viewModel.source != .lightning {
+            switch viewModel.source {
+            case .btcOnChain:
+                if viewModel.confirmations < 6 && !viewState.isReachable {
+                    NoInternetConnectionView()
+                        .padding(.horizontal, -16)
+
+                }
                 ConfirmationCounterView(confirmations: viewModel.confirmations)
+            case .ethOnChain:
+                if viewModel.confirmations < 6 && !viewState.isReachable {
+                    NoInternetConnectionView()
+                        .padding(.horizontal, -16)
+
+                }
+                ConfirmationCounterView(confirmations: viewModel.confirmations)
+            case .lightning:
+                EmptyView()
+            case .swap:
+                if viewModel.confirmations < 6 && !viewState.isReachable {
+                    NoInternetConnectionView()
+                        .padding(.horizontal, -16)
+
+                }
             }
             
             TxAmountView(

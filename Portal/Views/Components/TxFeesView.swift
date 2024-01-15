@@ -19,7 +19,7 @@ struct TxFeesView: View {
             return "Fees"
         case .ethOnChain:
             return "Fees"
-        case .lightning:
+        case .lightning, .swap:
             return "Network Fees"
         }
     }
