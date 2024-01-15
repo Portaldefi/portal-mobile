@@ -53,7 +53,15 @@ class EthereumAdapter {
         let data = txDataStorage.fetch(source: source, id: txHash)
         let userData = TxUserData(data: data)
         
-        let record = TransactionRecord(coin: .ethereum(), transaction: transaction, amount: amount, type: type, userData: userData)
+        let record = EvmTransactionRecord(
+            coin: .ethereum(),
+            transaction: transaction,
+            type: type, 
+            amount: amount,
+            sender: transaction.from?.hex,
+            receiver: transaction.to?.hex,
+            userData: userData
+        )
         
 //        if isNew {
 //            guard record.type == .received else { return record }
