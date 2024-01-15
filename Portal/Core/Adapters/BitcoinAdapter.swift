@@ -204,7 +204,7 @@ final class BitcoinAdapter {
             let source: TxSource = .btcOnChain
             let data = txDataStorage.fetch(source: source, id: txRecord.txid)
             let userData = TxUserData(data: data)
-            let record = TransactionRecord(transaction: txRecord, userData: userData)
+            let record = BTCTransactionRecord(transaction: txRecord, userData: userData)
             
             txRecords.append(record)
             
@@ -287,7 +287,7 @@ extension BitcoinAdapter: ITransactionsAdapter {
             let source: TxSource = .btcOnChain
             let data = txDataStorage.fetch(source: source, id: txRecord.txid)
             let userData = TxUserData(data: data)
-            let record = TransactionRecord(transaction: txRecord, userData: userData)
+            let record = BTCTransactionRecord(transaction: txRecord, userData: userData)
             
             txRecords.append(record)
             
@@ -371,7 +371,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
             let source: TxSource = .btcOnChain
             let data = txDataStorage.fetch(source: source, id: txDetails.txid)
             let userData = TxUserData(data: data)
-            return TransactionRecord(transaction: txDetails, userData: userData)
+            return BTCTransactionRecord(transaction: txDetails, userData: userData)
         } else {
             throw SendFlowError.error("Tx not finalized")
         }
@@ -403,7 +403,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
             let source: TxSource = .btcOnChain
             let data = txDataStorage.fetch(source: source, id: txDetails.txid)
             let userData = TxUserData(data: data)
-            let record = TransactionRecord(transaction: txDetails, userData: userData)
+            let record = BTCTransactionRecord(transaction: txDetails, userData: userData)
             return(record)
         } else {
             throw SendFlowError.error("Tx not finalized")
@@ -445,7 +445,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
             let source: TxSource = .btcOnChain
             let data = txDataStorage.fetch(source: source, id: txDetails.txid)
             let userData = TxUserData(data: data)
-            return TransactionRecord(transaction: txDetails, userData: userData)
+            return BTCTransactionRecord(transaction: txDetails, userData: userData)
         } else {
             throw SendFlowError.error("Tx not finalized")
         }
