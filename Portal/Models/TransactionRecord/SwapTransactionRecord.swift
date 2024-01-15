@@ -16,23 +16,22 @@ class SwapTransactionRecord: TransactionRecord {
     let quoteQuantity: Decimal
     
     init(swap: DBSwap, userData: TxUserData) {
-        base = .lightningBitcoin()
-        quote = .ethereum()
-        
-        let type: TxType = .swap(base: base, quote: quote)
-        
         switch swap.partyType {
         case "holder":
-            baseQuantity = Decimal(swap.secretHolder?.quantity ?? 0) / 1_000_000_000_000_000_000
-            quoteQuantity = Decimal(swap.secretSeeker?.quantity ?? 0) / 100_000_000
+            baseQuantity = Decimal(swap.secretHolder?.quantity ?? 0) / 100_000_000
+            quoteQuantity = Decimal(swap.secretSeeker?.quantity ?? 0) / 1_000_000_000_000_000_000
+            base = .lightningBitcoin()
+            quote = .ethereum()
         case "seeker":
             baseQuantity = Decimal(swap.secretSeeker?.quantity ?? 0) / 1_000_000_000_000_000_000
             quoteQuantity = Decimal(swap.secretHolder?.quantity ?? 0) / 100_000_000
+            base = .ethereum()
+            quote = .lightningBitcoin()
         default:
-            baseQuantity = Decimal(swap.secretHolder?.quantity ?? 0)
-            quoteQuantity = Decimal(swap.secretSeeker?.quantity ?? 0)
+            fatalError("Unknown partyType")
         }
         
+        let type: TxType = .swap(base: base, quote: quote)
         let source: TxSource = .swap(base: base, quote: quote)
         
         super.init(source: source, type: type, id: swap.swapID!, timestamp: Int(swap.timestamp), userData: userData)
