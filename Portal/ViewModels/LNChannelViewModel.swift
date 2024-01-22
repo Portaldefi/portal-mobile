@@ -9,14 +9,15 @@ import Foundation
 import Factory
 import LightningDevKit
 import Lightning
+import Combine
 
 class LNChannelViewModel: ObservableObject {
     private let ldkManager = Container.lightningKitManager()
     
     @Published var peers: [String] = []
-    @Published var showError: Bool = false
     @Published var showConfirmationPopup = false
-    @Published var errorMessage: String = String()
+    @Published var message: String = String()
+    @Published var showMessage: Bool = false
     @Published var isOpeningChannel: Bool = false
     
     var allChannels: [ChannelDetails] {
@@ -32,53 +33,55 @@ class LNChannelViewModel: ObservableObject {
     }
     
     func openChannel(peer: Peer) async {
+        let msg: String
+        
         do {
             try await ldkManager.openChannel(peer: peer)
-            DispatchQueue.main.async {
-                self.errorMessage = "Channel is opened! Wait for fundind tx is confirmed on-chain"
-                self.isOpeningChannel.toggle()
-                self.showError.toggle()
-            }
+            msg = "Channel is opened! Wait for fundind tx is confirmed on-chain"
         } catch {
-            DispatchQueue.main.async {
-                if let apiError = error as? NodeError.Channels {
-                    self.errorMessage = apiError.description
-                } else {
-                    self.errorMessage = error.localizedDescription
-                }
-                self.showError.toggle()
-                self.isOpeningChannel.toggle()
+            if let apiError = error as? NodeError.Channels {
+                msg = apiError.description
+            } else {
+                msg = error.localizedDescription
             }
+        }
+        
+        DispatchQueue.main.async {
+            self.message = msg
+            self.isOpeningChannel.toggle()
+            self.showMessage.toggle()
         }
     }
     
     func connect(peer: Peer) async {
+        let msg: String
+
         do {
             try await ldkManager.connectPeer(peer)
-            DispatchQueue.main.async {
-                self.errorMessage = "Connected to \(peer.name)"
-                self.showError.toggle()
-            }
+            msg = "Connected to \(peer.name)"
         } catch {
-            DispatchQueue.main.async {
-                self.errorMessage = "Failed connect to \(peer.name)"
-                self.showError.toggle()
-            }
+            msg = "Failed connect to \(peer.name)"
+        }
+        
+        DispatchQueue.main.async {
+            self.message = msg
+            self.showMessage.toggle()
         }
     }
     
     func disconnect(peer: Peer) {
+        let msg: String
+        
         do {
             try ldkManager.disconnectPeer(peer)
-            DispatchQueue.main.async {
-                self.errorMessage = "Disconnected from \(peer.name)"
-                self.showError.toggle()
-            }
+            msg = "Disconnected from \(peer.name)"
         } catch {
-            DispatchQueue.main.async {
-                self.errorMessage = "Failed connect disconnect \(peer.name)"
-                self.showError.toggle()
-            }
+            msg = "Failed connect disconnect \(peer.name)"
+        }
+        
+        DispatchQueue.main.async {
+            self.message = msg
+            self.showMessage.toggle()
         }
     }
     

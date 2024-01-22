@@ -260,7 +260,7 @@ struct ChannelView: View {
             }
         }
         .padding()
-        .popup(isPresented: $viewModel.showError) {
+        .popup(isPresented: $viewModel.showMessage) {
             HStack {
                 ZStack {
                     Circle()
@@ -273,7 +273,7 @@ struct ChannelView: View {
                 .frame(width: 32, height: 32)
                 .padding(.horizontal, 12)
                 
-                Text(viewModel.errorMessage)
+                Text(viewModel.message)
                     .padding(.vertical)
                     .font(.Main.fixed(.monoBold, size: 16))
                     .foregroundColor(.white)
