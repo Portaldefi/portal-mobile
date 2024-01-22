@@ -207,6 +207,9 @@ struct ActivityView: View {
                     .padding(.bottom, viewModel.viewState.hideTabBar ? 0 : 65)
                 }
                 .background(Palette.grayScale20)
+                .refreshable {
+                    print("Refresh")
+                }
                 
                 if viewModel.searchContext.isEmpty && viewModel.filteredTransactions.isEmpty {
                     Text("No transactions yet.")
