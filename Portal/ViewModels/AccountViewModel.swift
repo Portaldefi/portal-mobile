@@ -112,7 +112,6 @@ import Factory
             .onMarketDataUpdate
             .receive(on: RunLoop.main)
             .sink { [unowned self] _ in
-                guard !self.goToSend && !self.goToReceive && !self.goToSettings && !self.goToLightningChannelSetup else { return }
                 self.updateValue()
             }
             .store(in: &subscriptions)
@@ -146,6 +145,8 @@ import Factory
     }
     
     func updateValues() {
+        guard !self.goToSend && !self.goToReceive && !self.goToSettings && !self.goToLightningChannelSetup else { return }
+
         updateBalance()
         updateValue()
     }
