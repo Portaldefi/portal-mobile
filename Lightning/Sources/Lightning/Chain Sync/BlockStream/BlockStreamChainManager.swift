@@ -357,6 +357,11 @@ extension BlockStreamChainManager {
     }
 }
 
+public struct OutSpent: Codable {
+    let spent: Bool
+    let txid: String?
+}
+
 // MARK: Supporting Data Structures
 extension BlockStreamChainManager {
     struct BlockDetails: Decodable {
