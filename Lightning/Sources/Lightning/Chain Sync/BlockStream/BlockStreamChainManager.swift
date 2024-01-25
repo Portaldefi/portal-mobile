@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import CryptoSwift
+import LightningDevKit
 
 enum BlockStreamMethods {
     case getChainTip,
@@ -18,7 +19,9 @@ enum BlockStreamMethods {
          getTransaction(String),
          getRawTransaction(String),
          getMerkleProof(String),
+         getTxStatus(String),
          getTxById(String),
+         outSpent(txId: String, index: UInt16),
          postRawTx(String)
     
     var path: String {
@@ -41,17 +44,21 @@ enum BlockStreamMethods {
             return "/tx/\(id)/raw"
         case .getMerkleProof(let id):
             return "/tx/\(id)/merkle-proof"
+        case .outSpent(let txId, let index):
+            return "/tx/\(txId)/outspend/\(index)"
         case .postRawTx:
             return "/tx"
+        case .getTxStatus(let txId):
+            return "/tx/\(txId)/status"
         }
     }
     
     var httpMethod: String {
         switch self {
-        case .getChainTip, .getBlockHashHex, .getBlock, .getBlockBinary, .getBlockHeader, .getTransaction, .getTxById, .getMerkleProof, .getRawTransaction:
-            return "GET"
         case .postRawTx:
             return "POST"
+        default:
+            return "GET"
         }
     }
 }
@@ -80,8 +87,21 @@ class BlockStreamChainManager {
             .eraseToAnyPublisher()
     }
     
-    init(rpcProtocol: RpcProtocol) throws {
-        guard let rpcUrl = URL(string: "\(rpcProtocol.rawValue)://blockstream.info/testnet/api") else {
+    init(network: Network) throws {
+        let baseUrlString: String
+        
+        switch network {
+        case .Bitcoin:
+            baseUrlString = "https://blockstream.info/api"
+        case .Regtest:
+            baseUrlString = "http:/localhost:3002"
+        case .Testnet:
+            baseUrlString = "https://blockstream.info/testnet/api"
+        default:
+            fatalError("Network not supported")
+        }
+        
+        guard let rpcUrl = URL(string: baseUrlString) else {
             throw ChainManagerError.invalidUrlString
         }
         
@@ -240,6 +260,14 @@ extension BlockStreamChainManager {
                 print("Error in parsing JSON")
                 return [:]
             }
+        case .outSpent:
+            if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                // Accessing the 'status' dictionary
+                return json
+            } else {
+                print("Error in parsing JSON")
+                return [:]
+            }
         case .getRawTransaction:
             return ["rawTx": data]
         case .postRawTx:
@@ -248,6 +276,14 @@ extension BlockStreamChainManager {
                 return ["txID": txID as Any]
             }
             return [:]
+        case .getTxStatus:
+            if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                // Accessing the 'status' dictionary
+                return json
+            } else {
+                print("Error in parsing JSON")
+                return [:]
+            }
         }
     }
     
@@ -415,6 +451,24 @@ extension BlockStreamChainManager {
 
 // MARK: Common ChainManager Functions
 extension BlockStreamChainManager: RpcChainManager {
+    func getTxStatus(txId: String) async throws -> [String : Any] {
+        return try await self.callRpcMethod(method: .getTxStatus(txId))
+    }
+    
+    func getTxOutspent(txId: String, index: UInt16) async throws -> OutSpent {
+        let response = try await self.callRpcMethod(method: .outSpent(txId: txId, index: index))
+        
+        var outoutSpent = false
+        
+        if let spent = response["spent"] as? Bool {
+            outoutSpent = spent
+        } else {
+            print("")
+        }
+        
+        return OutSpent(spent: outoutSpent, txid: response["txid"] as? String)
+    }
+    
     func getRawTransaction(txId: String) async throws -> Data {
         let data = try await self.callRpcMethod(method: .getRawTransaction(txId))
         return data["rawTx"] as! Data
