@@ -28,4 +28,6 @@ protocol RpcChainManager {
     func getDescriptorInfo(descriptor: String) async throws -> String
     func scanTxOutSet(descriptor: String) async throws -> [String: Any]
     func mineBlocks(number: Int, coinbaseDestinationAddress: String) async throws -> [String]
+    func getTxOutspent(txId: String, index: UInt16) async throws -> OutSpent
+    func getTxStatus(txId: String) async throws -> [String: Any]
 }
