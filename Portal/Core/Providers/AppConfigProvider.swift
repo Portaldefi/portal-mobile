@@ -21,7 +21,7 @@ class AppConfigProvider: IAppConfigProvider {
     let keychainStorageID: String = "com.portal.keychain.service"
     let rafaSocketUrl: String = "wss://api.rafa.ai/v1/data/feed/websocket"
     let forexUrl: String = "https://api.rafa.ai/v1/data/feed/forex"
-    let network: Network = .playnet
+    let network: Network = .testnet
 
     var infuraCredentials: (id: String, secret: String?) {
         let id = (Bundle.main.object(forInfoDictionaryKey: "InfuraProjectId") as? String) ?? ""
