@@ -6,11 +6,12 @@
 //
 
 import Foundation
+import PortalSwapSDK
 
 protocol ISubmarineSwap {
     var id: String { get }
     var hash: String { get }
-    var swap: Swap? { get set }
+    var swap: SwapModel? { get set }
     func open() async throws
     func commit() async throws
     func cancel() async throws
@@ -19,7 +20,7 @@ protocol ISubmarineSwap {
 protocol IAtomicSwap {
     var id: String { get }
     var secretHash: String { get }
-    var swap: Swap? { get set }
+    var swap: SwapModel? { get set }
     func open() async throws
     func commit() async throws
     func cancel() async throws
