@@ -13,6 +13,7 @@ import LightningDevKit
 import Factory
 import HsCryptoKit
 import BitcoinDevKit
+import SwiftBTC
 
 public struct BlockInfo {
     public let height: Int
@@ -31,17 +32,11 @@ class LightningKitManager: ILightningKitManager {
     
     private var started = false
     private var hodlInvoices = [HodlInvoice]()
-    private var peer: Peer?
+    private(set) var peer: Peer?
     private var subscriptions = Set<AnyCancellable>()
         
     var transactionsPublisher: AnyPublisher<[TransactionRecord], Never> {
-        let payments = fileManager.getPayments().map { payment in
-            let source: TxSource = .lightning
-            let data = txDataStorage.fetch(source: source, id: payment.paymentId)
-            let userData = TxUserData(data: data)
-            return TransactionRecord(payment: payment, userData: userData)
-        }
-        return Just(payments).eraseToAnyPublisher()
+        Just(transactions).eraseToAnyPublisher()
     }
     
     var transactions: [TransactionRecord] {
@@ -49,7 +44,7 @@ class LightningKitManager: ILightningKitManager {
             let source: TxSource = .lightning
             let data = txDataStorage.fetch(source: source, id: payment.paymentId)
             let userData = TxUserData(data: data)
-            return TransactionRecord(payment: payment, userData: userData)
+            return LNTransactionRecord(payment: payment, userData: userData)
         }
     }
             
@@ -74,18 +69,18 @@ class LightningKitManager: ILightningKitManager {
         
         do {
             try await instance.start()
-                        
-            if let peerData = UserDefaults.standard.data(forKey: "NodeToConnect") {
-                let decoder = JSONDecoder()
-                if let peer = try? decoder.decode(Peer.self, from: peerData) {
-                    self.peer = peer
-                }
-            }
             
             var connectionAttempts = 0
             
             activePeersPublisher.sink { [unowned self] peerIDs in
-                guard let peer = peer else { return }
+                var peerModel: Peer? = nil
+                
+                if let peerData = UserDefaults.standard.data(forKey: "NodeToConnect"),
+                   let peer = try? JSONDecoder().decode(Peer.self, from: peerData)
+                {
+                    peerModel = peer
+                }
+                guard let peer = peerModel else { return }
                 
                 if connectionAttempts < 5, !peerIDs.contains(peer.peerPubKey) {
                     connectionAttempts+=1
@@ -189,7 +184,8 @@ class LightningKitManager: ILightningKitManager {
                 preimage: preimage.toHexString(),
                 type: .received,
                 timestamp: timestamp,
-                fee: nil
+                fee: nil,
+                memo: hodlInvoices.first(where: { $0.id == paymentId})?.description
             )
                             
             switch fileManager.persist(payment: payment) {
@@ -226,7 +222,8 @@ class LightningKitManager: ILightningKitManager {
                 preimage: preimage.toHexString(),
                 type: .sent,
                 timestamp: pendingPayment.timestamp,
-                fee: fee
+                fee: fee,
+                memo: pendingPayment.memo
             )
             
             switch fileManager.persist(payment: updatedPayment) {
@@ -323,7 +320,7 @@ class LightningKitManager: ILightningKitManager {
             }
         }
                     
-        let paymentResult = Bindings.payInvoice(invoice: invoice, retryStrategy: .initWithAttempts(a: 3), channelmanager: manager)
+        let paymentResult = Bindings.payInvoice(invoice: invoice, retryStrategy: .initWithAttempts(a: 5), channelmanager: manager)
             
         guard paymentResult.isOk() else {
             if let invoicePayError = paymentResult.getError() {
@@ -373,7 +370,7 @@ class LightningKitManager: ILightningKitManager {
         let totalAmountMsat = type.getTotalMsat()
         
         let timestamp = Int(Date().timeIntervalSince1970)
-        
+                
         let payment = LightningPayment(
             nodeId: instance.channelManager?.getOurNodeId().toHexString() ?? "-",
             paymentId: paymentID.toHexString(),
@@ -381,7 +378,8 @@ class LightningKitManager: ILightningKitManager {
             preimage: String(),
             type: .sent,
             timestamp: timestamp,
-            fee: nil
+            fee: nil,
+            memo: Bolt11.decode(string: invoice.toStr())?.description
         )
         
         instance.pendingPayments.append(payment)
@@ -457,7 +455,7 @@ extension LightningKitManager: ILightningInvoiceHandler {
         let source: TxSource = .lightning
         let data = txDataStorage.fetch(source: source, id: paymentResult.paymentId)
         let userData = TxUserData(data: data)
-        return TransactionRecord(payment: paymentResult, userData: userData)
+        return LNTransactionRecord(payment: paymentResult, userData: userData)
     }
     
     func decode(invoice: String) throws -> Bolt11Invoice {
@@ -488,38 +486,6 @@ extension LightningKitManager: ILightningChannels {
     
     var channelBalance: Decimal {
         Decimal(instance.totalBalance)
-    }
-    
-    func openChannel(peer: Peer) async throws {
-        print("opening channel with peer: \(peer.peerPubKey)")
-        
-        let channelValue: UInt64 = 2500000
-        let reserveAmount: UInt64 = 1000
-        // send open channel request through channel manager
-        let channelInfo = try await instance.requestChannelOpen(
-            peer.peerPubKey,
-            channelValue: channelValue,
-            reserveAmount: reserveAmount
-        )
-        
-        print("open channel requested")
-        // decode output script
-        if let address = await instance.getFundingTransactionScriptPubKey(outputScript: channelInfo.fundingOutputScript) {
-            print("decoded address: \(address)")
-            // create funding transaction
-            let fundingTransaction = try rawTx(amount: channelValue, address: address)
-            // finilaze opening channel by providing funding transaction to channel manager
-            if try await instance.openChannel(
-                channelOpenInfo: channelInfo,
-                fundingTransaction: fundingTransaction.serialize()
-            ) {
-                print("Channel \(channelInfo.temporaryChannelId) is opened")
-            } else {
-                throw ServiceError.cannotOpenChannel
-            }
-        } else {
-            throw NodeError.noRpcInterface
-        }
     }
     
     func openChannel(peer: Peer, amount: UInt64) async throws {
@@ -636,7 +602,7 @@ extension LightningKitManager: ILightningClient {
             
             let secretHash = secret.sha256().toHexString()
             
-            if let hodlInvoice = hodlInvoices.first(where: { $0.id == secretHash}) {
+            if hodlInvoices.first(where: { $0.id == secretHash}) != nil {
                 let preimage: [UInt8] = Array(secret)
                 instance.claimFunds(preimage: preimage)
                 
