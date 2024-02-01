@@ -10,12 +10,24 @@ import Factory
 import LightningDevKit
 
 @Observable class AwaitsFundingViewModel {
+    let peer: Peer?
+    let channel: ChannelDetails?
+    
     @ObservationIgnored let kit = Container.lightningKitManager()
-    var channel: ChannelDetails?
     
     init() {
         if let channelDetails = kit.allChannels.first {
             channel = channelDetails
+        } else {
+            channel = nil
+        }
+        
+        if let peerData = UserDefaults.standard.data(forKey: "NodeToConnect"),
+           let peer = try? JSONDecoder().decode(Peer.self, from: peerData)
+        {
+            self.peer = peer
+        } else {
+            peer = nil
         }
     }
     
