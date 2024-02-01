@@ -48,7 +48,32 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     var amountString: String {
-        guard let amount = transaction.amount else { return "0" }
+        let txAmount: Decimal?
+        
+        switch transaction {
+        case let record as BTCTransactionRecord:
+            switch transaction.type {
+            case .sent:
+                if let amount = record.amount, let fee = record.fee {
+                    txAmount = amount - (fee*100_000_000)
+                } else {
+                    txAmount = record.amount
+                }
+            default:
+                txAmount = record.amount
+            }
+        case let record as EvmTransactionRecord:
+            txAmount = record.amount
+        case let record as LNTransactionRecord:
+            txAmount = record.amount
+        case let record as SwapTransactionRecord:
+            txAmount = record.baseQuantity
+        default:
+            txAmount = nil
+        }
+        
+        guard let amount = txAmount else { return "0" }
+        
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
             return Double(amount.double/100_000_000).toString(decimal: 8)
@@ -60,35 +85,54 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     var currencyAmountString: String {
-        guard let amount = transaction.amount else { return "0" }
+        let txAmount: Decimal?
+        
+        switch transaction {
+        case let record as BTCTransactionRecord:
+            txAmount = record.amount
+        case let record as EvmTransactionRecord:
+            txAmount = record.amount
+        case let record as LNTransactionRecord:
+            txAmount = record.amount
+        case let record as SwapTransactionRecord:
+            txAmount = record.baseQuantity
+        default:
+            txAmount = nil
+        }
+        
+        guard let amount = txAmount else { return "0" }
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            return (transaction.userData.price * (amount/100_000_000) * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
+            return (transaction.price * (amount/100_000_000) * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
         case .ethereum, .erc20:
-            return (transaction.userData.price * amount * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
+            return (transaction.price * amount * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
         }
     }
     
     var recipientString: String? {
-        switch source {
-        case .btcOnChain:
-            return transaction.to//storage.object(forKey: transaction.id + "recipient") as? String
-        case .ethOnChain:
-            return transaction.to
-        case .lightning:
-            return transaction.to
+        switch transaction {
+        case let record as BTCTransactionRecord:
+            return record.receiver
+        case let record as EvmTransactionRecord:
+            return record.receiver
+        case let record as LNTransactionRecord:
+            return record.receiver
+        default:
+            return nil
         }
     }
     
     var senderString: String? {
-        switch source {
-        case .btcOnChain:
-            return transaction.from//storage.object(forKey: transaction.id + "recipient") as? String
-        case .ethOnChain:
-            return transaction.from
-        case .lightning:
-            return transaction.from
+        switch transaction {
+        case let record as BTCTransactionRecord:
+            return record.sender
+        case let record as EvmTransactionRecord:
+            return record.sender
+        case let record as LNTransactionRecord:
+            return record.sender
+        default:
+            return nil
         }
     }
     
@@ -101,8 +145,20 @@ class TransactionDetailsViewModel: ObservableObject {
     }
     
     var feeString: String {
-        guard let fee = transaction.fee else { return "-" }
-        return String(describing: fee)
+        let fee: Decimal?
+        
+        switch transaction {
+        case let record as BTCTransactionRecord:
+            fee = record.fee
+        case let record as EvmTransactionRecord:
+            fee = record.fee
+        case let record as LNTransactionRecord:
+            fee = record.fee
+        default:
+            fee = nil
+        }
+        guard let txFee = fee else { return "-" }
+        return String(describing: txFee)
     }
         
     var txIdString: String {
@@ -135,15 +191,24 @@ class TransactionDetailsViewModel: ObservableObject {
         self.blockChainHeight = blockChainHeight
         self.source = transaction.source
         
-        if let blockHeight = tx.blockHeight {
-            confirmations = blockChainHeight - Int32(blockHeight) + 1
+        switch tx {
+        case let record as BTCTransactionRecord:
+            if let blockHeight = record.blockHeight {
+                confirmations = blockChainHeight - Int32(blockHeight) + 1
+            }
+        case let record as EvmTransactionRecord:
+            if let blockHeight = record.blockHeight {
+                confirmations = blockChainHeight - Int32(blockHeight) + 1
+            }
+        default:
+            break
         }
                 
-        if let notes = tx.userData.notes, !notes.isEmpty {
+        if let notes = tx.notes, !notes.isEmpty {
             self.notes = notes
         }
         
-        self.labels = tx.userData.labels
+        self.labels = tx.labels
         
         $labels.removeDuplicates().dropFirst().sink { [unowned self] labels in
             self.storage.update(source: tx.source, id: tx.id, labels: labels)
