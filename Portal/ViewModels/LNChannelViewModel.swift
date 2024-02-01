@@ -12,13 +12,20 @@ import Lightning
 import Combine
 
 class LNChannelViewModel: ObservableObject {
+    enum AlertType {
+        case cooperativeClose, forceClose
+    }
+    
     private let ldkManager = Container.lightningKitManager()
     
     @Published var peers: [String] = []
-    @Published var showConfirmationPopup = false
     @Published var message: String = String()
     @Published var showMessage: Bool = false
     @Published var isOpeningChannel: Bool = false
+    
+    @Published var peer: Peer?
+    @Published var showChannelCloseAlert = false
+    @Published private(set) var alertType: AlertType = .cooperativeClose
     
     var allChannels: [ChannelDetails] {
         ldkManager.allChannels
@@ -30,13 +37,20 @@ class LNChannelViewModel: ObservableObject {
     
     init() {
         ldkManager.activePeersPublisher.assign(to: &$peers)
+        
+        if
+            let peerData = UserDefaults.standard.data(forKey: "NodeToConnect"),
+            let peer = try? JSONDecoder().decode(Peer.self, from: peerData)
+        {
+            self.peer = peer
+        }
     }
     
     func openChannel(peer: Peer) async {
         let msg: String
         
         do {
-            try await ldkManager.openChannel(peer: peer)
+            try await ldkManager.openChannel(peer: peer, amount: 2500)
             msg = "Channel is opened! Wait for fundind tx is confirmed on-chain"
         } catch {
             if let apiError = error as? NodeError.Channels {
@@ -85,12 +99,42 @@ class LNChannelViewModel: ObservableObject {
         }
     }
     
-    func cooperativeCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {
+    func showChannelChannelClose(type: AlertType) {
+        switch type {
+        case .cooperativeClose:
+            alertType = .cooperativeClose
+        case .forceClose:
+            alertType = .forceClose
+        }
+        showChannelCloseAlert.toggle()
+    }
+    
+    func cooperativeClose() {
+        guard let channel = usableChannels.first, let channelId = channel.getChannelId() else {
+            print("cooperativeClose error: Cannot get channel data")
+            return
+        }
+        let counterPartyId = channel.getCounterparty().getNodeId()
+        cooperativeCloseChannel(id: channelId, counterPartyId: counterPartyId)
+        UserDefaults.standard.set(Data(), forKey: "NodeToConnect")
+    }
+    
+    func forceClose() {
+        guard let channel = usableChannels.first, let channelId = channel.getChannelId() else {
+            print("forceClose error: Cannot get channel data")
+            return
+        }
+        let counterPartyId = channel.getCounterparty().getNodeId()
+        forceCloseChannel(id: channelId, counterPartyId: counterPartyId)
+        UserDefaults.standard.set(Data(), forKey: "NodeToConnect")
+    }
+    
+    private func cooperativeCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {
         print("=====Cooperativly closing channel=====\nwith id: \(id.toHexString())\ncounterparty id: \(counterPartyId.toHexString())\n=====")
         ldkManager.cooperativeCloseChannel(id: id, counterPartyId: counterPartyId)
     }
     
-    func forceCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {
+    private func forceCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {
         print("=====Force closing channel=====\nwith id: \(id.toHexString())\ncounterparty id: \(counterPartyId.toHexString())\n=====")
         ldkManager.forceCloseChannel(id: id, counterPartyId: counterPartyId)
     }
