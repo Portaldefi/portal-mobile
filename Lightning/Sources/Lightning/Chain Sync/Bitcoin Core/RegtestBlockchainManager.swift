@@ -219,6 +219,10 @@ extension RegtestBlockchainManager {
 
 // MARK: Common ChainManager Functions
 extension RegtestBlockchainManager: RpcChainManager {
+    func getTxStatus(txId: String) async throws -> [String : Any] {
+        [:]
+    }
+    
     func getRawTransaction(txId: String) async throws -> Data {
         Data()
     }
@@ -233,6 +237,11 @@ extension RegtestBlockchainManager: RpcChainManager {
     
     func getTransactionWithId(id: String) async throws -> [String : Any] {
         return try await self.callRpcMethod(method: "gettransaction", params: [id])
+    }
+    
+    func getTxOutspent(txId: String, index: UInt16) async throws -> OutSpent {
+        let response = try await self.callRpcMethod(method: "gettxout", params: [txId, index])
+        return OutSpent(spent: response["result"] == nil, txid: response["txid"] as? String)
     }
     
     func decodeRawTransaction(tx: [UInt8]) async throws -> [String : Any] {
