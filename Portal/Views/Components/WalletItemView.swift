@@ -47,8 +47,15 @@ struct WalletItemView: View {
             
             Spacer()
             
-            if viewModel.coin == .lightningBitcoin() {
-                if !viewModel.lightningKit.usableChannels.isEmpty {
+            switch viewModel.coin.type {
+            case .lightningBitcoin:
+                if let channel = viewModel.lightningKit.allChannels.first, let confirmations = channel.getConfirmations(), let requiredConfirmations = channel.getConfirmationsRequired(), confirmations < requiredConfirmations {
+                    Text("Waiting for Confirmations")
+                        .multilineTextAlignment(.center)
+                        .font(.Main.fixed(.monoRegular, size: 16))
+                        .foregroundColor(.yellow)
+                        .padding(.trailing, 12)
+                } else if let channel = viewModel.lightningKit.allChannels.first, let confirmations = channel.getConfirmations(), let requiredConfirmations = channel.getConfirmationsRequired(), confirmations >= requiredConfirmations {
                     HStack(spacing: 6) {
                         VStack(alignment: .trailing, spacing: 0) {
                             Text(viewModel.balanceString)
@@ -74,12 +81,6 @@ struct WalletItemView: View {
                                 .offset(y: 3)
                         }
                     }
-                } else if !viewModel.lightningKit.allChannels.isEmpty {
-                    Text("Waiting for Confirmations")
-                        .multilineTextAlignment(.center)
-                        .font(.Main.fixed(.monoRegular, size: 16))
-                        .foregroundColor(.yellow)
-                        .padding(.trailing, 12)
                 } else {
                     Text("Setup a Channel")
                         .multilineTextAlignment(.center)
@@ -88,7 +89,7 @@ struct WalletItemView: View {
                         .padding(.trailing, 12)
                         .frame(width: 80)
                 }
-            } else {
+            default:
                 if showBalance {
                     HStack(spacing: 6) {
                         VStack(alignment: .trailing, spacing: 0) {
@@ -117,6 +118,12 @@ struct WalletItemView: View {
                     }
                 }
             }
+            
+//            if viewModel.coin == .lightningBitcoin() {
+//                
+//            } else {
+//
+//            }
         }
         .padding(.vertical, 12)
         .frame(height: 70)

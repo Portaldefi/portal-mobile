@@ -11,21 +11,8 @@ import Factory
 import Combine
 
 struct ActivityView: View {
-    @StateObject private var viewModel = ActivityViewModel()
-    @Bindable private var viewState: ViewState = Container.viewState()
-
-    private var keyboardPublisher: AnyPublisher<Bool, Never> {
-        Publishers.Merge(
-            NotificationCenter.default
-                .publisher(for: UIResponder.keyboardWillShowNotification)
-                .map { _ in true },
-            
-            NotificationCenter.default
-                .publisher(for: UIResponder.keyboardWillHideNotification)
-                .map { _ in false }
-        )
-        .eraseToAnyPublisher()
-    }
+    @StateObject private var viewModel = ActivityViewModel.config()
+    @State private var viewState = Container.viewState()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -55,8 +42,8 @@ struct ActivityView: View {
                             .frame(height: 40)
                     )
                     .padding(.bottom, 4)
-                    .onReceive(keyboardPublisher) { newIsKeyboardVisible in
-                        Container.viewState().hideTabBar = newIsKeyboardVisible
+                    .onReceive(viewModel.keyboardPublisher) { newIsKeyboardVisible in
+                        viewState.hideTabBar = newIsKeyboardVisible
                     }
                     .layoutPriority(1)
                     
@@ -204,7 +191,7 @@ struct ActivityView: View {
                                 }
                         }
                     }
-                    .padding(.bottom, viewModel.viewState.hideTabBar ? 0 : 65)
+                    .padding(.bottom, viewState.hideTabBar ? 0 : 65)
                 }
                 .background(Palette.grayScale20)
                 .refreshable {

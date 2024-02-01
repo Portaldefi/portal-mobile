@@ -51,7 +51,8 @@ struct AccountView: View {
                                     .padding(.trailing, 10)
                                     .contentShape(Rectangle())
                                     .onTapGesture {
-                                        if item.coin == .lightningBitcoin() {
+                                        switch item.coin.type {
+                                        case .lightningBitcoin:
                                             if viewModel.hasUsableLightningChannel {
                                                 navigation.push(.assetDetails(item: item))
                                                 withAnimation {
@@ -62,7 +63,7 @@ struct AccountView: View {
                                             } else {
                                                 viewModel.goToLightningChannelSetup.toggle()
                                             }
-                                        } else {
+                                        default:
                                             navigation.push(.assetDetails(item: item))
                                             withAnimation {
                                                 viewState.hideTabBar = true
@@ -81,6 +82,9 @@ struct AccountView: View {
                     .padding(.horizontal, 8)
                 }
                 .background(Palette.grayScale20)
+                .refreshable {
+                    print("Refresh")
+                }
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))

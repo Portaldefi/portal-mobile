@@ -91,11 +91,26 @@ struct TransactionDetailsView: View {
                             }
                         }
                         
-                        NotesView()
-                        
-                        Divider()
-                        
-                        LabelsView()
+                        switch (viewModel.notes.isEmpty, viewModel.labels.isEmpty) {
+                        case (false, true):
+                            NotesView()
+                            
+                            Divider()
+                            
+                            LabelsView()
+                        case (true, false):
+                            LabelsView()
+                            
+                            Divider()
+                            
+                            NotesView()
+                        default:
+                            NotesView()
+                            
+                            Divider()
+                            
+                            LabelsView()
+                        }
                         
                         Divider()
                     }
@@ -175,36 +190,68 @@ struct TransactionDetailsView: View {
     private func TxSummaryView() -> some View {
         VStack(spacing: 24) {
             switch viewModel.source {
-            case .btcOnChain:
+            case .btcOnChain, .ethOnChain:
                 if viewModel.confirmations < 6 && !viewState.isReachable {
                     NoInternetConnectionView()
                         .padding(.horizontal, -16)
 
                 }
                 ConfirmationCounterView(confirmations: viewModel.confirmations)
-            case .ethOnChain:
-                if viewModel.confirmations < 6 && !viewState.isReachable {
-                    NoInternetConnectionView()
-                        .padding(.horizontal, -16)
-
-                }
-                ConfirmationCounterView(confirmations: viewModel.confirmations)
+                
+                TxAmountView(
+                    amount: viewModel.amountString,
+                    value: viewModel.currencyAmountString,
+                    coinCode: viewModel.coin.code.lowercased(),
+                    currencyCode: viewModel.fiatCurrency.code.lowercased()
+                )
             case .lightning:
-                EmptyView()
+                TxAmountView(
+                    amount: viewModel.amountString,
+                    value: viewModel.currencyAmountString,
+                    coinCode: viewModel.coin.code.lowercased(),
+                    currencyCode: viewModel.fiatCurrency.code.lowercased()
+                )
             case .swap:
                 if viewModel.confirmations < 6 && !viewState.isReachable {
                     NoInternetConnectionView()
                         .padding(.horizontal, -16)
-
+                }
+                
+                switch viewModel.transaction {
+                case let record as SwapTransactionRecord:
+                    VStack(alignment: .center, spacing: 8) {
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            Text("+ ")
+                                .font(.Main.fixed(.monoBold, size: 32))
+                                .foregroundColor(Palette.grayScale6A)
+                            + Text(record.quoteQuantity.double.toString(decimal: 8))
+                                .font(.Main.fixed(.monoBold, size: 32))
+                                .foregroundColor(Palette.grayScaleEA)
+                            
+                            Text(record.quote.code.lowercased())
+                                .font(.Main.fixed(.monoRegular, size: 18))
+                                .foregroundColor(Palette.grayScale6A)
+                        }
+                        
+                        Asset.switchIcon.resizable().frame(width: 22, height: 22).rotationEffect(.degrees(90))
+                        
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            Text("- ")
+                                .font(.Main.fixed(.monoBold, size: 32))
+                                .foregroundColor(Palette.grayScale6A)
+                            + Text(record.baseQuantity.double.toString(decimal: 8))
+                                .font(.Main.fixed(.monoBold, size: 32))
+                                .foregroundColor(Palette.grayScaleEA)
+                            
+                            Text(record.base.code.lowercased())
+                                .font(.Main.fixed(.monoRegular, size: 18))
+                                .foregroundColor(Palette.grayScale6A)
+                        }
+                    }
+                default:
+                    EmptyView()
                 }
             }
-            
-            TxAmountView(
-                amount: viewModel.amountString,
-                value: viewModel.currencyAmountString,
-                coinCode: viewModel.coin.code.lowercased(),
-                currencyCode: viewModel.fiatCurrency.code.lowercased()
-            )
             
             Text(viewModel.dateString)
                 .font(.Main.fixed(.monoMedium, size: 16))

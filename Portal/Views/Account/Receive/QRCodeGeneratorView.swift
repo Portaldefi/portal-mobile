@@ -148,7 +148,8 @@ struct QRCodeGeneratorView: View {
                                     .frame(height: 1)
                                 
                                 if let exchanger = viewModel.exchanger {
-                                    if viewModel.description.isEmpty, exchanger.baseAmountDecimal == 0 {
+                                    switch (viewModel.description.isEmpty, exchanger.baseAmountDecimal == 0) {
+                                    case (true, true):
                                         Button {
                                             viewModel.editingAmount.toggle()
                                         } label: {
@@ -181,8 +182,7 @@ struct QRCodeGeneratorView: View {
                                             .frame(height: 62)
                                             .padding(.horizontal, 24)
                                         }
-                                    } else if viewModel.description.isEmpty, exchanger.baseAmountDecimal > 0 {
-                                        
+                                    case (true, false):
                                         Button {
                                             viewModel.editingAmount.toggle()
                                         } label: {
@@ -208,8 +208,7 @@ struct QRCodeGeneratorView: View {
                                             .frame(height: 62)
                                             .padding(.horizontal, 24)
                                         }
-                                    } else if !viewModel.description.isEmpty, exchanger.baseAmountDecimal == 0 {
-                                        
+                                    case (false, true):
                                         Button {
                                             viewModel.editingDescription.toggle()
                                         } label: {
@@ -235,7 +234,7 @@ struct QRCodeGeneratorView: View {
                                             .frame(height: 62)
                                             .padding(.horizontal, 24)
                                         }
-                                    } else {
+                                    default:
                                         Button {
                                             viewModel.editingAmount.toggle()
                                         } label: {

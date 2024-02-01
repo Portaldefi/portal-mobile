@@ -125,7 +125,7 @@ struct AssetDetailsView: View {
         .sheet(isPresented: $showChannelDetails, onDismiss: {
             //viewModel.updateTransactions()
         }) {
-            ChannelView()
+            LNChannelView()
         }
     }
     

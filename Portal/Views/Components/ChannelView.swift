@@ -1,244 +1,290 @@
 //
-//  ChannelView.swift
-//  Portal
+// ChannelView.swift
+// Portal
 //
-//  Created by farid on 04.01.2024.
+//  Created by farid on 23/8/22.
 //
 
 import SwiftUI
-import LightningDevKit
-import Factory
+import PopupView
 import PortalUI
+import LightningDevKit
 
 struct ChannelView: View {
-    @ObservedObject private var viewModel = LightningStatstViewModel()
-    @Environment(\.presentationMode) private var presentationMode
-    @State private var peer: Peer?
+    @StateObject private var viewModel = LNChannelViewModel()
+    var peers: [Peer] = [Peer.alice, Peer.bob]
     
-    @Injected(Container.marketData) private var marketData
-    
-    init() {
-        if let peerData = UserDefaults.standard.data(forKey: "NodeToConnect") {
-            let decoder = JSONDecoder()
-            if let peer = try? decoder.decode(Peer.self, from: peerData) {
-                self._peer = State(initialValue: peer)
+    func channelView(channel: ChannelDetails) -> some View {
+        ZStack {
+            Color.white.opacity(0.2).cornerRadius(12)
+            
+            VStack {
+                HStack {
+                    Text(peers.first{ $0.peerPubKey == channel.getCounterparty().getNodeId().toHexString() }!.name)
+                    Spacer()
+                    Text(channel.getCounterparty().getNodeId().toHexString().turnicated)
+                        .font(.system(size: 14))
+                }
+                
+                HStack {
+                    Text("Channel id:")
+                    Spacer()
+                    Text(channel.getChannelId()!.toHexString().turnicated)
+                        .font(.system(size: 14))
+                }
+                
+                HStack {
+                    Text("VALUE:")
+                    Spacer()
+                    Text("\(channel.getChannelValueSatoshis()) sats")
+                }
+                
+                HStack {
+                    Text("BALANCE:")
+                    Spacer()
+                    Text("\(channel.getBalanceMsat()/1000) sats")
+                }
+                
+                if let inboundhtlcMin = channel.getInboundHtlcMinimumMsat() {
+                    HStack {
+                        Text("INBOUND HTLC MIN:")
+                        Spacer()
+                        Text("\(inboundhtlcMin/1000) sats")
+                    }
+                }
+                
+                if let inboundhtlcMax = channel.getInboundHtlcMaximumMsat() {
+                    HStack {
+                        Text("INBOUND HTLC MAX:")
+                        Spacer()
+                        Text("\(inboundhtlcMax/1000) sats")
+                    }
+                }
+                
+                HStack {
+                    Text("INBOUND CAPACITY:")
+                    Spacer()
+                    Text("\(channel.getInboundCapacityMsat()/1000) sats")
+                }
+                
+                HStack {
+                    Text("OUTBOUND CAPACITY:")
+                    Spacer()
+                    Text("\(channel.getOutboundCapacityMsat()/1000) sats")
+                }
+                
+                VStack(spacing: 12) {
+                    Button {
+                        viewModel.cooperativeClose()
+                    } label: {
+                        if viewModel.isOpeningChannel {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                        } else {
+                            Text("Cooperative Close")
+                                .font(.system(size: 16))
+                        }
+                    }
+                    .disabled(viewModel.isOpeningChannel)
+                    
+                    Button {
+                        viewModel.forceClose()
+                    } label: {
+                        if viewModel.isOpeningChannel {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                        } else {
+                            if let delay = channel.getForceCloseSpendDelay() {
+                                Text("Force Close (\(delay) blocks delay)")
+                                    .font(.system(size: 16))
+                            } else {
+                                Text("Force Close")
+                                    .font(.system(size: 16))
+                            }
+                        }
+                    }
+                    .disabled(viewModel.isOpeningChannel)
+                }
+                .padding(.vertical, 6)
             }
+            .font(.system(size: 18))
+            .padding()
         }
     }
     
     var body: some View {
-        VStack {
-            ZStack {
-                HStack {
-                    PButton(config: .onlyIcon(Asset.xIcon), style: .free, size: .medium, enabled: true) {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                    .frame(width: 20)
-                    
-                    Spacer()
-                }
-                
-                Text("Channel")
-                    .frame(width: 300, height: 62)
-                    .font(.Main.fixed(.monoBold, size: 16))
-            }
-            .padding(.horizontal, 16)
-            
+        VStack(spacing: 8) {
             ScrollView {
-                ForEach(viewModel.usableChannels, id: \.hashValue) { channel in
-                    channelView(channel: channel)
-                }
-            }
-            
-            Spacer()
-        }
-        .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
-    }
-    
-    func channelView(channel: ChannelDetails) -> some View {
-        VStack {
-            if let peer = peer {
+                
                 HStack {
-                    Text("Node Name")
-                        .font(.Main.fixed(.monoBold, size: 14))
-                        .foregroundColor(Palette.grayScaleAA)
+                    Text("Peers")
+                        .font(.system(size: 16))
                     Spacer()
-                    Text(peer.name)
-                        .font(.Main.fixed(.monoBold, size: 16))
-                        .foregroundColor(Palette.grayScaleF4)
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal)
                 
-                Divider()
-                    .frame(height: 1)
-                    .overlay(Palette.grayScale4A)
-                
-                HStack(alignment: .top) {
-                    Text("Public key")
-                        .font(.Main.fixed(.monoBold, size: 14))
-                        .foregroundColor(Palette.grayScaleAA)
+                HStack {
                     Spacer()
-                    Text(peer.peerPubKey)
-                        .multilineTextAlignment(.leading)
-                        .font(.Main.fixed(.monoBold, size: 16))
-                        .foregroundColor(Palette.grayScaleF4)
-                }
-                .padding(.horizontal, 16)
 
-                Divider()
-                    .frame(height: 1)
-                    .overlay(Palette.grayScale4A)
-            }
-            
-            HStack(alignment: .firstTextBaseline) {
-                Text("Total value locked")
-                    .font(.Main.fixed(.monoBold, size: 14))
-                    .foregroundColor(Palette.grayScaleAA)
-                    .offset(y: -10)
-                Spacer()
-                
-                VStack(alignment: .trailing) {
-                    HStack(alignment: .lastTextBaseline) {
-                        Text(String(describing: Decimal(channel.getChannelValueSatoshis())/100_000_000))
-                            .font(.Main.fixed(.monoBold, size: 32))
-                            .foregroundColor(Palette.grayScaleEA)
-                        Text("btc")
-                            .font(.Main.fixed(.monoBold, size: 14))
-                            .foregroundColor(Palette.grayScale6A)
+                    VStack(spacing: 15) {
+                        Text("Alice")
+                            .font(.system(size: 16))
+
+                        Button {
+                            if viewModel.peers.contains(Peer.alice.peerPubKey) {
+                                viewModel.disconnect(peer: Peer.alice)
+                            } else {
+                                Task {
+                                    await viewModel.connect(peer: Peer.alice)
+                                }
+                            }
+                        } label: {
+                            if viewModel.peers.contains(Peer.alice.peerPubKey) {
+                                Text("Disconnect")
+                                    .font(.system(size: 16))
+                            } else {
+                                Text("Connect")
+                                    .font(.system(size: 16))
+                            }
+                        }
                     }
                     
-                    Text("\(((Decimal(channel.getChannelValueSatoshis())/100_000_000).double * marketData.lastSeenBtcPrice.double).usdFormatted()) USD")
-                        .font(.Main.fixed(.monoBold, size: 14))
-                        .foregroundColor(Palette.grayScale6A)
-                }
-            }
-            .padding(.horizontal, 16)
+                    Spacer()
+                    
+                    VStack(spacing: 15) {
+                        Text("Bob")
+                            .font(.system(size: 16))
 
-            Divider()
-                .frame(height: 1)
-                .overlay(Palette.grayScale4A)
-                        
-            HStack(alignment: .firstTextBaseline) {
-                Text("Balance")
-                    .font(.Main.fixed(.monoBold, size: 14))
-                    .foregroundColor(Palette.grayScaleAA)
-                Spacer()
-                
-                VStack(alignment: .trailing) {
-                    HStack(alignment: .lastTextBaseline) {
-                        Text(String(describing: Decimal(channel.getBalanceMsat())/100/100_000_000))
-                            .font(.Main.fixed(.monoBold, size: 18))
-                            .foregroundColor(Palette.grayScaleEA)
-                        Text("BTC")
-                            .font(.Main.fixed(.monoBold, size: 14))
-                            .foregroundColor(Palette.grayScaleEA)
+                        Button {
+                            if viewModel.peers.contains(Peer.bob.peerPubKey) {
+                                viewModel.disconnect(peer: Peer.bob)
+                            } else {
+                                Task {
+                                    await viewModel.connect(peer: Peer.bob)
+                                }
+                            }
+                        } label: {
+                            if viewModel.peers.contains(Peer.bob.peerPubKey) {
+                                Text("Disconnect")
+                                    .font(.system(size: 16))
+                            } else {
+                                Text("Connect")
+                                    .font(.system(size: 16))
+                            }
+                        }
                     }
                     
-                    Text("\(((Decimal(channel.getBalanceMsat())/100/100_000_000).double * marketData.lastSeenBtcPrice.double).usdFormatted()) USD")
-                        .font(.Main.fixed(.monoBold, size: 14))
-                        .foregroundColor(Palette.grayScale6A)
+                    Spacer()
+                    
+//                    VStack(spacing: 15) {
+//                        Text("Carol")
+//                            .font(.system(size: 16))
+//
+//                        Button {
+//                            if viewModel.peers.contains(Peer.carol.peerPubKey) {
+//                                viewModel.disconnect(peer: Peer.carol)
+//                            } else {
+//                                Task {
+//                                    await viewModel.connect(peer: Peer.carol)
+//                                }
+//                            }
+//                        } label: {
+//                            if viewModel.peers.contains(Peer.carol.peerPubKey) {
+//                                Text("Disconnect")
+//                                    .font(.system(size: 16))
+//                            } else {
+//                                Text("Connect")
+//                                    .font(.system(size: 16))
+//                            }
+//                        }
+//                    }
                 }
-            }
-            .padding(.horizontal, 16)
-
-            Divider()
-                .frame(height: 1)
-                .overlay(Palette.grayScale4A)
-                        
-            HStack(alignment: .firstTextBaseline) {
-                Text("Inbound Capacity")
-                    .font(.Main.fixed(.monoBold, size: 14))
-                    .foregroundColor(Palette.grayScaleAA)
-                Spacer()
+                .frame(maxWidth: .infinity)
+                .padding()
                 
-                VStack(alignment: .trailing) {
-                    HStack(alignment: .lastTextBaseline) {
-                        Text(String(describing: Decimal(channel.getInboundCapacityMsat())/100/100_000_000))
-                            .font(.Main.fixed(.monoBold, size: 18))
-                            .foregroundColor(Palette.grayScaleEA)
-                        Text("BTC")
-                            .font(.Main.fixed(.monoBold, size: 14))
-                            .foregroundColor(Palette.grayScaleEA)
+                if !viewModel.peers.isEmpty {
+                    HStack {
+                        Text("Connected: ")
+                            .font(.system(size: 16))
+                        Spacer()
                     }
                     
-                    Text("\(((Decimal(channel.getInboundCapacityMsat())/100/100_000_000).double * marketData.lastSeenBtcPrice.double).usdFormatted()) USD")
-                        .font(.Main.fixed(.monoBold, size: 14))
-                        .foregroundColor(Palette.grayScale6A)
-                }
-            }
-            .padding(.horizontal, 16)
-
-            Divider()
-                .frame(height: 1)
-                .overlay(Palette.grayScale4A)
-            
-            HStack(alignment: .firstTextBaseline) {
-                Text("Outbound Capacity")
-                    .font(.Main.fixed(.monoBold, size: 14))
-                    .foregroundColor(Palette.grayScaleAA)
-                Spacer()
-                
-                VStack(alignment: .trailing) {
-                    HStack(alignment: .lastTextBaseline) {
-                        Text(String(describing: Decimal(channel.getOutboundCapacityMsat())/100/100_000_000))
-                            .font(.Main.fixed(.monoBold, size: 18))
-                            .foregroundColor(Palette.grayScaleEA)
-                        Text("BTC")
-                            .font(.Main.fixed(.monoBold, size: 14))
-                            .foregroundColor(Palette.grayScaleEA)
+                    ForEach(viewModel.peers, id: \.hashValue) { peerId in
+                        ZStack {
+                            Color.yellow.opacity(0.35).cornerRadius(12)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack {
+                                    Text(peers.first{ $0.peerPubKey == peerId }!.name)
+                                        .font(.system(size: 16))
+                                    Spacer()
+                                    Button {
+                                        viewModel.isOpeningChannel.toggle()
+                                        Task {
+                                            await viewModel.openChannel(peer: peers.first{ $0.peerPubKey == peerId }!)
+                                        }
+                                    } label: {
+                                        if viewModel.isOpeningChannel {
+                                            ProgressView()
+                                                .progressViewStyle(.circular)
+                                        } else {
+                                            Text("Open new channel")
+                                                .font(.system(size: 16))
+                                        }
+                                    }
+                                    .disabled(viewModel.isOpeningChannel)
+                                }
+                                
+                                Text(peerId)
+                                    .font(.system(size: 16))
+                            }
+                            .padding()
+                        }
                     }
                     
-                    Text("\(((Decimal(channel.getOutboundCapacityMsat())/100/100_000_000).double * marketData.lastSeenBtcPrice.double).usdFormatted()) USD")
-                        .font(.Main.fixed(.monoBold, size: 14))
-                        .foregroundColor(Palette.grayScale6A)
-                }
-            }
-            .padding(.horizontal, 16)
-
-            Divider()
-                .frame(height: 1)
-                .overlay(Palette.grayScale4A)
-            
-            VStack(spacing: 16) {
-                PButton(
-                    config: .onlyLabel("Cooperative close"),
-                    style: .outline,
-                    size: .big,
-                    enabled: true
-                ) {
-                    guard let channelId = channel.getChannelId() else { return }
-                    viewModel.cooperativeCloseChannel(id: channelId, counterPartyId: channel.getCounterparty().getNodeId())
-                }
-                
-                if let delay = channel.getForceCloseSpendDelay() {
-                    PButton(
-                        config: .onlyLabel("Force Close (\(delay) blocks)"),
-                        style: .outline,
-                        size: .big,
-                        enabled: true
-                    ) {
-                        guard let channelId = channel.getChannelId() else { return }
-                        viewModel.forceCloseChannel(id: channelId, counterPartyId: channel.getCounterparty().getNodeId())
+                    HStack {
+                        Text("Channels: ")
+                            .font(.system(size: 16))
+                        Spacer()
+                        Text("\(viewModel.usableChannels.count)")
+                            .font(.system(size: 16))
                     }
-                } else {
-                    PButton(
-                        config: .onlyLabel("Force Close"),
-                        style: .outline,
-                        size: .big,
-                        enabled: true
-                    ) {
-                        guard let channelId = channel.getChannelId() else { return }
-                        viewModel.forceCloseChannel(id: channelId, counterPartyId: channel.getCounterparty().getNodeId())
+                    .padding(.vertical)
+                    
+                    ForEach(viewModel.usableChannels, id: \.hashValue) { channel in
+                        channelView(channel: channel)
                     }
                 }
                 
-                
             }
-            .padding(16)
         }
+        .padding()
+        .popup(isPresented: $viewModel.showMessage) {
+            HStack {
+                ZStack {
+                    Circle()
+                        .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
+                    Asset.warningIcon
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .foregroundColor(.black)
+                }
+                .frame(width: 32, height: 32)
+                .padding(.horizontal, 12)
+                
+                Text(viewModel.message)
+                    .padding(.vertical)
+                    .font(.Main.fixed(.monoBold, size: 16))
+                    .foregroundColor(.white)
+                Spacer()
+            }
+            .frame(width: 300)
+            .frame(minHeight: 56)
+            .background(Color(red: 0.165, green: 0.165, blue: 0.165))
+            .cornerRadius(16)
+        } customize: {
+            $0.autohideIn(3).type(.floater()).position(.top).animation(.spring()).closeOnTapOutside(true)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-}
-
-#Preview {
-    ChannelView()
 }

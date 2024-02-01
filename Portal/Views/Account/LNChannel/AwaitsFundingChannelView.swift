@@ -9,23 +9,8 @@ import SwiftUI
 import PortalUI
 
 struct AwaitsFundingChannelView: View {
-    let peer: Peer?
-    
     @Environment(\.presentationMode) private var presentationMode
     @State private var viewModel = AwaitsFundingViewModel()
-    
-    init() {
-        if let peerData = UserDefaults.standard.data(forKey: "NodeToConnect") {
-            let decoder = JSONDecoder()
-            if let peer = try? decoder.decode(Peer.self, from: peerData) {
-                self.peer = peer
-            } else {
-                peer = nil
-            }
-        } else {
-            peer = nil
-        }
-    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -66,7 +51,7 @@ struct AwaitsFundingChannelView: View {
                     .font(.Main.fixed(.monoMedium, size: 14))
                     .foregroundColor(Palette.grayScaleAA)
                 Spacer()
-                Text(peer?.name ?? "Unknown name")
+                Text(viewModel.peer?.name ?? "Unknown name")
                     .font(.Main.fixed(.monoMedium, size: 16))
             }
             .padding(16)
@@ -80,7 +65,7 @@ struct AwaitsFundingChannelView: View {
                     .font(.Main.fixed(.monoMedium, size: 14))
                     .foregroundColor(Palette.grayScaleAA)
                 Spacer()
-                Text(peer?.peerPubKey ?? "Unknown pubKey")
+                Text(viewModel.peer?.peerPubKey ?? "Unknown pubKey")
                     .multilineTextAlignment(.leading)
                     .font(.Main.fixed(.monoMedium, size: 16))
             }
