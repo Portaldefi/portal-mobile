@@ -149,7 +149,7 @@ class BlockStreamChainManager {
     }
     
     func isMonitoring() async -> Bool {
-        return await self.monitoringTracker.startTracking()
+        await self.monitoringTracker.startTracking()
     }
 }
 
@@ -161,10 +161,7 @@ extension BlockStreamChainManager {
         let currentChaintipHash = try await self.getChaintipHashHex()
 
         // Check if we area already at chain tip.
-        guard let knownChaintip = self.connectedBlocks.last,
-           knownChaintip.height != currentChaintipHeight && knownChaintip.hash != currentChaintipHash else {
-            return
-        }
+        guard let knownChaintip = self.connectedBlocks.last, knownChaintip.height != currentChaintipHeight && knownChaintip.hash != currentChaintipHash else { return }
 
         // create an array of the new blocks
         var addedBlocks = [BlockDetails]()
