@@ -8,12 +8,13 @@
 import Foundation
 import Factory
 import HsCryptoKit
+import PortalSwapSDK
 
 class SubmarineHolderTemplate: ISubmarineSwap {
     private let bitcoinKit: ISendBitcoinAdapter
     private let lightningKit: ILightningInvoiceHandler
     
-    var swap: Swap?
+    var swap: SwapModel?
     var hash: String
     var id: String = "alice"
     
@@ -40,16 +41,16 @@ class SubmarineHolderTemplate: ISubmarineSwap {
         
         print("[SWAP] Open in holder submarine")
                 
-        if let invoice = await lightningKit.createInvoice(paymentHash: swap.secretHash, satAmount: UInt64(swap.secretHolder.quantity)) {
-            print("[SWAP] secret holder lightning invoice: \(invoice)")
-        }
+//        if let invoice = await lightningKit.createInvoice(paymentHash: swap.secretHash, satAmount: UInt64(swap.secretHolder.quantity)) {
+//            print("[SWAP] secret holder lightning invoice: \(invoice)")
+//        }
     }
     
     func commit() async throws {
         guard let swap = swap else { return }
 
-        let tx = try bitcoinKit.send(amount: Decimal(swap.secretSeeker.quantity), address: "swap.secretSeeker")
-        print("[SWAP] Holder sent tx: \(tx.id)")
+//        let tx = try bitcoinKit.send(amount: Decimal(swap.secretSeeker.quantity), address: "swap.secretSeeker")
+//        print("[SWAP] Holder sent tx: \(tx.id)")
     }
     
     func cancel() async throws {

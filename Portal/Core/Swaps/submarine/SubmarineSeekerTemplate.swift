@@ -8,6 +8,7 @@
 import Foundation
 import HsCryptoKit
 import Factory
+import PortalSwapSDK
 
 class SubmarineSeekerTemplate: ISubmarineSwap {
     private let RELATIVE_SWAP_TIMELOCK: Int32 = 36
@@ -20,7 +21,7 @@ class SubmarineSeekerTemplate: ISubmarineSwap {
     
     private var payDescriptor: String?
     
-    var swap: Swap?
+    var swap: SwapModel?
     var hash: String = "ignored"
     var id: String = "bob"
     
@@ -39,14 +40,14 @@ class SubmarineSeekerTemplate: ISubmarineSwap {
         print("[SWAP] seeker pubKey: \(secretSeekerPublicKey)")
         let secretHolderPublicKey = ""//swap.secretSeeker.pubKey
         print("[SWAP] holder pubKey: \(secretHolderPublicKey)")
-        let swapHash = swap.id
+        let swapHash = swap.swapId
         let timelock = blockchainHeight + RELATIVE_SWAP_TIMELOCK
         print("[SWAP] timelock: \(timelock)")
 
         let witnessScript = scriptGenerator(
             secretSeekerPublicKey: secretSeekerPublicKey,
             secretHolderPublicKey: secretHolderPublicKey,
-            swapHash: swapHash,
+            swapHash: swapHash ?? "",
             timelock: timelock
         )
 

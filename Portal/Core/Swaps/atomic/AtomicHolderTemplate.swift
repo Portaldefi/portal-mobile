@@ -10,6 +10,7 @@ import Factory
 import HsCryptoKit
 import EvmKit
 import BigInt
+import PortalSwapSDK
 
 class CreateInvoiceMethod: ContractMethod {
     private let tokenAddress: Address
@@ -75,7 +76,7 @@ class AtomicHolderTemplate: IAtomicSwap {
     private let ethereumKit: ISendEthereumAdapter
     private let lightningKit: ILightningInvoiceHandler
     
-    var swap: Swap?
+    var swap: SwapModel?
     var secret: [UInt8]
     var secretHash: String
     var id: String = "alice"
@@ -99,24 +100,24 @@ class AtomicHolderTemplate: IAtomicSwap {
     func open() async throws {
         print("[SWAP] Open in holder")
                 
-        guard let swap = swap, let holderAddressHex = swap.secretHolder.asset.contractAddress else {
-            throw SwapError.missingData
-        }
+//        guard let swap = swap, let holderAddressHex = swap.secretHolder.asset.contractAddress else {
+//            throw SwapError.missingData
+//        }
         
 //        try await signalSwapOpen(swap: swap)
 
-        let tokenAddress = try Address(hex: holderAddressHex)
-        let quantity = BigUInt(swap.secretHolder.quantity)
-        
-        let createInvoiceTransaction = try await createInvoice(tokenAddress: tokenAddress, quantity: quantity, tokenNetwork: 0)
-        
-        print("[SWAP] CreateInvoice tx id: \(createInvoiceTransaction.transaction.hash.toHexString())")
-        
-        let receipt = try await waitForTransactionReceipt(transactionHash: createInvoiceTransaction.transaction.hash)
-        let invoiceId = parseInvoiceId(receipt: receipt)
-        
-        print(invoiceId.description)
-        print("[SWAP] Invoice id: \(invoiceId.description) is created for holder")
+//        let tokenAddress = try Address(hex: holderAddressHex)
+//        let quantity = BigUInt(swap.secretHolder.quantity)
+//        
+//        let createInvoiceTransaction = try await createInvoice(tokenAddress: tokenAddress, quantity: quantity, tokenNetwork: 0)
+//        
+//        print("[SWAP] CreateInvoice tx id: \(createInvoiceTransaction.transaction.hash.toHexString())")
+//        
+//        let receipt = try await waitForTransactionReceipt(transactionHash: createInvoiceTransaction.transaction.hash)
+//        let invoiceId = parseInvoiceId(receipt: receipt)
+//        
+//        print(invoiceId.description)
+//        print("[SWAP] Invoice id: \(invoiceId.description) is created for holder")
         
 //        let updatedSwap = updateState(swap: swap, state: ["goerli" : invoiceId.description])
 //
@@ -130,27 +131,28 @@ class AtomicHolderTemplate: IAtomicSwap {
         //settleInvoice
     }
     
-    func updateState(swap: Swap, state: [String : [String: InvoiceCodable]]) -> Swap {
+    func updateState(swap: SwapModel, state: [String : [String: InvoiceCodable]]) -> SwapModel? {
         let secretHolder = swap.secretHolder
         
-        let secretHolderUpdated = Party(
-            id: secretHolder.id,
-            swap: secretHolder.swap,
-            asset: secretHolder.asset,
-            network: secretHolder.network,
-            quantity: secretHolder.quantity,
-            state: state,
-            isSecretSeeker: secretHolder.isSecretSeeker,
-            isSecretHolder: secretHolder.isSecretHolder
-        )
-        
-        return Swap(
-            id: swap.id,
-            secretHash: swap.secretHash,
-            secretHolder: secretHolderUpdated,
-            secretSeeker: swap.secretSeeker,
-            status: swap.status
-        )
+//        let secretHolderUpdated = Party(
+//            id: secretHolder.id,
+//            swap: secretHolder.swap,
+//            asset: secretHolder.asset,
+//            network: secretHolder.network,
+//            quantity: secretHolder.quantity,
+//            state: state,
+//            isSecretSeeker: secretHolder.isSecretSeeker,
+//            isSecretHolder: secretHolder.isSecretHolder
+//        )
+//        
+//        return Swap(
+//            id: swap.id,
+//            secretHash: swap.secretHash,
+//            secretHolder: secretHolderUpdated,
+//            secretSeeker: swap.secretSeeker,
+//            status: swap.status
+//        )
+        return nil
     }
     
     func waitForTransactionReceipt(transactionHash: Data, pollingInterval: TimeInterval = 3) async throws -> RpcTransactionReceipt {
@@ -220,7 +222,7 @@ class AtomicHolderTemplate: IAtomicSwap {
         return try await ethereumKit.send(transactionData: transactionData, gasLimit: estimatedGas, gasPrice: gasPrice)
     }
     
-    private func signalSwapOpen(swap: Swap) async throws {
+    private func signalSwapOpen(swap: SwapModel) async throws {
         let urlString = "http://\(host):\(port)/api/v1/swap"
         
         guard let url = URL(string: urlString) else {
@@ -230,25 +232,25 @@ class AtomicHolderTemplate: IAtomicSwap {
         
         let encoder = JSONEncoder()
         
-        let swapData = try encoder.encode(swap)
+//        let swapData = try encoder.encode(swap)
 //        let partyData = try encoder.encode(swap.secretHolder.isSecretHolder ? swap.secretHolder : swap.secretSeeker)
         
-        let swapDict = try JSONSerialization.jsonObject(with: swapData, options: []) as? [String: Any]
-//        let partyDict = try JSONSerialization.jsonObject(with: partyData, options: []) as? [String: Any]
-        let requestBody: [String: Any] = [
-            "swap": swapDict as Any,
-//            "party": partyDict as Any
-        ]
+//        let swapDict = try JSONSerialization.jsonObject(with: swapData, options: []) as? [String: Any]
+////        let partyDict = try JSONSerialization.jsonObject(with: partyData, options: []) as? [String: Any]
+//        let requestBody: [String: Any] = [
+//            "swap": swapDict as Any,
+////            "party": partyDict as Any
+//        ]
                 
-        let request = try buildRequest(url: url, method: "PUT", userId: swap.secretHolder.isSecretHolder ? swap.secretHolder.id : swap.secretSeeker.id, body: requestBody)
-        
-        let (data, _) = try await URLSession.shared.data(for: request)
-        if let responseString = String(data: data, encoding: .utf8) {
-            print("Response: \(responseString)")
-        } else {
-            print("No response data")
-            throw SwapError.emptyResponse
-        }
+//        let request = try buildRequest(url: url, method: "PUT", userId: swap.secretHolder.isSecretHolder ? swap.secretHolder.id : swap.secretSeeker.id, body: requestBody)
+//        
+//        let (data, _) = try await URLSession.shared.data(for: request)
+//        if let responseString = String(data: data, encoding: .utf8) {
+//            print("Response: \(responseString)")
+//        } else {
+//            print("No response data")
+//            throw SwapError.emptyResponse
+//        }
     }
     
     private func buildRequest(url: URL, method: String, userId: String, body: [String: Any]) throws -> URLRequest {

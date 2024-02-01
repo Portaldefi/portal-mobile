@@ -9,6 +9,7 @@ import Foundation
 import Factory
 import SwiftUI
 import Combine
+import PortalSwapSDK
 
 class AtomicSwapViewModel: ObservableObject {
     enum SwapState {

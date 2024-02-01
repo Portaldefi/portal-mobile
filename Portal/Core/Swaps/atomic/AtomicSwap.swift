@@ -10,6 +10,7 @@ import Starscream
 import Combine
 import Factory
 import BigInt
+import PortalSwapSDK
 
 class AtomicSwap {
     private let host = "localhost"
@@ -21,7 +22,7 @@ class AtomicSwap {
     private var subscriptions = Set<AnyCancellable>()
     
     var onOrderUpdate = PassthroughSubject<Order, Never>()
-    var onSwapUpdate = PassthroughSubject<Swap, Never>()
+    var onSwapUpdate = PassthroughSubject<SwapModel, Never>()
         
     init(side: Order.OrderSide) {
         self.side = side
@@ -82,11 +83,11 @@ class AtomicSwap {
         
         let decoder = JSONDecoder()
         
-        if let updatedOrder = try? decoder.decode(Order.self, from: dataFromSocketString) {
-            update(order: updatedOrder)
-        } else if let swapUpdate = try? decoder.decode(Swap.self, from: dataFromSocketString) {
-            update(swap: swapUpdate)
-        }
+//        if let updatedOrder = try? decoder.decode(Order.self, from: dataFromSocketString) {
+//            update(order: updatedOrder)
+//        } else if let swapUpdate = try? decoder.decode(Swap.self, from: dataFromSocketString) {
+//            update(swap: swapUpdate)
+//        }
     }
     
     private func submitLimitOrder(userId: String, side: Order.OrderSide, hash: String, baseQuantity: Decimal, quoteQuantity: Decimal) async throws -> Order {
@@ -175,7 +176,7 @@ class AtomicSwap {
         onOrderUpdate.send(order)
     }
     
-    func update(swap: Swap) {
+    func update(swap: SwapModel) {
         client?.swap = swap
         onSwapUpdate.send(swap)
     }

@@ -9,6 +9,7 @@ import Foundation
 import Starscream
 import Combine
 import Factory
+import PortalSwapSDK
 
 enum SwapSide {
     case secretHolder, secretSeeker
@@ -34,7 +35,7 @@ class SubmarineSwap {
     private var side: Order.OrderSide
     private var socket: WebSocket?
     var onOrderUpdate = PassthroughSubject<Order, Never>()
-    var onSwapUpdate = PassthroughSubject<Swap, Never>()
+    var onSwapUpdate = PassthroughSubject<SwapModel, Never>()
     private var subscriptions = Set<AnyCancellable>()
     
     init(side: Order.OrderSide) {
@@ -98,11 +99,11 @@ class SubmarineSwap {
         
         let decoder = JSONDecoder()
         
-        if let updatedOrder = try? decoder.decode(Order.self, from: dataFromSocketString) {
-            update(order: updatedOrder)
-        } else if let swapUpdate = try? decoder.decode(Swap.self, from: dataFromSocketString) {
-            update(swap: swapUpdate)
-        }
+//        if let updatedOrder = try? decoder.decode(Order.self, from: dataFromSocketString) {
+//            update(order: updatedOrder)
+//        } else if let swapUpdate = try? decoder.decode(Swap.self, from: dataFromSocketString) {
+//            update(swap: swapUpdate)
+//        }
     }
     
     private func submitLimitOrder(userId: String, side: Order.OrderSide, hash: String) async throws -> Order {
@@ -203,7 +204,7 @@ class SubmarineSwap {
         onOrderUpdate.send(order)
     }
     
-    func update(swap: Swap) {
+    func update(swap: SwapModel) {
         client?.swap = swap
         onSwapUpdate.send(swap)
     }
