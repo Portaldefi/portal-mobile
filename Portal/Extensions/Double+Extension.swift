@@ -11,11 +11,7 @@ extension Double {
     func dollarFormatted() -> String {
         StringFormatter.localizedValueString(value: self, symbol: "$")
     }
-    func btcFormatted() -> String {
-        let formatter = NumberFormatter()
-        let number = NSNumber(value: self)
-        return String(formatter.string(from: number) ?? "")
-    }
+
     func ethFormatted() -> String {
         roundToDecimal(6).toString() + " ETH"
     }
@@ -51,21 +47,13 @@ extension Double {
         formatter.minimumIntegerDigits = 1
         return formatter.string(from: NSNumber(value: self)) ?? "#"
     }
-    
-    func precisionString() -> String {
-        let formatter = NumberFormatter()
-        let number = NSNumber(value: self)
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 18
-        return String(formatter.string(from: number) ?? "")
-    }
-    
+        
     func formattedString(_ currency: AccountCurrency, decimals: Int = 5) -> String {
         let formatter = NumberFormatter()
         
         switch currency {
-        case .fiat(let fiatCurrency):
-            formatter.currencySymbol = fiatCurrency.symbol
+        case .fiat:
+            formatter.currencySymbol = String()
             formatter.groupingSize = 3
             formatter.numberStyle = .currency
             formatter.maximumFractionDigits = 2
