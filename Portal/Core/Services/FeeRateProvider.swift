@@ -13,8 +13,17 @@ class FeeRateProvider {
     private let feeRateKit: FeeRateKit.Kit
 
     init(appConfigProvider: IAppConfigProvider) {
+        let ethEvmUrl: String
+        
+        switch appConfigProvider.network {
+        case .mainnet:
+            ethEvmUrl = "https://mainnet.infura.io/v3/\(appConfigProvider.infuraCredentials.id)"
+        case .testnet, .playnet:
+            ethEvmUrl = "https://sepolia.infura.io/v3/\(appConfigProvider.infuraCredentials.id)"
+        }
+        
         let providerConfig = FeeProviderConfig(
-                ethEvmUrl: FeeProviderConfig.infuraUrl(projectId: appConfigProvider.infuraCredentials.id),
+                ethEvmUrl: ethEvmUrl,
                 ethEvmAuth: appConfigProvider.infuraCredentials.secret,
                 bscEvmUrl: FeeProviderConfig.defaultBscEvmUrl,
                 btcCoreRpcUrl: appConfigProvider.btcCoreRpcUrl,
