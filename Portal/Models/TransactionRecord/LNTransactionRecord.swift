@@ -16,6 +16,7 @@ class LNTransactionRecord: TransactionRecord {
     let fee: Decimal?
     let preimage: String?
     let nodeId: String?
+    let memo: String?
     
     init(payment: LightningPayment, userData: TxUserData) {
         let type: TxType = payment.type == .sent ? .sent(coin: .lightningBitcoin()) : .received(coin: .lightningBitcoin())
@@ -39,6 +40,7 @@ class LNTransactionRecord: TransactionRecord {
         
         self.preimage = payment.preimage
         self.nodeId = payment.nodeId
+        self.memo = payment.memo
         
         let source: TxSource = .lightning
         
@@ -57,7 +59,8 @@ extension TransactionRecord {
             preimage: "lntb255m1p3l3qgadqqnp4qffgdax9g9ux3496d809u6le05nffsccvyuhdyvu5uumvyt7j5twkpp55eham28a4cnwz3epal2geeceskmjs6pxph987shgj3ydnv0nnqvssp5u8meh0nx9jaz68n97h3c22vxvmla2yynjgtcccpu5f4pjt7u7eps9qyysgqcqpcxqzlgsjl4nkpvgu4x54unwafr3s0h2mjtakw9cdklsa28qqdhmsxuqphhytyxlzwfx08nuwez5qvrvcfvkdgwdurtn67cr4l9wkdd6yu8rqgp88xwlu",
             type: .sent,
             timestamp: Int(Date().timeIntervalSince1970),
-            fee: 1000
+            fee: 1000,
+            memo: String()
         )
         return LNTransactionRecord(payment: payment, userData: TxUserData(price: 1000))
     }
