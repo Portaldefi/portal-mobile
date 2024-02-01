@@ -11,8 +11,8 @@ import Combine
 import Factory
 
 @Observable class SwapViewModel {
-    enum SwapState {
-        case placeOrder, matchingOrder, orderMatched, swapping, swapSucceed, swapError(String)
+    enum SwapState: Comparable {
+        case start, publishOrder, matchingOrder, orderMatched, swapping, swapSucceed, swapError(String)
     }
     
     var bottomOffset: CGFloat = 65
@@ -33,9 +33,9 @@ import Factory
     }
     
     private let swapTimeoutTimer = RepeatingTimer(timeInterval: 1)
-    private var swapTimeoutCountDown = 180
+    private var swapTimeoutCountDown = 120
     
-    var swapState: SwapState = .placeOrder {
+    var swapState: SwapState = .start {
         didSet {
             switch swapState {
             case .matchingOrder:
@@ -54,8 +54,14 @@ import Factory
                 }
             case .swapSucceed:
                 swapTimeoutTimer.suspend()
+                if let sdk = sdk, sdk.isConnected {
+                    _ = sdk.stop()
+                }
             case .swapError:
                 swapTimeoutTimer.suspend()
+                if let sdk = sdk, sdk.isConnected {
+                    _ = sdk.stop()
+                }
             default:
                 break
             }
@@ -145,8 +151,8 @@ import Factory
     @ObservationIgnored private var baseAmountPublisher = CurrentValueSubject<Decimal, Never>(0)
     @ObservationIgnored private var quoteAmountPublisher = CurrentValueSubject<Decimal, Never>(0)
     
-    @ObservationIgnored var swap: PortalSwapSDK.Swap?
     @ObservationIgnored var order: PortalSwapSDK.Order?
+    var orders: [PortalSwapSDK.Order] = []
     
     private let config = Container.configProvider()
     
@@ -168,10 +174,6 @@ import Factory
                 
         do {
             try setupSDK(ethPrivKey: privKey, lightningClient: lightningKitManager)
-            
-            sdk?.start().catch({ error in
-                self.swapState = .swapError("SDK start error: \(error)")
-            })
         } catch {
             swapState = .swapError("SDK setup error: \(error)")
         }
@@ -189,7 +191,7 @@ import Factory
         
         guard let sdk = sdk else { return }
         
-        sdk.on("swap.received", { [unowned self] _ in
+        sdk.addListener(event: "swap.received", action: { _ in
             DispatchQueue.main.async {
                 self.swapState = .orderMatched
             }
@@ -198,13 +200,13 @@ import Factory
             }
         })
         
-        sdk.on("swap.completed", { [unowned self] _ in
+        sdk.addListener(event: "swap.completed", action: { _ in
             DispatchQueue.main.async {
                 self.swapState = .swapSucceed
             }
         })
         
-        sdk.on("error", { [unowned self] args in
+        sdk.addListener(event: "error", action: { args in
             DispatchQueue.main.async {
                 self.swapState = .swapError("Swap error: \(args.first ?? "Unknown")")
             }
@@ -258,50 +260,64 @@ import Factory
         let sdkConfig = SwapSdkConfig(
             id: UUID().uuidString,
             network: network,
-            store: [:],
-            blockchains: blockchains,
-            dex: [:],
-            swaps: [:]
+            blockchains: blockchains
         )
         
         sdk = SDK.init(config: sdkConfig)
     }
     
     func submitLimitOrder() {
-        let baseQuantity = Int(truncating: NSDecimalNumber(decimal: baseAmountPublisher.value * 100_000_000))
-        let quoteQuantity = Int(truncating: NSDecimalNumber(decimal: quoteAmountPublisher.value * 1_000_000_000_000_000_000))
+        guard let sdk = sdk else {
+            return
+        }
         
-        let order = OrderRequest(
-            baseAsset: "BTC",
-            baseNetwork: "lightning.btc",
-            baseQuantity: baseQuantity,
-            quoteAsset: "ETH",
-            quoteNetwork: "ethereum",
-            quoteQuantity: quoteQuantity,
-            side: orderSide.rawValue
-        )
+        swapState = .publishOrder
         
-        sdk?.submitLimitOrder(order).then({ [unowned self] order in
-            print("Order recieved: \(order)")
-            self.order = order
-            self.swapState = .matchingOrder
-        }).catch({ error in
-            self.swapState = .swapError("submitting order error: \(error)")
+        sdk.start().then({ [unowned self] _ in
+            let baseQuantity = Int(truncating: NSDecimalNumber(decimal: baseAmountPublisher.value * 100_000_000))
+            let quoteQuantity = Int(truncating: NSDecimalNumber(decimal: quoteAmountPublisher.value * 1_000_000_000_000_000_000))
+            
+            let order = OrderRequest(
+                baseAsset: "BTC",
+                baseNetwork: "lightning.btc",
+                baseQuantity: baseQuantity,
+                quoteAsset: "ETH",
+                quoteNetwork: "ethereum",
+                quoteQuantity: quoteQuantity,
+                side: orderSide.rawValue
+            )
+            
+            sdk.submitLimitOrder(order).then { [unowned self] order in
+                print("Order recieved: \(order)")
+                self.order = order
+                self.orders.append(order)
+                self.swapState = .matchingOrder
+            }.catch{ error in
+                self.swapState = .swapError("submitting order error: \(error)")
+            }
+        }).catch({ [unowned self] error in
+            self.swapState = .swapError("SDK start error: \(error)")
         })
     }
     
     func cancelOrder() {
-        guard let order = order else { return }
+        guard let order = order, let sdk = sdk else { return }
         
-        sdk?.cancelLimitOrder(order).then{ [unowned self] _ in
-            self.swapState = .placeOrder
+        sdk.cancelLimitOrder(order).then{ [unowned self] _ in
+            self.swapState = .start
+            
+            orders.removeFirst()
+            
+            if sdk.isConnected {
+                _ = sdk.stop()
+            }
         }.catch{ [unowned self] error in
             self.swapState = .swapError("Cancel order error: \(error)")
         }
     }
     
     func clear() {
-        swapState = .placeOrder
+        swapState = .start
         baseAmount = String()
         quoteAmount = String()
         actionButtonEnabled = false
