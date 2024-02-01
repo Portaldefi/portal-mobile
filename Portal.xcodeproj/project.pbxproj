@@ -578,7 +578,6 @@
 		75B7532C29F6B18F00F2A93D /* SubmarineSwapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmarineSwapViewModel.swift; sourceTree = "<group>"; };
 		75B7533029F6C30D00F2A93D /* IBitcoinKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IBitcoinKitManager.swift; sourceTree = "<group>"; };
 		75B7533229F6C32C00F2A93D /* ISubmarineSwap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISubmarineSwap.swift; sourceTree = "<group>"; };
-		75BF3B922B4EAD6900089ACE /* portal-ui-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "portal-ui-swift"; path = "../../portal-ui-swift"; sourceTree = "<group>"; };
 		75BF3B932B515A9500089ACE /* BTCTransactionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTCTransactionRecord.swift; sourceTree = "<group>"; };
 		75BF3B952B515AF500089ACE /* EvmTransactionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvmTransactionRecord.swift; sourceTree = "<group>"; };
 		75BF3B972B515B3300089ACE /* LNTransactionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LNTransactionRecord.swift; sourceTree = "<group>"; };
@@ -1023,7 +1022,6 @@
 		756A3114288821F3004978E2 /* Portal */ = {
 			isa = PBXGroup;
 			children = (
-				75BF3B922B4EAD6900089ACE /* portal-ui-swift */,
 				752BAB792AFD157700F27440 /* portal-swap-sdk-swift */,
 				7542183C298955410028D5DF /* Lightning */,
 				4774D72328B4F62500B7988B /* Info.plist */,
