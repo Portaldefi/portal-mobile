@@ -39,7 +39,7 @@ class SendAssetMockedService: ISendAssetService {
     }
     
     func send() async throws -> TransactionRecord {
-        TransactionRecord(transaction: TransactionDetails.mockedConfirmed, userData: TxUserData(price: 1000))
+        BTCTransactionRecord(transaction: TransactionDetails.mockedConfirmed, userData: TxUserData(price: 1000))
     }
     
     func sendMax() async throws -> TransactionRecord {
