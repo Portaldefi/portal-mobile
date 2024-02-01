@@ -72,14 +72,6 @@ class WalletItemViewModel: ObservableObject {
         updateValue()
     }
     
-    private func updateBalance() {
-        if balance != balanceAdapter.balance {
-            balance = balanceAdapter.balance
-            balanceString = "\(balanceAdapter.balance.formatted())"
-            updateValue()
-        }
-    }
-    
     private func updateValue() {
         let _valueString: String
         
