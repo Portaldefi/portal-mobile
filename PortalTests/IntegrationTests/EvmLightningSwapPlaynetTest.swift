@@ -27,8 +27,8 @@ final class EvmLightningSwapPlaynetTest: XCTestCase {
     func test_01_PerformSwapBetweenAliceAndBob() async throws {
         sut = try await EvmLightningSwapPlaynetSample()
         
-        var alicesSwap: Swap?
-        var bobsSwap: Swap?
+        var alicesSwap: SwapModel?
+        var bobsSwap: SwapModel?
         
         let swapPromise = expectation(description: "Successefuly execute swap between Alice and Bob")
                        
