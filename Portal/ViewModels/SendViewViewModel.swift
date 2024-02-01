@@ -172,7 +172,7 @@ enum UserInputResult {
             sendService = SendBTCService(adapter: sendAdapter)
             
             if let service = sendService {
-                balanceString = String(describing: service.spendable)
+                balanceString = service.spendable.formatted()
                 valueString = (service.balance * marketData.lastSeenBtcPrice * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
             }
         case .lightningBitcoin:
@@ -183,7 +183,7 @@ enum UserInputResult {
             sendService = SendLightningService(adapter: sendAdapter)
             
             if let service = sendService {
-                balanceString = String(describing: service.spendable)
+                balanceString = service.spendable.formatted()
                 valueString = (service.balance * marketData.lastSeenBtcPrice * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
             }
         case .ethereum, .erc20:
@@ -198,7 +198,7 @@ enum UserInputResult {
             sendService = SendETHService(coin: coin, adapter: sendAdapter, feeRateProvider: ethFeeRateProvider, manager: ethManager)
             
             if let service = sendService {
-                balanceString = String(describing: service.spendable)
+                balanceString = service.spendable.formatted()
                 valueString = (service.balance * marketData.lastSeenEthPrice * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
             }
         }
