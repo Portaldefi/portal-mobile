@@ -88,7 +88,7 @@ extension LightningAdapter: ITransactionsAdapter {
 
 extension LightningAdapter: ISendLightningAdapter {
     var spendable: Decimal {
-        manager.channelBalance
+        manager.channelBalance/1000/coinRate
     }
     
     func createInvoice(amount: String, description: String) async -> String? {
@@ -127,10 +127,6 @@ extension LightningAdapter: ILightningChannels {
     
     var channelBalance: Decimal {
         manager.channelBalance
-    }
-    
-    func openChannel(peer: Peer) async throws {
-        try await manager.openChannel(peer: peer)
     }
     
     func cooperativeCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {

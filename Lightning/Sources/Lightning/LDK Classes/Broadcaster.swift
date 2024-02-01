@@ -31,10 +31,6 @@ class Broadcaster: BroadcasterInterface {
                 
                 let resultTxId = try await self.rpcInterface.submitTransaction(transaction: transaction.serialize())
                 print("Submitted tx with id: \(resultTxId)")
-                
-                guard expectedTxId == resultTxId else {
-                    fatalError("Expected txId: \(expectedTxId), result: \(resultTxId)")
-                }
             }
         }
     }
