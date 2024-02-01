@@ -9,6 +9,7 @@ import SwiftUI
 import PortalUI
 import Factory
 import Combine
+import PortalSwapSDK
 
 struct SwapView: View, IKeyboardReadable {
     @FocusState private var focusedField: Exchanger.Side?
@@ -41,7 +42,7 @@ struct SwapView: View, IKeyboardReadable {
                 AssetSelectorView()
                     .frame(height: 178)
                     .padding(16)
-                
+                                
                 Rectangle()
                     .foregroundColor(Color(red: 0.118, green: 0.118, blue: 0.118))
                     .onTapGesture {
@@ -56,11 +57,23 @@ struct SwapView: View, IKeyboardReadable {
                     .overlay(Palette.grayScale4A)
                 
                 switch viewModel.swapState {
-                case .placeOrder:
+                case .start:
                     PButton(config: .onlyLabel("Swap"), style: .filled, size: .big, enabled: viewModel.actionButtonEnabled) {
                         focusedField = .none
                         viewModel.submitLimitOrder()
                     }
+                    .padding(16)
+                case .publishOrder:
+                    HStack(spacing: 16) {
+                        Spacer()
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                        Text("Publishing order...")
+                            .font(.Main.fixed(.monoBold, size: 16))
+                            .foregroundColor(Palette.grayScaleF4)
+                        Spacer()
+                    }
+                    .frame(height: 60)
                     .padding(16)
                 case .matchingOrder:
                     HStack(spacing: 16) {
