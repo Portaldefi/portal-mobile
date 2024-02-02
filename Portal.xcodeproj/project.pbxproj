@@ -140,7 +140,7 @@
 		755C56AF28E5BDD600A4B57B /* WalletItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */; };
 		755C56B128E5BE1800A4B57B /* BalanceAdapterMocked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */; };
 		755C56B328E5BE5700A4B57B /* IMarketDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */; };
-		755C56C228E9B13700A4B57B /* TransactionDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56C128E9B13700A4B57B /* TransactionDetailsViewModel.swift */; };
+		755C56C228E9B13700A4B57B /* TransactionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56C128E9B13700A4B57B /* TransactionViewModel.swift */; };
 		755C56C428E9B2CC00A4B57B /* AssetDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56C328E9B2CC00A4B57B /* AssetDetailsViewModel.swift */; };
 		755C56C928EAC99700A4B57B /* TextEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56C828EAC99700A4B57B /* TextEditorViewModel.swift */; };
 		755C56D328EACC9000A4B57B /* TxLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755C56D228EACC9000A4B57B /* TxLabel.swift */; };
@@ -252,7 +252,7 @@
 		75B7531529F1636000F2A93D /* WordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752FB29F1636000F2A93D /* WordView.swift */; };
 		75B7531629F1636000F2A93D /* TextEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752FC29F1636000F2A93D /* TextEditorView.swift */; };
 		75B7531729F1636000F2A93D /* TxAmountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752FD29F1636000F2A93D /* TxAmountView.swift */; };
-		75B7531829F1636000F2A93D /* TransactionDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752FE29F1636000F2A93D /* TransactionDetailsView.swift */; };
+		75B7531829F1636000F2A93D /* TransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752FE29F1636000F2A93D /* TransactionView.swift */; };
 		75B7531929F1636000F2A93D /* AssetDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752FF29F1636000F2A93D /* AssetDetailsView.swift */; };
 		75B7531A29F1636000F2A93D /* ChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7530029F1636000F2A93D /* ChannelView.swift */; };
 		75B7531B29F1636000F2A93D /* TxLabelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B7530129F1636000F2A93D /* TxLabelsView.swift */; };
@@ -461,7 +461,7 @@
 		755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletItemViewModel.swift; sourceTree = "<group>"; };
 		755C56B028E5BE1800A4B57B /* BalanceAdapterMocked.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceAdapterMocked.swift; sourceTree = "<group>"; };
 		755C56B228E5BE5700A4B57B /* IMarketDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMarketDataRepository.swift; sourceTree = "<group>"; };
-		755C56C128E9B13700A4B57B /* TransactionDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewModel.swift; sourceTree = "<group>"; };
+		755C56C128E9B13700A4B57B /* TransactionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionViewModel.swift; sourceTree = "<group>"; };
 		755C56C328E9B2CC00A4B57B /* AssetDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetDetailsViewModel.swift; sourceTree = "<group>"; };
 		755C56C828EAC99700A4B57B /* TextEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEditorViewModel.swift; sourceTree = "<group>"; };
 		755C56D228EACC9000A4B57B /* TxLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxLabel.swift; sourceTree = "<group>"; };
@@ -563,7 +563,7 @@
 		75B752FB29F1636000F2A93D /* WordView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WordView.swift; sourceTree = "<group>"; };
 		75B752FC29F1636000F2A93D /* TextEditorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextEditorView.swift; sourceTree = "<group>"; };
 		75B752FD29F1636000F2A93D /* TxAmountView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TxAmountView.swift; sourceTree = "<group>"; };
-		75B752FE29F1636000F2A93D /* TransactionDetailsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionDetailsView.swift; sourceTree = "<group>"; };
+		75B752FE29F1636000F2A93D /* TransactionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionView.swift; sourceTree = "<group>"; };
 		75B752FF29F1636000F2A93D /* AssetDetailsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetDetailsView.swift; sourceTree = "<group>"; };
 		75B7530029F1636000F2A93D /* ChannelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChannelView.swift; sourceTree = "<group>"; };
 		75B7530129F1636000F2A93D /* TxLabelsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TxLabelsView.swift; sourceTree = "<group>"; };
@@ -775,7 +775,7 @@
 				75B752EE29F1635F00F2A93D /* SingleTxView.swift */,
 				75B752FC29F1636000F2A93D /* TextEditorView.swift */,
 				75B752F329F1636000F2A93D /* TextFieldWrapper.swift */,
-				75B752FE29F1636000F2A93D /* TransactionDetailsView.swift */,
+				75B752FE29F1636000F2A93D /* TransactionView.swift */,
 				75B752FD29F1636000F2A93D /* TxAmountView.swift */,
 				75B7530329F1636000F2A93D /* TxFeesView.swift */,
 				75B752F129F1635F00F2A93D /* TxIDView.swift */,
@@ -1108,7 +1108,7 @@
 				479A7ACF28B7A92C0057E100 /* SendViewViewModel.swift */,
 				75D8C5C628DC89DB00228298 /* ReceiveViewModel.swift */,
 				755C56AE28E5BDD600A4B57B /* WalletItemViewModel.swift */,
-				755C56C128E9B13700A4B57B /* TransactionDetailsViewModel.swift */,
+				755C56C128E9B13700A4B57B /* TransactionViewModel.swift */,
 				755C56C328E9B2CC00A4B57B /* AssetDetailsViewModel.swift */,
 				755C56C828EAC99700A4B57B /* TextEditorViewModel.swift */,
 				755C56DF28EB09EC00A4B57B /* LabelManagerViewModel.swift */,
@@ -1643,7 +1643,7 @@
 				7545BC3828C9E32A00ED92C3 /* FiatRatesResponse.swift in Sources */,
 				7551707D2937A2AD00CC84D7 /* ResponsibleWarningView.swift in Sources */,
 				755C56C428E9B2CC00A4B57B /* AssetDetailsViewModel.swift in Sources */,
-				75B7531829F1636000F2A93D /* TransactionDetailsView.swift in Sources */,
+				75B7531829F1636000F2A93D /* TransactionView.swift in Sources */,
 				750C05E629646860005519FF /* ISendAssetService.swift in Sources */,
 				7551709A2948D02700CC84D7 /* AccountBackupNavigationConfig.swift in Sources */,
 				756A3131288844FD004978E2 /* AccountViewModel.swift in Sources */,
@@ -1701,7 +1701,7 @@
 				75B7531129F1636000F2A93D /* TxAddressView.swift in Sources */,
 				75BF3B982B515B3300089ACE /* LNTransactionRecord.swift in Sources */,
 				75B7530B29F1636000F2A93D /* TxIDView.swift in Sources */,
-				755C56C228E9B13700A4B57B /* TransactionDetailsViewModel.swift in Sources */,
+				755C56C228E9B13700A4B57B /* TransactionViewModel.swift in Sources */,
 				75517081293A515E00CC84D7 /* NavigationStackView.swift in Sources */,
 				75754A9C2B21B2400076FFB3 /* LightningAdapter.swift in Sources */,
 				75388B7C2A3079E500B879A2 /* SecuritySettingsView.swift in Sources */,

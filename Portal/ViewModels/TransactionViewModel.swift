@@ -1,5 +1,5 @@
 //
-//  TransactionDetailsViewModel.swift
+//  TransactionViewModel.swift
 // Portal
 //
 //  Created by farid on 10/2/22.
@@ -11,7 +11,7 @@ import BitcoinDevKit
 import Factory
 import BigInt
 
-class TransactionDetailsViewModel: ObservableObject {    
+class TransactionViewModel: ObservableObject {    
     struct TestNetDataResponse: Codable {
         let height: Int
     }
@@ -222,8 +222,8 @@ class TransactionDetailsViewModel: ObservableObject {
     }
 }
 
-extension TransactionDetailsViewModel {
-    static func config(coin: Coin, tx: TransactionRecord) -> TransactionDetailsViewModel {
+extension TransactionViewModel {
+    static func config(coin: Coin, tx: TransactionRecord) -> TransactionViewModel {
         let adapterManager: IAdapterManager = Container.adapterManager()
         let walletManager: IWalletManager = Container.walletManager()
 
@@ -234,7 +234,7 @@ extension TransactionDetailsViewModel {
             fatalError("coudn't fetch dependencies")
         }
 
-        return TransactionDetailsViewModel(coin: coin, tx: tx, blockChainHeight: adapter.blockchainHeight)
+        return TransactionViewModel(coin: coin, tx: tx, blockChainHeight: adapter.blockchainHeight)
     }
 }
 

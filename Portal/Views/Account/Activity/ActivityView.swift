@@ -216,7 +216,7 @@ struct ActivityView: View {
         }) { tx in
             switch tx.type {
             case .sent(let coin), .received(let coin), .swap(let coin, _):
-                TransactionDetailsView(coin: coin, tx: tx).lockableView()
+                TransactionView(coin: coin, tx: tx).lockableView()
             case .unknown:
                 EmptyView()
             }

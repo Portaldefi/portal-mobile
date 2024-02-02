@@ -1,5 +1,5 @@
 //
-//  TransactionDetailsView.swift
+//  TransactionView.swift
 // Portal
 //
 //  Created by farid on 9/29/22.
@@ -9,13 +9,13 @@ import SwiftUI
 import PortalUI
 import BitcoinDevKit
 
-struct TransactionDetailsView: View {
+struct TransactionView: View {
     private var viewState: ViewState = Container.viewState()
-    @StateObject private var viewModel: TransactionDetailsViewModel
+    @StateObject private var viewModel: TransactionViewModel
     @Environment(\.presentationMode) private var presentationMode
     
     init(coin: Coin, tx: TransactionRecord) {
-        _viewModel = StateObject(wrappedValue: TransactionDetailsViewModel.config(coin: coin, tx: tx))
+        _viewModel = StateObject(wrappedValue: TransactionViewModel.config(coin: coin, tx: tx))
     }
     
     var body: some View {
@@ -333,7 +333,7 @@ struct TransactionDetailsView_Confirmed_Has_Connection: PreviewProvider {
         let _ = Container.adapterManager.register { AdapterManager.mocked }
         let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
         
-        TransactionDetailsView(coin: .bitcoin(), tx: TransactionRecord.mocked(confirmed: true))
+        TransactionView(coin: .bitcoin(), tx: TransactionRecord.mocked(confirmed: true))
     }
 }
 
@@ -343,6 +343,6 @@ struct TransactionDetailsView_NoInternet: PreviewProvider {
         let _ = Container.adapterManager.register { AdapterManager.mocked }
         let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
 
-        TransactionDetailsView(coin: .bitcoin(), tx: TransactionRecord.mocked(confirmed: false))
+        TransactionView(coin: .bitcoin(), tx: TransactionRecord.mocked(confirmed: false))
     }
 }

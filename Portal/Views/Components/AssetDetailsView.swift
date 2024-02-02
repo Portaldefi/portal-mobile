@@ -106,7 +106,7 @@ struct AssetDetailsView: View {
         .sheet(item: $selectedTx, onDismiss: {
             viewModel.updateTransactions()
         }) { tx in
-            TransactionDetailsView(coin: viewModel.coin, tx: tx).lockableView()
+            TransactionView(coin: viewModel.coin, tx: tx).lockableView()
         }
         .sheet(isPresented: $viewModel.goToReceive, onDismiss: {
             viewModel.updateTransactions()

@@ -13,7 +13,7 @@ struct SendViewNavigationConfig: NavigationConfigurator {
         case .transactionDetails(let coin, let tx):
             return ViewElement(
                 id: screen.id,
-                wrappedElement: AnyView(TransactionDetailsView(coin: coin, tx: tx))
+                wrappedElement: AnyView(TransactionView(coin: coin, tx: tx))
             )
         case .sendSelectAsset(let viewModel):
             return ViewElement(
