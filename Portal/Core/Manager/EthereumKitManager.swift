@@ -111,7 +111,10 @@ class EthereumKitManager {
             
             Task {
                 do {
-                    if let estimatedGasLimit = try await self.ethereumKit?.fetchEstimateGas(transactionData: transactionData, gasPrice: .legacy(gasPrice: gasPrice)) {
+                    if let estimatedGasLimit = try await self.ethereumKit?.fetchEstimateGas(
+                        transactionData: transactionData,
+                        gasPrice: .legacy(gasPrice: gasPrice))
+                    {
                         promise(.success(estimatedGasLimit))
                     } else {
                         promise(.success(Kit.defaultGasLimit))

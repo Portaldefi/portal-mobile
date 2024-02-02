@@ -86,7 +86,7 @@ class SendETHService: ISendAssetService {
             }
             .store(in: &subscriptions)
         
-        amount.send(0.00001)
+//        amount.send(0.00001)
     }
     
     private func transaction(gasPrice: Int, transactionData: TransactionData) -> AnyPublisher<Transaction, Never> {
@@ -135,10 +135,8 @@ class SendETHService: ISendAssetService {
     }
     
     func send() async throws -> TransactionRecord {
-        guard let transaction = transaction else {
-            throw SendError.noTransaction
-        }
-        return try await adapter.send(tx: transaction)
+        guard let transaction = transaction else { throw SendError.noTransaction }
+        return try await adapter.send(transaction: transaction)
     }
     
     func sendMax() async throws -> TransactionRecord {

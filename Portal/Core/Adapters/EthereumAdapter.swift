@@ -218,13 +218,13 @@ extension EthereumAdapter: ISendEthereumAdapter {
         evmKit.transferTransactionData(to: address, value: amount)
     }
     
-    func send(tx: SendETHService.Transaction) async throws -> TransactionRecord {
-        let fullTransaction = try await send(
-            to: tx.data.to,
-            amount: tx.data.value,
-            gasLimit: tx.gasData.gasLimit,
-            gasPrice: .legacy(gasPrice: tx.gasData.gasPrice)
-        )
+    func send(transaction: SendETHService.Transaction) async throws -> TransactionRecord {
+        let to = transaction.data.to
+        let amount = transaction.data.value
+        let gasLimit = transaction.gasData.gasLimit
+        let gasPrice: GasPrice = .legacy(gasPrice: transaction.gasData.gasPrice)
+        
+        let fullTransaction = try await send(to: to, amount: amount, gasLimit: gasLimit, gasPrice: gasPrice)
         
         let record = transactionRecord(fullTransaction: fullTransaction)
         print("Eth tx sent: \(record.id) ")
