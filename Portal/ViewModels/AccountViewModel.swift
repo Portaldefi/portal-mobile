@@ -112,7 +112,7 @@ import Factory
             .onMarketDataUpdate
             .receive(on: RunLoop.main)
             .sink { [unowned self] _ in
-                self.updateValue()
+                self.updateValues()
             }
             .store(in: &subscriptions)
         
@@ -130,7 +130,7 @@ import Factory
             .receive(on: RunLoop.main)
             .sink { [weak self] currency in
                 self?.fiatCurrency = currency
-                self?.updateValue()
+                self?.updateValues()
             }
             .store(in: &subscriptions)
         
@@ -139,7 +139,7 @@ import Factory
             .receive(on: RunLoop.main)
             .sink { [weak self] currency in
                 self?.portolioCurrency = currency
-                self?.updateBalance()
+                self?.updateValues()
             }
             .store(in: &subscriptions)
     }
@@ -151,15 +151,15 @@ import Factory
         updateValue()
     }
     
-    func updatePortfolioCurrency() {
-        if portolioCurrency == .bitcoin() {
-            portolioCurrency = .ethereum()
-        } else {
-            portolioCurrency = .bitcoin()
-        }
-        
-        updateBalance()
-    }
+//    func updatePortfolioCurrency() {
+//        if portolioCurrency == .bitcoin() {
+//            portolioCurrency = .ethereum()
+//        } else {
+//            portolioCurrency = .bitcoin()
+//        }
+//        
+//        updateBalance()
+//    }
     
     private func convertToBtcBalance(item: WalletItem) -> Decimal {
         switch item.coin.type {
