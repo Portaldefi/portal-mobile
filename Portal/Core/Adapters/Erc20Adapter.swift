@@ -49,11 +49,11 @@ class Erc20Adapter {
         eip20Kit = try Eip20Kit.Kit.instance(evmKit: evmKit, contractAddress: contractAddress)
     }
 
-    private func transactionRecord(fromTransaction fullTransaction: FullTransaction) -> TransactionRecord? {
+    private func transactionRecord(fromTransaction fullTransaction: FullTransaction) -> TransactionRecord {
         let transaction = fullTransaction.transaction
         
-        var isNew = false
-        if txDataStorage.fetchTxData(txID: transaction.hash.hs.hexString) == nil { isNew = true }
+//        var isNew = false
+//        if txDataStorage.fetchTxData(txID: transaction.hash.hs.hexString) == nil { isNew = true }
         
         var type: TxType = .unknown
         
@@ -203,8 +203,16 @@ extension Erc20Adapter: ISendEthereumAdapter {
         eip20Kit.transferTransactionData(to: address, value: amount)
     }
     
-    func send(tx: SendETHService.Transaction) async throws -> TransactionRecord {
-        .mocked(confirmed: true)
+    func send(transaction: SendETHService.Transaction) async throws -> TransactionRecord {
+        let txData = transaction.data
+        let gasLimit = transaction.gasData.gasLimit
+        let gasPrice: GasPrice = .legacy(gasPrice: transaction.gasData.gasPrice)
+        
+        let fullTransaction = try await send(transactionData: txData, gasLimit: gasLimit, gasPrice: gasPrice)
+        
+        let record = transactionRecord(fromTransaction: fullTransaction)
+        print("\(token.code) tx sent: \(record.id) ")
+        return record
     }
     
     func callSolidity(contractAddress: EvmKit.Address, data: Data) async throws -> Data {
@@ -216,7 +224,14 @@ extension Erc20Adapter: ISendEthereumAdapter {
     }
     
     func send(transactionData: EvmKit.TransactionData, gasLimit: Int, gasPrice: EvmKit.GasPrice) async throws -> EvmKit.FullTransaction {
-        throw SendError.noSigner
+        guard let signer = signer else {
+            throw SendError.noSigner
+        }
+
+        let rawTransaction = try await evmKit.fetchRawTransaction(transactionData: transactionData, gasPrice: gasPrice, gasLimit: gasLimit)
+        let signature = try signer.signature(rawTransaction: rawTransaction)
+
+        return try await evmKit.send(rawTransaction: rawTransaction, signature: signature)
     }
 }
 
@@ -278,10 +293,7 @@ extension Erc20Adapter {
     }
 
     func transactions(from hash: Data?, limit: Int?) -> [TransactionRecord] {
-        eip20Kit.transactions(from: hash, limit: limit)
-                .compactMap {
-                    transactionRecord(fromTransaction: $0)
-                }
+        eip20Kit.transactions(from: hash, limit: limit).compactMap { transactionRecord(fromTransaction: $0) }
     }
 
     func transaction(hash: Data, interTransactionIndex: Int) -> TransactionRecord? {
@@ -290,7 +302,7 @@ extension Erc20Adapter {
 
     func estimatedGasLimit(to address: Address, value: Decimal, gasPrice: GasPrice) async throws -> Int {
         let value = BigUInt(value.hs.roundedString(decimal: token.decimal))!
-        let transactionData = eip20Kit.transferTransactionData(to: address, value: value)
+        let transactionData = transactionData(amount: value, address: address)
 
         return try await evmKit.fetchEstimateGas(transactionData: transactionData, gasPrice: gasPrice)
     }
@@ -308,21 +320,6 @@ extension Erc20Adapter {
 
         return Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
     }
-
-    func send(to: Address, amount: Decimal, gasLimit: Int, gasPrice: GasPrice) async throws {
-        guard let signer = signer else {
-            throw SendError.noSigner
-        }
-
-        let value = BigUInt(amount.hs.roundedString(decimal: token.decimal))!
-        let transactionData = eip20Kit.transferTransactionData(to: to, value: value)
-
-        let rawTransaction = try await evmKit.fetchRawTransaction(transactionData: transactionData, gasPrice: gasPrice, gasLimit: gasLimit)
-        let signature = try signer.signature(rawTransaction: rawTransaction)
-
-        _ = try await evmKit.send(rawTransaction: rawTransaction, signature: signature)
-    }
-
 }
 
 extension Erc20Adapter {
