@@ -174,7 +174,7 @@ class TransactionDetailsViewModel: ObservableObject {
         switch coin.type {
         case .bitcoin:
             return URL(string: "https://blockstream.info/testnet/tx/\(transaction.id)")
-        case .ethereum:
+        case .ethereum, .erc20:
             return URL(string: "https://sepolia.etherscan.io/tx/\(transaction.id)")
         default:
             return nil
