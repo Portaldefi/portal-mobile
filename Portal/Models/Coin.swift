@@ -48,7 +48,7 @@ struct Coin: Identifiable {
             case .playnet:
                 return "Lightning"
             }
-        case .ethereum, .erc20:
+        case .ethereum:
             switch config.network {
             case .mainnet:
                 return "Ethereum"
@@ -57,6 +57,8 @@ struct Coin: Identifiable {
             case .playnet:
                 return "Developer"
             }
+        case .erc20:
+            return "ERC-20"
         }
     }
     
