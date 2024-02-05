@@ -65,122 +65,118 @@ struct SingleTxView: View {
                     
                     Spacer()
                     
-                    HStack(spacing: 6) {
-                        VStack(alignment: .trailing, spacing: 0) {
+                    VStack(alignment: .trailing, spacing: 0) {
+                        HStack(spacing: 6) {
                             switch viewModel.transaction.type {
                             case .unknown:
                                 EmptyView()
                             case .sent:
-                                HStack {
-                                    Text("-")
-                                        .font(.Main.fixed(.monoMedium, size: 16))
-                                        .foregroundColor(Palette.grayScaleEA)
-                                    HighlightedText(
-                                        text: viewModel.amount,
-                                        textColor: Palette.grayScaleEA,
-                                        highlight: searchContext,
-                                        font: .Main.fixed(.monoMedium, size: 16),
-                                        highlightFont: .Main.fixed(.monoBold, size: 16)
-                                    )
-                                    .layoutPriority(1)
-                                }
+                                Text("-")
+                                    .font(.Main.fixed(.monoMedium, size: 16))
+                                    .foregroundColor(Palette.grayScaleEA)
+                                
+                                HighlightedText(
+                                    text: viewModel.amount,
+                                    textColor: Palette.grayScaleEA,
+                                    highlight: searchContext,
+                                    font: .Main.fixed(.monoMedium, size: 16),
+                                    highlightFont: .Main.fixed(.monoBold, size: 16)
+                                )
                             case .received:
-                                HStack {
-                                    Text("+")
-                                        .font(.Main.fixed(.monoMedium, size: 16))
-                                        .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
-                                    HighlightedText(
-                                        text: viewModel.amount,
-                                        textColor: Color(red: 0.191, green: 0.858, blue: 0.418),
-                                        highlight: searchContext,
-                                        font: .Main.fixed(.monoMedium, size: 16),
-                                        highlightFont: .Main.fixed(.monoBold, size: 16)
-                                    )
-                                    .layoutPriority(1)
-                                }
+                                Text("+")
+                                    .font(.Main.fixed(.monoMedium, size: 16))
+                                    .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
+                                
+                                HighlightedText(
+                                    text: viewModel.amount,
+                                    textColor: Color(red: 0.191, green: 0.858, blue: 0.418),
+                                    highlight: searchContext,
+                                    font: .Main.fixed(.monoMedium, size: 16),
+                                    highlightFont: .Main.fixed(.monoBold, size: 16)
+                                )
                             case .swap:
-                                HStack {
-                                    Text("+")
-                                        .font(.Main.fixed(.monoMedium, size: 16))
-                                        .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
-                                    HighlightedText(
-                                        text: viewModel.amount,
-                                        textColor: Color(red: 0.191, green: 0.858, blue: 0.418),
-                                        highlight: searchContext,
-                                        font: .Main.fixed(.monoMedium, size: 16),
-                                        highlightFont: .Main.fixed(.monoBold, size: 16)
-                                    )
-                                    .layoutPriority(1)
-                                }
+                                Text("+")
+                                    .font(.Main.fixed(.monoMedium, size: 16))
+                                    .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
+                                
+                                HighlightedText(
+                                    text: viewModel.amount,
+                                    textColor: Color(red: 0.191, green: 0.858, blue: 0.418),
+                                    highlight: searchContext,
+                                    font: .Main.fixed(.monoMedium, size: 16),
+                                    highlightFont: .Main.fixed(.monoBold, size: 16)
+                                )
                             }
                             
-                            HStack {
-                                switch viewModel.transaction.type {
-                                case .unknown:
-                                    EmptyView()
-                                case .sent, .received:
-                                    Text("\(viewModel.transaction.type.description == "Received" ? "+" : "-")")
-                                        .font(.Main.fixed(.monoBold, size: 16))
-                                        .foregroundColor(Palette.grayScale6A)
-                                    
-                                    Text(viewModel.value)
-                                        .font(.Main.fixed(.monoRegular, size: 16))
-                                        .foregroundColor(Palette.grayScale6A)
-                                        .offset(x: 1)
-                                case .swap:
-                                    Text("-")
-                                        .font(.Main.fixed(.monoBold, size: 16))
-                                        .foregroundColor(Palette.grayScale6A)
-                                    
-                                    Text(viewModel.value)
-                                        .font(.Main.fixed(.monoRegular, size: 16))
-                                        .foregroundColor(.white)
-                                        .offset(x: 1)
-                                }
-                            }
+                            HighlightedText(
+                                text: viewModel.coin?.code.uppercased() ?? "MOK",
+                                textColor: Palette.grayScale6A,
+                                highlight: searchContext,
+                                font: .Main.fixed(.monoMedium, size: 12),
+                                highlightFont: .Main.fixed(.monoBold, size: 12)
+                            )
+                            .offset(y: 1)
                         }
-                        VStack(alignment: .leading, spacing: 0) {
+                        
+                        HStack(spacing: 6) {
                             switch viewModel.transaction.type {
-                            case .unknown:
-                                EmptyView()
-                            case .sent, .received:
-                                HStack {
-                                    HighlightedText(
-                                        text: viewModel.coin?.code.uppercased() ?? "MOK",
-                                        textColor: Palette.grayScale6A,
-                                        highlight: searchContext,
-                                        font: .Main.fixed(.monoMedium, size: 12),
-                                        highlightFont: .Main.fixed(.monoBold, size: 16)
-                                    )
-                                    .offset(y: -1)
-                                    
-                                    Spacer()
-                                }
-                                .frame(width: 38)
+                            case .swap(_, let quote):
+                                Text("-")
+                                    .font(.Main.fixed(.monoBold, size: 16))
+                                    .foregroundColor(Palette.grayScaleEA)
+                                
+                                HighlightedText(
+                                    text: viewModel.value,
+                                    textColor: Palette.grayScaleEA,
+                                    highlight: searchContext,
+                                    font: .Main.fixed(.monoMedium, size: 16),
+                                    highlightFont: .Main.fixed(.monoBold, size: 16)
+                                )
+                                
+                                HighlightedText(
+                                    text: quote.code.uppercased(),
+                                    textColor: Palette.grayScale6A,
+                                    highlight: searchContext,
+                                    font: .Main.fixed(.monoRegular, size: 12),
+                                    highlightFont: .Main.fixed(.monoBold, size: 12)
+                                )
+                                .offset(y: 1)
+                            case .sent:
+                                Text("-")
+                                    .font(.Main.fixed(.monoBold, size: 16))
+                                    .foregroundColor(Palette.grayScale6A)
+                                
+                                HighlightedText(
+                                    text: viewModel.value,
+                                    textColor: Palette.grayScale6A,
+                                    highlight: searchContext,
+                                    font: .Main.fixed(.monoMedium, size: 16),
+                                    highlightFont: .Main.fixed(.monoBold, size: 16)
+                                )
                                 
                                 Text(viewModel.fiatCurrency.code.uppercased())
-                                    .font(.Main.fixed(.monoMedium, size: 12))
-                                    .foregroundColor(Palette.grayScale6A)
-                                    .offset(x: 1, y: 4)
-                            case .swap(let base, let quote):
-                                HStack {
-                                    HighlightedText(
-                                        text: base.code.uppercased(),
-                                        textColor: Palette.grayScale6A,
-                                        highlight: searchContext,
-                                        font: .Main.fixed(.monoMedium, size: 12),
-                                        highlightFont: .Main.fixed(.monoBold, size: 16)
-                                    )
-                                    .offset(y: -1)
-                                    
-                                    Spacer()
-                                }
-                                .frame(width: 38)
-                                
-                                Text(quote.code.uppercased())
                                     .font(.Main.fixed(.monoRegular, size: 12))
                                     .foregroundColor(Palette.grayScale6A)
-                                    .offset(x: 1, y: 4)
+                                    .offset(y: 1)
+                            case .received:
+                                Text("+")
+                                    .font(.Main.fixed(.monoMedium, size: 16))
+                                    .foregroundColor(Palette.grayScale6A)
+                                
+                                HighlightedText(
+                                    text: viewModel.value,
+                                    textColor: Palette.grayScale6A,
+                                    highlight: searchContext,
+                                    font: .Main.fixed(.monoMedium, size: 16),
+                                    highlightFont: .Main.fixed(.monoBold, size: 16)
+                                )
+                                
+                                Text(viewModel.fiatCurrency.code.uppercased())
+                                    .font(.Main.fixed(.monoRegular, size: 12))
+                                    .foregroundColor(Palette.grayScale6A)
+                                    .offset(y: 1)
+                            case .unknown:
+                                EmptyView()
                             }
                         }
                     }
