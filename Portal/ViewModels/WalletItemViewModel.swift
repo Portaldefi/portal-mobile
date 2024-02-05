@@ -28,11 +28,11 @@ class WalletItemViewModel: ObservableObject {
     var value: Decimal {
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            return marketData.lastSeenBtcPrice
+            return balance * marketData.lastSeenBtcPrice * fiatCurrency.rate
         case .ethereum:
-            return balance * marketData.lastSeenEthPrice
+            return balance * marketData.lastSeenEthPrice * fiatCurrency.rate
         case .erc20:
-            return balance * marketData.lastSeenLinkPrice
+            return balance * 1.2 * fiatCurrency.rate
         }
     }
     
@@ -73,17 +73,8 @@ class WalletItemViewModel: ObservableObject {
     }
     
     private func updateValue() {
-        let _valueString: String
-        
-        switch coin.type {
-        case .bitcoin, .lightningBitcoin:
-            _valueString = (marketData.lastSeenBtcPrice * balance * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
-        case .ethereum:
-            _valueString = (marketData.lastSeenEthPrice * balance * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
-        case .erc20:
-            _valueString = (marketData.lastSeenLinkPrice * balance * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
-        }
-                
+        let _valueString = value.double.formattedString(.fiat(fiatCurrency))
+                        
         if valueString != _valueString {
             valueString = _valueString
         }
