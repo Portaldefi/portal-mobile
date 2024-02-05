@@ -48,7 +48,7 @@ struct AccountView: View {
                             ZStack(alignment: .trailing) {
                                 WalletItemView(viewModel: item.viewModel)
                                     .padding(.leading, 12)
-                                    .padding(.trailing, 10)
+                                    .padding(.trailing, 22)
                                     .contentShape(Rectangle())
                                     .onTapGesture {
                                         switch item.coin.type {
@@ -72,7 +72,7 @@ struct AccountView: View {
                                     }
                                 Asset.chevronRightIcon
                                     .foregroundColor(Palette.grayScale4A)
-                                    .offset(x: 2)
+                                    .offset(y: 3)
                             }
                             Divider()
                                 .frame(height: 1)
