@@ -116,7 +116,7 @@ struct Coin: Identifiable {
     }
     
     static func portal() -> Self {
-        Coin(type: .erc20(address: "0xC3Ce6148B680D0DB3AdD8504A78340AA471C4190"), code: "WHALE", name: "Portal whale token", decimal: 18, iconUrl: "https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/96/Ethereum-ETH-icon.png")
+        Coin(type: .erc20(address: "0x6054237C799Ee1E61b0b4b47936E6FfF213b3ad3"), code: "XPORT", name: "Portal", decimal: 18, iconUrl: "https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/96/Ethereum-ETH-icon.png")
     }
     
     static func mocked() -> Self {
