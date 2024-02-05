@@ -59,7 +59,7 @@ class Erc20Adapter {
         let data = txDataStorage.fetch(source: source, id: transaction.hash.hs.hexString)
         let userData = TxUserData(data: data)
         
-        var type: TxType
+        var type: TxType = .unknown
         
         switch fullTransaction.decoration {
         case is IncomingDecoration:
