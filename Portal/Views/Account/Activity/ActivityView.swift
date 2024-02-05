@@ -181,7 +181,10 @@ struct ActivityView: View {
             ZStack {
                 ScrollView {
                     VStack(spacing: 0) {
-                        ForEach(viewModel.searchContext.isEmpty ? viewModel.filteredTransactions : viewModel.searchResults, id: \.self) { transaction in
+                        ForEach(
+                            viewModel.searchContext.isEmpty ? viewModel.filteredTransactions : viewModel.searchResults,
+                            id: \.self
+                        ) { transaction in
                             SingleTxView(searchContext: viewModel.searchContext, transaction: transaction)
                                 .padding(.leading, 10)
                                 .padding(.trailing, 6)
