@@ -54,12 +54,12 @@ class Erc20Adapter {
         
 //        var isNew = false
 //        if txDataStorage.fetchTxData(txID: transaction.hash.hs.hexString) == nil { isNew = true }
-        
-        var type: TxType = .unknown
-        
+                
         let source: TxSource = .ethOnChain
         let data = txDataStorage.fetch(source: source, id: transaction.hash.hs.hexString)
         let userData = TxUserData(data: data)
+        
+        var type: TxType
         
         switch fullTransaction.decoration {
         case is IncomingDecoration:
@@ -68,7 +68,7 @@ class Erc20Adapter {
             type = .sent(coin: token.coin)
         case let decoration as UnknownTransactionDecoration:
             let address = evmKit.address
-            let internalTransactions = decoration.internalTransactions.filter { $0.to == address }
+//            let internalTransactions = decoration.internalTransactions.filter { $0.to == address }
             let transferEventInstances = decoration.eventInstances.compactMap { $0 as? TransferEventInstance }
             let incomingTransfers = transferEventInstances.filter { $0.to == address && $0.from != address }
             let outgoingTransfers = transferEventInstances.filter { $0.from == address }
@@ -110,9 +110,26 @@ class Erc20Adapter {
                 
                 return EvmTransactionRecord(coin: token.coin, transaction: transaction, type: type, amount: amount, sender: transfer.from.eip55, receiver: transfer.to.eip55, userData: userData)
             }
-        case is OutgoingEip20Decoration:
+        case let decoration as OutgoingEip20Decoration:
             type = .sent(coin: token.coin)
+                        
+            var amount: Decimal?
+            
+            if let significand = Decimal(string: decoration.value.description) {
+                amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
+            }
+            
+            let record = EvmTransactionRecord(
+                coin: token.coin,
+                transaction: transaction,
+                type: type,
+                amount: amount,
+                sender: evmKit.address.eip55,
+                receiver: decoration.to.eip55,
+                userData: userData
+            )
 
+            return record
         case is ApproveEip20Decoration:
             type = .sent(coin: token.coin)
 
