@@ -21,6 +21,11 @@ public class Node {
     public var channelManager: ChannelManager?
     public let logger = Logger(logLevels: [.Warn, .Error, .Info, .Debug])
     public var pendingPayments = [LightningPayment]()
+    
+    public var bestBlock: Int32 {
+        guard let channelManager = channelManager else { return 0 }
+        return Int32(channelManager.currentBestBlock().height())
+    }
 
     var rpcInterface: RpcChainManager?
     var broadcaster: Broadcaster?
@@ -231,15 +236,12 @@ public class Node {
         
         for txId in reorgTxIds {
             let txIdHex = Utils.bytesToHex32Reversed(bytes: Utils.arrayToTuple32(array: txId))
+            let status = try await rpcInterface.getTxStatus(txId: txIdHex)
             
-            guard
-                let status = try? await rpcInterface.getTxStatus(txId: txIdHex),
-                let confirmed = status["confirmed"] as? Bool else
-            {
-                continue
-            }
+            guard let confirmed = status["confirmed"] as? Bool else { continue }
             
-            if confirmed, let transaction = try? await fetchConfirmedTx(txId: txIdHex, status: status) {
+            if confirmed {
+                let transaction = try await fetchConfirmedTx(txId: txIdHex, status: status)
                 confirmedTxs.append(transaction)
             } else {
                 try transactionUnconfirmed(txId: txId)
@@ -252,16 +254,13 @@ public class Node {
             guard let txId = watchedTx.0 else { continue }
             
             let txIdHex = Utils.bytesToHex32Reversed(bytes: Utils.arrayToTuple32(array: txId))
-            
             let processedTx = confirmedTxs.contains(where: { ($0["txIdHex"] as? String) ?? String() == txIdHex })
             
-            if
-                !processedTx,
-                let status = try? await rpcInterface.getTxStatus(txId: txIdHex),
-                let confirmed = status["confirmed"] as? Bool,
-                let transaction = try? await fetchConfirmedTx(txId: txIdHex, status: status)
-            {
-                if confirmed {
+            if !processedTx {
+                let status = try await rpcInterface.getTxStatus(txId: txIdHex)
+                
+                if let confirmed = status["confirmed"] as? Bool, confirmed {
+                    let transaction = try await fetchConfirmedTx(txId: txIdHex, status: status)
                     confirmedTxs.append(transaction)
                 }
             }
@@ -277,18 +276,17 @@ public class Node {
             let txIdHex = Utils.bytesToHex32Reversed(bytes: Utils.arrayToTuple32(array: txId))
             let outputIndex = outpoint.getIndex()
 
-            guard
-                let outSpent = try? await rpcInterface.getTxOutspent(txId: txIdHex, index: outputIndex), outSpent.spent,
-                let outspentTxId = outSpent.txid,
-                let status = try? await rpcInterface.getTxStatus(txId: outspentTxId),
-                let confirmed = status["confirmed"] as? Bool else
-            {
-                continue
-            }
+            let outSpent = try await rpcInterface.getTxOutspent(txId: txIdHex, index: outputIndex)
+            
+            guard outSpent.spent, let outspentTxId = outSpent.txid else { continue }
+            
+            let status = try await rpcInterface.getTxStatus(txId: outspentTxId)
+            guard let confirmed = status["confirmed"] as? Bool else { continue }
                         
             let processedTx = confirmedTxs.contains(where: { ($0["txIdHex"] as? String) ?? String() == outspentTxId })
             
-            if !processedTx, confirmed, let transaction = try? await fetchConfirmedTx(txId: outspentTxId, status: status) {
+            if !processedTx, confirmed {
+                let transaction = try await fetchConfirmedTx(txId: outspentTxId, status: status)
                 confirmedTxs.append(transaction)
             }
         }
@@ -916,7 +914,7 @@ extension Node {
 // MARK: Publishers
 extension Node {
     public var connectedPeers: AnyPublisher<[String], Never> {
-        Timer.publish(every: 5, on: .main, in: .default)
+        Timer.publish(every: 10, on: .main, in: .default)
             .autoconnect()
             .prepend(Date())
             .filter { [weak self] _ in self?.peerManager != nil }
@@ -941,7 +939,13 @@ extension Node {
             .sink(receiveCompletion: { error in
                 print("Error subscribing to blockchain monitor")
             }, receiveValue: { [unowned self] _ in
-                Task { try? await sync() }
+                Task {
+                    do {
+                        try await sync()
+                    } catch {
+                        print("Node syncing error: \(error.localizedDescription)")
+                    }
+                }
             })
             .store(in: &cancellables)
     }
