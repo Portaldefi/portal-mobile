@@ -40,6 +40,7 @@ protocol IBitcoinCore {
 
 protocol ILightningKitManager: ILightningChannels, ILightningInvoiceHandler, ILightningPeerHandler, IBitcoinCore {
     var peer: Peer? { get }
+    var bestBlock: Int32 { get }
     var transactions: [TransactionRecord] { get }
     var transactionsPublisher: AnyPublisher<[TransactionRecord], Never> { get }
     var activePeersPublisher: AnyPublisher<[String], Never> { get }

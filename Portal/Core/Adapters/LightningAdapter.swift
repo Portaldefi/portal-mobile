@@ -54,7 +54,7 @@ extension LightningAdapter: IAdapter {
     
     var blockchainHeight: Int32 {
         //TODO: - implement blockchainHeight
-        0
+        manager.bestBlock
     }
 }
 

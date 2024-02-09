@@ -18,7 +18,6 @@ final class BitcoinAdapter {
     
     private let electrumTestNetURL = "ssl://electrum.blockstream.info:60002"
     private let espolaRegTestURL = "http:/localhost:3002"
-    private var blockChainHeight: Int32 = 0
     
     private let coinRate: Decimal = pow(10, 8)
     
@@ -28,12 +27,11 @@ final class BitcoinAdapter {
     
     private let wallet: BitcoinDevKit.Wallet
     private let blockchain: BitcoinDevKit.Blockchain
-    private let updateTimer = RepeatingTimer(timeInterval: 5)
+    private let updateTimer: RepeatingTimer
     private let networkQueue = DispatchQueue(label: "com.portal.network.layer.queue", qos: .userInitiated)
     
     private var adapterState: AdapterState = .synced
     private var _balance = Balance(immature: 0, trustedPending: 0, untrustedPending: 0, confirmed: 0, spendable: 0, total: 0)
-    private var _receiveAddress: AddressInfo?
     private var _transactions = [TransactionDetails]()
     
     @Injected(Container.notificationService) var notificationService
@@ -82,6 +80,7 @@ final class BitcoinAdapter {
                     validateDomain: false
                 )
                 blockchainConfig = BlockchainConfig.electrum(config: electrumConfig)
+                updateTimer = RepeatingTimer(timeInterval: 30)
             case .regtest:
                 let espolaConfig = EsploraConfig(
                     baseUrl: espolaRegTestURL,
@@ -91,7 +90,8 @@ final class BitcoinAdapter {
                     timeout: nil
                 )
                 blockchainConfig = BlockchainConfig.esplora(config: espolaConfig)
-                
+                updateTimer = RepeatingTimer(timeInterval: 5)
+
                 //RPC Config is broken
                 
 //                let rpcConfig = RpcConfig(
@@ -132,11 +132,11 @@ final class BitcoinAdapter {
         networkQueue.async {
             do {
 //                print("SYNCING WITH BITCOIN NETWORK...")
-                let start = DispatchTime.now()
+//                let start = DispatchTime.now()
                 try self.wallet.sync(blockchain: self.blockchain, progress: nil)
-                let end = DispatchTime.now()
-                let nanoTime = end.uptimeNanoseconds - start.uptimeNanoseconds
-                let timeInterval = Double(nanoTime)/1_000_000_000
+//                let end = DispatchTime.now()
+//                let nanoTime = end.uptimeNanoseconds - start.uptimeNanoseconds
+//                let timeInterval = Double(nanoTime)/1_000_000_000
 //                print("SYNCED in \(timeInterval) seconds")
                 try self.update()
                 self.update(state: .synced)
@@ -150,10 +150,8 @@ final class BitcoinAdapter {
     }
     
     private func update() throws {
-        try updateAddress()
         try updateBalance()
         try updateTransactions()
-        try updateBlockHeight()
     }
     
     private func update(state: AdapterState) {
@@ -164,13 +162,10 @@ final class BitcoinAdapter {
     private func updateBalance() throws {
         let oldValue = _balance
         _balance = try wallet.getBalance()
+        
         if _balance != oldValue {
             balanceUpdatedSubject.send()
         }
-    }
-    
-    private func updateAddress() throws {
-        _receiveAddress = try wallet.getAddress(addressIndex: AddressIndex.lastUnused)
     }
     
     private func updateTransactions() throws {
@@ -201,7 +196,7 @@ final class BitcoinAdapter {
             var isNew = false
             if txDataStorage.fetchTxData(txID: txRecord.txid) == nil { isNew = true }
             
-            let source: TxSource = .btcOnChain
+            let source: TxSource = .bitcoin
             let data = txDataStorage.fetch(source: source, id: txRecord.txid)
             let userData = TxUserData(data: data)
             let record = BTCTransactionRecord(transaction: txRecord, userData: userData)
@@ -222,12 +217,6 @@ final class BitcoinAdapter {
                 
         transactionsSubject.send(txRecords)
     }
-    
-    private func updateBlockHeight() throws {
-        let blockHeight = Int32(try blockchain.getHeight())
-//        print("BDK LATEST BLOCK: \(blockHeight)")
-        blockChainHeight = blockHeight
-    }
 }
 
 extension BitcoinAdapter: IAdapter {
@@ -244,7 +233,7 @@ extension BitcoinAdapter: IAdapter {
     }
     
     var blockchainHeight: Int32 {
-        blockChainHeight
+        return 0
     }
 }
 
@@ -268,7 +257,7 @@ extension BitcoinAdapter: IBalanceAdapter {
 
 extension BitcoinAdapter: IDepositAdapter {
     var receiveAddress: String {
-        _receiveAddress?.address.asString() ?? String()
+        (try? wallet.getAddress(addressIndex: AddressIndex.lastUnused).address.asString()) ?? String()
     }
 }
 
@@ -284,7 +273,7 @@ extension BitcoinAdapter: ITransactionsAdapter {
             var isNew = false
             if txDataStorage.fetchTxData(txID: txRecord.txid) == nil { isNew = true }
             
-            let source: TxSource = .btcOnChain
+            let source: TxSource = .bitcoin
             let data = txDataStorage.fetch(source: source, id: txRecord.txid)
             let userData = TxUserData(data: data)
             let record = BTCTransactionRecord(transaction: txRecord, userData: userData)
@@ -368,7 +357,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         
         if finalized {
             try blockchain.broadcast(transaction: psbt.extractTx())
-            let source: TxSource = .btcOnChain
+            let source: TxSource = .bitcoin
             let data = txDataStorage.fetch(source: source, id: txDetails.txid)
             let userData = TxUserData(data: data)
             return BTCTransactionRecord(transaction: txDetails, userData: userData)
@@ -400,7 +389,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         
         if finalized {
             try blockchain.broadcast(transaction: psbt.extractTx())
-            let source: TxSource = .btcOnChain
+            let source: TxSource = .bitcoin
             let data = txDataStorage.fetch(source: source, id: txDetails.txid)
             let userData = TxUserData(data: data)
             let record = BTCTransactionRecord(transaction: txDetails, userData: userData)
@@ -442,7 +431,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
 
         if finalized {
             try blockchain.broadcast(transaction: psbt.extractTx())
-            let source: TxSource = .btcOnChain
+            let source: TxSource = .bitcoin
             let data = txDataStorage.fetch(source: source, id: txDetails.txid)
             let userData = TxUserData(data: data)
             return BTCTransactionRecord(transaction: txDetails, userData: userData)
