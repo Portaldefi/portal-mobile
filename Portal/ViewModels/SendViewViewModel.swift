@@ -112,8 +112,10 @@ enum UserInputResult {
                 switch coin.type {
                 case .bitcoin, .lightningBitcoin:
                     self.valueString = (sendService.balance * self.marketData.lastSeenBtcPrice * self.fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
-                case .ethereum, .erc20:
+                case .ethereum:
                     self.valueString = (sendService.balance * self.marketData.lastSeenEthPrice * self.fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
+                case .erc20:
+                    self.valueString = (sendService.balance * 1.2 * self.fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
                 }
             }
             .store(in: &subscriptions)
@@ -125,8 +127,10 @@ enum UserInputResult {
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
             price = marketData.lastSeenBtcPrice
-        case .ethereum, .erc20:
+        case .ethereum:
             price = marketData.lastSeenEthPrice
+        case .erc20:
+            price = 1.2
         }
         
         exchanger = Exchanger(
@@ -186,7 +190,7 @@ enum UserInputResult {
                 balanceString = service.spendable.formatted()
                 valueString = (service.balance * marketData.lastSeenBtcPrice * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
             }
-        case .ethereum, .erc20:
+        case .ethereum:
             guard let sendAdapter = adapter as? ISendEthereumAdapter else {
                 fatalError("coudn't fetch dependencies")
             }
@@ -200,6 +204,21 @@ enum UserInputResult {
             if let service = sendService {
                 balanceString = service.spendable.formatted()
                 valueString = (service.balance * marketData.lastSeenEthPrice * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
+            }
+        case .erc20:
+            guard let sendAdapter = adapter as? ISendEthereumAdapter else {
+                fatalError("coudn't fetch dependencies")
+            }
+            
+            let feeRateProvider = Container.feeRateProvider()
+            let ethFeeRateProvider = EthereumFeeRateProvider(feeRateProvider: feeRateProvider)
+            
+            let ethManager = Container.ethereumKitManager()
+            sendService = SendETHService(coin: coin, adapter: sendAdapter, feeRateProvider: ethFeeRateProvider, manager: ethManager)
+            
+            if let service = sendService {
+                balanceString = service.spendable.formatted()
+                valueString = (service.balance * 1.2 * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
             }
         }
         

@@ -42,12 +42,12 @@ struct TransactionView: View {
                             
                             Divider()
                             
-                            TxFeesView(fees: viewModel.feeString, coin: viewModel.coin.code.lowercased(), source: viewModel.source)
+                            TxFeesView(fees: viewModel.feeString, source: viewModel.source)
                             
                             Divider()
                             
                             switch viewModel.source {
-                            case .btcOnChain, .ethOnChain:
+                            case .bitcoin, .ethereum, .erc20:
                                 TxIDView(txID: viewModel.txIdString, explorerURL: viewModel.explorerUrl)
                                 
                                 Divider()
@@ -190,7 +190,7 @@ struct TransactionView: View {
     private func TxSummaryView() -> some View {
         VStack(spacing: 24) {
             switch viewModel.source {
-            case .btcOnChain, .ethOnChain:
+            case .bitcoin, .ethereum, .erc20:
                 if viewModel.confirmations < 6 && !viewState.isReachable {
                     NoInternetConnectionView()
                         .padding(.horizontal, -16)

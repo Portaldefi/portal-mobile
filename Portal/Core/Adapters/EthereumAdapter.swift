@@ -49,7 +49,7 @@ class EthereumAdapter {
             amount = Decimal(sign: .plus, exponent: -decimal, significand: significand)
         }
         
-        let source: TxSource = .ethOnChain
+        let source: TxSource = .ethereum
         let data = txDataStorage.fetch(source: source, id: txHash)
         let userData = TxUserData(data: data)
         

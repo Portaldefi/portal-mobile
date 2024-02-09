@@ -68,10 +68,12 @@ extension TxDataStorage: ITxUserDataStorage {
                 data.txID = id
                 
                 switch source {
-                case .btcOnChain, .lightning, .swap:
+                case .bitcoin, .lightning, .swap:
                     data.assetUSDPrice = marketData.lastSeenBtcPrice as NSDecimalNumber
-                case .ethOnChain:
+                case .ethereum:
                     data.assetUSDPrice = marketData.lastSeenEthPrice as NSDecimalNumber
+                case .erc20:
+                    data.assetUSDPrice = 1.2
                 }
                 
                 context.insert(data)
@@ -83,10 +85,12 @@ extension TxDataStorage: ITxUserDataStorage {
             
             if data.assetUSDPrice == 0 {
                 switch source {
-                case .btcOnChain, .lightning, .swap:
+                case .bitcoin, .lightning, .swap:
                     data.assetUSDPrice = marketData.lastSeenBtcPrice as NSDecimalNumber
-                case .ethOnChain:
+                case .ethereum:
                     data.assetUSDPrice = marketData.lastSeenEthPrice as NSDecimalNumber
+                case .erc20:
+                    data.assetUSDPrice = 1.2
                 }
             }
             

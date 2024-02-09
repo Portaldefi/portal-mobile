@@ -31,7 +31,7 @@ class EvmTransactionRecord: TransactionRecord {
             fee = nil
         }
         
-        let source: TxSource = .ethOnChain
+        let source: TxSource = .ethereum
 
         super.init(source: source, type: type, id: transaction.hash.hs.hexString, timestamp: transaction.timestamp, userData: userData)
     }

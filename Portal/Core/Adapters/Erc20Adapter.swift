@@ -55,7 +55,7 @@ class Erc20Adapter {
 //        var isNew = false
 //        if txDataStorage.fetchTxData(txID: transaction.hash.hs.hexString) == nil { isNew = true }
                 
-        let source: TxSource = .ethOnChain
+        let source: TxSource = .erc20(token: token)
         let data = txDataStorage.fetch(source: source, id: transaction.hash.hs.hexString)
         let userData = TxUserData(data: data)
         
