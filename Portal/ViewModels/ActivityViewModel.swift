@@ -70,10 +70,9 @@ class ActivityViewModel: ObservableObject {
         
         persistenceManager = try? LocalPersistenceManager.manager()
 
-        updateTransactions()
         subscribeForSearchContext()
     }
-    
+        
     func updateTransactions() {
         transactions.removeAll()
         

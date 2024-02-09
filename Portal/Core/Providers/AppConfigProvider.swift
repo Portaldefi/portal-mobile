@@ -8,7 +8,7 @@
 import Foundation
 
 class AppConfigProvider: IAppConfigProvider {
-    enum Network {
+    enum Network: CaseIterable {
         case mainnet, testnet, playnet
     }
     

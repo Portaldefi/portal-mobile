@@ -9,6 +9,8 @@ import Combine
 import LightningDevKit
 
 class MockedLightningKitManager: ILightningKitManager {
+    var bestBlock: Int32 = 0
+    
     var peer: Peer?
     
     func cooperativeCloseChannel(id: [UInt8], counterPartyId: [UInt8]) {

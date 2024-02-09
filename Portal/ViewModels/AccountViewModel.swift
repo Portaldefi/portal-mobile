@@ -47,12 +47,12 @@ import Factory
     public var goToLightningChannelSetup = false
     public var goToLightningChannelAwaits = false
     
-    private let accountManager: IAccountManager
-    private let walletManager: IWalletManager
-    private let adapterManager: IAdapterManager
-    private let marketData: IMarketDataRepository
-    private let localStorage: ILocalStorage
-    private let settings: IPortalSettings
+    @ObservationIgnored private let accountManager: IAccountManager
+    @ObservationIgnored private let walletManager: IWalletManager
+    @ObservationIgnored private let adapterManager: IAdapterManager
+    @ObservationIgnored private let marketData: IMarketDataRepository
+    @ObservationIgnored private let localStorage: ILocalStorage
+    @ObservationIgnored private let settings: IPortalSettings
     
     @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
         
