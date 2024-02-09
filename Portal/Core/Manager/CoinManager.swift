@@ -52,6 +52,7 @@ final class CoinManager: ICoinManager {
         walletCoins.append(.bitcoin())
         walletCoins.append(.lightningBitcoin())
         walletCoins.append(.ethereum())
+        walletCoins.append(.portal())
         
         for code in coinCodes {
             guard let coin = avaliableCoins.first(where: { $0.code == code }) else { return }
