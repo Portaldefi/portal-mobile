@@ -59,7 +59,7 @@ struct WalletItemView: View {
                         .multilineTextAlignment(.center)
                         .font(.Main.fixed(.monoRegular, size: 16))
                         .foregroundColor(.yellow)
-                        .padding(.trailing, 12)
+//                        .padding(.trailing, 12)
                     
                 } else if
                     let channel = viewModel.lightningKit.allChannels.first,
@@ -95,7 +95,7 @@ struct WalletItemView: View {
                         .multilineTextAlignment(.center)
                         .font(.Main.fixed(.monoRegular, size: 16))
                         .foregroundColor(Palette.grayScale6A)
-                        .padding(.trailing, 12)
+                        .padding(.trailing, -12)
                         .frame(width: 80)
                 }
             }

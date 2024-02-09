@@ -61,9 +61,15 @@ struct SetRecipientView: View {
                         Spacer()
                     }
                     
-                    Text("Send")
-                        .frame(width: 300, height: 62)
-                        .font(.Main.fixed(.monoBold, size: 16))
+                    if let coin = viewModel.coin {
+                        Text("Send \(coin.code) (\(coin.network))")
+                            .frame(width: 300, height: 62)
+                            .font(.Main.fixed(.monoBold, size: 16))
+                    } else {
+                        Text("Send")
+                            .frame(width: 300, height: 62)
+                            .font(.Main.fixed(.monoBold, size: 16))
+                    }
                 }
                 
                 if !viewState.isReachable {

@@ -57,7 +57,7 @@ struct SendSelectAssetView: View {
                                 ZStack(alignment: .trailing) {
                                     WalletItemView(viewModel: item.viewModel)
                                         .padding(.leading, 16)
-                                        .padding(.trailing, 14)
+                                        .padding(.trailing, 22)
                                         .contentShape(Rectangle())
                                         .onTapGesture {
                                             if item.coin == .lightningBitcoin(), !viewModel.hasUsableChannels {
