@@ -1,5 +1,5 @@
 //
-//  AssetDetailsViewModel.swift
+//  AssetViewModel.swift
 // Portal
 //
 //  Created by farid on 10/2/22.
@@ -11,7 +11,7 @@ import BitcoinDevKit
 import Factory
 import PortalSwapSDK
 
-@Observable class AssetDetailsViewModel {
+@Observable class AssetViewModel {
     let coin: Coin
     
     public var goToReceive = false
@@ -115,8 +115,8 @@ import PortalSwapSDK
     }
 }
 
-extension AssetDetailsViewModel {
-    static func config(coin: Coin) -> AssetDetailsViewModel {
+extension AssetViewModel {
+    static func config(coin: Coin) -> AssetViewModel {
         let adapterManager: IAdapterManager = Container.adapterManager()
         let walletManager: IWalletManager = Container.walletManager()
 
@@ -126,10 +126,10 @@ extension AssetDetailsViewModel {
         else {
             fatalError("coudn't fetch dependencies")
         }
-        return AssetDetailsViewModel(coin: coin, transactionAdapter: transactionsAdapter)
+        return AssetViewModel(coin: coin, transactionAdapter: transactionsAdapter)
     }
     
-    static var mocked: AssetDetailsViewModel {
-        AssetDetailsViewModel(coin: .bitcoin(), transactionAdapter: MockedAdapter())
+    static var mocked: AssetViewModel {
+        AssetViewModel(coin: .bitcoin(), transactionAdapter: MockedAdapter())
     }
 }

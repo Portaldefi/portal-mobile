@@ -1,5 +1,5 @@
 //
-//  AssetDetailsView.swift
+//  AssetView.swift
 //  BDKDemoApp
 //
 //  Created by farid on 7/22/22.
@@ -10,17 +10,17 @@ import BitcoinDevKit
 import PortalUI
 import Factory
 
-struct AssetDetailsView: View {
+struct AssetView: View {
     @Environment(NavigationStack.self) var navigation: NavigationStack
     @State private var showChannelDetails = false
-    @State private var viewModel: AssetDetailsViewModel
+    @State private var viewModel: AssetViewModel
     @State private var showTxDetails = false
     
     let item: WalletItem
     
     private var viewState: ViewState = Container.viewState()
         
-    init(item: WalletItem, viewModel: AssetDetailsViewModel) {
+    init(item: WalletItem, viewModel: AssetViewModel) {
         self.item = item
         self._viewModel = State(initialValue: viewModel)
     }
@@ -163,14 +163,14 @@ struct NoInternetConnectionView: View {
 struct TxsView_Has_Connection: PreviewProvider {
     static var previews: some View {
         let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
-        AssetDetailsView(item: WalletItem.mockedBtc, viewModel: AssetDetailsViewModel.mocked)
+        AssetView(item: WalletItem.mockedBtc, viewModel: AssetViewModel.mocked)
     }
 }
 
 struct TxsView_No_Connection: PreviewProvider {
     static var previews: some View {
         let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
-        AssetDetailsView(item: WalletItem.mockedBtc, viewModel: AssetDetailsViewModel.mocked)
+        AssetView(item: WalletItem.mockedBtc, viewModel: AssetViewModel.mocked)
     }
 }
 
