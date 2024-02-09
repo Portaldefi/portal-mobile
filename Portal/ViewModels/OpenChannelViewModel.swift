@@ -20,7 +20,7 @@ import Factory
         case .playnet:
             peers = [.alice, .bob]
         case .testnet, .mainnet:
-            peers = [.mlCom, .aranguren, .openNode]
+            peers = [.olympus, .aranguren, .openNode]
 
         }
     }

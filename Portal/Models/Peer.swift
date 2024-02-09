@@ -108,6 +108,19 @@ extension Peer {
         )
     }
     
+    static var olympus: Peer {
+        let name = "OLYMPUS by ZEUS"
+        let pubKey = "03e84a109cd70e57864274932fc87c5e6434c59ebb8e6e7d28532219ba38f7f6df"
+        let host = "139.144.22.237"
+        let port: UInt16 = 9735
+        
+        return Peer(
+            peerPubKey: pubKey,
+            name: name,
+            connectionInformation: .init(hostname: host, port: port)
+        )
+    }
+    
     static var openNode: Peer {
         let name = "OpenNode"
         let pubKey = "02eadbd9e7557375161df8b646776a547c5cbc2e95b3071ec81553f8ec2cea3b8c"
