@@ -106,7 +106,7 @@ struct SwapView: View, IKeyboardReadable {
                     HStack(spacing: 16) {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle())
-                        Text("Swapping...")
+                        Text("Swapping: \(viewModel.swapStatus ?? "")")
                             .font(.Main.fixed(.monoBold, size: 16))
                             .foregroundColor(Palette.grayScaleF4)
                         Spacer()

@@ -18,6 +18,8 @@ import Factory
     var bottomOffset: CGFloat = 65
     var exchangerSide: Exchanger.Side = .base
     
+    var swapStatus: String?
+    
     var base: Coin = .lightningBitcoin()
     var quote: Coin = .ethereum()
         
@@ -41,7 +43,7 @@ import Factory
             case .matchingOrder:
                 swapTimeoutTimer.suspend()
             case .swapping:
-                swapTimeoutCountDown = 180
+                swapTimeoutCountDown = 120
                 swapTimeoutTimer.resume()
                 
                 swapTimeoutTimer.eventHandler = { [unowned self] in
@@ -194,21 +196,72 @@ import Factory
         sdk.addListener(event: "swap.received", action: { _ in
             DispatchQueue.main.async {
                 self.swapState = .orderMatched
+                self.swapStatus = "swap.received"
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.swapState = .swapping
             }
         })
         
-        sdk.addListener(event: "swap.completed", action: { _ in
+        sdk.addListener(event: "swap.holder.invoice.created", action: { _ in
             DispatchQueue.main.async {
+                self.swapStatus = "holder.invoice.created"
+            }
+        })
+        
+        sdk.addListener(event: "swap.holder.invoice.sent", action: { _ in
+            DispatchQueue.main.async {
+                self.swapStatus = "holder.invoice.sent"
+            }
+        })
+        
+        sdk.addListener(event: "swap.seeker.invoice.created", action: { _ in
+            DispatchQueue.main.async {
+                self.swapStatus = "seeker.invoice.created"
+            }
+        })
+        
+        sdk.addListener(event: "swap.seeker.invoice.sent", action: { _ in
+            DispatchQueue.main.async {
+                self.swapStatus = "seeker.invoice.sent"
+            }
+        })
+        
+        sdk.addListener(event: "swap.holder.invoice.paid", action: { _ in
+            DispatchQueue.main.async {
+                self.swapStatus = "holder.invoice.paid"
+            }
+        })
+        
+        sdk.addListener(event: "swap.seeker.invoice.paid", action: { _ in
+            DispatchQueue.main.async {
+                self.swapStatus = "seeker.invoice.paid"
+            }
+        })
+        
+        sdk.addListener(event: "swap.holder.invoice.settled", action: { _ in
+            DispatchQueue.main.async {
+                self.swapStatus = "holder.invoice.settled"
+            }
+        })
+        
+        sdk.addListener(event: "swap.seeker.invoice.settled", action: { _ in
+            DispatchQueue.main.async {
+                self.swapStatus = "seeker.invoice.settled"
+            }
+        })
+        
+        sdk.addListener(event: "swap.completed", action: { _ in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.swapState = .swapSucceed
+                self.swapStatus = nil
             }
         })
         
         sdk.addListener(event: "error", action: { args in
             DispatchQueue.main.async {
                 self.swapState = .swapError("Swap error: \(args.first ?? "Unknown")")
+                self.swapStatus = nil
             }
         })
     }
