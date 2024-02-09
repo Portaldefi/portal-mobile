@@ -25,6 +25,11 @@ class LightningKitManager: ILightningKitManager {
     @Injected(Container.txDataStorage) private var txDataStorage
     
     private let instance: Node
+    private let connectionType: ConnectionType
+    
+    var bestBlock: Int32 {
+        instance.bestBlock
+    }
     
     private var fileManager: LightningFileManager {
         instance.fileManager
@@ -49,12 +54,8 @@ class LightningKitManager: ILightningKitManager {
     }
             
     init(connectionType: ConnectionType) {
-        switch connectionType {
-        case .regtest(let config):
-            instance = Node(type: .regtest(config))
-        case .testnet(let config):
-            instance = Node(type: .testnet(config))
-        }
+        self.connectionType = connectionType
+        instance = Node(type: connectionType)
     }
     
     func start() async throws {
@@ -91,7 +92,6 @@ class LightningKitManager: ILightningKitManager {
                             hostname: peer.connectionInformation.hostname,
                             port: peer.connectionInformation.port
                         )
-                        try? await Task.sleep(nanoseconds: 1_000_000_000)
                     }
                 } else if peerIDs.contains(peer.peerPubKey)  {
                     connectionAttempts = 0
@@ -536,16 +536,25 @@ extension LightningKitManager: ILightningClient {
             }
             
             let satAmount = UInt64(quantity)
+            
+            let currency: Bindings.Currency
+            
+            switch connectionType {
+            case .testnet:
+                currency = .BitcoinTestnet
+            case .regtest:
+                currency = .Regtest
+            }
                         
             let createInvoiceWithPaymentHashResult = Bindings.createInvoiceFromChannelmanagerAndDurationSinceEpochWithPaymentHash(
                 channelmanager: channelManager,
                 nodeSigner: keyInterface.asNodeSigner(),
                 logger: instance.logger,
-                network: .Regtest,
+                network: currency,
                 amtMsat: satAmount * 1000,
                 description: memo,
                 durationSinceEpoch: UInt64(Date().timeIntervalSince1970),
-                invoiceExpiryDeltaSecs: 86400,
+                invoiceExpiryDeltaSecs: 3600,
                 paymentHash: hash.hexToBytes(),
                 minFinalCltvExpiryDelta: nil
             )
