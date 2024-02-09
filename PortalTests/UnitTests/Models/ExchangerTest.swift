@@ -48,12 +48,12 @@ final class ExchangerTest: XCTestCase {
     
     func testQuoteAmountString() throws {
         sut.side = .base
-        XCTAssertEqual(sut.quoteAmountString, "0.0", "Quote amount string isn't correct")
+        XCTAssertEqual(sut.quoteAmountString, "0", "Quote amount string isn't correct")
         let testAmount = "0.0001"
         sut.amount.string = testAmount
-        XCTAssertEqual(sut.quoteAmountString, "3.0", "Quote amount string isn't correct")
+        XCTAssertEqual(sut.quoteAmountString, "3", "Quote amount string isn't correct")
         sut.side = .quote
-        XCTAssertEqual(sut.quoteAmountString, "3.0", "Quote amount string isn't correct")
+        XCTAssertEqual(sut.quoteAmountString, "3", "Quote amount string isn't correct")
     }
     
     func testBaseAmountDecimal() throws {

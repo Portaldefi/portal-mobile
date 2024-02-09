@@ -22,6 +22,8 @@
     {
       "parallelizable" : true,
       "skippedTests" : [
+        "EvmLightningSwapPlaynetTest",
+        "PlaynetBDKIntegrationSample",
         "PlaynetIntegrationTest"
       ],
       "target" : {

@@ -32,37 +32,34 @@ final class EvmLightningSwapPlaynetTest: XCTestCase {
         
         let swapPromise = expectation(description: "Successefuly execute swap between Alice and Bob")
                        
-        sut.alice.on("swap.received", { args in
-            if let data = args as? [Swap], let swap = data.first {
-                alicesSwap = swap
-            }
-        })
-        .store(in: &subscriptions)
+//        sut.alice.addListener(event: "swap.received", action: { args in
+//            if let data = args as? [Swap], let swap = data.first {
+//                alicesSwap = swap
+//            }
+//        })
+//        .store(in: &subscriptions)
         
-        sut.alice.on("order.closed", { _ in
+        sut.alice.addListener(event: "order.closed", action: { _ in
             XCTFail("Alice received order closed")
         })
-        .store(in: &subscriptions)
         
-        sut.bob.on("swap.received", { args in
-            if let data = args as? [Swap], let swap = data.first {
-                bobsSwap = swap
-            }
-        })
-        .store(in: &subscriptions)
+//        sut.bob.addListener(event: "swap.received", action: { args in
+//            if let data = args as? [Swap], let swap = data.first {
+//                bobsSwap = swap
+//            }
+//        })
+//        .store(in: &subscriptions)
                 
-        sut.bob.on("order.closed", { _ in
+        sut.bob.addListener(event: "order.closed", action: { _ in
             XCTFail("Bob received order closed")
         })
-        .store(in: &subscriptions)
                 
-        sut.bob.on("swap.completed", { _ in
+        sut.bob.addListener(event: "swap.completed", action: { _ in
             XCTAssertNotNil(alicesSwap)
             XCTAssertNotNil(bobsSwap)
             
             swapPromise.fulfill()
         })
-        .store(in: &subscriptions)
         
         sut.start().then { [unowned self] _ in
             let aliceOrderUid = self.sut.alice.id

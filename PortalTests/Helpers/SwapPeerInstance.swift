@@ -9,6 +9,8 @@ class SwapParticipant: BaseClass {
     private var subscriptions = Set<AnyCancellable>()
     private let onSwapAccessQueue = DispatchQueue(label: "swap.sdk.onSwapAccessQueueTest")
     
+    let id: String
+    
     private let ldnPeerProps = LdkNode.LNDProps(
         pubKey: "03debebcf97019c836cab78633ecc228d4545d125ea5717bce86159ab5bf043488", address: "127.0.0.1", port: 9001
     )
@@ -20,14 +22,15 @@ class SwapParticipant: BaseClass {
     let invocieToPayForBob = "lnbcrt1m1pjc27dcpp5tk66sa2g0388gy6zshlqjc46sh98ej3s2smnsnwt4e8agf740ctsdqqcqzzsxqyz5vqsp50u42zark4sqqrupwee83ka3rzelfrmrdmlvc90yqr4g5p4srcsks9qyyssq8gzvgyt5par7wn3chd63hrrst5jlq5gxcyn550qvjlyx0hc869u84sp2h2kct479wle5f92y9e80ypuhk0s9e69j5ymefmdma0tn0dcp926zur"
     
     private lazy var onSwap: ([Any]) -> Void = { [unowned self] args in
-        if let data = args as? [Swap], let swap = data.first {
-            self.onSwapAccessQueue.async {
-                self.emit(event: "swap.\(swap.status)", args: [swap])
-            }
-        }
+//        if let data = args as? [Swap], let swap = data.first {
+//            self.onSwapAccessQueue.async {
+//                self.emit(event: "swap.\(swap.status)", args: [swap])
+//            }
+//        }
     }
     
     init(id: String, ethPrivKey: String, rpcInterface: RegtestBlockchainManager) async throws {
+        self.id = id
         print("SWAP SDK \(id) ldk node starting...")
         self.ldkNode = try await LdkNode(instanceId: id, ldnPeerProps: ldnPeerProps, rpcInterface: rpcInterface)
         print("SWAP SDK \(id) ldk node started")
@@ -65,21 +68,18 @@ class SwapParticipant: BaseClass {
         let sdkConfig = SwapSdkConfig(
             id: "\(id)",
             network: network,
-            store: [:],
-            blockchains: blockchains,
-            dex: [:],
-            swaps: [:]
+            blockchains: blockchains
         )
         
         sdk = SDK.init(config: sdkConfig)
         
         super.init(id: id)
         
-        sdk.on("order.closed", { [unowned self] args in emit(event: "order.closed", args: args) }).store(in: &subscriptions)
-        sdk.on("swap.received", onSwap).store(in: &subscriptions)
-        sdk.on("swap.holder.invoice.paid", onSwap).store(in: &subscriptions)
-        sdk.on("swap.seeker.invoice.paid", onSwap).store(in: &subscriptions)
-        sdk.on("swap.completed", onSwap).store(in: &subscriptions)
+//        sdk.addListener(event: "order.closed", action: { [unowned self] args in emit(event: "order.closed", args: args) })
+        sdk.addListener(event: "swap.received", action: onSwap)
+        sdk.addListener(event: "swap.holder.invoice.paid", action: onSwap)
+        sdk.addListener(event: "swap.seeker.invoice.paid", action: onSwap)
+        sdk.addListener(event: "swap.completed", action: onSwap)
     }
         
     func startSDK() -> Promise<Void> {
