@@ -23,14 +23,18 @@ class Broadcaster: BroadcasterInterface {
             for tx in txs {
                 let transaction = try Transaction(transactionBytes: tx)
                 let expectedTxId = transaction.txid()
-                let transactionDict = try await rpcInterface.getTransactionWithId(id: expectedTxId)
-                
-                guard transactionDict.keys.isEmpty else {
-                    break
+                if let transactionDict = try? await rpcInterface.getTransactionWithId(id: expectedTxId) {
+                    guard transactionDict.keys.isEmpty else {
+                        //tx already broadcasted
+                        break
+                    }
+                    
+                    let resultTxId = try await self.rpcInterface.submitTransaction(transaction: transaction.serialize())
+                    print("Submitted tx with id: \(resultTxId)")
+                } else {
+                    let resultTxId = try await self.rpcInterface.submitTransaction(transaction: transaction.serialize())
+                    print("Submitted tx with id: \(resultTxId)")
                 }
-                
-                let resultTxId = try await self.rpcInterface.submitTransaction(transaction: transaction.serialize())
-                print("Submitted tx with id: \(resultTxId)")
             }
         }
     }
