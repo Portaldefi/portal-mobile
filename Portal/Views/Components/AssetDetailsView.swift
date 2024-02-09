@@ -15,7 +15,6 @@ struct AssetDetailsView: View {
     @State private var showChannelDetails = false
     @State private var viewModel: AssetDetailsViewModel
     @State private var showTxDetails = false
-    @State private var selectedTx: TransactionRecord?
     
     let item: WalletItem
     
@@ -66,9 +65,8 @@ struct AssetDetailsView: View {
                 }
                                 
                 WalletItemView(viewModel: item.viewModel)
-                    .padding(.leading, 16)
                     .padding(.vertical, 8)
-                    .padding(.horizontal, 14)
+                    .padding(.horizontal, 24)
                 
                 ActionButtonsView
                     .padding(.horizontal, 12)
@@ -88,7 +86,7 @@ struct AssetDetailsView: View {
                                 .padding(.trailing, 6)
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    selectedTx = transaction
+                                    viewModel.selectedTx = transaction
                                 }
                         }
                     }
@@ -103,28 +101,23 @@ struct AssetDetailsView: View {
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
-        .sheet(item: $selectedTx, onDismiss: {
+        .onAppear {
             viewModel.updateTransactions()
-        }) { tx in
+        }
+        .sheet(item: $viewModel.selectedTx) { tx in
             TransactionView(coin: viewModel.coin, tx: tx).lockableView()
         }
-        .sheet(isPresented: $viewModel.goToReceive, onDismiss: {
-            viewModel.updateTransactions()
-        }) {
+        .sheet(isPresented: $viewModel.goToReceive) {
             let account = Container.accountViewModel()
             let item = account.items.first{ $0.coin == viewModel.coin }
             let receiveViewModel = ReceiveViewModel.config(items: account.items, selectedItem: item)
             
            ReceiveRootView(viewModel: receiveViewModel, withAssetPicker: false).lockableView()
         }
-        .sheet(isPresented: $viewModel.goSend, onDismiss: {
-            viewModel.updateTransactions()
-        }) {
+        .sheet(isPresented: $viewModel.goSend) {
             SendRootView(withAssetPicker: false).environment(Container.sendViewModel()).lockableView()
         }
-        .sheet(isPresented: $showChannelDetails, onDismiss: {
-            //viewModel.updateTransactions()
-        }) {
+        .sheet(isPresented: $showChannelDetails) {
             LNChannelView()
         }
     }

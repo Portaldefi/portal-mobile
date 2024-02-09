@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct TxUserData {
-    let notes: String?
-    let labels: [TxLabel]
+class TxUserData {
+    var notes: String?
+    var labels: [TxLabel]
     let price: Decimal
     
     init(notes: String? = nil, labels: [TxLabel]? = [], price: Decimal) {

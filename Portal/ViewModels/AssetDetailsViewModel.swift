@@ -23,6 +23,7 @@ import PortalSwapSDK
         }
     }
     public var transactions: [TransactionRecord] = []
+    public var selectedTx: TransactionRecord?
     
     @ObservationIgnored private let transactionAdapter: ITransactionsAdapter
     @ObservationIgnored private var persistenceManager: LocalPersistenceManager?
@@ -48,7 +49,18 @@ import PortalSwapSDK
         self.transactionAdapter = transactionAdapter
         persistenceManager = try? LocalPersistenceManager.manager()
         txDataStorage = Container.txDataStorage()
-        updateTransactions()
+        subscribe()
+    }
+    
+    func subscribe() {
+        transactionAdapter
+            .onTxsUpdate
+            .receive(on: RunLoop.main)
+            .sink
+        { [weak self] _ in
+            self?.updateTransactions()
+        }
+        .store(in: &subscriptions)
     }
         
     func updateTransactions() {

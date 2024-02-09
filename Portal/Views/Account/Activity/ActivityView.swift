@@ -198,7 +198,7 @@ struct ActivityView: View {
                 }
                 .background(Palette.grayScale20)
                 .refreshable {
-                    print("Refresh")
+                    viewModel.updateTransactions()
                 }
                 
                 if viewModel.searchContext.isEmpty && viewModel.filteredTransactions.isEmpty {
@@ -209,14 +209,13 @@ struct ActivityView: View {
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
+        .onAppear {
+            viewModel.updateTransactions()
+        }
         .sheet(isPresented: $viewState.showQRCodeScannerFromTabBar) {
             QRCodeReaderRootView(config: .universal).lockableView()
         }
-        .sheet(item: $viewModel.selectedTx, onDismiss: {
-            DispatchQueue.main.async {
-                viewModel.updateTransactions()
-            }
-        }) { tx in
+        .sheet(item: $viewModel.selectedTx) { tx in
             switch tx.type {
             case .sent(let coin), .received(let coin), .swap(let coin, _):
                 TransactionView(coin: coin, tx: tx).lockableView()

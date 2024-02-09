@@ -27,7 +27,7 @@ class TransactionViewModel: ObservableObject {
     @Published var editingLabels = false
     @Published var showAddLabelInterface = false
     @Published var newLabelTitle: String?
-    @Published var source: TxSource = .btcOnChain
+    @Published var source: TxSource = .bitcoin
     
     @Injected(Container.settings) private var settings
 
@@ -212,11 +212,13 @@ class TransactionViewModel: ObservableObject {
         
         $labels.removeDuplicates().dropFirst().sink { [unowned self] labels in
             self.storage.update(source: tx.source, id: tx.id, labels: labels)
+            tx.set(labels: labels)
         }
         .store(in: &subscriptions)
         
         $notes.removeDuplicates().dropFirst().sink { [unowned self] notes in
             self.storage.update(source: tx.source, id: tx.id, notes: notes)
+            tx.set(notes: notes)
         }
         .store(in: &subscriptions)
     }
@@ -226,15 +228,29 @@ extension TransactionViewModel {
     static func config(coin: Coin, tx: TransactionRecord) -> TransactionViewModel {
         let adapterManager: IAdapterManager = Container.adapterManager()
         let walletManager: IWalletManager = Container.walletManager()
-
-        guard
-            let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
-            let adapter = adapterManager.adapter(for: wallet)
-        else {
-            fatalError("coudn't fetch dependencies")
+        
+        let blockchainHeight: Int32
+        
+        switch coin.type {
+        case .bitcoin, .lightningBitcoin:
+            guard
+                let wallet = walletManager.activeWallets.first(where: { $0.coin == .lightningBitcoin() }),
+                let adapter = adapterManager.adapter(for: wallet)
+            else {
+                fatalError("coudn't fetch dependencies")
+            }
+            blockchainHeight = adapter.blockchainHeight
+        case .ethereum, .erc20:
+            guard
+                let wallet = walletManager.activeWallets.first(where: { $0.coin == coin }),
+                let adapter = adapterManager.adapter(for: wallet)
+            else {
+                fatalError("coudn't fetch dependencies")
+            }
+            blockchainHeight = adapter.blockchainHeight
         }
 
-        return TransactionViewModel(coin: coin, tx: tx, blockChainHeight: adapter.blockchainHeight)
+        return TransactionViewModel(coin: coin, tx: tx, blockChainHeight: blockchainHeight)
     }
 }
 

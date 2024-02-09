@@ -82,16 +82,15 @@ struct AccountView: View {
                     .padding(.horizontal, 8)
                 }
                 .background(Palette.grayScale20)
-                .refreshable {
-                    print("Refresh")
-                }
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         .sheet(isPresented: $viewState.showQRCodeScannerFromTabBar) {
             QRCodeReaderRootView(config: .universal).lockableView()
         }
-        .sheet(isPresented: $viewModel.goToReceive) {
+        .sheet(isPresented: $viewModel.goToReceive, onDismiss: {
+            viewModel.updateValues()
+        }) {
             let viewModel = ReceiveViewModel.config(items: viewModel.items, selectedItem: nil)
             ReceiveRootView(viewModel: viewModel, withAssetPicker: true).lockableView()
         }
@@ -102,7 +101,7 @@ struct AccountView: View {
             SendRootView(withAssetPicker: true).environment(vm).lockableView()
         }
         .sheet(isPresented: $viewModel.goToLightningChannelSetup, onDismiss: {
-            
+            viewModel.updateValues()
         }) {
             CreateChannelRootView(channelIsFunded: viewModel.hasLightningChannel).lockableView()
         }
