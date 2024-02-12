@@ -169,7 +169,7 @@ import Factory
             return (item.viewModel.balance * marketData.lastSeenEthPrice) / marketData.lastSeenBtcPrice
         case .erc20:
             //FIX ME
-            return (item.viewModel.balance * marketData.lastSeenLinkPrice) / marketData.lastSeenBtcPrice
+            return (item.viewModel.balance * 1.2) / marketData.lastSeenBtcPrice
         }
     }
     
