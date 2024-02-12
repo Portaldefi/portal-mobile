@@ -22,61 +22,80 @@ class TxDataStorage {
 extension TxDataStorage: ITxUserDataStorage {
     func fetchTxData(txID: String) -> TxData? {
         var txData: TxData? = nil
-        
         context.performAndWait {
             let fetchRequest: NSFetchRequest<TxData> = TxData.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "txID == %@", txID)
             do {
-                let transactionInfos = try context.fetch(fetchRequest)
-                txData = transactionInfos.first
+                txData = try context.fetch(fetchRequest).first
             } catch {
                 print("Error fetching TransactionInfo: \(error)")
             }
         }
-        
         return txData
     }
     
     func update(source: TxSource, id: String, notes: String) {
-        let tx = fetch(source: source, id: id)
-        tx.notes = notes
-        try? context.save()
+        context.performAndWait {
+            let txData = self.fetch(source: source, id: id)
+            txData.notes = notes
+            saveContext()
+        }
     }
     
     func update(source: TxSource, id: String, labels: [TxLabel]) {
-        let tx = fetch(source: source, id: id)
-        guard let data = try? JSONEncoder().encode(labels.map{ $0.label }),
-        let labelsData = String(data: data, encoding: .utf8) else { return }
-        tx.compressedLabels = labelsData
-        try? context.save()
+        context.performAndWait {
+            let tx = fetch(source: source, id: id)
+            guard let data = try? JSONEncoder().encode(labels.map{ $0.label }),
+            let labelsData = String(data: data, encoding: .utf8) else { return }
+            tx.compressedLabels = labelsData
+            saveContext()
+        }
     }
     
     func update(source: TxSource, id: String, price: Decimal) {
-        let tx = fetch(source: source, id: id)
-        tx.assetUSDPrice = price as NSDecimalNumber
-        try? context.save()
+        context.performAndWait {
+            let tx = fetch(source: source, id: id)
+            tx.assetUSDPrice = price as NSDecimalNumber
+            saveContext()
+        }
     }
     
     func fetch(source: TxSource, id: String) -> TxData {
-        guard let data = fetchTxData(txID: id) else {
-            //Creating new instance
-            let data = TxData(context: context)
-            data.txID = id
-            
-            switch source {
-            case .btcOnChain, .lightning:
-                data.assetUSDPrice = marketData.lastSeenBtcPrice as NSDecimalNumber
-            case .ethOnChain:
-                data.assetUSDPrice = marketData.lastSeenEthPrice as NSDecimalNumber
-            }
-            
-            context.performAndWait {
+        context.performAndWait {
+            guard let data = fetchTxData(txID: id) else {
+                //Creating new instance
+                let data = TxData(context: context)
+                data.txID = id
+                
+                switch source {
+                case .bitcoin, .lightning, .swap:
+                    data.assetUSDPrice = marketData.lastSeenBtcPrice as NSDecimalNumber
+                case .ethereum:
+                    data.assetUSDPrice = marketData.lastSeenEthPrice as NSDecimalNumber
+                case .erc20:
+                    data.assetUSDPrice = 1.2
+                }
+                
                 context.insert(data)
-                try? context.save()
+                
+                saveContext()
+                
+                return data
             }
+            
+            if data.assetUSDPrice == 0 {
+                switch source {
+                case .bitcoin, .lightning, .swap:
+                    data.assetUSDPrice = marketData.lastSeenBtcPrice as NSDecimalNumber
+                case .ethereum:
+                    data.assetUSDPrice = marketData.lastSeenEthPrice as NSDecimalNumber
+                case .erc20:
+                    data.assetUSDPrice = 1.2
+                }
+            }
+            
             return data
         }
-        return data
     }
     
     func clear() {
@@ -90,6 +109,14 @@ extension TxDataStorage: ITxUserDataStorage {
             } catch {
                 print("Error clearing data: \(error)")
             }
+        }
+    }
+    
+    private func saveContext() {
+        do {
+            try context.save()
+        } catch {
+            print("Error saving context: \(error)")
         }
     }
 }

@@ -15,8 +15,9 @@ import Lightning
 struct ReviewTransactionView: View {
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) private var presentationMode
-    @ObservedObject private var viewModel: SendViewViewModel
-    @EnvironmentObject private var navigation: NavigationStack
+    @Environment(SendViewViewModel.self) var viewModel: SendViewViewModel
+    @Environment(NavigationStack.self) var navigation: NavigationStack
+    private var viewState: ViewState = Container.viewState()
     
     @State private var step: ReviewStep = .reviewing
     @State private var actionButtonEnabled = true
@@ -47,11 +48,13 @@ struct ReviewTransactionView: View {
         }
     }
     
-    init(viewModel: SendViewViewModel) {
-        self.viewModel = viewModel
-    }
+//    init(viewModel: SendViewViewModel) {
+//        self.viewModel = viewModel
+//    }
     
     var body: some View {
+        @Bindable var bindableViewModel = viewModel
+
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
                 ZStack {
@@ -69,6 +72,11 @@ struct ReviewTransactionView: View {
                     Text(title)
                         .frame(width: 300, height: 62)
                         .font(.Main.fixed(.monoBold, size: 16))
+                }
+                
+                if !viewState.isReachable {
+                    NoInternetConnectionView()
+                        .padding(.horizontal, -16)
                 }
                 
                 HStack(alignment: .top, spacing: 16) {
@@ -242,15 +250,15 @@ struct ReviewTransactionView: View {
                                 .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
                         
-                        PButton(config: .onlyLabel(viewModel.sendError == nil ? "Send" : "Try again"), style: .filled, size: .big, enabled: viewModel.amountIsValid) {
-                            
+                        PButton(config: .onlyLabel(viewModel.sendError == nil ? "Send" : "Try again"), style: .filled, size: .big, enabled: viewModel.amountIsValid && viewState.isReachable) {
                             if viewModel.signingTxProtected {
                                 locked = true
                             } else {
                                 withAnimation {
                                     step = .signing
                                 }
-                                viewModel.send { success in
+                                Task {
+                                    let success = await viewModel.send()
                                     withAnimation {
                                         step = success ? .sent : .reviewing
                                     }
@@ -293,7 +301,7 @@ struct ReviewTransactionView: View {
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
         .onReceive(
             viewModel
-                .$unconfirmedTx
+                .unconfirmedTx
                 .compactMap{$0}
                 .delay(for: 1, scheduler: RunLoop.main)
         ) { transaction in
@@ -301,12 +309,12 @@ struct ReviewTransactionView: View {
             navigation.push(.transactionDetails(coin: coin, tx: transaction))
         }
         //TxFeesPickerView
-        .popup(isPresented: $viewModel.showFeesPicker) {
-            if let fees = viewModel.recomendedFees, let coin = viewModel.coin {
+        .popup(isPresented: $bindableViewModel.showFeesPicker) {
+            if let fees = bindableViewModel.recomendedFees, let coin = bindableViewModel.coin {
                 TxFeesPickerView(
                     coin: coin,
                     recommendedFees: fees,
-                    feeRate: $viewModel.feeRate,
+                    feeRate: $bindableViewModel.feeRate,
                     onDismiss: {
                         viewModel.showFeesPicker.toggle()
                     }
@@ -347,7 +355,8 @@ struct ReviewTransactionView: View {
             withAnimation {
                 step = .signing
             }
-            viewModel.send { success in
+            Task {
+                let success = await viewModel.send()
                 withAnimation {
                     step = success ? .sent : .reviewing
                 }
@@ -362,7 +371,18 @@ struct ReviewTransactionView_Previews: PreviewProvider {
     static var previews: some View {
         let _ = Container.walletManager.register { WalletManager.mocked }
         let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
         
-        ReviewTransactionView(viewModel: SendViewViewModel.mocked)
+        ReviewTransactionView().environment(SendViewViewModel.mocked)
+    }
+}
+
+struct ReviewTransactionView_No_Connection: PreviewProvider {
+    static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
+        
+        ReviewTransactionView().environment(SendViewViewModel.mocked)
     }
 }

@@ -11,13 +11,16 @@ import PortalUI
 import Factory
 
 struct SendSelectAssetView: View {
+    private var viewState: ViewState = Container.viewState()
     @Environment(\.presentationMode) private var presentationMode
-    @EnvironmentObject private var navigation: NavigationStack
-    @ObservedObject var viewModel: SendViewViewModel
+    @Environment(NavigationStack.self) var navigation: NavigationStack
+    @Environment(SendViewViewModel.self) var viewModel: SendViewViewModel
     @State private var notEnoughFunds = false
     @State private var notEnoughFundsMessage = String()
             
     var body: some View {
+        let _ = Self._printChanges()
+
         VStack(spacing: 0) {
             ZStack {
                 HStack {
@@ -35,6 +38,12 @@ struct SendSelectAssetView: View {
             }
             .padding(.horizontal, 10)
             
+            if !viewState.isReachable {
+                NoInternetConnectionView()
+                    .padding(.horizontal, -8)
+                    .padding(.bottom, 6)
+            }
+            
             VStack(alignment: .leading, spacing: 16) {
                 Text("Select Asset")
                     .font(.Main.fixed(.bold, size: 24))
@@ -48,15 +57,23 @@ struct SendSelectAssetView: View {
                                 ZStack(alignment: .trailing) {
                                     WalletItemView(viewModel: item.viewModel)
                                         .padding(.leading, 16)
-                                        .padding(.trailing, 14)
+                                        .padding(.trailing, 22)
                                         .contentShape(Rectangle())
                                         .onTapGesture {
-                                            guard item.viewModel.balance > 0 else {
-                                                notEnoughFundsMessage = "\(item.viewModel.coin.code) on \(item.viewModel.coin.description)"
-                                                return notEnoughFunds.toggle()
+                                            if item.coin == .lightningBitcoin(), !viewModel.hasUsableChannels {
+                                                if viewModel.hasChannelBalance {
+                                                    
+                                                } else {
+                                                    
+                                                }
+                                            } else {
+                                                guard item.viewModel.balance > 0 else {
+                                                    notEnoughFundsMessage = "\(item.viewModel.coin.code) on \(item.viewModel.coin.description)"
+                                                    return notEnoughFunds.toggle()
+                                                }
+                                                viewModel.coin = item.viewModel.coin
+                                                navigation.push(.sendSetRecipient(viewModel: viewModel))
                                             }
-                                            viewModel.coin = item.viewModel.coin
-                                            navigation.push(.sendSetRecipient(viewModel: viewModel))
                                         }
                                     Asset.chevronRightIcon
                                         .foregroundColor(Palette.grayScale4A)
@@ -68,6 +85,8 @@ struct SendSelectAssetView: View {
                             }
                         }
                     }
+                    .disabled(!viewState.isReachable)
+                    .opacity(viewState.isReachable ? 1 : 0.5)
                 }
                 .frame(height: CGFloat(viewModel.walletItems.count) * 72)
             }
@@ -87,7 +106,18 @@ struct SendFromView_Previews: PreviewProvider {
     static var previews: some View {
         let _ = Container.walletManager.register { WalletManager.mocked }
         let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
         
-        SendSelectAssetView(viewModel: SendViewViewModel.mocked)
+        SendSelectAssetView().environment(SendViewViewModel.mocked)
+    }
+}
+
+struct SendFromView_No_Connection: PreviewProvider {
+    static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
+        
+        SendSelectAssetView().environment(SendViewViewModel.mocked)
     }
 }

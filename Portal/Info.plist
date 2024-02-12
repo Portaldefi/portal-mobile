@@ -2,14 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>RafaPassword</key>
-	<string>${rafa_pass}</string>
-	<key>RafaUsername</key>
-	<string>${rafa_user}</string>
-	<key>RafaToken</key>
-	<string>${rafa_token}</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>12.3</string>
+	<string>14.0</string>
+	<key>bugsnag</key>
+	<dict>
+		<key>apiKey</key>
+		<string>486f91e1be4e2943b4ef3cf55c4d5372</string>
+	</dict>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -23,5 +22,17 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>RafaPassword</key>
+	<string>${rafa_pass}</string>
+	<key>RafaToken</key>
+	<string>${rafa_token}</string>
+	<key>InfuraProjectId</key>
+	<string>${infura_project_id}</string>
+	<key>InfuraProjectSecret</key>
+	<string>${infura_project_secret}</string>
+	<key>EtherscanApiKey</key>
+	<string>${etherscan_api_key}</string>
+	<key>RafaUsername</key>
+	<string>${rafa_user}</string>
 </dict>
 </plist>

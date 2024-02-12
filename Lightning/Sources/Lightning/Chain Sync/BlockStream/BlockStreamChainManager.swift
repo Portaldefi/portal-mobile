@@ -1,12 +1,14 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by farid on 2/10/23.
 //
 
 import Foundation
 import Combine
+import CryptoSwift
+import LightningDevKit
 
 enum BlockStreamMethods {
     case getChainTip,
@@ -15,6 +17,11 @@ enum BlockStreamMethods {
          getBlockBinary(String),
          getBlockHeader(String),
          getTransaction(String),
+         getRawTransaction(String),
+         getMerkleProof(String),
+         getTxStatus(String),
+         getTxById(String),
+         outSpent(txId: String, index: UInt16),
          postRawTx(String)
     
     var path: String {
@@ -31,17 +38,27 @@ enum BlockStreamMethods {
             return "/block/\(hash)/header"
         case .getTransaction(let hash):
             return "/tx/\(hash)/hex"
+        case .getTxById(let id):
+            return "/tx/\(id)"
+        case .getRawTransaction(let id):
+            return "/tx/\(id)/raw"
+        case .getMerkleProof(let id):
+            return "/tx/\(id)/merkle-proof"
+        case .outSpent(let txId, let index):
+            return "/tx/\(txId)/outspend/\(index)"
         case .postRawTx:
             return "/tx"
+        case .getTxStatus(let txId):
+            return "/tx/\(txId)/status"
         }
     }
     
     var httpMethod: String {
         switch self {
-        case .getChainTip, .getBlockHashHex, .getBlock, .getBlockBinary, .getBlockHeader, .getTransaction:
-            return "GET"
         case .postRawTx:
             return "POST"
+        default:
+            return "GET"
         }
     }
 }
@@ -55,23 +72,36 @@ class BlockStreamChainManager {
     
     private let monitoringTracker = MonitoringTracker()
     private var chainListeners = [ChainListener]()
+    private var chainFilter: ChainFilter?
+    
+    private var subscriptions = Set<AnyCancellable>()
     
     var blockchainMonitorPublisher: AnyPublisher<Void, Error> {
         Timer.publish(every: 15, on: RunLoop.main, in: .default)
             .autoconnect()
-            .flatMap { [unowned self] _ in
+            .flatMap { _ in
                 Future { promise in
-                    Task {
-                        try await self.reconcileChaintips()
-                        promise(.success(()))
-                    }
+                    promise(.success(()))
                 }
             }
             .eraseToAnyPublisher()
     }
     
-    init(rpcProtocol: RpcProtocol) throws {
-        guard let rpcUrl = URL(string: "\(rpcProtocol.rawValue)://blockstream.info/testnet/api") else {
+    init(network: Network) throws {
+        let baseUrlString: String
+        
+        switch network {
+        case .Bitcoin:
+            baseUrlString = "https://blockstream.info/api"
+        case .Regtest:
+            baseUrlString = "http:/localhost:3002"
+        case .Testnet:
+            baseUrlString = "https://blockstream.info/testnet/api"
+        default:
+            fatalError("Network not supported")
+        }
+        
+        guard let rpcUrl = URL(string: baseUrlString) else {
             throw ChainManagerError.invalidUrlString
         }
         
@@ -119,7 +149,7 @@ class BlockStreamChainManager {
     }
     
     func isMonitoring() async -> Bool {
-        return await self.monitoringTracker.startTracking()
+        await self.monitoringTracker.startTracking()
     }
 }
 
@@ -183,47 +213,71 @@ extension BlockStreamChainManager {
                 
         switch method {
         case .getChainTip:
-            if let chainTip = String.init(data: data, encoding: String.Encoding.utf8) {
-                return ["chainTip": UInt32(chainTip) as Any]
+            guard let chainTip = data.utf8String() else {
+                throw BlockStreamApiError.getChainTip
             }
-            return [:]
+            return ["chainTip": UInt32(chainTip) as Any]
         case .getBlockHashHex:
-            if let blockHash = String.init(data: data, encoding: String.Encoding.utf8) {
-                return ["blockHash": blockHash as Any]
+            guard let blockHash = data.utf8String() else {
+                throw BlockStreamApiError.getBlockHashHex
             }
-            return [:]
-        case .getBlock:
-            let response = try JSONSerialization.jsonObject(with: data, options: .topLevelDictionaryAssumed)
-            let responseDictionary = response as! [String: Any]
-            if let responseError = responseDictionary["error"] as? [String: Any] {
-                let errorDetails = RPCErrorDetails(message: responseError["message"] as! String, code: responseError["code"] as! Int64)
-                print("error details: \(errorDetails)")
-                throw RpcError.errorResponse(errorDetails)
-            }
-            return responseDictionary
+            return ["blockHash": blockHash as Any]
         case .getBlockBinary:
             return ["blockBinary": data.toHexString() as Any]
         case .getBlockHeader:
-            let response = try JSONSerialization.jsonObject(with: data, options: .topLevelDictionaryAssumed)
-            let responseDictionary = response as! [String: Any]
-            if let responseError = responseDictionary["error"] as? [String: Any] {
-                let errorDetails = RPCErrorDetails(message: responseError["message"] as! String, code: responseError["code"] as! Int64)
+            guard let headerHash = data.utf8String() else {
+                throw BlockStreamApiError.getBlockHeader
+            }
+            return ["result": headerHash as Any]
+        case .getTransaction:
+            guard let txHex = data.utf8String() else {
+                throw BlockStreamApiError.getTransaction
+            }
+            return ["txHex": txHex as Any]
+        case .getRawTransaction:
+            return ["rawTx": data]
+        case .postRawTx:
+            guard let txID = data.utf8String() else {
+                throw BlockStreamApiError.postRawTx
+            }
+            print("posted txID: \(txID)")
+            return ["txID": txID as Any]
+        case .getBlock:
+            guard let json = try JSONSerialization.jsonObject(with: data, options: .topLevelDictionaryAssumed) as? [String: Any] else {
+                throw BlockStreamApiError.getBlock
+            }
+            
+            if
+                let responseError = json["error"] as? [String: Any],
+                let message = responseError["message"] as? String,
+                let code = responseError["code"] as? Int64
+            {
+                
+                let errorDetails = RPCErrorDetails(message: message, code: code)
+                
                 print("error details: \(errorDetails)")
                 throw RpcError.errorResponse(errorDetails)
             }
-            return responseDictionary
-        case .getTransaction:
-            if let txHex = String.init(data: data, encoding: String.Encoding.utf8) {
-                print(txHex)
-                return ["txHex": txHex as Any]
+            
+            return json
+        case .getTxById, .getMerkleProof, .outSpent, .getTxStatus:
+            guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+                throw BlockStreamApiError.unwrapJson
             }
-            return [:]
-        case .postRawTx:
-            if let txID = String.init(data: data, encoding: String.Encoding.utf8) {
-                print("posted txID: \(txID)")
-                return ["txID": txID as Any]
+            
+            if
+                let responseError = json["error"] as? [String: Any],
+                let message = responseError["message"] as? String,
+                let code = responseError["code"] as? Int64
+            {
+                
+                let errorDetails = RPCErrorDetails(message: message, code: code)
+                
+                print("error details: \(errorDetails)")
+                throw RpcError.errorResponse(errorDetails)
             }
-            return [:]
+            
+            return json
         }
     }
     
@@ -286,24 +340,50 @@ extension BlockStreamChainManager {
     }
 }
 
+enum BlockStreamApiError: Error {
+    case getChainTip,
+         hexStringToBytesDecodeFailed,
+         getBlockHashHex,
+         getBlock,
+         getBlockHeader,
+         getChaintipHeight,
+         getTransaction,
+         getRawTransaction,
+         getTxById,
+         getMerkleProof,
+         postRawTx,
+         getTransactionWithHash,
+         unwrapJson
+}
+
 // MARK: RPC Calls
 extension BlockStreamChainManager {
     func getChaintipHeight() async throws -> UInt32 {
         let response = try await self.callRpcMethod(method: .getChainTip)
-        if let result = response["chainTip"] as? UInt32 {
-            return result
+        
+        guard let result = response["chainTip"] as? UInt32 else {
+            throw BlockStreamApiError.getChaintipHeight
         }
-        throw ChainManagerError.unknownAnchorBlock
+        
+        return result
     }
     
     func getChaintipHash() async throws -> [UInt8] {
         let blockHashHex = try await self.getChaintipHashHex()
-        return hexStringToBytes(hexString: blockHashHex)!
+        
+        guard let bytesArraay = Utils.hexStringToBytes(hexString: blockHashHex) else {
+            throw BlockStreamApiError.hexStringToBytesDecodeFailed
+        }
+        return bytesArraay
     }
     
     func getBlockHashHex(height: UInt32) async throws -> String {
         let response = try await self.callRpcMethod(method: .getBlockHashHex(height))
-        let result = response["blockHash"] as! String
+        
+        guard let result = response["blockHash"] as? String else {
+            throw BlockStreamApiError.getBlockHashHex
+        }
+        
         return result
     }
     
@@ -314,30 +394,44 @@ extension BlockStreamChainManager {
     
     func getBlockBinary(hash: String) async throws -> [UInt8] {
         let response = try await self.callRpcMethod(method: .getBlockBinary(hash))
-        let result = response["blockBinary"] as! String
-        let blockData = hexStringToBytes(hexString: result)!
+        
+        guard
+            let result = response["blockBinary"] as? String,
+            let blockData = Utils.hexStringToBytes(hexString: result)
+        else {
+            throw BlockStreamApiError.hexStringToBytesDecodeFailed
+        }
+        
         return blockData
     }
     
     func getChaintipHashHex() async throws -> String {
         let height = try await self.getChaintipHeight()
-        let hash = try await self.getBlockHashHex(height: height)
-        return hash
+        return try await self.getBlockHashHex(height: height)
     }
-    
-    func getBlockHeader(hash: String) async throws -> [UInt8] {
-        let response = try await self.callRpcMethod(method: .getBlockHeader(hash))
-        let result = response["result"] as! String
-        let blockHeader = hexStringToBytes(hexString: result)!
-        assert(blockHeader.count == 80)
-        return blockHeader
-    }
-    
+        
     public func getTransaction(with hash: String) async throws -> [UInt8] {
         let response = try await self.callRpcMethod(method: .getTransaction(hash))
-        let txHex = response["result"] as! String
-        let transaction = hexStringToBytes(hexString: txHex)!
+        
+        guard
+            let txHex = response["txHex"] as? String,
+            let transaction = Utils.hexStringToBytes(hexString: txHex)
+        else {
+            throw BlockStreamApiError.getTransactionWithHash
+        }
+        
         return transaction
+    }
+}
+
+public struct OutSpent: Codable {
+    let spent: Bool
+    let txid: String?
+}
+
+extension Data {
+    func utf8String() -> String? {
+        String.init(data: self, encoding: String.Encoding.utf8)
     }
 }
 
@@ -379,6 +473,15 @@ extension BlockStreamChainManager {
         case http = "http"
         case https = "https"
     }
+    func getTxMerkleProof(txId: String) async throws -> Int32 {
+        let response = try await self.callRpcMethod(method: .getMerkleProof(txId))
+        
+        guard let pos = response["pos"] as? Int32 else {
+            throw BlockStreamApiError.getMerkleProof
+        }
+        
+        return pos
+    }
     
     enum ChainManagerError: Error {
         case invalidUrlString
@@ -390,6 +493,52 @@ extension BlockStreamChainManager {
 
 // MARK: Common ChainManager Functions
 extension BlockStreamChainManager: RpcChainManager {
+    func getTxStatus(txId: String) async throws -> [String : Any] {
+        try await self.callRpcMethod(method: .getTxStatus(txId))
+    }
+    
+    func getTxOutspent(txId: String, index: UInt16) async throws -> OutSpent {
+        let response = try await self.callRpcMethod(method: .outSpent(txId: txId, index: index))
+        
+        var outoutSpent = false
+        
+        if let spent = response["spent"] as? Bool {
+            outoutSpent = spent
+        } else {
+            print("")
+        }
+        
+        return OutSpent(spent: outoutSpent, txid: response["txid"] as? String)
+    }
+    
+    func getRawTransaction(txId: String) async throws -> Data {
+        let data = try await self.callRpcMethod(method: .getRawTransaction(txId))
+        
+        guard let rawTx = data["rawTx"] as? Data else {
+            throw BlockStreamApiError.getRawTransaction
+        }
+        
+        return rawTx
+    }
+    
+    func getBlockHashHex(height: Int64) async throws -> String {
+        guard let blockHeight = UInt32(exactly: height) else {
+            throw BlockStreamApiError.getBlockHashHex
+        }
+        
+        let response = try await self.callRpcMethod(method: .getBlockHashHex(blockHeight))
+        
+        guard let blockHash = response["blockHash"] as? String else {
+            throw BlockStreamApiError.getBlockHashHex
+        }
+        
+        return blockHash
+    }
+    
+    func decodeRawTransaction(tx: [UInt8]) async throws -> [String : Any] {
+        [:]
+    }
+    
     func mineBlocks(number: Int, coinbaseDestinationAddress: String) async throws -> [String] {
         []
     }
@@ -403,45 +552,40 @@ extension BlockStreamChainManager: RpcChainManager {
     }
     
     func decodeScript(script: [UInt8]) async throws -> [String : Any] {
-        [:]
+        let scriptHexString = script.toHexString()
+        
+        // Extract the script hash (skip the first 2 characters '00' and the next 2 characters '20' which represents the length)
+        let scriptHashHexString = String(scriptHexString.dropFirst(4))
+        let scriptHash = Data(hex: scriptHashHexString)
+    
+        let segwitCoder = SegwitAddress()
+        let decoded = try segwitCoder.encode(hrp: "tb", version: 0, program: scriptHash)
+        return ["address": decoded]
     }
     
     func submitTransaction(transaction: [UInt8]) async throws -> String {
-        let txHex = bytesToHexString(bytes: transaction)
+        let txHex = Utils.bytesToHexString(bytes: transaction)
         let response = try? await self.callRpcMethod(method: .postRawTx(txHex))
         // returns the txid
         let result = response?["txID"] as? String
         return result ?? "unknown tx id"
     }
-}
-
-fileprivate func hexStringToBytes(hexString: String) -> [UInt8]? {
-    let hexStr = hexString.dropFirst(hexString.hasPrefix("0x") ? 2 : 0)
-
-    guard hexStr.count % 2 == 0 else {
-        return nil
+    
+    func getTransactionWithId(id: String) async throws -> [String: Any] {
+        try await self.callRpcMethod(method: .getTxById(id))
     }
-
-    var newData = [UInt8]()
-
-    var indexIsEven = true
-    for i in hexStr.indices {
-        if indexIsEven {
-            let byteRange = i...hexStr.index(after: i)
-            guard let byte = UInt8(hexStr[byteRange], radix: 16) else {
-                return nil
-            }
-            newData.append(byte)
+    
+    func getBlockHeader(hash: String) async throws -> [UInt8] {
+        let response = try await self.callRpcMethod(method: .getBlockHeader(hash))
+        
+        guard
+            let result = response["result"] as? String,
+            let blockHeader = Utils.hexStringToBytes(hexString: result)
+        else {
+            throw BlockStreamApiError.getBlockHeader
         }
-        indexIsEven.toggle()
+        
+        assert(blockHeader.count == 80)
+        return blockHeader
     }
-    return newData
-}
-
-fileprivate func bytesToHexString(bytes: [UInt8]) -> String {
-    let format = "%02hhx" // "%02hhX" (uppercase)
-    return bytes.map {
-        String(format: format, $0)
-    }
-    .joined()
 }

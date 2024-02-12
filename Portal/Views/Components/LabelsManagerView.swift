@@ -28,10 +28,10 @@ struct LabelsManagerView: View {
                     
                     Spacer()
                     
-                    PButton(config: .onlyLabel("Save"), style: .free, size: .small, applyGradient: true, enabled: viewModel.saveButtonEnabled) {
+                    PButton(config: .onlyLabel(viewModel.saveButtonEnabled ? "Save" : "Close"), style: .free, size: .small, applyGradient: true, enabled: true) {
                         onSaveAcion(viewModel.selectedLabels)
                     }
-                    .frame(width: 39)
+                    .frame(width: 50)
                 }
                 .padding(.vertical, 20)
             }

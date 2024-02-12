@@ -1,0 +1,37 @@
+{
+  "configurations" : [
+    {
+      "id" : "6A71D0F8-A8DB-4345-839A-151223137209",
+      "name" : "Configuration 1",
+      "options" : {
+        "addressSanitizer" : {
+          "enabled" : false
+        }
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "addressSanitizer" : {
+      "enabled" : true
+    },
+    "testTimeoutsEnabled" : true,
+    "threadSanitizerEnabled" : true,
+    "undefinedBehaviorSanitizerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "skippedTests" : [
+        "EvmLightningSwapPlaynetTest",
+        "PlaynetBDKIntegrationSample",
+        "PlaynetIntegrationTest"
+      ],
+      "target" : {
+        "containerPath" : "container:Portal.xcodeproj",
+        "identifier" : "755501C22A6131230027D5FD",
+        "name" : "PortalTests"
+      }
+    }
+  ],
+  "version" : 1
+}

@@ -14,7 +14,7 @@ enum QRScannerConfig: Equatable {
 
 struct QRCodeReaderView: View {
     @Environment(\.presentationMode) private var presentation
-    @EnvironmentObject private var navigation: NavigationStack
+    @Environment(NavigationStack.self) var navigation: NavigationStack
 
     private(set) var completion: (QRCodeItem) -> ()
     private let config: QRScannerConfig

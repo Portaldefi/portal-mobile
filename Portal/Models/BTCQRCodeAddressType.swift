@@ -13,7 +13,7 @@ enum BTCQRCodeAddressType: CaseIterable {
     var title: String {
         switch self {
         case .lightning:
-            return "Lightnig"
+            return "Lightning"
         case .onChain:
             return "On Chain"
         case .unified:

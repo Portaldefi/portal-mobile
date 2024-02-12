@@ -16,10 +16,11 @@ struct ViewHeightKey: PreferenceKey {
 }
 
 struct SetRecipientView: View {
+    var viewState: ViewState = Container.viewState()
     @State private var showScanner = false
-    @State var textEditorHeight : CGFloat = 0
-    @ObservedObject var viewModel: SendViewViewModel
-    @EnvironmentObject private var navigation: NavigationStack
+    @State private var textEditorHeight : CGFloat = 0
+    @Environment(SendViewViewModel.self) private var viewModel: SendViewViewModel
+    @Environment(NavigationStack.self) private var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
     
     let rootView: Bool
@@ -39,7 +40,11 @@ struct SetRecipientView: View {
     }
     
     var body: some View {
+        @Bindable var bindableViewModel = viewModel
+        
         ZStack(alignment: .bottom) {
+            let _ = Self._printChanges()
+
             VStack(spacing: 0) {
                 ZStack {
                     HStack {
@@ -56,9 +61,20 @@ struct SetRecipientView: View {
                         Spacer()
                     }
                     
-                    Text("Send")
-                        .frame(width: 300, height: 62)
-                        .font(.Main.fixed(.monoBold, size: 16))
+                    if let coin = viewModel.coin {
+                        Text("Send \(coin.code) (\(coin.network))")
+                            .frame(width: 300, height: 62)
+                            .font(.Main.fixed(.monoBold, size: 16))
+                    } else {
+                        Text("Send")
+                            .frame(width: 300, height: 62)
+                            .font(.Main.fixed(.monoBold, size: 16))
+                    }
+                }
+                
+                if !viewState.isReachable {
+                    NoInternetConnectionView()
+                        .padding(.horizontal, -16)
                 }
                 
                 VStack(spacing: 16) {
@@ -84,7 +100,7 @@ struct SetRecipientView: View {
                                 )
                             //
                             
-                            TextEditor(text: $viewModel.receiverAddress)
+                            TextEditor(text: $bindableViewModel.receiverAddress)
                                 .hideBackground()
                                 .disableAutocorrection(true)
                                 .textInputAutocapitalization(.never)
@@ -92,6 +108,7 @@ struct SetRecipientView: View {
                                 .foregroundColor(textEditorInputColor)
                                 .frame(height: max(40, textEditorHeight))
                                 .padding(8)
+                                .disabled(true)
                             
                             if viewModel.receiverAddress.isEmpty {
                                 Text("Enter address")
@@ -164,7 +181,7 @@ struct SetRecipientView: View {
                         config: .onlyLabel("Continue"),
                         style: .filled,
                         size: .big,
-                        enabled: !viewModel.receiverAddress.isEmpty && viewModel.sendError == nil
+                        enabled: !viewModel.receiverAddress.isEmpty && viewModel.sendError == nil && viewState.isReachable
                     ) {
                         do {
                             let result = try viewModel.validateInput()
@@ -194,7 +211,7 @@ struct SetRecipientView: View {
             .zIndex(1)
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
-        .alert(isPresented: $viewModel.clipboardIsEmpty) {
+        .alert(isPresented: $bindableViewModel.clipboardIsEmpty) {
             Alert(title: Text("Empty Clipboard"), message: Text("You don't have anything in your device clipboard."), dismissButton: .default(Text("OK")))
         }
         .sheet(isPresented: $showScanner) {
@@ -235,7 +252,18 @@ struct RecipientView_Previews: PreviewProvider {
     static var previews: some View {
         let _ = Container.walletManager.register { WalletManager.mocked }
         let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
         
-        SetRecipientView(viewModel: SendViewViewModel.mocked, rootView: true)
+        SetRecipientView(rootView: true).environment(SendViewViewModel.mocked)
+    }
+}
+
+struct RecipientView_No_Connection: PreviewProvider {
+    static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
+        
+        ReviewTransactionView().environment(SendViewViewModel.mocked)
     }
 }

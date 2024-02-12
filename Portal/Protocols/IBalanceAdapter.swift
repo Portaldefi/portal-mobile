@@ -9,7 +9,6 @@ import Foundation
 import Combine
 
 protocol IBalanceAdapter {
-    var L1Balance: Decimal { get }
     var state: AdapterState { get }
     var balance: Decimal { get }
     var balanceLocked: Decimal? { get }

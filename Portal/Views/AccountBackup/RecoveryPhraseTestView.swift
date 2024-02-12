@@ -9,7 +9,7 @@ import SwiftUI
 import PortalUI
 
 struct RecoveryPhraseTestView: View {
-    @EnvironmentObject private var navigation: NavigationStack
+    @Environment(NavigationStack.self) var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel: RecoveryPhraseViewModel
     
@@ -39,7 +39,7 @@ struct RecoveryPhraseTestView: View {
                 
                 HStack {
                     if !viewModel.isCorrectSelection {
-                        Text("Not the next word, try again")
+                        Text(viewModel.recoveryArray.count == 1 ? "Not the first word, try again" : "Not the next word, try again")
                             .font(.Main.fixed(.monoRegular, size: 16))
                             .foregroundColor(.red)
                     } else {

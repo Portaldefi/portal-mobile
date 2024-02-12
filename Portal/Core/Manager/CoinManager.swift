@@ -12,10 +12,10 @@ import Factory
 
 final class CoinManager: ICoinManager {
     var onCoinsUpdate = PassthroughSubject<[Coin], Never>()
-    @Injected(Container.settings) private var settings
     
     private let storage: ICoinStorage
     private let accountManager: IAccountManager
+    private let settings: IPortalSettings
     private var subscriptions = Set<AnyCancellable>()
     
     var walletCoins: [Coin] = []
@@ -24,38 +24,37 @@ final class CoinManager: ICoinManager {
         storage.coins.value
     }
     
-    init(storage: ICoinStorage, accountManager: IAccountManager) {
+    init(storage: ICoinStorage, accountManager: IAccountManager, userSettings: IPortalSettings) {
         self.storage = storage
         self.accountManager = accountManager
-        self.syncCoins(account: accountManager.activeAccount)
+        self.settings = userSettings
+        self.syncCoins(userSettings.userCoins.value)
         self.subscribe()
     }
     
     private func subscribe() {
-        storage.coins
-            .sink { [weak self] coins in
-                guard let self = self else { return }
-                self.syncCoins(account: self.accountManager.activeAccount)
-            }
-            .store(in: &subscriptions)
+//        storage.coins
+//            .sink { [unowned self] coins in
+//                syncCoins(coins.map{ $0.code })
+//            }
+//            .store(in: &subscriptions)
         
         accountManager.onActiveAccountUpdate
-            .sink { [weak self] account in
-                guard let account = account else { return }
-                self?.syncCoins(account: account)
+            .sink { [unowned self] _ in
+                syncCoins(settings.userCoins.value)
             }
             .store(in: &subscriptions)
     }
     
-    private func syncCoins(account: Account?) {
-//        guard let account = account else { return }
-        
+    private func syncCoins(_ coinCodes: [String]) {
         walletCoins.removeAll()
         
         walletCoins.append(.bitcoin())
+        walletCoins.append(.lightningBitcoin())
         walletCoins.append(.ethereum())
+        walletCoins.append(.portal())
         
-        for code in settings.userCoins {
+        for code in coinCodes {
             guard let coin = avaliableCoins.first(where: { $0.code == code }) else { return }
             walletCoins.append(coin)
         }

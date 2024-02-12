@@ -37,6 +37,8 @@ class PincodeViewModel: ObservableObject {
     init() {
         print("Pincode vm init")
         
+        self.requiredBiometrics = settings.biometricsEnabled.value
+        
         $pin.dropFirst().filter{ $0.count == self.pinLength }.delay(for: 0.2, scheduler: RunLoop.main).sink { [unowned self] pin in
             withAnimation {
                 guard let securedPin = storage.string(for: "PIN"), pin == securedPin else {
@@ -58,87 +60,106 @@ class PincodeViewModel: ObservableObject {
         }
         .store(in: &subscriptions)
         
-        settings.$biometricsEnabled.receive(on: RunLoop.main).sink { [weak self] enabled in
-            self?.requiredBiometrics = enabled
+        settings.biometricsEnabled.dropFirst().receive(on: RunLoop.main).sink { [unowned self] enabled in
+            self.requiredBiometrics = enabled
+            
+            print("self.viewState.sceneState == .background \(self.viewState.sceneState == .background)")
+            print("enabled = \(enabled)")
+            print("self.settings.biometricsEnabled.value = \(self.settings.biometricsEnabled.value)")
+            print("self.viewState.walletLocked = \(self.viewState.walletLocked)")
+            
+            if self.viewState.sceneState == .background && enabled && self.settings.biometricsEnabled.value && self.viewState.walletLocked {
+                self.biometricAuth()
+            }
         }
         .store(in: &subscriptions)
         
-        viewState.$sceneState.filter{ $0 == .active }.subscribe(on: RunLoop.main).sink { [weak self] _ in
+        viewState.onSceneStateChange.filter{ $0 == .active }.subscribe(on: RunLoop.main).sink { [weak self] _ in
             guard let self = self else { return }
-            print(self.requiredBiometrics)
-            guard self.requiredBiometrics && self.settings.biometricsEnabled && self.viewState.walletLocked else { return }
+            print("self.requiredBiometrics = \(self.requiredBiometrics)")
+            print("self.settings.biometricsEnabled.value = \(self.settings.biometricsEnabled.value)")
+            print("self.viewState.walletLocked = \(self.viewState.walletLocked)")
 
-            self.biometrics.authenticateUser { success, error in
-                DispatchQueue.main.async {
-                    if success {
-                        self.unlock()
-                    } else {
-                        if let error = error {
-                            switch error {
-                            case LAError.appCancel:
-                                // The app canceled authentication by
-                                // invalidating the LAContext
-                                print("The app canceled authentication by invalidating the LAContext")
-                                self.requiredBiometrics = false
-                            case LAError.authenticationFailed:
-                                // The user did not provide
-                                // valid credentials
-                                print("The user did not provide valid credentials")
-                            case LAError.invalidContext:
-                                // The LAContext was invalid
-                                print("The LAContext was invalid")
-                                self.requiredBiometrics = false
-                            case LAError.notInteractive:
-                                // Interaction was not allowed so the
-                                // authentication failed
-                                print("Interaction was not allowed so the authentication failed")
-                            case LAError.passcodeNotSet:
-                                // The user has not set a passcode
-                                // on this device
-                                print("The user has not set a passcode on this device")
-                            case LAError.systemCancel:
-                                // The system canceled authentication,
-                                // for example to show another app
-                                print("The system canceled authentication, for example to show another app")
-                            case LAError.userCancel:
-                                // The user canceled the
-                                // authentication dialog
-                                print("The user cancΩeled the authentication dialog")
-                                self.requiredBiometrics = false
-                            case LAError.userFallback:
-                                // The user selected to use a fallback
-                                // authentication method
-                                print("The user selected to use a fallback authentication method")
-                            case LAError.biometryLockout:
-                                // Too many failed attempts locked
-                                // biometric authentication
-                                print("Too many failed attempts locked biometric authentication")
-                                self.requiredBiometrics = false
-                            case LAError.biometryNotAvailable:
-                                // The user's device does not support
-                                // biometric authentication
-                                print("The user's device does not support biometric authentication")
-                                self.settings.biometricsEnabled = false
-                                self.requiredBiometrics = false
-                            case LAError.biometryNotEnrolled:
-                                // The user has not configured
-                                // biometric authentication
-                                print("The user has not configured biometric authentication")
-                                self.settings.biometricsEnabled = false
-                                self.requiredBiometrics = false
-                            default:
-                                print("Unknown authentification error")
-                            }
+            guard self.requiredBiometrics && self.settings.biometricsEnabled.value && self.viewState.walletLocked else { return }
+
+            self.biometricAuth()
+        }
+        .store(in: &subscriptions)
+        
+        guard viewState.sceneState == .active && requiredBiometrics && settings.biometricsEnabled.value && viewState.walletLocked else { return }
+
+        biometricAuth()
+    }
+    
+    func biometricAuth() {
+        biometrics.authenticateUser { success, error in
+            DispatchQueue.main.async {
+                if success {
+                    self.unlock()
+                } else {
+                    if let error = error {
+                        switch error {
+                        case LAError.appCancel:
+                            // The app canceled authentication by
+                            // invalidating the LAContext
+                            print("The app canceled authentication by invalidating the LAContext")
+                            self.requiredBiometrics = false
+                        case LAError.authenticationFailed:
+                            // The user did not provide
+                            // valid credentials
+                            print("The user did not provide valid credentials")
+                        case LAError.invalidContext:
+                            // The LAContext was invalid
+                            print("The LAContext was invalid")
+                            self.requiredBiometrics = false
+                        case LAError.notInteractive:
+                            // Interaction was not allowed so the
+                            // authentication failed
+                            print("Interaction was not allowed so the authentication failed")
+                        case LAError.passcodeNotSet:
+                            // The user has not set a passcode
+                            // on this device
+                            print("The user has not set a passcode on this device")
+                        case LAError.systemCancel:
+                            // The system canceled authentication,
+                            // for example to show another app
+                            print("The system canceled authentication, for example to show another app")
+                        case LAError.userCancel:
+                            // The user canceled the
+                            // authentication dialog
+                            print("The user cancΩeled the authentication dialog")
+                            self.requiredBiometrics = false
+                        case LAError.userFallback:
+                            // The user selected to use a fallback
+                            // authentication method
+                            print("The user selected to use a fallback authentication method")
+                        case LAError.biometryLockout:
+                            // Too many failed attempts locked
+                            // biometric authentication
+                            print("Too many failed attempts locked biometric authentication")
+                            self.requiredBiometrics = false
+                        case LAError.biometryNotAvailable:
+                            // The user's device does not support
+                            // biometric authentication
+                            print("The user's device does not support biometric authentication")
+                            self.settings.updateBiometricsSetting(enabled: false)
+                            self.requiredBiometrics = false
+                        case LAError.biometryNotEnrolled:
+                            // The user has not configured
+                            // biometric authentication
+                            print("The user has not configured biometric authentication")
+                            self.settings.updateBiometricsSetting(enabled: false)
+                            self.requiredBiometrics = false
+                        default:
+                            print("Unknown authentification error")
                         }
                     }
                 }
             }
         }
-        .store(in: &subscriptions)
     }
     
     deinit {
-        //TODO:- fixme vm won't deinit
         print("pincode vm deinit")
     }
         

@@ -20,11 +20,11 @@ final class NotificationService: INotificationService {
     private var subscriptions = Set<AnyCancellable>()
         
     init(accountManager: IAccountManager) {
-        if let url = Bundle.main.url(forResource: "alert", withExtension: "mp3") {
-            player = AVPlayer.init(url: url)
-        } else {
+//        if let url = Bundle.main.url(forResource: "alert", withExtension: "mp3") {
+//            player = AVPlayer.init(url: url)
+//        } else {
             player = nil
-        }
+//        }
         
         accountId = accountManager.activeAccount?.id
         

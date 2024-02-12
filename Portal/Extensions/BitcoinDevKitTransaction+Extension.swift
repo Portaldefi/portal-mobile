@@ -35,9 +35,9 @@ extension BitcoinDevKit.TransactionDetails: Equatable {
     
     var type: TxType {
         if self.sent > 0 {
-            return .sent
+            return .sent(coin: .bitcoin())
         } else {
-            return .received
+            return .received(coin: .bitcoin())
         }
     }
     

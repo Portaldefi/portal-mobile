@@ -9,7 +9,7 @@ import SwiftUI
 import PortalUI
 
 struct RecoveryPhraseView: View {
-    @EnvironmentObject private var navigation: NavigationStack
+    @Environment(NavigationStack.self) var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var viewModel: RecoveryPhraseViewModel
     

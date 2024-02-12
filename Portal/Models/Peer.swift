@@ -43,11 +43,12 @@ class Peer: Codable, Equatable {
 }
 
 extension Peer {
+    //Playnet peers
     static var alice: Peer {
         let name = "Alice"
-        let pubKey = "031d4f7f926e7b6d74362e5996b67563fef459bbb3465e7da320d932d85786abb6"
+        let pubKey = "038fa0a228939e7164d76a5bd211d9fec248d17476c1e30fe6c2b37736d8476004"
         let host = "127.0.0.1"
-        let port: UInt16 = 9735
+        let port: UInt16 = 9001
                 
         return Peer(
             peerPubKey: pubKey,
@@ -57,9 +58,9 @@ extension Peer {
     }
     static var bob: Peer {
         let name = "Bob"
-        let pubKey = "02030e7ed5557c27b8d3ddfe0fcf9297209623af1683e3ca83ad276ceeb451afe1"
-        let host = "127.0.0.1"    //P2p external
-        let port: UInt16 = 9736   //in Polar
+        let pubKey = "0338b91ec1c39260ac18e723abd65d82828aa5cb994f646c9377897ed33cffd0d9"
+        let host = "127.0.0.1"
+        let port: UInt16 = 9002
                 
         return Peer(
             peerPubKey: pubKey,
@@ -67,11 +68,12 @@ extension Peer {
             connectionInformation: .init(hostname: host, port: port)
         )
     }
-    static var carol: Peer {
-        let name = "Carol"
-        let pubKey = "038e6e4a8c1315a6311991ed919a9de052dfcd9c19fa22ca54fc90b64073ff80c2"
-        let host = "127.0.0.1"    //P2p external
-        let port: UInt16 = 9737   //in Polar
+    //Public peers in testnet
+    static var wangOne: Peer {
+        let name = "WagOne"
+        let pubKey = "03b05b2b15cad59018428d6088dc12ee6ea9758d6743eeace71a19b65f5e05b457"
+        let host = "128.16.7.139"
+        let port: UInt16 = 9735
                 
         return Peer(
             peerPubKey: pubKey,
@@ -79,6 +81,72 @@ extension Peer {
             connectionInformation: .init(hostname: host, port: port)
         )
     }
+    
+    static var wangTwo: Peer {
+        let name = "WagTwo"
+        let pubKey = "03320eaaa83c6e7c4ca4199b5d672d3c19961b0f73c4a005f9b42dc376e23ca6dd"
+        let host = "3.86.28.215"
+        let port: UInt16 = 9735
+        
+        return Peer(
+            peerPubKey: pubKey,
+            name: name,
+            connectionInformation: .init(hostname: host, port: port)
+        )
+    }
+    
+    static var mlCom: Peer {
+        let name = "1ML.com node ALPHA"
+        let pubKey = "02312627fdf07fbdd7e5ddb136611bdde9b00d26821d14d94891395452f67af248"
+        let host = "23.237.77.12"
+        let port: UInt16 = 9735
+        
+        return Peer(
+            peerPubKey: pubKey,
+            name: name,
+            connectionInformation: .init(hostname: host, port: port)
+        )
+    }
+    
+    static var olympus: Peer {
+        let name = "OLYMPUS by ZEUS"
+        let pubKey = "03e84a109cd70e57864274932fc87c5e6434c59ebb8e6e7d28532219ba38f7f6df"
+        let host = "139.144.22.237"
+        let port: UInt16 = 9735
+        
+        return Peer(
+            peerPubKey: pubKey,
+            name: name,
+            connectionInformation: .init(hostname: host, port: port)
+        )
+    }
+    
+    static var openNode: Peer {
+        let name = "OpenNode"
+        let pubKey = "02eadbd9e7557375161df8b646776a547c5cbc2e95b3071ec81553f8ec2cea3b8c"
+        let host = "18.191.253.246"
+        let port: UInt16 = 9735
+        
+        return Peer(
+            peerPubKey: pubKey,
+            name: name,
+            connectionInformation: .init(hostname: host, port: port)
+        )
+    }
+    
+    static var aranguren: Peer {
+        let name = "aranguren.org"
+        let pubKey = "038863cf8ab91046230f561cd5b386cbff8309fa02e3f0c3ed161a3aeb64a643b9"
+        let host = "203.132.94.196"
+        let port: UInt16 = 9735
+        
+        return Peer(
+            peerPubKey: pubKey,
+            name: name,
+            connectionInformation: .init(hostname: host, port: port)
+        )
+    }
+    
 }
 
 // MARK: Helper Models

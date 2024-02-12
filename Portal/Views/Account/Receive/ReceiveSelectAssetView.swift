@@ -10,8 +10,8 @@ import PortalUI
 
 struct ReceiveSelectAssetView: View {
     @Environment(\.presentationMode) private var presentationMode
-    @EnvironmentObject private var navigation: NavigationStack
-    @ObservedObject var viewModel: ReceiveViewModel
+    @Environment(NavigationStack.self) var navigation: NavigationStack
+    @State var viewModel: ReceiveViewModel
             
     var body: some View {
         VStack(spacing: 0) {
@@ -44,11 +44,19 @@ struct ReceiveSelectAssetView: View {
                                 ZStack(alignment: .trailing) {
                                     WalletItemView(viewModel: item.viewModel)
                                         .padding(.leading, 16)
-                                        .padding(.trailing, 14)
+                                        .padding(.trailing, 22)
                                         .contentShape(Rectangle())
                                         .onTapGesture {
-                                            viewModel.selectedItem = item
-                                            navigation.push(.receiveGenerateQRCode(viewModel: viewModel))
+                                            if item.coin == .lightningBitcoin(), !viewModel.hasUsableChannels {
+                                                if viewModel.hasChannelBalance {
+                                                    
+                                                } else {
+                                                    
+                                                }
+                                            } else {
+                                                viewModel.selectedItem = item
+                                                navigation.push(.receiveGenerateQRCode(viewModel: viewModel))
+                                            }
                                         }
                                                                         
                                     Asset.chevronRightIcon

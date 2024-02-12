@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RootView: View {
-    @StateObject private var viewModel = RootViewViewModel()
+    private var viewModel = RootViewViewModel()
     
     var body: some View {
         switch viewModel.state {

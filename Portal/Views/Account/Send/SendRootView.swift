@@ -15,9 +15,9 @@ struct SendRootView: View {
         let rootView: AnyView
         
         if withAssetPicker {
-            rootView = AnyView(SendSelectAssetView(viewModel: Container.sendViewModel()))
+            rootView = AnyView(SendSelectAssetView())
         } else {
-            rootView = AnyView(SetRecipientView(viewModel: Container.sendViewModel(), rootView: true))
+            rootView = AnyView(SetRecipientView(rootView: true))
         }
         
         navigationStack = NavigationStackView<AnyView>(

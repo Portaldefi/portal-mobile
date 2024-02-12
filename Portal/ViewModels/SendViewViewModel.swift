@@ -16,39 +16,64 @@ enum UserInputResult {
     case btcOnChain(address: String), lightningInvoice(amount: String), ethOnChain(address: String)
 }
 
-class SendViewViewModel: ObservableObject {
-    private var sendService: ISendAssetService?
-    private var subscriptions = Set<AnyCancellable>()
+@Observable class SendViewViewModel {
+    @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
+    @ObservationIgnored private var sendService: ISendAssetService?
+    
+    public var receiverAddress = String() {
+        didSet {
+            sendService?.receiver.send(receiverAddress)
+            guard sendError != nil else { return }
+            withAnimation {
+                sendError = nil
+            }
+        }
+    }
+    public var coin: Coin? {
+        didSet {
+            guard let coin = coin else { return }
+            syncSendService(coin: coin)
+            syncExchanger(coin: coin)
+        }
+    }
+    public var qrCodeItem: QRCodeItem?
+    public var clipboardIsEmpty = false
+    public var feeRate: TxFees = .normal {
+        didSet {
+            sendService?.feeRateType.send(feeRate)
+        }
+    }
+    public var amountIsValid: Bool = true
+    public var showFeesPicker = false
+    
     private(set) var walletItems: [WalletItem]  = []
-    
-    @Published var receiverAddress = String()
-    @Published var coin: Coin?
-    @Published var qrCodeItem: QRCodeItem?
-    @Published var clipboardIsEmpty = false
-    @Published var feeRate: TxFees = .normal
-    @Published var amountIsValid: Bool = true
-    @Published var showFeesPicker = false
-    
-    @Published private(set) var balanceString = String()
-    @Published private(set) var valueString = String()
-    @Published private(set) var useAllFundsEnabled = true
-    
-    @Published private(set) var unconfirmedTx: TransactionRecord?
-    @Published private(set) var recomendedFees: RecomendedFees?
-    @Published private(set) var exchanger: Exchanger?
-    @Published private(set) var sendError: Error?
-    @Published var confirmSigning = false
+    private(set) var balanceString = String()
+    private(set) var valueString = String()
+    private(set) var useAllFundsEnabled = true
+    private(set) var unconfirmedTx = PassthroughSubject<TransactionRecord, Never>()
+    private(set) var recomendedFees: RecomendedFees?
+    private(set) var exchanger: Exchanger?
+    private(set) var sendError: Error?
+    private(set) var confirmSigning = false
 
-    @Injected(Container.accountViewModel) private var account
-    @Injected(Container.marketData) private var marketData
-    @Injected(Container.settings) private var settings
+    private var marketData = Container.marketData()
+    private var settings = Container.settings()
+    private var lightningKit = Container.lightningKitManager()
     
     var fiatCurrency: FiatCurrency {
-        settings.fiatCurrency
+        settings.fiatCurrency.value
     }
     
     var signingTxProtected: Bool {
-        settings.pincodeEnabled || settings.biometricsEnabled
+        settings.pincodeEnabled.value || settings.biometricsEnabled.value
+    }
+    
+    var hasUsableChannels: Bool {
+        !lightningKit.usableChannels.isEmpty
+    }
+    
+    var hasChannelBalance: Bool {
+        lightningKit.channelBalance > 0
     }
         
     var fee: String {
@@ -68,37 +93,16 @@ class SendViewViewModel: ObservableObject {
         return exchanger.baseAmountDecimal > 0 && sendService?.fee != 0
     }
     
-    init() {
+    init(items: [WalletItem]? = []) {
         subscribeForUpdates()
+        if let initItems = items { walletItems = initItems }
+    }
+    
+    deinit {
+        print("SendViewModel DEINITED")
     }
     
     private func subscribeForUpdates() {
-        $coin
-            .sink { [weak self] newCoin in
-                guard let self = self, let coin = newCoin else { return }
-                
-                self.syncSendService(coin: coin)
-                self.syncExchanger(coin: coin)
-            }
-            .store(in: &subscriptions)
-        
-        $receiverAddress
-            .sink { [unowned self] address in
-                self.sendService?.receiverAddress.send(address)
-                guard sendError != nil else { return }
-                withAnimation {
-                    self.sendError = nil
-                }
-            }
-            .store(in: &subscriptions)
-        
-        account
-            .$items
-            .sink { items in
-                self.walletItems = items
-            }
-            .store(in: &subscriptions)
-        
         marketData
             .onMarketDataUpdate
             .receive(on: RunLoop.main)
@@ -106,31 +110,27 @@ class SendViewViewModel: ObservableObject {
                 guard let self = self, let sendService = self.sendService, let coin = self.coin else { return }
                 
                 switch coin.type {
-                case .bitcoin:
-                    self.valueString = (sendService.balance * self.marketData.lastSeenBtcPrice * self.fiatCurrency.rate).double.usdFormatted()
-                case .lightningBitcoin:
-                    fatalError("not implemented")
-                case .ethereum, .erc20:
-                    self.valueString = (sendService.balance * self.marketData.lastSeenEthPrice * self.fiatCurrency.rate).double.usdFormatted()
+                case .bitcoin, .lightningBitcoin:
+                    self.valueString = (sendService.balance * self.marketData.lastSeenBtcPrice * self.fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
+                case .ethereum:
+                    self.valueString = (sendService.balance * self.marketData.lastSeenEthPrice * self.fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
+                case .erc20:
+                    self.valueString = (sendService.balance * 1.2 * self.fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
                 }
             }
             .store(in: &subscriptions)
-        
-        $feeRate
-            .sink { [unowned self] rate in
-                self.sendService?.feeRateType.send(rate)
-            }
-            .store(in: &subscriptions)
     }
-    
+        
     private func syncExchanger(coin: Coin) {
         let price: Decimal
         
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
             price = marketData.lastSeenBtcPrice
-        case .ethereum, .erc20:
+        case .ethereum:
             price = marketData.lastSeenEthPrice
+        case .erc20:
+            price = 1.2
         }
         
         exchanger = Exchanger(
@@ -173,15 +173,24 @@ class SendViewViewModel: ObservableObject {
                 fatalError("coudn't fetch dependencies")
             }
             
-            sendService = SendBTCService(sendAdapter: sendAdapter)
+            sendService = SendBTCService(adapter: sendAdapter)
             
             if let service = sendService {
-                balanceString = String(describing: service.spendable)
-                valueString = (service.balance * marketData.lastSeenBtcPrice * fiatCurrency.rate).double.usdFormatted()
+                balanceString = service.spendable.formatted()
+                valueString = (service.balance * marketData.lastSeenBtcPrice * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
             }
         case .lightningBitcoin:
-            fatalError("not implemented yet")
-        case .ethereum, .erc20:
+            guard let sendAdapter = adapter as? ISendLightningAdapter else {
+                fatalError("coudn't fetch dependencies")
+            }
+            
+            sendService = SendLightningService(adapter: sendAdapter)
+            
+            if let service = sendService {
+                balanceString = service.spendable.formatted()
+                valueString = (service.balance * marketData.lastSeenBtcPrice * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
+            }
+        case .ethereum:
             guard let sendAdapter = adapter as? ISendEthereumAdapter else {
                 fatalError("coudn't fetch dependencies")
             }
@@ -190,11 +199,26 @@ class SendViewViewModel: ObservableObject {
             let ethFeeRateProvider = EthereumFeeRateProvider(feeRateProvider: feeRateProvider)
             
             let ethManager = Container.ethereumKitManager()
-            sendService = SendETHService(coin: coin, sendAdapter: sendAdapter, feeRateProvider: ethFeeRateProvider, manager: ethManager)
+            sendService = SendETHService(coin: coin, adapter: sendAdapter, feeRateProvider: ethFeeRateProvider, manager: ethManager)
             
             if let service = sendService {
-                balanceString = String(describing: service.spendable)
-                valueString = (service.balance * marketData.lastSeenEthPrice * fiatCurrency.rate).double.usdFormatted()
+                balanceString = service.spendable.formatted()
+                valueString = (service.balance * marketData.lastSeenEthPrice * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
+            }
+        case .erc20:
+            guard let sendAdapter = adapter as? ISendEthereumAdapter else {
+                fatalError("coudn't fetch dependencies")
+            }
+            
+            let feeRateProvider = Container.feeRateProvider()
+            let ethFeeRateProvider = EthereumFeeRateProvider(feeRateProvider: feeRateProvider)
+            
+            let ethManager = Container.ethereumKitManager()
+            sendService = SendETHService(coin: coin, adapter: sendAdapter, feeRateProvider: ethFeeRateProvider, manager: ethManager)
+            
+            if let service = sendService {
+                balanceString = service.spendable.formatted()
+                valueString = (service.balance * 1.2 * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
             }
         }
         
@@ -214,51 +238,26 @@ class SendViewViewModel: ObservableObject {
     func updateError() {
         sendError = SendFlowError.addressIsntValid
     }
-        
-    func send(_ completionHandler: @escaping (Bool) -> ()) {
-//        if !useAllFundsEnabled {
-//            sendService?
-//                .sendMax()
-//                .receive(on: RunLoop.main)
-//                .sink(receiveCompletion: { [weak self] completion in
-//                    guard let self = self else { return }
-//
-//                    if case let .failure(error) = completion {
-//                        withAnimation {
-//                            self.sendError = error
-//                        }
-//                        completionHandler(false)
-//                    }
-//                }, receiveValue: { [weak self] transaction in
-//                    guard let self = self else { return }
-//
-//                    self.unconfirmedTx = transaction
-//
-//                    completionHandler(true)
-//                })
-//                .store(in: &subscriptions)
-//        } else {
-//            sendService?
-//                .send()
-//                .receive(on: RunLoop.main)
-//                .sink(receiveCompletion: { [weak self] completion in
-//                    guard let self = self else { return }
-//
-//                    if case let .failure(error) = completion {
-//                        withAnimation {
-//                            self.sendError = error
-//                        }
-//                        completionHandler(false)
-//                    }
-//                }, receiveValue: { [weak self] transaction in
-//                    guard let self = self else { return }
-//
-//                    self.unconfirmedTx = transaction
-//
-//                    completionHandler(true)
-//                })
-//                .store(in: &subscriptions)
-//        }
+    
+    func send() async -> Bool {
+        guard let service = sendService else {
+            withAnimation {
+                self.sendError = SendFlowError.error("Send service is nil")
+            }
+            return false
+        }
+        do {
+            let transaction = !useAllFundsEnabled ? try await service.sendMax() : try await service.send()
+            DispatchQueue.main.async {
+                self.unconfirmedTx.send(transaction)
+            }
+            return true
+        } catch {
+            withAnimation {
+                self.sendError = error
+            }
+            return false
+        }
     }
     
     func clearRecipient() {

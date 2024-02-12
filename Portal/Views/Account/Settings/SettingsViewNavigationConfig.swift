@@ -20,6 +20,11 @@ struct SettingsViewNavigationConfig: NavigationConfigurator {
                 id: screen.id,
                 wrappedElement: AnyView(SetPincodeView())
             )
+        case .devUtility:
+            return ViewElement(
+                id: screen.id,
+                wrappedElement: AnyView(DevUtilityView())
+            )
         default:
             fatalError("unsupported navigation case")
         }

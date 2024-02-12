@@ -1,0 +1,50 @@
+{
+  "configurations" : [
+    {
+      "id" : "170ABA1D-189C-4353-AA5B-4A294A28E39F",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "skippedTests" : [
+        "AccountCurrencyTest",
+        "AccountStorageTest",
+        "AccountTest",
+        "AdapterManagerTest",
+        "BTCQRCodeAddressTypeTest",
+        "BitcoinAdapterTest",
+        "CoinManagerTest",
+        "CoinTest",
+        "Erc20AdapterTest",
+        "EthereumAdapterTest",
+        "EthereumKitManager",
+        "ExchangerTest",
+        "FiatCurrencyTest",
+        "KeychainStorageTest",
+        "LightningKitManager",
+        "LocalStorageTest",
+        "NotificationServiceTest",
+        "PeerStoreTest",
+        "QRCodeItemTest",
+        "TxFeesText",
+        "TxTypeTest",
+        "WalletItemTest",
+        "WalletManagerTest",
+        "WalletStorageTest"
+      ],
+      "target" : {
+        "containerPath" : "container:Portal.xcodeproj",
+        "identifier" : "755501C22A6131230027D5FD",
+        "name" : "PortalTests"
+      }
+    }
+  ],
+  "version" : 1
+}

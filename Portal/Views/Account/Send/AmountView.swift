@@ -123,14 +123,14 @@ struct AmountView: View {
                 .stroke(Color(red: 58/255, green: 58/255, blue: 58/255), lineWidth: 1)
                 .foregroundColor(Color.clear)
         )
-        .onChange(of: exchanger.side, perform: { newValue in
+        .onChange(of: exchanger.side) { oldValue, newValue in
             switch newValue {
             case .base:
                 focusedField = .base
             case .quote:
                 focusedField = .quote
             }
-        })
+        }
 //        .onChange(of: viewState.showFeesPicker, perform: { newValue in
 //            if newValue {
 //                focusedField = nil

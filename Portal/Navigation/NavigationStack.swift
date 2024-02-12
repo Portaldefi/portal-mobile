@@ -25,11 +25,11 @@ enum NavigationType {
     case pop
 }
 
-class NavigationStack: ObservableObject {
+@Observable class NavigationStack {
     private let configurator: NavigationConfigurator
     
-    @Published private(set) var navigationType = NavigationType.push
-    @Published private(set) var currentView: ViewElement?
+    private(set) var navigationType = NavigationType.push
+    private(set) var currentView: ViewElement?
     
     init(configurator: NavigationConfigurator) {
         self.configurator = configurator

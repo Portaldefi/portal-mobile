@@ -13,8 +13,17 @@ class FeeRateProvider {
     private let feeRateKit: FeeRateKit.Kit
 
     init(appConfigProvider: IAppConfigProvider) {
+        let ethEvmUrl: String
+        
+        switch appConfigProvider.network {
+        case .mainnet:
+            ethEvmUrl = "https://mainnet.infura.io/v3/\(appConfigProvider.infuraCredentials.id)"
+        case .testnet, .playnet:
+            ethEvmUrl = "https://sepolia.infura.io/v3/\(appConfigProvider.infuraCredentials.id)"
+        }
+        
         let providerConfig = FeeProviderConfig(
-                ethEvmUrl: FeeProviderConfig.infuraUrl(projectId: appConfigProvider.infuraCredentials.id),
+                ethEvmUrl: ethEvmUrl,
                 ethEvmAuth: appConfigProvider.infuraCredentials.secret,
                 bscEvmUrl: FeeProviderConfig.defaultBscEvmUrl,
                 btcCoreRpcUrl: appConfigProvider.btcCoreRpcUrl,
@@ -29,60 +38,10 @@ class FeeRateProvider {
     func ethereumGasPrice() async throws -> Int {
         try await feeRateKit.ethereum()
     }
-
-//    var ethereumGasPrice: Future<Int, Never> {
-//        Future { [unowned self] promise in
-//            self.feeRateKit.ethereum
-//                .subscribe(onSuccess: { price in
-//                    promise(.success(price))
-//                })
-//                .disposed(by: self.disposeBag)
-//        }
-//    }
     
     func binanceSmartChainGasPrice() async throws -> Int {
         try await feeRateKit.binanceSmartChain()
     }
-
-//    var binanceSmartChainGasPrice: Future<Int, Never> {
-//        Future { [unowned self] promise in
-//            self.feeRateKit.binanceSmartChain
-//                .subscribe(onSuccess: { price in
-//                    promise(.success(price))
-//                })
-//                .disposed(by: self.disposeBag)
-//        }
-//    }
-
-//    var litecoinFeeRate: Future<Int, Never> {
-//        Future { [unowned self] promise in
-//            self.feeRateKit.litecoin
-//                .subscribe(onSuccess: { price in
-//                    promise(.success(price))
-//                })
-//                .disposed(by: self.disposeBag)
-//        }
-//    }
-//
-//    var bitcoinCashFeeRate: Future<Int, Never> {
-//        Future { [unowned self] promise in
-//            self.feeRateKit.bitcoinCash
-//                .subscribe(onSuccess: { price in
-//                    promise(.success(price))
-//                })
-//                .disposed(by: self.disposeBag)
-//        }
-//    }
-//
-//    var dashFeeRate: Future<Int, Never> {
-//        Future { [unowned self] promise in
-//            self.feeRateKit.dash
-//                .subscribe(onSuccess: { price in
-//                    promise(.success(price))
-//                })
-//                .disposed(by: self.disposeBag)
-//        }
-//    }
 
     func bitcoinFeeRate(blockCount: Int) async throws -> Int {
         try await feeRateKit.bitcoin(blockCount: blockCount)

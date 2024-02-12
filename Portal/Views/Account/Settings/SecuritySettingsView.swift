@@ -9,8 +9,9 @@ import SwiftUI
 import PortalUI
 
 struct SecuritySettingsView: View {
-    @EnvironmentObject private var navigation: NavigationStack
+    @Environment(NavigationStack.self) var navigation: NavigationStack
     @StateObject var viewModel = SecuritySettingsViewModel()
+    @State private var biometricsEnrolled = false
     let canGoBack: Bool
 
     var body: some View {
@@ -100,6 +101,7 @@ struct SecuritySettingsView: View {
                     Toggle(isOn: $viewModel.biometricEnabled) {
                         EmptyView()
                     }
+                    .disabled(!viewModel.pinCodeEnabled || !biometricsEnrolled)
                 }
                 
                 Divider()
@@ -112,6 +114,13 @@ struct SecuritySettingsView: View {
         
             
             Spacer()
+        }
+        .onAppear {
+            biometricsEnrolled = viewModel.biometrics.isBiometricEnrolled()
+        }
+        .onReceive(viewModel.biometricsEnrolledPublisher) { enabled in
+            guard biometricsEnrolled != enabled else { return }
+            biometricsEnrolled = enabled
         }
     }
 }

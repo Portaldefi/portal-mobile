@@ -11,7 +11,18 @@ import BitcoinDevKit
 import Factory
 
 class SingleTxViewModel: ObservableObject {
-    let tx: TransactionRecord
+    let transaction: TransactionRecord
+    
+    var coin: Coin? {
+        switch transaction.type {
+        case .unknown:
+            return nil
+        case .sent(let coin), .received(let coin):
+            return coin
+        case .swap(let base, _):
+            return base
+        }
+    }
     
     @Published private(set) var notes: String?
     @Published private(set) var labels: [TxLabel]
@@ -19,38 +30,92 @@ class SingleTxViewModel: ObservableObject {
     @Injected(Container.settings) private var settings
 
     var fiatCurrency: FiatCurrency {
-        settings.fiatCurrency
+        settings.fiatCurrency.value
     }
     
     var amount: String {
-        guard let amount = tx.amount else { return "0" }
-        switch tx.coin.type {
-        case .bitcoin:
-            return (amount.double/100_000_000).toString(decimal: 8)
-        case .ethereum:
-            return amount.double.toString(decimal: 8)
-        case .erc20:
-            return amount.double.toString(decimal: 8)
-        case .lightningBitcoin:
-            return "0"
+        let txAmount: Decimal?
+        
+        switch transaction {
+        case let record as BTCTransactionRecord:
+            switch transaction.type {
+            case .sent:
+                if let amount = record.amount, let fee = record.fee {
+                    txAmount = amount - (fee*100_000_000)
+                } else {
+                    txAmount = record.amount
+                }
+            default:
+                txAmount = record.amount
+            }
+        case let record as EvmTransactionRecord:
+            txAmount = record.amount
+        case let record as LNTransactionRecord:
+            txAmount = record.amount
+        case let record as SwapTransactionRecord:
+            txAmount = record.baseQuantity
+        default:
+            txAmount = nil
+        }
+        
+        guard let amount = txAmount else { return "0" }
+        
+        switch transaction.type {
+        case .sent(let coin), .received(let coin):
+            switch coin.type {
+            case .bitcoin, .lightningBitcoin:
+                return (amount.double/100_000_000).toString(decimal: 8)
+            case .ethereum, .erc20:
+                return amount.double.toString(decimal: 8)
+            }
+        case .swap(_, let quote):
+            switch quote.type {
+            case .bitcoin, .lightningBitcoin:
+                return (amount.double).toString(decimal: 8)
+            case .ethereum, .erc20:
+                return amount.double.toString(decimal: 8)
+            }
+        case .unknown:
+            return String()
         }
     }
     
     var value: String {
-        guard let amount = tx.amount else { return "0" }
-        switch tx.coin.type {
-        case .bitcoin, .lightningBitcoin:
-            return (amount/100_000_000 * tx.userData.price * fiatCurrency.rate).double.usdFormatted()
-        case .ethereum:
-            return (amount * tx.userData.price * fiatCurrency.rate).double.usdFormatted()
-        case .erc20:
-            return (amount * tx.userData.price * fiatCurrency.rate).double.usdFormatted()
+        let txAmount: Decimal?
+        
+        switch transaction {
+        case let record as BTCTransactionRecord:
+            txAmount = record.amount
+        case let record as EvmTransactionRecord:
+            txAmount = record.amount
+        case let record as LNTransactionRecord:
+            txAmount = record.amount
+        case let record as SwapTransactionRecord:
+            txAmount = record.quoteQuantity
+        default:
+            txAmount = nil
+        }
+        
+        guard let amount = txAmount else { return "0" }
+        
+        switch transaction.type {
+        case .sent(let coin), .received(let coin):
+            switch coin.type {
+            case .bitcoin, .lightningBitcoin:
+                return (amount/100_000_000 * transaction.price * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
+            case .ethereum, .erc20:
+                return (amount * transaction.price * fiatCurrency.rate).double.formattedString(.fiat(fiatCurrency))
+            }
+        case .swap:
+            return amount.double.toString(decimal: 8)
+        case .unknown:
+            return String()
         }
     }
         
-    init(tx: TransactionRecord) {
-        self.tx = tx
-        self.notes = tx.notes
-        self.labels = tx.labels
+    init(transaction: TransactionRecord) {
+        self.transaction = transaction
+        self.notes = transaction.notes
+        self.labels = transaction.labels
     }
 }

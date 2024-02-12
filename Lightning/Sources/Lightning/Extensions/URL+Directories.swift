@@ -11,6 +11,14 @@ extension URL {
         documentsDirectory.appendingPathComponent("channelManager")
     }
     
+    static var aliceAdminMacaroon: URL {
+        documentsDirectory.appendingPathComponent("alice.macaroon")
+    }
+    
+    static var bobAdminMacaroon: URL {
+        documentsDirectory.appendingPathComponent("bob.macaroon")
+    }
+    
     static var scorerDirectory: URL {
         documentsDirectory.appendingPathComponent("scorer")
     }

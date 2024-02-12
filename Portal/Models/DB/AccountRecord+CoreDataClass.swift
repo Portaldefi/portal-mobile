@@ -23,3 +23,9 @@ public class AccountRecord: NSManagedObject {
         self.ethNetwork = 1 //ropsten
     }
 }
+
+extension AccountRecord {
+    static var mocked: AccountRecord {
+        AccountRecord(id: "MockedAccountID", index: 0, name: "Mocked", context: PersistenceController.shared.container.viewContext)
+    }
+}

@@ -11,10 +11,12 @@ public enum NodeError: Error {
     case connectPeer
     case disconectPeer
     case noChannelManager
+    case networkGraphDataCorrupt
     case keyInterfaceFailure
     case keySeedNotFound
     case alreadyRunning
     case noChainManager
+    case noChainMonitor
     case noRpcInterface
     case channelMaterialNotFound
     case noPayer
@@ -27,10 +29,10 @@ public enum NodeError: Error {
     }
     
     public enum Channels: Error {
-        case apiMisuse
-        case router
-        case channelUnavailable
-        case feeRatesTooHigh
+        case apiMisuse(String)
+        case router(String)
+        case channelUnavailable(String)
+        case feeRatesTooHigh(String)
         case incompatibleShutdownScript
         case unknown
         case channelManagerNotFound
@@ -100,6 +102,10 @@ public enum NodeError: Error {
             return string
         case .disconectPeer:
             return "Failed disconnect from peer"
+        case .noChainMonitor:
+            return "ChainMonitor is not init"
+        case .networkGraphDataCorrupt:
+            return "Network graph data is corrupt"
         }
     }
 }

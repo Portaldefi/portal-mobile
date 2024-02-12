@@ -16,6 +16,15 @@ extension Date {
         return formatter.string(from: self)
     }
     
+    func dateTimeFormatted() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_us")
+        formatter.dateFormat = "MMM d 'at' h:mma"
+        formatter.amSymbol = "am"
+        formatter.pmSymbol = "pm"
+        return formatter.string(from: self)
+    }
+    
     func extendedDate() -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_us")

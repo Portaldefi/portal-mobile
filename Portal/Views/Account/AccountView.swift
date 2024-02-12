@@ -10,19 +10,20 @@ import PortalUI
 import Factory
 
 struct AccountView: View {
-    @EnvironmentObject private var navigation: NavigationStack
-    @ObservedObject private var viewModel: AccountViewModel = Container.accountViewModel()
-    @ObservedObject private var viewState: ViewState = Container.viewState()
+    @Environment(NavigationStack.self) var navigation: NavigationStack
+    @State private var viewModel: AccountViewModel = Container.accountViewModel()
+    @Bindable private var viewState: ViewState = Container.viewState()
     
     var body: some View {
+        let _ = Self._printChanges()
         VStack(spacing: 0) {
             Group {
                 AccountView()
                 Divider()
                     .frame(height: 1)
                     .overlay(Palette.grayScale2A)
-                BalanceView(balance: viewModel.totalBalance, value: viewModel.totalValue)
-                    .frame(height: 124)
+                BalanceView(value: viewModel.totalValue)
+                    .frame(height: 98)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                     .onAppear {
@@ -37,48 +38,78 @@ struct AccountView: View {
                 .frame(height: 1)
                 .overlay(Palette.grayScale10)
             
-            ScrollView {
-                VStack(spacing: 0) {
-                    ForEach(viewModel.items) { item in
-                        ZStack(alignment: .trailing) {
-                            WalletItemView(viewModel: item.viewModel)
-                                .padding(.leading, 12)
-                                .padding(.trailing, 10)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    navigation.push(.assetDetails(item: item))
-                                    withAnimation {
-                                        viewState.hideTabBar = true
+            if viewModel.items.isEmpty {
+                ProgressView()
+                    .progressViewStyle(.circular)
+            } else {
+                ScrollView {
+                    VStack(spacing: 0) {
+                        ForEach(viewModel.items) { item in
+                            ZStack(alignment: .trailing) {
+                                WalletItemView(viewModel: item.viewModel)
+                                    .padding(.leading, 12)
+                                    .padding(.trailing, 22)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        switch item.coin.type {
+                                        case .lightningBitcoin:
+                                            if viewModel.hasUsableLightningChannel {
+                                                navigation.push(.assetDetails(item: item))
+                                                withAnimation {
+                                                    viewState.hideTabBar = true
+                                                }
+                                            } else if viewModel.hasLightningChannel {
+                                                viewModel.goToLightningChannelAwaits.toggle()
+                                            } else {
+                                                viewModel.goToLightningChannelSetup.toggle()
+                                            }
+                                        default:
+                                            navigation.push(.assetDetails(item: item))
+                                            withAnimation {
+                                                viewState.hideTabBar = true
+                                            }
+                                        }
                                     }
-                                }
-                            Asset.chevronRightIcon
-                                .foregroundColor(Palette.grayScale4A)
-                                .offset(x: 2)
+                                Asset.chevronRightIcon
+                                    .foregroundColor(Palette.grayScale4A)
+                                    .offset(y: 3)
+                            }
+                            Divider()
+                                .frame(height: 1)
+                                .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
                         }
-                        Divider()
-                            .frame(height: 1)
-                            .overlay(Color(red: 42/255, green: 42/255, blue: 42/255))
                     }
+                    .padding(.horizontal, 8)
                 }
-                .padding(.horizontal, 8)
+                .background(Palette.grayScale20)
             }
-            .background(Palette.grayScale20)
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale1A))
         .sheet(isPresented: $viewState.showQRCodeScannerFromTabBar) {
             QRCodeReaderRootView(config: .universal).lockableView()
         }
-        .sheet(isPresented: $viewModel.goToReceive) {
+        .sheet(isPresented: $viewModel.goToReceive, onDismiss: {
+            viewModel.updateValues()
+        }) {
             let viewModel = ReceiveViewModel.config(items: viewModel.items, selectedItem: nil)
             ReceiveRootView(viewModel: viewModel, withAssetPicker: true).lockableView()
         }
         .sheet(isPresented: $viewModel.goToSend, onDismiss: {
             viewModel.updateValues()
         }) {
-            SendRootView(withAssetPicker: true).lockableView()
+            let vm = SendViewViewModel(items: viewModel.items)
+            SendRootView(withAssetPicker: true).environment(vm).lockableView()
+        }
+        .sheet(isPresented: $viewModel.goToLightningChannelSetup, onDismiss: {
+            viewModel.updateValues()
+        }) {
+            CreateChannelRootView(channelIsFunded: viewModel.hasLightningChannel).lockableView()
+        }
+        .sheet(isPresented: $viewModel.goToLightningChannelAwaits) {
+            AwaitsFundingChannelView().lockableView()
         }
         .fullScreenCover(isPresented: $viewState.showBackUpFlow) {
-            AccountBackupRootView().environmentObject(viewState).lockableView()
+            AccountBackupRootView().environment(viewState).lockableView()
         }
         .fullScreenCover(isPresented: $viewModel.goToSettings) {
             SettingsRootView().lockableView()
@@ -88,27 +119,22 @@ struct AccountView: View {
     func AccountView() -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text(viewModel.accountName)
-                    .font(.Main.fixed(.bold, size: 24))
-                    .foregroundColor(Palette.grayScaleF4)
-
                 HStack {
                     RoundedRectangle(cornerRadius: 4)
                         .frame(width: 16, height: 16)
-                    Text("All systems ok!")
+                    Text(viewState.isReachable ? "Online" : "No internet connection")
                         .font(.Main.fixed(.monoRegular, size: 14))
 
                 }
-                .foregroundColor(Color(red: 0.191, green: 0.858, blue: 0.418))
+                .foregroundColor(viewState.isReachable ? Color(red: 0.191, green: 0.858, blue: 0.418) : Color.red)
             }
-            .padding(.bottom)
             .padding(.leading, 20)
             
             Spacer()
             
             HStack(spacing: 0) {
                 Divider()
-                    .frame(width: 1, height: 70)
+                    .frame(width: 1, height: 36)
                     .overlay(Palette.grayScale2A)
                 
                 if !viewModel.accountDataIsBackedUp {
@@ -126,46 +152,20 @@ struct AccountView: View {
                 .padding(.horizontal)
             }
         }
-        .frame(height: 73)
+        .frame(height: 42)
         .padding(.horizontal, 6)
     }
     
-    func BalanceView(balance: String, value: String) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 10) {
-                VStack(spacing: 4) {
-                    HStack(alignment: .lastTextBaseline, spacing: 6) {
-                        Spacer()
-                        Text(balance)
-                            .font(.Main.fixed(.monoBold, size: 32))
-                            .foregroundColor(Palette.grayScaleEA)
-                            .minimumScaleFactor(0.5)
-                            .lineLimit(1)
-                        Text(viewModel.portolioCurrency.code.uppercased())
-                            .font(.Main.fixed(.monoRegular, size: 18))
-                            .foregroundColor(Palette.grayScale6A)
-                            .padding(.bottom, 4)
-                        Spacer()
-                    }
-                    .frame(height: 32)
-                    .onTapGesture {
-                        viewModel.updatePortfolioCurrency()
-                    }
-                    
-                    HStack(spacing: 4) {
-                        Text(value)
-                            .font(.Main.fixed(.monoMedium, size: 16))
-                            .foregroundColor(Palette.grayScaleEA)
-                        Text(viewModel.fiatCurrency.code.uppercased())
-                            .font(.Main.fixed(.monoMedium, size: 12))
-                            .foregroundColor(Palette.grayScale6A)
-                            .offset(y: 2)
-                    }
-                    .frame(height: 23)
-                }
-            }
-            Spacer()
+    func BalanceView(value: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 4) {
+            Text(value)
+                .font(.Main.fixed(.monoMedium, size: 32))
+                .foregroundColor(Palette.grayScaleEA)
+            Text(viewModel.fiatCurrency.code.uppercased())
+                .font(.Main.fixed(.monoMedium, size: 14))
+                .foregroundColor(Palette.grayScale6A)
         }
+        .frame(height: 26)
     }
     
     var ActionButtonsView: some View {
@@ -182,6 +182,7 @@ struct AccountView: View {
                         iconSize: 26
                     )
                 ),
+                color: .white,
                 enabled: true
             ) {
                 viewModel.goToReceive.toggle()

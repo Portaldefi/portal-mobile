@@ -70,7 +70,6 @@ final class AdapterManager {
 }
 
 extension AdapterManager: IAdapterManager {
-
     func adapter(for wallet: Wallet) -> IAdapter? {
         queue.sync { adapters[wallet] }
     }

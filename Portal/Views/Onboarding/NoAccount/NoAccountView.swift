@@ -9,8 +9,8 @@ import SwiftUI
 import PortalUI
 
 struct NoAccountView: View {
-    @EnvironmentObject private var navigation: NavigationStack
-    
+    @Environment(NavigationStack.self) var navigation: NavigationStack
+
     var body: some View {
         VStack {
             VStack(spacing: 56) {

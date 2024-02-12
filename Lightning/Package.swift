@@ -17,8 +17,9 @@ let package = Package(
             targets: ["Lightning"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/lightningdevkit/ldk-swift/", exact: "0.0.114"),
+        .package(url: "https://github.com/lightningdevkit/ldk-swift/", exact: "0.0.118"),
         .package(url: "https://github.com/krzyzanowskim/CryptoSwift", .upToNextMajor(from: "1.0.0")),
+        .package(url: "https://github.com/cuhte3/SwiftBTC", from: "1.0.0")
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -28,6 +29,7 @@ let package = Package(
             dependencies: [
                 "CryptoSwift",
                 .product(name: "LightningDevKit", package: "ldk-swift"),
+                .product(name: "SwiftBTC", package: "SwiftBTC")
             ]),
         .testTarget(
             name: "LightningTests",

@@ -47,7 +47,7 @@ class SetPincodeViewModel: ObservableObject {
                 guard pinConfirmation.count == pinLength else { return }
                 if pinConfirmation == pin {
                     self.storage.save(string: pin, key: "PIN")
-                    self.settings.pincodeEnabled = true
+                    self.settings.updatePinCodeSetting(enabled: true)
                     self.pinIsSet = true
                 } else {
                     self.pinConfirmation.removeAll()

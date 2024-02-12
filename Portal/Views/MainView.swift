@@ -11,14 +11,13 @@ import Factory
 
 struct Mainview: View {
     private let views: [AnyView]
-    @ObservedObject private var viewState: ViewState = Container.viewState()
+    private var viewState: ViewState = Container.viewState()
     @Environment(\.scenePhase) private var scenePhase
     
     init() {
         views = [
             AnyView(AccountRootView()),
-//            AnyView(SwapView()),
-            AnyView(LightningStatstView()),
+            AnyView(SwapView()),
             AnyView(ActivityView())
         ]
     }
@@ -46,60 +45,35 @@ struct Mainview: View {
                     .foregroundColor(Color.gray)
                 }
             }
-            .frame(width: 65)
-            
-//            Spacer()
-//
-//            Button {
-//                viewState.openTab(.swap)
-//            } label: {
-//                if viewState.selectedTab == .swap {
-//                    RadialGradient.main
-//                        .mask(
-//                            VStack(spacing: 4) {
-//                                Asset.swapIcon
-//                                Text("Swap")
-//                                    .font(.Main.fixed(.bold, size: 14))
-//                            }
-//                        )
-//                } else {
-//                    VStack(spacing: 4) {
-//                        Asset.swapIcon
-//                        Text("Swap")
-//                            .font(.Main.fixed(.bold, size: 14))
-//                    }
-//                    .foregroundColor(Color.gray)
-//                }
-//            }
-//            .frame(width: 85)
+            .frame(width: 75)
             
             Spacer()
-                        
+
             Button {
-                viewState.openTab(.lightning)
+                viewState.openTab(.swap)
             } label: {
-                if viewState.selectedTab == .lightning {
+                if viewState.selectedTab == .swap {
                     RadialGradient.main
                         .mask(
                             VStack(spacing: 4) {
-                                Asset.lightningIcon
-                                Text("Lightning")
+                                Asset.swapIcon
+                                Text("Swap")
                                     .font(.Main.fixed(.bold, size: 14))
                             }
                         )
                 } else {
                     VStack(spacing: 4) {
-                        Asset.lightningIcon
-                        Text("Lightning")
+                        Asset.swapIcon
+                        Text("Swap")
                             .font(.Main.fixed(.bold, size: 14))
                     }
-                    .padding(6)
                     .foregroundColor(Color.gray)
+//                    .opacity(0.65)
                 }
             }
-            .frame(width: 85)
+            .frame(width: 75)
             .disabled(false)
-            
+
             Spacer()
             
             Button {
@@ -124,7 +98,7 @@ struct Mainview: View {
                     .foregroundColor(Color.gray)
                 }
             }
-            .frame(width: 85)
+            .frame(width: 75)
             .disabled(false)
             
             Spacer()
@@ -172,6 +146,17 @@ struct Mainview_Previews: PreviewProvider {
     static var previews: some View {
         let _ = Container.walletManager.register { WalletManager.mocked }
         let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
+        
+        Mainview()
+    }
+}
+
+struct Mainview_No_Connection: PreviewProvider {
+    static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
         
         Mainview()
     }

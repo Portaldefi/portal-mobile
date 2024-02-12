@@ -33,6 +33,10 @@ extension WalletItem {
         WalletItem(coin: .bitcoin())
     }
     
+    static var mockedPortal: WalletItem {
+        WalletItem(coin: .portal())
+    }
+    
     static var mocked: WalletItem {
         WalletItem(coin: .mocked())
     }

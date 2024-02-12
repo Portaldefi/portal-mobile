@@ -13,9 +13,7 @@ import Combine
 import Factory
 
 //MARK: - IAdapter
-class EthereumAdapter: IAdapter {
-    var blockchainHeight: Int32 = 0
-    
+class EthereumAdapter {
     private let evmKit: Kit
     private let signer: Signer?
     private let decimal = 18
@@ -30,21 +28,20 @@ class EthereumAdapter: IAdapter {
 
     private func transactionRecord(fullTransaction: FullTransaction) -> TransactionRecord {
         let transaction = fullTransaction.transaction
+        let txHash = transaction.hash.hs.hexString
         
         var isNew = false
-        if txDataStorage.fetchTxData(txID: transaction.hash.toHexString()) == nil { isNew = true }
-        
-        print("tx \(transaction.hash.toHexString()) decoration: \(fullTransaction.decoration)")
-        
+        if txDataStorage.fetchTxData(txID: txHash) == nil { isNew = true }
+                
         let type: TxType
         
         switch fullTransaction.decoration {
         case is IncomingDecoration:
-            type = .received
+            type = .received(coin: .ethereum())
         case is OutgoingDecoration:
-            type = .sent
+            type = .sent(coin: .ethereum())
         default:
-            type = .unknown
+            type = .sent(coin: .ethereum())
         }
         
         var amount: Decimal?
@@ -52,21 +49,29 @@ class EthereumAdapter: IAdapter {
             amount = Decimal(sign: .plus, exponent: -decimal, significand: significand)
         }
         
-        let source: TxSource = .ethOnChain
-        let data = txDataStorage.fetch(source: source, id: transaction.hash.toHexString())
+        let source: TxSource = .ethereum
+        let data = txDataStorage.fetch(source: source, id: txHash)
         let userData = TxUserData(data: data)
         
-        let record = TransactionRecord(coin: .ethereum(), transaction: transaction, amount: amount, type: type, userData: userData)
+        let record = EvmTransactionRecord(
+            coin: .ethereum(),
+            transaction: transaction,
+            type: type, 
+            amount: amount,
+            sender: transaction.from?.hex,
+            receiver: transaction.to?.hex,
+            userData: userData
+        )
         
-        if isNew {
-            guard record.type == .received else { return record }
-
-            let amount = "\(record.amount?.double ?? 0)"
-            let message = "You've received \(amount) \(record.coin.code.uppercased())"
-
-            let pNotification = PNotification(message: message)
-            notificationService.notify(pNotification)
-        }
+//        if isNew {
+//            guard record.type == .received else { return record }
+//
+//            let amount = "\(record.amount?.double ?? 0)"
+//            let message = "You've received \(amount) \(record.coin.code.uppercased())"
+//
+//            let pNotification = PNotification(message: message)
+//            notificationService.notify(pNotification)
+//        }
         
         return record
     }
@@ -80,7 +85,11 @@ class EthereumAdapter: IAdapter {
     }
 }
 
-extension EthereumAdapter {
+extension EthereumAdapter: IAdapter {
+    var blockchainHeight: Int32 {
+        Int32(lastBlockHeight ?? 0)
+    }
+    
     func start() {
         evmKit.start()
     }
@@ -164,11 +173,7 @@ extension EthereumAdapter {
 }
 
 //MARK: - IBalanceAdapter
-extension EthereumAdapter: IBalanceAdapter {
-    var L1Balance: Decimal {
-        balance
-    }
-    
+extension EthereumAdapter: IBalanceAdapter {    
     var state: AdapterState {
         convertToAdapterState(evmSyncState: syncState)
     }
@@ -191,11 +196,12 @@ extension EthereumAdapter: IBalanceAdapter {
 
 //MARK: - ITransactionsAdapter
 extension EthereumAdapter: ITransactionsAdapter {
-    var transactionRecords: AnyPublisher<[TransactionRecord], Never> {
-        Future { [unowned self] promisse in
-            promisse(.success(self.transactions(from: nil, limit: nil)))
-        }
-        .eraseToAnyPublisher()
+    var onTxsUpdate: AnyPublisher<Void, Never> {
+        transactionsPublisher
+    }
+    
+    var transactionRecords: [TransactionRecord] {
+        transactions(from: nil, limit: nil)
     }
 }
 
@@ -212,26 +218,17 @@ extension EthereumAdapter: ISendEthereumAdapter {
         evmKit.transferTransactionData(to: address, value: amount)
     }
     
-    func send(tx: SendETHService.Transaction) -> Future<TransactionRecord, Error> {
-        Future { [unowned self] promise in
-            Task {
-                do {
-                    let fullTransaction = try await self.send(
-                        to: tx.data.to,
-                        amount: tx.data.value,
-                        gasLimit: tx.gasData.gasLimit,
-                        gasPrice: .legacy(gasPrice: tx.gasData.gasPrice)
-                    )
-                    
-                    let record = self.transactionRecord(fullTransaction: fullTransaction)
-                    print("Eth tx sent: \(record.id) ")
-                    
-                    promise(.success(record))
-                } catch  {
-                    promise(.failure(error))
-                }
-            }
-        }
+    func send(transaction: SendETHService.Transaction) async throws -> TransactionRecord {
+        let to = transaction.data.to
+        let amount = transaction.data.value
+        let gasLimit = transaction.gasData.gasLimit
+        let gasPrice: GasPrice = .legacy(gasPrice: transaction.gasData.gasPrice)
+        
+        let fullTransaction = try await send(to: to, amount: amount, gasLimit: gasLimit, gasPrice: gasPrice)
+        
+        let record = transactionRecord(fullTransaction: fullTransaction)
+        print("Eth tx sent: \(record.id) ")
+        return record
     }
     
     func callSolidity(contractAddress: Address, data: Data) async throws -> Data {

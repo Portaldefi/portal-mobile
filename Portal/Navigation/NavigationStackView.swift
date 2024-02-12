@@ -18,10 +18,11 @@ enum Screen {
     case receive(item: WalletItem)
     case accountBackup
     case securitySettings
-    case setSecuritySettings(viewModel: CreateAccountViewModel)
+    case setSecuritySettings
     case setPinCode
     case assetDetails(item: WalletItem)
     case createAccount
+    case devUtility
     case restoreAccount
     case restoreConfirmation(viewModel: RestoreAccountViewModel)
     case nameAccount(words: [String]?)
@@ -37,6 +38,9 @@ enum Screen {
     case sendReviewTxView(viewModel: SendViewViewModel)
     
     case receiveGenerateQRCode(viewModel: ReceiveViewModel)
+    
+    case createChannelView(peer: Peer)
+    case awaitsFundingChannelView(peer: Peer)
 }
 
 extension Screen {
@@ -88,6 +92,12 @@ extension Screen {
             return "set_pincode_ID"
         case .setupSecuritySettings:
             return "set_security_settings_ID"
+        case .devUtility:
+            return "dev_utility_ID"
+        case .createChannelView:
+            return "create_channel_ID"
+        case .awaitsFundingChannelView:
+            return "awaits_funding_channel_ID"
         }
     }
 }
@@ -102,7 +112,7 @@ extension NavigationConfigurator {
 }
 
 struct NavigationStackView<Root>: View where Root: View {
-    @ObservedObject private var navigationStack: NavigationStack
+    private var navigationStack: NavigationStack
     
     private let rootViewID = "Root"
     private let rootView: Root
@@ -144,7 +154,7 @@ struct NavigationStackView<Root>: View where Root: View {
                     .transition(navigationType == .push ? rootViewtransitions.push : rootViewtransitions.pop)
             }
         }
-        .environmentObject(navigationStack)
+        .environment(navigationStack)
     }
 }
 

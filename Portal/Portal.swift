@@ -6,7 +6,9 @@
 //
 
 import SwiftUI
-import Factory
+import Bugsnag
+import BugsnagPerformance
+import Mixpanel
 
 @main
 struct Portal: App {
@@ -14,6 +16,12 @@ struct Portal: App {
     
     init() {
         persistenceController = PersistenceController.shared
+        
+        Bugsnag.start()
+        BugsnagPerformance.start()
+        
+        Mixpanel.initialize(token: "80cf661b81aa75a2b0a6edabb3c3705d", trackAutomaticEvents: true)
+        Mixpanel.mainInstance().track(event: "Start Portal")
     }
 
     var body: some Scene {

@@ -7,36 +7,36 @@
 
 import Foundation
 import LocalAuthentication
-import Combine
 
-class BiometricAuthentication: ObservableObject {
-    private let context = LAContext()
-    private let authenticationPolicy: LAPolicy = .deviceOwnerAuthenticationWithBiometrics
-    
-    @Published private(set) var biometryType: LABiometryType
-    @Published private(set) var permissionsGranted: Bool
+class BiometricAuthentication {
     private var policyError: NSError?
-    
-    private var subscriptions = Set<AnyCancellable>()
-    
-    init() {
-        biometryType = context.biometryType
-        
-        permissionsGranted = context.canEvaluatePolicy(
-            authenticationPolicy,
-            error: &policyError
-        )
+
+    private func canEvaluatePolicy() -> Bool {
+        LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &policyError)
     }
-    
-    func authenticateUser(_ completion: @escaping (Bool, LAError?) -> ()) {
-        context.evaluatePolicy(
-            authenticationPolicy,
-            localizedReason: "Authenticate to continue"
-        ) { success, error in
-            guard let error = error as? LAError else {
-                return completion(success, nil)
-            }
-            completion(success, error)
+
+    func authenticateUser(completion: @escaping (Bool, LAError?) -> Void) {
+        guard canEvaluatePolicy() else {
+            completion(false, LAError(.biometryNotEnrolled))
+            return
         }
+        
+        let reason = "Biometrics authentication is needed to sign transactions"
+
+        LAContext().evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, error in
+            DispatchQueue.main.async {
+                if success {
+                    completion(true, nil)
+                } else if let error = error as? LAError {
+                    completion(false, error)
+                } else {
+                    completion(false, LAError(.authenticationFailed))
+                }
+            }
+        }
+    }
+
+    func isBiometricEnrolled() -> Bool {
+        canEvaluatePolicy()
     }
 }

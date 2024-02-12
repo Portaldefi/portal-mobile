@@ -14,8 +14,9 @@ struct HighlightedText: View {
     let highlight: String?
     let highlightColor: Color
     let font: Font
+    let highlightFont: Font
     
-    init(text: String, textColor: Color, highlight: String?, highlightColor: Color? = nil, font: Font) {
+    init(text: String, textColor: Color, highlight: String?, highlightColor: Color? = nil, font: Font, highlightFont: Font? = nil) {
         self.text = text
         self.textColor = textColor
         self.highlight = highlight
@@ -27,6 +28,12 @@ struct HighlightedText: View {
         }
         
         self.font = font
+        
+        if let _highlightFont = highlightFont {
+            self.highlightFont = _highlightFont
+        } else {
+            self.highlightFont = font
+        }
     }
     
     var body: some View {
@@ -35,7 +42,7 @@ struct HighlightedText: View {
             let target = String(text[range])
             let suffix = String(text[range.upperBound...])
             
-            return Text(prefix).font(font).foregroundColor(textColor) + Text(target).font(font).foregroundColor(highlightColor) + Text(suffix).font(font).foregroundColor(textColor)
+            return Text(prefix).font(font).foregroundColor(textColor) + Text(target).font(highlightFont).foregroundColor(highlightColor) + Text(suffix).font(font).foregroundColor(textColor)
         } else {
             return Text(text).font(font).foregroundColor(textColor)
         }

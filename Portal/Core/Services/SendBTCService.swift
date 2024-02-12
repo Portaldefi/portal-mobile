@@ -13,16 +13,16 @@ import Factory
 class SendBTCService: ISendAssetService {
     private var url: URL? = URL(string: "https://api.blockcypher.com/v1/btc/test3")
     private var urlSession: URLSession
-    private let sendAdapter: ISendBitcoinAdapter
+    private let adapter: ISendBitcoinAdapter
     private var subscriptions = Set<AnyCancellable>()
         
     var amount = CurrentValueSubject<Decimal, Never>(0)
-    var receiverAddress = CurrentValueSubject<String, Never>(String())
+    var receiver = CurrentValueSubject<String, Never>(String())
     var feeRateType = CurrentValueSubject<TxFees, Never>(.normal)
     var recomendedFees = CurrentValueSubject<RecomendedFees?, Never>(nil)
     
     var balance: Decimal {
-        sendAdapter.balance
+        adapter.balance
     }
     
     var spendable: Decimal {
@@ -35,8 +35,8 @@ class SendBTCService: ISendAssetService {
         (self.recomendedFees.value?.fee(feeRateType.value) as? NSDecimalNumber)?.intValue
     }
 
-    init(sendAdapter: ISendBitcoinAdapter) {
-        self.sendAdapter = sendAdapter
+    init(adapter: ISendBitcoinAdapter) {
+        self.adapter = adapter
         
         let config = URLSessionConfiguration.default
         config.waitsForConnectivity = true
@@ -45,30 +45,25 @@ class SendBTCService: ISendAssetService {
         
         updateRecomendedFees()
         
-        Publishers.CombineLatest3(amount, receiverAddress, feeRateType)
+        Publishers.CombineLatest3(amount, receiver, feeRateType)
             .receive(on: DispatchQueue.global(qos: .userInteractive))
             .filter{ amount, address, _ in
                 amount > 0 && !address.isEmpty
             }
-            .flatMap{ amount, address, feeRateType -> AnyPublisher<UInt64?, Never> in
+            .flatMap{ [unowned self] amount, address, feeRateType -> AnyPublisher<UInt64?, Never> in
                 print("send btc service amount = \(String(describing: amount))")
                 
                 do {
                     let result = try self.validateUserInput()
                     
-                    switch result {
-                    case .btcOnChain(let address):
-                        let txFee = try self.sendAdapter.fee(
-                            max: amount == self.spendable,
-                            address: address,
-                            amount: amount,
-                            fee: self.recomendedFee
-                        )
-                        
-                        return Just(txFee).eraseToAnyPublisher()
-                    case .lightningInvoice, .ethOnChain:
-                        return Just(nil).eraseToAnyPublisher()
-                    }
+                    let txFee = try self.adapter.fee(
+                        max: amount == self.spendable,
+                        address: address,
+                        amount: amount,
+                        fee: self.recomendedFee
+                    )
+                    
+                    return Just(txFee).eraseToAnyPublisher()
                 } catch {
                     print(error)
                     return Just(nil).eraseToAnyPublisher()
@@ -101,53 +96,16 @@ class SendBTCService: ISendAssetService {
     }
     
     func validateUserInput() throws -> UserInputResult {
-        let ldkManager = Container.lightningKitManager()
-        let inputString = receiverAddress.value
-        
-        do {
-            if let invoice = try ldkManager.decode(invoice: inputString) {
-                if let value = invoice.amountMilliSatoshis() {
-                    return .lightningInvoice(amount: String(describing: Decimal(value)/1000/100_000_000))
-                } else {
-                    return .lightningInvoice(amount: String())
-                }
-            } else {
-                return .lightningInvoice(amount: String())
-            }
-        } catch {
-            print("user input isn't invoice")
-        }
-        
-        do {
-            try sendAdapter.validate(address: inputString)
-            return .btcOnChain(address: inputString)
-        } catch {
-            print("user input isn't on chain address")
-        }
-        
-        throw SendFlowError.addressIsntValid
+        let inputString = receiver.value
+        try adapter.validate(address: inputString)
+        return .btcOnChain(address: inputString)
     }
     
-    func send() -> Future<TransactionRecord, Error> {
-        if let result = try? validateUserInput() {
-            switch result {
-            case .btcOnChain:
-                return sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: self.recomendedFee)
-            case .lightningInvoice:
-                let manager = Container.lightningKitManager()
-                
-                return manager.pay(invoice: receiverAddress.value)
-            case .ethOnChain:
-                return sendAdapter.send(amount: amount.value, address: receiverAddress.value, fee: self.recomendedFee)
-            }
-        } else {
-            return Future { promise in
-                promise(.failure(SendFlowError.error("Not valid user input")))
-            }
-        }
+    func send() async throws -> TransactionRecord {
+        try adapter.send(amount: amount.value, address: receiver.value, fee: self.recomendedFee)
     }
     
-    func sendMax() -> Future<TransactionRecord, Error> {
-        sendAdapter.sendMax(address: receiverAddress.value, fee: self.recomendedFee)
+    func sendMax() async throws -> TransactionRecord {
+        try adapter.sendMax(address: receiver.value, fee: self.recomendedFee)
     }
 }

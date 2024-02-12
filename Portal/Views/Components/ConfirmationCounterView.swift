@@ -26,9 +26,13 @@ struct ConfirmationsCounterViewStyle: ProgressViewStyle {
 }
 
 struct ConfirmationCounterView: View {
-    let confirmations: Int32
+    enum Layout {
+        case vertical, horizontal
+    }
     
-    private let maxConfirmations: Int = 6
+    let confirmations: Int32
+    let maxConfirmations: Int
+    let layout: Layout
     
     private var progressColor: Color {
         switch confirmations {
@@ -40,50 +44,88 @@ struct ConfirmationCounterView: View {
     }
     
     private var title: String {
-        switch confirmations {
-        case 0:
-            return "Confirming..."
-        case 1:
-            return "\(Int(confirmations)) confirmation"
-        case 2, 3, 4, 5, 6:
-            return "\(Int(confirmations)) confirmations"
-        default:
-            return "6+ confirmations"
+        switch layout {
+        case .vertical:
+            return "\(confirmations)/\(maxConfirmations) confirmations"
+        case .horizontal:
+            switch confirmations {
+            case 0:
+                return "Confirming..."
+            case 1:
+                return "\(Int(confirmations)) confirmation"
+            case 2, 3, 4, 5, 6:
+                return "\(Int(confirmations)) confirmations"
+            default:
+                return "6+ confirmations"
+            }
         }
     }
     
-    init(confirmations: Int32) {
+    init(confirmations: Int32, maxConfirmations: Int? = 6, layout: Layout? = .horizontal) {
         self.confirmations = confirmations
+        self.maxConfirmations = maxConfirmations ?? 6
+        self.layout = layout ?? .vertical
     }
     
     var body: some View {
-        HStack(spacing: 4) {
-            ZStack {
-                ProgressView(
-                    String(),
-                    value: CGFloat(maxConfirmations),
-                    total: CGFloat(maxConfirmations)
-                )
-                    .progressViewStyle(ConfirmationsCounterViewStyle(lineWidth: 1))
-                    .foregroundColor(progressColor)
+        switch layout {
+        case .vertical:
+            VStack(spacing: 4) {
+                ZStack {
+                    ProgressView(
+                        String(),
+                        value: CGFloat(maxConfirmations),
+                        total: CGFloat(maxConfirmations)
+                    )
+                        .progressViewStyle(ConfirmationsCounterViewStyle(lineWidth: 1))
+                        .foregroundColor(progressColor)
 
-                ProgressView(
-                    String(),
-                    value: confirmations > maxConfirmations ? CGFloat(maxConfirmations) : CGFloat(confirmations),
-                    total: CGFloat(maxConfirmations)
-                )
-                    .progressViewStyle(ConfirmationsCounterViewStyle(lineWidth: 2))
+                    ProgressView(
+                        String(),
+                        value: confirmations > maxConfirmations ? CGFloat(maxConfirmations) : CGFloat(confirmations),
+                        total: CGFloat(maxConfirmations)
+                    )
+                        .progressViewStyle(ConfirmationsCounterViewStyle(lineWidth: 2))
+                        .foregroundColor(progressColor)
+                }
+                .rotationEffect(.degrees(-110))
+                .frame(width: 16, height: 16)
+                .padding(3.3)
+                
+                Text(title)
+                    .font(.Main.fixed(.monoRegular, size: 12))
                     .foregroundColor(progressColor)
             }
-            .rotationEffect(.degrees(-110))
-            .frame(width: 16, height: 16)
-            .padding(3.3)
-            
-            Text(title)
-                .font(.Main.fixed(.monoRegular, size: 12))
-                .foregroundColor(progressColor)
+            .frame(height: 40)
+        case .horizontal:
+            HStack(spacing: 4) {
+                ZStack {
+                    ProgressView(
+                        String(),
+                        value: CGFloat(maxConfirmations),
+                        total: CGFloat(maxConfirmations)
+                    )
+                        .progressViewStyle(ConfirmationsCounterViewStyle(lineWidth: 1))
+                        .foregroundColor(progressColor)
+
+                    ProgressView(
+                        String(),
+                        value: confirmations > maxConfirmations ? CGFloat(maxConfirmations) : CGFloat(confirmations),
+                        total: CGFloat(maxConfirmations)
+                    )
+                        .progressViewStyle(ConfirmationsCounterViewStyle(lineWidth: 2))
+                        .foregroundColor(progressColor)
+                }
+                .rotationEffect(.degrees(-110))
+                .frame(width: 16, height: 16)
+                .padding(3.3)
+                
+                Text(title)
+                    .font(.Main.fixed(.monoRegular, size: 16))
+                    .foregroundColor(progressColor)
+            }
+            .frame(height: 22)
         }
-        .frame(height: 22)
     }
 }
 

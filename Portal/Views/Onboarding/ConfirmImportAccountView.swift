@@ -9,7 +9,7 @@ import SwiftUI
 import PortalUI
 
 struct ConfirmImportAccountView: View {
-    @EnvironmentObject private var navigation: NavigationStack
+    @Environment(NavigationStack.self) var navigation: NavigationStack
     @ObservedObject var viewModel: RestoreAccountViewModel
     
     var body: some View {

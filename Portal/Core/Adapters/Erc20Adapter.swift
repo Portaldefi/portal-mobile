@@ -18,6 +18,16 @@ struct Erc20Token {
     let code: String
     let contractAddress: String
     let decimal: Int
+    
+    var coin: Coin {
+        Coin(
+            type: .erc20(address: contractAddress),
+            code: code,
+            name: name,
+            decimal: decimal,
+            iconUrl: "https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/96/Ethereum-ETH-icon.png"
+        )
+    }
 }
 
 class Erc20Adapter {
@@ -39,26 +49,26 @@ class Erc20Adapter {
         eip20Kit = try Eip20Kit.Kit.instance(evmKit: evmKit, contractAddress: contractAddress)
     }
 
-    private func transactionRecord(fromTransaction fullTransaction: FullTransaction) -> TransactionRecord? {
+    private func transactionRecord(fromTransaction fullTransaction: FullTransaction) -> TransactionRecord {
         let transaction = fullTransaction.transaction
         
-        var isNew = false
-        if txDataStorage.fetchTxData(txID: transaction.hash.toHexString()) == nil { isNew = true }
+//        var isNew = false
+//        if txDataStorage.fetchTxData(txID: transaction.hash.hs.hexString) == nil { isNew = true }
+                
+        let source: TxSource = .erc20(token: token)
+        let data = txDataStorage.fetch(source: source, id: transaction.hash.hs.hexString)
+        let userData = TxUserData(data: data)
         
         var type: TxType = .unknown
         
-        let source: TxSource = .ethOnChain
-        let data = txDataStorage.fetch(source: source, id: transaction.hash.toHexString())
-        let userData = TxUserData(data: data)
-        
         switch fullTransaction.decoration {
         case is IncomingDecoration:
-            type = .received
+            type = .received(coin: token.coin)
         case is OutgoingDecoration:
-            type = .sent
+            type = .sent(coin: token.coin)
         case let decoration as UnknownTransactionDecoration:
             let address = evmKit.address
-            let internalTransactions = decoration.internalTransactions.filter { $0.to == address }
+//            let internalTransactions = decoration.internalTransactions.filter { $0.to == address }
             let transferEventInstances = decoration.eventInstances.compactMap { $0 as? TransferEventInstance }
             let incomingTransfers = transferEventInstances.filter { $0.to == address && $0.from != address }
             let outgoingTransfers = transferEventInstances.filter { $0.from == address }
@@ -66,37 +76,62 @@ class Erc20Adapter {
             var amount: Decimal?
             
             if let transfer = incomingTransfers.first, incomingTransfers.count == 1 {
-                type = .received
+                type = .received(coin: token.coin)
                 
                 if let significand = Decimal(string: transfer.value.description) {
                     amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
                 }
                 
-                let record = TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transfer.from.eip55, to: transfer.to.eip55, userData: userData)
+                let record = EvmTransactionRecord(
+                    coin: token.coin,
+                    transaction: transaction,
+                    type: type,
+                    amount: amount,
+                    sender: transfer.from.eip55,
+                    receiver: transfer.to.eip55,
+                    userData: userData
+                )
                 
-                if isNew {
-                    let amount = "\(record.amount?.double ?? 0)"
-                    let message = "You've received \(amount) \(record.coin.code.uppercased())"
-
-                    let pNotification = PNotification(message: message)
-                    notificationService.notify(pNotification)
-                }
+//                if isNew {
+//                    let amount = "\(record.amount?.double ?? 0)"
+//                    let message = "You've received \(amount) \(record.coin.code.uppercased())"
+//
+//                    let pNotification = PNotification(message: message)
+//                    notificationService.notify(pNotification)
+//                }
                 
                 return record
             } else if let transfer = outgoingTransfers.first, outgoingTransfers.count == 1 {
-                type = .sent
+                type = .sent(coin: token.coin)
                 
                 if let significand = Decimal(string: transfer.value.description) {
                     amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
                 }
                 
-                return TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transfer.from.eip55, to: transfer.to.eip55, userData: userData)
+                return EvmTransactionRecord(coin: token.coin, transaction: transaction, type: type, amount: amount, sender: transfer.from.eip55, receiver: transfer.to.eip55, userData: userData)
             }
-        case is OutgoingEip20Decoration:
-            type = .sent
+        case let decoration as OutgoingEip20Decoration:
+            type = .sent(coin: token.coin)
+                        
+            var amount: Decimal?
+            
+            if let significand = Decimal(string: decoration.value.description) {
+                amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
+            }
+            
+            let record = EvmTransactionRecord(
+                coin: token.coin,
+                transaction: transaction,
+                type: type,
+                amount: amount,
+                sender: evmKit.address.eip55,
+                receiver: decoration.to.eip55,
+                userData: userData
+            )
 
+            return record
         case is ApproveEip20Decoration:
-            type = .sent
+            type = .sent(coin: token.coin)
 
         default:
             type = .unknown
@@ -108,17 +143,17 @@ class Erc20Adapter {
             amount = Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
         }
         
-        let record =  TransactionRecord(token: token, transaction: transaction, amount: amount, type: type, from: transaction.from?.eip55, to: transaction.to?.eip55, userData: userData)
+        let record = EvmTransactionRecord(coin: token.coin, transaction: transaction, type: type, amount: amount, sender: transaction.from?.eip55, receiver: transaction.to?.eip55, userData: userData)
         
-        if isNew {
-            guard record.type == .received else { return record }
-
-            let amount = "\(record.amount?.double ?? 0)"
-            let message = "You've received \(amount) \(record.coin.code.uppercased())"
-
-            let pNotification = PNotification(message: message)
-            notificationService.notify(pNotification)
-        }
+//        if isNew {
+//            guard record.type == .received else { return record }
+//
+//            let amount = "\(record.amount?.double ?? 0)"
+//            let message = "You've received \(amount) \(record.coin.code.uppercased())"
+//
+//            let pNotification = PNotification(message: message)
+//            notificationService.notify(pNotification)
+//        }
                 
         return record
     }
@@ -142,11 +177,7 @@ extension Erc20Adapter: IAdapter {
     }
 }
 
-extension Erc20Adapter: IBalanceAdapter {
-    var L1Balance: Decimal {
-        balance
-    }
-    
+extension Erc20Adapter: IBalanceAdapter {    
     var state: AdapterState {
         convertToAdapterState(evmSyncState: eip20Kit.syncState)
     }
@@ -169,8 +200,12 @@ extension Erc20Adapter: IBalanceAdapter {
 }
 
 extension Erc20Adapter: ITransactionsAdapter {
-    var transactionRecords: AnyPublisher<[TransactionRecord], Never> {
-        Just(transactions(from: nil, limit: nil)).eraseToAnyPublisher()
+    var onTxsUpdate: AnyPublisher<Void, Never> {
+        balancePublisher
+    }
+    
+    var transactionRecords: [TransactionRecord] {
+        transactions(from: nil, limit: nil)
     }
 }
 
@@ -185,10 +220,16 @@ extension Erc20Adapter: ISendEthereumAdapter {
         eip20Kit.transferTransactionData(to: address, value: amount)
     }
     
-    func send(tx: SendETHService.Transaction) -> Future<TransactionRecord, Error> {
-        Future { promiss in
-            promiss(.success(TransactionRecord.mocked))
-        }
+    func send(transaction: SendETHService.Transaction) async throws -> TransactionRecord {
+        let txData = transaction.data
+        let gasLimit = transaction.gasData.gasLimit
+        let gasPrice: GasPrice = .legacy(gasPrice: transaction.gasData.gasPrice)
+        
+        let fullTransaction = try await send(transactionData: txData, gasLimit: gasLimit, gasPrice: gasPrice)
+        
+        let record = transactionRecord(fromTransaction: fullTransaction)
+        print("\(token.code) tx sent: \(record.id) ")
+        return record
     }
     
     func callSolidity(contractAddress: EvmKit.Address, data: Data) async throws -> Data {
@@ -200,7 +241,14 @@ extension Erc20Adapter: ISendEthereumAdapter {
     }
     
     func send(transactionData: EvmKit.TransactionData, gasLimit: Int, gasPrice: EvmKit.GasPrice) async throws -> EvmKit.FullTransaction {
-        throw SendError.noSigner
+        guard let signer = signer else {
+            throw SendError.noSigner
+        }
+
+        let rawTransaction = try await evmKit.fetchRawTransaction(transactionData: transactionData, gasPrice: gasPrice, gasLimit: gasLimit)
+        let signature = try signer.signature(rawTransaction: rawTransaction)
+
+        return try await evmKit.send(rawTransaction: rawTransaction, signature: signature)
     }
 }
 
@@ -262,10 +310,7 @@ extension Erc20Adapter {
     }
 
     func transactions(from hash: Data?, limit: Int?) -> [TransactionRecord] {
-        eip20Kit.transactions(from: hash, limit: limit)
-                .compactMap {
-                    transactionRecord(fromTransaction: $0)
-                }
+        eip20Kit.transactions(from: hash, limit: limit).compactMap { transactionRecord(fromTransaction: $0) }
     }
 
     func transaction(hash: Data, interTransactionIndex: Int) -> TransactionRecord? {
@@ -274,7 +319,7 @@ extension Erc20Adapter {
 
     func estimatedGasLimit(to address: Address, value: Decimal, gasPrice: GasPrice) async throws -> Int {
         let value = BigUInt(value.hs.roundedString(decimal: token.decimal))!
-        let transactionData = eip20Kit.transferTransactionData(to: address, value: value)
+        let transactionData = transactionData(amount: value, address: address)
 
         return try await evmKit.fetchEstimateGas(transactionData: transactionData, gasPrice: gasPrice)
     }
@@ -292,21 +337,6 @@ extension Erc20Adapter {
 
         return Decimal(sign: .plus, exponent: -token.decimal, significand: significand)
     }
-
-    func send(to: Address, amount: Decimal, gasLimit: Int, gasPrice: GasPrice) async throws {
-        guard let signer = signer else {
-            throw SendError.noSigner
-        }
-
-        let value = BigUInt(amount.hs.roundedString(decimal: token.decimal))!
-        let transactionData = eip20Kit.transferTransactionData(to: to, value: value)
-
-        let rawTransaction = try await evmKit.fetchRawTransaction(transactionData: transactionData, gasPrice: gasPrice, gasLimit: gasLimit)
-        let signature = try signer.signature(rawTransaction: rawTransaction)
-
-        _ = try await evmKit.send(rawTransaction: rawTransaction, signature: signature)
-    }
-
 }
 
 extension Erc20Adapter {

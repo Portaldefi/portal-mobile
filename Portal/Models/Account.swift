@@ -7,23 +7,44 @@
 
 import Foundation
 import BitcoinDevKit
+import EvmKit
+import Factory
 
 class Account {
     let id: String
     let index: Int
     let rootKey: String
+    
+    @Injected(Container.configProvider) var config
 
     private(set) var name: String
     
-    let btcNetwork: Network
-    private let ethNetwork: Int
+    var btcNetwork: BitcoinDevKit.Network {
+        switch config.network {
+        case .mainnet:
+            return .bitcoin
+        case .testnet:
+            return .testnet
+        case .playnet:
+            return .regtest
+        }
+    }
+    
+    var ethNetwork: EvmKit.Chain {
+        switch config.network {
+        case .mainnet:
+            return .ethereum
+        case .testnet:
+            return .ethereumSepolia
+        case .playnet:
+            return .ethereumPlaynet
+        }
+    }
 
     init(id: String, index: Int, name: String, key: String) {
         self.id = id
         self.index = index
         self.name = name
-        self.btcNetwork = .regtest
-        self.ethNetwork = 1 //ropsten
         self.rootKey = key
     }
     
@@ -31,8 +52,6 @@ class Account {
         self.id = record.id
         self.index = Int(record.index)
         self.name = record.name
-        self.btcNetwork = .regtest
-        self.ethNetwork = 1 //ropsten
         self.rootKey = key
     }
 }
@@ -49,7 +68,7 @@ extension Account: Hashable {
 
 extension Account {
     static var mocked: Account {
-        let id = UUID().uuidString
+        let id = "MockedAccountID"
         let index = 0
         let name = "Mocked"
         let mnemonic = Mnemonic(wordCount: .words12)

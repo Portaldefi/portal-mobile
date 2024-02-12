@@ -26,7 +26,8 @@ struct TxLabelView: View {
                 text: label.label,
                 textColor: Palette.grayScaleF4,
                 highlight: searchContext,
-                font: .Main.fixed(.monoMedium, size: 14)
+                font: .Main.fixed(.monoMedium, size: 14),
+                highlightFont: .Main.fixed(.monoBold, size: 14)
             )
             .padding(.horizontal, 8)
             .padding(.vertical, 4)

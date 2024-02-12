@@ -68,26 +68,13 @@ extension DBlocalStorage: IAccountRecordStorage {
 extension DBlocalStorage {
     fileprivate class DBLocalStorageMock: IAccountRecordStorage {
         var context: NSManagedObjectContext {
-            let managedObjectModel = NSManagedObjectModel.mergedModel(from: [Bundle.main])!
-            
-            let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
-            
-            do {
-                try persistentStoreCoordinator.addPersistentStore(ofType: NSInMemoryStoreType, configurationName: nil, at: nil, options: nil)
-            } catch {
-                print("Adding in-memory persistent store failed")
-            }
-            
-            let managedObjectContext = NSManagedObjectContext.init(concurrencyType: .mainQueueConcurrencyType)
-            managedObjectContext.persistentStoreCoordinator = persistentStoreCoordinator
-            
-            return managedObjectContext
+            PersistenceController.shared.container.viewContext
         }
         
         var accountRecords: [AccountRecord] = []
         
         func save(accountRecord: AccountRecord) {
-            
+            accountRecords.append(accountRecord)
         }
         
         func update(account: Account) {
@@ -95,7 +82,10 @@ extension DBlocalStorage {
         }
         
         func deleteAccount(_ account: Account) throws {
-            
+            guard let index = accountRecords.firstIndex(where: { record in
+                record.id == account.id
+            }) else { return }
+            accountRecords.remove(at: index)
         }
         
         func deleteAllAccountRecords() {

@@ -12,8 +12,8 @@ import Factory
 struct RestoreAccountView: View {
     @FocusState private var isFocused: Bool
     @StateObject private var viewModel = RestoreAccountViewModel()
-    @EnvironmentObject private var navigation: NavigationStack
-    
+    @Environment(NavigationStack.self) var navigation: NavigationStack
+
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack {

@@ -9,14 +9,15 @@ import Foundation
 import Combine
 import Factory
 
-class RootViewViewModel: ObservableObject {
+@Observable class RootViewViewModel {
     enum State {
         case account, empty
     }
-    @Published var state: State = .empty
+    public var state: State = .empty
     
-    private var subscriptions = Set<AnyCancellable>()
-    @Injected(Container.accountManager) private var manager
+    @ObservationIgnored private var subscriptions = Set<AnyCancellable>()
+    @ObservationIgnored private var manager = Container.accountManager()
+    @ObservationIgnored private var settings = Container.settings()
 
     init() {
         if manager.activeAccount != nil {

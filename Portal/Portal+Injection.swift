@@ -10,6 +10,7 @@ import Factory
 import KeychainAccess
 import CoreData
 import Lightning
+import HsToolKit
 
 extension SharedContainer {
     static let accountManager = Factory<IAccountManager>(scope: .singleton) {
@@ -58,7 +59,14 @@ extension SharedContainer {
         let appConfigProvider = Container.configProvider()
         let ethereumKitManager = Container.ethereumKitManager()
         let walletManager = Container.walletManager()
-        let adapterFactory = AdapterFactory(appConfigProvider: appConfigProvider, ethereumKitManager: ethereumKitManager)
+        let lightningKitManager = Container.lightningKitManager()
+        
+        let adapterFactory = AdapterFactory(
+            appConfigProvider: appConfigProvider,
+            ethereumKitManager: ethereumKitManager,
+            lightningKitManager: lightningKitManager
+        )
+        
         return AdapterManager(adapterFactory: adapterFactory, walletManager: walletManager)
     }
     
@@ -66,7 +74,7 @@ extension SharedContainer {
         EthereumKitManager(appConfigProvider: Container.configProvider())
     }
     
-    static let configProvider = Factory<AppConfigProvider>(scope: .singleton) {
+    static let configProvider = Factory<IAppConfigProvider>(scope: .singleton) {
         AppConfigProvider()
     }
     
@@ -78,12 +86,21 @@ extension SharedContainer {
     }
     
     static let coinManager = Factory<ICoinManager>(scope: .singleton) {
-        CoinManager(storage: CoinStorage(), accountManager: Container.accountManager())
+        CoinManager(storage: CoinStorage(), accountManager: Container.accountManager(), userSettings: Container.settings())
     }
     
     static let lightningKitManager = Factory<ILightningKitManager>(scope: .singleton) {
-        let config = BitcoinCoreRpcConfig(username: "polaruser", password: "polarpass", port: 18443, host: "localhost")
-        let connectionType: ConnectionType = .regtest(config)
+        let config = Container.configProvider()
+        let connectionType: ConnectionType
+        
+        switch config.network {
+        case .playnet, .mainnet:
+            let config = BitcoinCoreRpcConfig(username: "lnd", password: "lnd", port: 18443, host: "localhost")
+            connectionType = .regtest(config)
+        case .testnet:
+            connectionType = .testnet(.blockStream)
+        }
+        
         return LightningKitManager(connectionType: connectionType)
     }
     
@@ -93,6 +110,26 @@ extension SharedContainer {
     
     static let feeRateProvider = Factory<FeeRateProvider>(scope: .singleton) {
         FeeRateProvider(appConfigProvider: Container.configProvider())
+    }
+    
+    static let reachabilityService = Factory<IReachabilityService>(scope: .singleton) {
+        ReachabilityService()
+    }
+    
+    static let bitcoinDepositAdapter = Factory<IDepositAdapter?>(scope: .shared) {
+        let accountManager = Container.accountManager()
+        let walletManager = Container.walletManager()
+        let adapterManager = Container.adapterManager()
+        
+        guard let activeAccount = accountManager.activeAccount else { return nil }
+        
+        let wallets = walletManager.wallets(account: activeAccount)
+        
+        guard let btcWallet = wallets.first(where: { $0.coin == .bitcoin() }), let depositAdapter = adapterManager.depositAdapter(for: btcWallet) else { return nil }
+        
+        print("btc deposit adapter address: \(depositAdapter.receiveAddress)")
+        
+        return depositAdapter
     }
     
     static let accountViewModel = Factory<AccountViewModel>(scope: .singleton) {
@@ -122,8 +159,12 @@ extension SharedContainer {
         BiometricAuthentication()
     }
     
-    static let settings = Factory<PortalSettings>(scope: .singleton) {
+    static let settings = Factory<IPortalSettings>(scope: .singleton) {
         PortalSettings()
+    }
+    
+    static let pincodeViewModel = Factory<PincodeViewModel>(scope: .shared) {
+        PincodeViewModel()
     }
     
     static let marketData = Factory<IMarketDataRepository>(scope: .singleton) {

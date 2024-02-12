@@ -15,7 +15,6 @@ class WalletItemViewModel: ObservableObject {
     
     private var subscriptions = Set<AnyCancellable>()
     private var marketData: IMarketDataRepository
-    private let updateBalanceTimer = RepeatingTimer(timeInterval: 1)
         
     private(set) var balance: Decimal
     
@@ -24,15 +23,16 @@ class WalletItemViewModel: ObservableObject {
     @Published var fiatCurrency = FiatCurrency(code: "USD")
     
     @Injected(Container.settings) private var settings
+    @Injected(Container.lightningKitManager) private(set) var lightningKit
     
     var value: Decimal {
         switch coin.type {
         case .bitcoin, .lightningBitcoin:
-            return marketData.lastSeenBtcPrice
+            return balance * marketData.lastSeenBtcPrice * fiatCurrency.rate
         case .ethereum:
-            return balance * marketData.lastSeenEthPrice
+            return balance * marketData.lastSeenEthPrice * fiatCurrency.rate
         case .erc20:
-            return balance * marketData.lastSeenLinkPrice
+            return balance * 1.2 * fiatCurrency.rate
         }
     }
     
@@ -42,15 +42,14 @@ class WalletItemViewModel: ObservableObject {
         self.marketData = marketData
         
         self.balance = balanceAdapter.balance
-        self.balanceString = "\(balanceAdapter.balance)"
-                
-        self.updateBalanceTimer.eventHandler = {
-            DispatchQueue.main.async {
-                self.updateBalance()
-            }
-        }
+        self.balanceString = "\(balanceAdapter.balance.formatted())"
         
-        self.updateBalanceTimer.resume()
+        balanceAdapter.balanceUpdated.receive(on: RunLoop.main).sink { _ in
+            self.balance = balanceAdapter.balance
+            self.balanceString = "\(balanceAdapter.balance.formatted())"
+            self.updateValue()
+        }
+        .store(in: &subscriptions)
         
         self
             .marketData
@@ -62,7 +61,7 @@ class WalletItemViewModel: ObservableObject {
             .store(in: &subscriptions)
         
         settings
-            .$fiatCurrency
+            .fiatCurrency
             .receive(on: RunLoop.main)
             .sink { [weak self] currency in
                 self?.fiatCurrency = currency
@@ -73,26 +72,9 @@ class WalletItemViewModel: ObservableObject {
         updateValue()
     }
     
-    private func updateBalance() {
-        if balance != balanceAdapter.balance {
-            balance = balanceAdapter.balance
-            balanceString = "\(balanceAdapter.balance)"
-            updateValue()
-        }
-    }
-    
     private func updateValue() {
-        let _valueString: String
-        
-        switch coin.type {
-        case .bitcoin, .lightningBitcoin:
-            _valueString = (marketData.lastSeenBtcPrice * balance * fiatCurrency.rate).double.usdFormatted()
-        case .ethereum:
-            _valueString = (marketData.lastSeenEthPrice * balance * fiatCurrency.rate).double.usdFormatted()
-        case .erc20:
-            _valueString = (marketData.lastSeenLinkPrice * balance * fiatCurrency.rate).double.usdFormatted()
-        }
-                
+        let _valueString = value.double.formattedString(.fiat(fiatCurrency))
+                        
         if valueString != _valueString {
             valueString = _valueString
         }

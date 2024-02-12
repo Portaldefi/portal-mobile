@@ -7,12 +7,14 @@
 
 import SwiftUI
 import PortalUI
+import Factory
 
 struct SettingsView: View {
     @Environment(\.presentationMode) private var presentationMode
     @StateObject var viewModel = SettingsViewViewModel()
-    @EnvironmentObject private var navigation: NavigationStack
-    
+    @Environment(NavigationStack.self) var navigation: NavigationStack
+    @Injected(Container.configProvider) var config
+
     var body: some View {
         VStack {
             HStack {
@@ -33,6 +35,20 @@ struct SettingsView: View {
             .padding(.horizontal, 16)
             
             List {
+                if config.network == .playnet {
+                    Section(header: EmptyView()) {
+                        HStack{
+                            Text("Dev Utility")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Image(systemName: "chevron.forward")
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        navigation.push(.devUtility)
+                    }
+                }
+                
                 Section(header: EmptyView()) {
                     HStack{
                         Text("Security")
@@ -57,7 +73,7 @@ struct SettingsView: View {
                 if !viewModel.fiatCurrencies.isEmpty {
                     Section(header: Text("Base asset")) {
                         Picker(selection: $viewModel.fiatCurrency, label: EmptyView(), content: {
-                            ForEach(viewModel.fiatCurrencies, id: \.name) {
+                            ForEach(viewModel.fiatCurrencies, id: \.code) {
                                 Text("\($0.symbol) \($0.name)").tag($0)
                             }
                         })
@@ -65,19 +81,19 @@ struct SettingsView: View {
                     }
                 }
                 
-                Section(header: Text("Wallet Coins")) {
-                    ForEach(viewModel.coins, id: \.self) { coin in
-                        MultipleSelectionRow(
-                            title: coin.name,
-                            imageUrl: coin.icon,
-                            isSelected: viewModel.selectedCoins.contains(coin)
-                        ) {
-                            DispatchQueue.main.async {
-                                viewModel.updatedWallet(coin)
-                            }
-                        }
-                    }
-                }
+//                Section(header: Text("Wallet Coins")) {
+//                    ForEach(viewModel.coins, id: \.self) { coin in
+//                        MultipleSelectionRow(
+//                            title: coin.name,
+//                            imageUrl: coin.icon,
+//                            isSelected: viewModel.selectedCoins.contains(coin)
+//                        ) {
+//                            DispatchQueue.main.async {
+//                                viewModel.updatedWallet(coin)
+//                            }
+//                        }
+//                    }
+//                }
             }
             .padding(.horizontal, 6)
             

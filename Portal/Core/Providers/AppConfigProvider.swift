@@ -8,6 +8,10 @@
 import Foundation
 
 class AppConfigProvider: IAppConfigProvider {
+    enum Network: CaseIterable {
+        case mainnet, testnet, playnet
+    }
+    
     let companyWebPageLink = "https://getportal.co"
     let appWebPageLink = "https://getportal.co"
     let appGitHubLink = ""
@@ -15,19 +19,18 @@ class AppConfigProvider: IAppConfigProvider {
     let pricesUpdateInterval = 60
     let fiatCurrenciesUpdateInterval = 3600
     let keychainStorageID: String = "com.portal.keychain.service"
-    let testMode = true
     let rafaSocketUrl: String = "wss://api.rafa.ai/v1/data/feed/websocket"
     let forexUrl: String = "https://api.rafa.ai/v1/data/feed/forex"
+    let network: Network = .testnet
 
     var infuraCredentials: (id: String, secret: String?) {
-        let id = "7bffa4b191da4e9682d4351178c4736e"//(Bundle.main.object(forInfoDictionaryKey: "InfuraProjectId") as? String) ?? ""
-        let secret = "5dedf9a8a4c4477687cfac3debbc23c6"//Bundle.main.object(forInfoDictionaryKey: "InfuraProjectSecret") as? String
+        let id = (Bundle.main.object(forInfoDictionaryKey: "InfuraProjectId") as? String) ?? ""
+        let secret = Bundle.main.object(forInfoDictionaryKey: "InfuraProjectSecret") as? String
         return (id: id, secret: secret)
     }
 
     var etherscanKey: String {
-        "PYPJHJFA2MUT12KPTT8FCKPAMGHTRDQICB"
-        //(Bundle.main.object(forInfoDictionaryKey: "EtherscanApiKey") as? String) ?? ""
+        (Bundle.main.object(forInfoDictionaryKey: "EtherscanApiKey") as? String) ?? ""
     }
 
     var coinPaprikaApiKey: String {

@@ -7,9 +7,11 @@
 
 import SwiftUI
 import PortalUI
+import Factory
 
 struct PincodeView: View {
-    @StateObject private var viewModel = PincodeViewModel()
+    @ObservedObject
+    private var viewModel: PincodeViewModel = Container.pincodeViewModel()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -56,6 +58,7 @@ struct PincodeView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.black)
         .blur(radius: viewModel.requiredBiometrics ? 8 : 0)
+        .allowsHitTesting(viewModel.requiredBiometrics ? false : true)
     }
 }
 

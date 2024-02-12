@@ -16,7 +16,7 @@ class SettingsViewViewModel: ObservableObject {
     
     @Published var portfolioCurrencyIndex: Int = 0 {
         didSet {
-            settings.portfolioCurrency = portfolioCurrencies[portfolioCurrencyIndex]
+            settings.updatePortfolioCurrency(portfolioCurrencies[portfolioCurrencyIndex])
         }
     }
     
@@ -24,18 +24,19 @@ class SettingsViewViewModel: ObservableObject {
         
     var fiatCurrency: FiatCurrency {
         get {
-            settings.fiatCurrency
+            settings.fiatCurrency.value
         }
         set {
-            settings.fiatCurrency = newValue
+            settings.updateFiatCurrency(newValue)
+            objectWillChange.send()
         }
     }
     
     init() {
-        let currency = settings.portfolioCurrency
+        let currency = settings.portfolioCurrency.value
         portfolioCurrencyIndex = portfolioCurrencies.firstIndex(of: currency) ?? 0
         
-        selectedCoins = settings.userCoins.compactMap { code in
+        selectedCoins = settings.userCoins.value.compactMap { code in
             coins.first(where: { $0.code == code})
         } 
     }
@@ -45,7 +46,7 @@ class SettingsViewViewModel: ObservableObject {
     }
     
     var portfolioCurrencies: [Coin] {
-        [.bitcoin(), .ethereum()]
+        [.bitcoin()]
     }
     
     var coins: [Coin] {
@@ -54,8 +55,8 @@ class SettingsViewViewModel: ObservableObject {
     
     func updateWallet() {
         let selected = selectedCoins.map{ $0.code }
-        guard settings.userCoins != selected else { return }
-        settings.userCoins = selectedCoins.map{ $0.code }
+        guard settings.userCoins.value != selected else { return }
+        settings.updateUserCoins(selectedCoins.map{ $0.code })
         accountManager.addCoin(coin: "coin.code")
     }
     

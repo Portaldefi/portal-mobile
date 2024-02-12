@@ -18,11 +18,23 @@ class EthereumKitManager {
     private(set) var signer: Signer?
     var ethereumKit: EvmKit.Kit?
     private var currentAccount: Account?
+
+    var key: String? {
+        let accountStorage = Container.accountStorage()
+        let accountData = accountStorage.activeAccountRecoveryData
+        
+        if let data = accountData, let seed = Mnemonic.seed(mnemonic: data.words) {
+            return try? Signer.privateKey(seed: seed, chain: .ethereumPlaynet).toHexString()
+        }
+        
+        return nil
+    }
     
     init(appConfigProvider: IAppConfigProvider) {
         self.appConfigProvider = appConfigProvider
     }
     
+    //FIXME: fix account recovery data
     func kit(account: Account) throws -> EvmKit.Kit {
         if let ethKit = ethereumKit, let currentAccount = currentAccount, currentAccount == account {
             return ethKit
@@ -35,21 +47,41 @@ class EthereumKitManager {
             throw LoginError.seedGenerationFailed
         }
 
-        let chain: Chain = .ethereumGoerli
+        let chain = account.ethNetwork
+        let rpcSource: RpcSource
+        let txSource: TransactionSource
+        
+        switch chain {
+        case .ethereumPlaynet:
+            rpcSource = .portalPlaynetWebSocket(url: "ws://localhost:8545")
+            txSource = .playnetDevMode(url: "http://localhost:8546")
+        case .ethereumGoerli:
+            rpcSource = .goerliInfuraWebsocket(
+                projectId: appConfigProvider.infuraCredentials.id,
+                projectSecret: appConfigProvider.infuraCredentials.secret
+            )
+            txSource = .goerliEtherscan(apiKey: appConfigProvider.etherscanKey)
+        case .ethereumSepolia:
+            rpcSource = .ethereumSepoliaHttp(projectId: appConfigProvider.infuraCredentials.id)
+            txSource = .sepoliaEtherscan(apiKey: appConfigProvider.etherscanKey)
+        default:
+            throw LoginError.unsupportedChain
+        }
         
         let address = try Signer.address(seed: seed, chain: chain)
         let signer = try Signer.instance(seed: seed, chain: chain)
+        let key = try Signer.privateKey(seed: seed, chain: chain)
+        
+        print("Eth privKey: \(key.toHexString())")
+        print("Eth pubKey: \(address.hex)")
         
         self.signer = signer
         
         let ethereumKit = try EvmKit.Kit.instance(
             address: address,
             chain: chain,
-            rpcSource: .goerliInfuraWebsocket(
-                projectId: appConfigProvider.infuraCredentials.id,
-                projectSecret: appConfigProvider.infuraCredentials.secret
-            ),
-            transactionSource: .goerliEtherscan(apiKey: appConfigProvider.etherscanKey),
+            rpcSource: rpcSource,
+            transactionSource: txSource,
             walletId: account.id,
             minLogLevel: .error
         )
@@ -79,7 +111,10 @@ class EthereumKitManager {
             
             Task {
                 do {
-                    if let estimatedGasLimit = try await self.ethereumKit?.fetchEstimateGas(transactionData: transactionData, gasPrice: .legacy(gasPrice: gasPrice)) {
+                    if let estimatedGasLimit = try await self.ethereumKit?.fetchEstimateGas(
+                        transactionData: transactionData,
+                        gasPrice: .legacy(gasPrice: gasPrice))
+                    {
                         promise(.success(estimatedGasLimit))
                     } else {
                         promise(.success(Kit.defaultGasLimit))
@@ -99,5 +134,6 @@ class EthereumKitManager {
 extension EthereumKitManager {
     enum LoginError: Error {
         case seedGenerationFailed
+        case unsupportedChain
     }
 }

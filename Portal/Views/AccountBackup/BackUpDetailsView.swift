@@ -9,7 +9,7 @@ import SwiftUI
 import PortalUI
 
 struct BackUpDetailsView: View {
-    @EnvironmentObject private var navigation: NavigationStack
+    @Environment(NavigationStack.self) var navigation: NavigationStack
     @Environment(\.presentationMode) private var presentationMode
     @StateObject private var viewModel: RecoveryPhraseViewModel = RecoveryPhraseViewModel.config()
 

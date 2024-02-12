@@ -12,15 +12,17 @@ protocol ILightningChannels {
     var allChannels: [ChannelDetails] { get }
     var usableChannels: [ChannelDetails] { get }
     var channelBalance: Decimal { get }
-    func openChannel(peer: Peer) async throws
+    func openChannel(peer: Peer, amount: UInt64) async throws
+    func cooperativeCloseChannel(id: [UInt8], counterPartyId: [UInt8])
+    func forceCloseChannel(id: [UInt8], counterPartyId: [UInt8])
 }
 
 protocol ILightningInvoiceHandler {
     func createInvoice(amount: String, description: String) async -> String?
-    func decode(invoice: String) throws -> Invoice?
-    func pay(invoice: String) -> Combine.Future<TransactionRecord, Error>
-    func pay(invoice: Invoice) async throws -> TransactionRecord
-    func createInvoice(paymentHash: String, satAmount: UInt64) async -> Invoice?
+    func decode(invoice: String) throws -> Bolt11Invoice
+    func pay(invoice: String) async throws -> TransactionRecord
+    func pay(invoice: Bolt11Invoice) async throws -> TransactionRecord
+    func createInvoice(paymentHash: String, satAmount: UInt64) async -> Bolt11Invoice?
 }
 
 protocol ILightningPeerHandler {
@@ -37,6 +39,9 @@ protocol IBitcoinCore {
 }
 
 protocol ILightningKitManager: ILightningChannels, ILightningInvoiceHandler, ILightningPeerHandler, IBitcoinCore {
+    var peer: Peer? { get }
+    var bestBlock: Int32 { get }
+    var transactions: [TransactionRecord] { get }
     var transactionsPublisher: AnyPublisher<[TransactionRecord], Never> { get }
     var activePeersPublisher: AnyPublisher<[String], Never> { get }
     func start() async throws

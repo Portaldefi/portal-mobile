@@ -8,31 +8,18 @@
 import Foundation
 
 enum TxType: Equatable {
-    case unknown, sent, received, swapped(for: Coin)
+    case unknown, sent(coin: Coin), received(coin: Coin), swap(base: Coin, quote: Coin)
     
     var description: String {
         switch self {
         case .unknown:
             return "Unknown"
-        case .sent:
-            return "Sent"
-        case .received:
-            return "Received"
-        case .swapped(for: let coin):
-            return "Swapped for \(coin.code)"
-        }
-    }
-    
-    static func typeFor(filter: TxFilterOption) -> TxType {
-        switch filter {
-        case .none, .success, .pending, .failed:
-            return .unknown
-        case .received:
-            return .received
-        case .send:
-            return .sent
-        case .swapped:
-            return .swapped(for: .bitcoin())
+        case .sent(let coin):
+            return "Sent \(coin.code)"
+        case .received(let coin):
+            return "Received \(coin.code)"
+        case .swap(let base, let quote):
+            return "\(base.code) to \(quote.code)"
         }
     }
 }

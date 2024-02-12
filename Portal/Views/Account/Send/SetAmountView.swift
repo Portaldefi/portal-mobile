@@ -12,15 +12,18 @@ import PopupView
 
 struct SetAmountView: View {
     private let warningColor = Color(red: 1, green: 0.321, blue: 0.321)
-    @EnvironmentObject private var navigation: NavigationStack
-    @ObservedObject private var viewModel: SendViewViewModel
+    private var viewState: ViewState = Container.viewState()
+    @Environment(NavigationStack.self) var navigation: NavigationStack
+    @Environment(SendViewViewModel.self) var viewModel: SendViewViewModel
     @FocusState private var focusedField: Bool
     
-    init(viewModel: SendViewViewModel) {
-        self.viewModel = viewModel
-    }
+//    init(viewModel: SendViewViewModel) {
+//        self.viewModel = viewModel
+//    }
     
     var body: some View {
+        @Bindable var bindableViewModel = viewModel
+
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
                 ZStack {
@@ -34,9 +37,21 @@ struct SetAmountView: View {
                         Spacer()
                     }
                     
-                    Text("Send")
-                        .frame(width: 300, height: 62)
-                        .font(.Main.fixed(.monoBold, size: 16))
+                    if let coin = viewModel.coin {
+                        Text("Send \(coin.code) (\(coin.network))")
+                            .frame(width: 300, height: 62)
+                            .font(.Main.fixed(.monoBold, size: 16))
+                    } else {
+                        Text("Send")
+                            .frame(width: 300, height: 62)
+                            .font(.Main.fixed(.monoBold, size: 16))
+                    }
+                }
+                
+                if !viewState.isReachable {
+                    NoInternetConnectionView()
+                        .padding(.horizontal, -16)
+                        .padding(.bottom, 8)
                 }
                 
                 if let exchanger = viewModel.exchanger {
@@ -227,7 +242,12 @@ struct SetAmountView: View {
                         }
                         
                         if let exchanger = viewModel.exchanger {
-                            PButton(config: .onlyLabel("Continue"), style: .filled, size: .big, enabled: viewModel.amountIsValid && exchanger.baseAmountDecimal > 0) {
+                            PButton(
+                                config: .onlyLabel("Continue"),
+                                style: .filled,
+                                size: .big,
+                                enabled: viewModel.amountIsValid && exchanger.baseAmountDecimal > 0 && viewState.isReachable
+                            ) {
                                 navigation.push(.sendReviewTxView(viewModel: viewModel))
                             }
                         }
@@ -242,12 +262,12 @@ struct SetAmountView: View {
             }
         }
         .filledBackground(BackgroundColorModifier(color: Palette.grayScale0A))
-        .popup(isPresented: $viewModel.showFeesPicker) {
+        .popup(isPresented: $bindableViewModel.showFeesPicker) {
             if let fees = viewModel.recomendedFees, let coin = viewModel.coin {
                 TxFeesPickerView(
                     coin: coin,
                     recommendedFees: fees,
-                    feeRate: $viewModel.feeRate,
+                    feeRate: $bindableViewModel.feeRate,
                     onDismiss: {
                         focusedField = true
                         viewModel.showFeesPicker.toggle()
@@ -277,7 +297,19 @@ struct SetAmountView_Previews: PreviewProvider {
     static var previews: some View {
         let _ = Container.walletManager.register { WalletManager.mocked }
         let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: true) }
         
-        SetAmountView(viewModel: SendViewViewModel.mocked)
+        SetAmountView().environment(SendViewViewModel.mocked)
     }
 }
+
+struct SetAmountView_No_Connection: PreviewProvider {
+    static var previews: some View {
+        let _ = Container.walletManager.register { WalletManager.mocked }
+        let _ = Container.adapterManager.register { AdapterManager.mocked }
+        let _ = Container.viewState.register { ViewState.mocked(hasConnection: false) }
+        
+        SetAmountView().environment(SendViewViewModel.mocked)
+    }
+}
+

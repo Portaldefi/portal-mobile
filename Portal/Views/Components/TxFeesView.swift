@@ -10,17 +10,27 @@ import PortalUI
 
 struct TxFeesView: View {
     let fees: String
-    let coin: String
     let source: TxSource
     
     var title: String {
         switch source {
-        case .btcOnChain:
+        case .bitcoin:
             return "Fees"
-        case .ethOnChain:
+        case .ethereum, .erc20:
             return "Fees"
-        case .lightning:
+        case .lightning, .swap:
             return "Network Fees"
+        }
+    }
+    
+    private var coin: String {
+        switch source {
+        case .bitcoin, .lightning:
+            return Coin.bitcoin().code
+        case .ethereum, .erc20:
+            return Coin.ethereum().code
+        case .swap(let base, _):
+            return base.code
         }
     }
     
@@ -44,7 +54,7 @@ struct TxFeesView: View {
 
 struct TxFeesView_Previews: PreviewProvider {
     static var previews: some View {
-        TxFeesView(fees: "0.000000134", coin: "btc", source: .btcOnChain)
+        TxFeesView(fees: "0.000000134", source: .bitcoin)
             .padding()
             .previewLayout(.sizeThatFits)
     }

@@ -8,20 +8,34 @@
 
 import Foundation
 import LightningDevKit
+import BitcoinDevKit
 
 class Broadcaster: BroadcasterInterface {
-    private let chainInterface: RpcChainManager
-      
+    private let rpcInterface: RpcChainManager
+    
     init(rpcInterface: RpcChainManager) {
-        self.chainInterface = rpcInterface
+        self.rpcInterface = rpcInterface
         super.init()
     }
-
-    override func broadcastTransaction(tx: [UInt8]) {
-        print("Broadcasting Transaction: \(tx.toHexString())")
-
+    
+    override func broadcastTransactions(txs: [[UInt8]]) {
         Task {
-            try? await self.chainInterface.submitTransaction(transaction: tx)
+            for tx in txs {
+                let transaction = try Transaction(transactionBytes: tx)
+                let expectedTxId = transaction.txid()
+                if let transactionDict = try? await rpcInterface.getTransactionWithId(id: expectedTxId) {
+                    guard transactionDict.keys.isEmpty else {
+                        //tx already broadcasted
+                        break
+                    }
+                    
+                    let resultTxId = try await self.rpcInterface.submitTransaction(transaction: transaction.serialize())
+                    print("Submitted tx with id: \(resultTxId)")
+                } else {
+                    let resultTxId = try await self.rpcInterface.submitTransaction(transaction: transaction.serialize())
+                    print("Submitted tx with id: \(resultTxId)")
+                }
+            }
         }
     }
 }

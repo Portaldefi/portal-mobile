@@ -15,7 +15,7 @@ class SendETHService: ISendAssetService {
     private let gasLimitSurchargePercent: Int = 5
     private var transaction: Transaction?
     
-    private let sendAdapter: ISendEthereumAdapter
+    private let adapter: ISendEthereumAdapter
     private let manager: EthereumKitManager
     
     private(set) var feeRateProvider: IFeeRateProvider
@@ -24,11 +24,11 @@ class SendETHService: ISendAssetService {
     
     var amount = CurrentValueSubject<Decimal, Never>(0)
     var feeRateType = CurrentValueSubject<TxFees, Never>(.normal)
-    var receiverAddress = CurrentValueSubject<String, Never>(String())
+    var receiver = CurrentValueSubject<String, Never>(String())
     var recomendedFees = CurrentValueSubject<RecomendedFees?, Never>(nil)
     
     var balance: Decimal {
-        sendAdapter.balance
+        adapter.balance
     }
     
     var spendable: Decimal {
@@ -43,13 +43,13 @@ class SendETHService: ISendAssetService {
         return Decimal(sign: .plus, exponent: -coin.decimal, significand: significand)
     }
     
-    init(coin: Coin, sendAdapter: ISendEthereumAdapter, feeRateProvider: IFeeRateProvider, manager: EthereumKitManager) {
+    init(coin: Coin, adapter: ISendEthereumAdapter, feeRateProvider: IFeeRateProvider, manager: EthereumKitManager) {
         self.coin = coin
-        self.sendAdapter = sendAdapter
+        self.adapter = adapter
         self.feeRateProvider = feeRateProvider
         self.manager = manager
         
-        Publishers.CombineLatest(amount, receiverAddress)
+        Publishers.CombineLatest(amount, receiver)
             .flatMap { amount, address -> AnyPublisher<TransactionData?, Never> in
                 print("send eth service amount = \(String(describing: amount))")
 
@@ -66,7 +66,7 @@ class SendETHService: ISendAssetService {
                     return Just(nil).eraseToAnyPublisher()
                 }
                 
-                let transactionData = sendAdapter.transactionData(amount: amountToSend, address: recepientAddress)
+                let transactionData = adapter.transactionData(amount: amountToSend, address: recepientAddress)
                 
                 return Just(transactionData).eraseToAnyPublisher()
             }
@@ -86,7 +86,7 @@ class SendETHService: ISendAssetService {
             }
             .store(in: &subscriptions)
         
-        amount.send(0.00001)
+//        amount.send(0.00001)
     }
     
     private func transaction(gasPrice: Int, transactionData: TransactionData) -> AnyPublisher<Transaction, Never> {
@@ -130,19 +130,17 @@ class SendETHService: ISendAssetService {
     }
     
     func validateUserInput() throws -> UserInputResult {
-        _ = try EvmKit.Address.init(hex: receiverAddress.value)
-        return .ethOnChain(address: receiverAddress.value)
+        _ = try EvmKit.Address.init(hex: receiver.value)
+        return .ethOnChain(address: receiver.value)
     }
     
-    func send() -> Future<TransactionRecord, Error> {
-        guard let transaction = transaction else {
-            return Future { $0(.failure(SendError.noTransaction)) }
-        }
-        return sendAdapter.send(tx: transaction)
+    func send() async throws -> TransactionRecord {
+        guard let transaction = transaction else { throw SendError.noTransaction }
+        return try await adapter.send(transaction: transaction)
     }
     
-    func sendMax() -> Future<TransactionRecord, Error> {
-        send()
+    func sendMax() async throws -> TransactionRecord {
+        try await send()
     }
 }
 

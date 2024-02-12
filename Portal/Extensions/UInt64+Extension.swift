@@ -39,19 +39,4 @@ extension UInt64 {
         formatter.minimumIntegerDigits = 1
         return formatter.string(from: NSNumber(value: value)) ?? "#"
     }
-    
-    func totalValueString(currency: AccountCurrency) -> String {
-        let double = Double(self)
-        switch currency {
-        case .fiat(let currency):
-            return localizedValueString(value: double * currency.rate.double, symbol: currency.symbol)
-        case .coin(let coin):
-            switch coin.type {
-            case .bitcoin, .lightningBitcoin:
-                return double.btcFormatted()
-            case .ethereum, .erc20:
-                return double.ethFormatted()
-            }
-        }
-    }
 }
