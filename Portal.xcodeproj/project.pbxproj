@@ -38,7 +38,6 @@
 		75231FE929FBD213001EED49 /* TxData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75231FE729FBD213001EED49 /* TxData+CoreDataClass.swift */; };
 		75231FEA29FBD213001EED49 /* TxData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75231FE829FBD213001EED49 /* TxData+CoreDataProperties.swift */; };
 		752BAB752AFCFE3400F27440 /* Eip20Kit in Frameworks */ = {isa = PBXBuildFile; productRef = 752BAB742AFCFE3400F27440 /* Eip20Kit */; };
-		752BAB7B2AFD15F200F27440 /* PortalSwapSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 752BAB7A2AFD15F200F27440 /* PortalSwapSDK */; };
 		752BAB7D2B05F4DD00F27440 /* playnetContract.json in Resources */ = {isa = PBXBuildFile; fileRef = 752BAB7C2B05F4DC00F27440 /* playnetContract.json */; };
 		752BAB7F2B05F68600F27440 /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752BAB7E2B05F68600F27440 /* Bundle.swift */; };
 		752FA6222965A0AF00008796 /* SendBTCService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752FA6212965A0AF00008796 /* SendBTCService.swift */; };
@@ -228,7 +227,6 @@
 		758DFC85294B6A7600AB35CC /* TransactionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758DFC84294B6A7600AB35CC /* TransactionRecord.swift */; };
 		75A0F1CB2B59467D00F74239 /* LNChannelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A0F1CA2B59467D00F74239 /* LNChannelViewModel.swift */; };
 		75A0F1CD2B59491100F74239 /* CreateChannelRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A0F1CC2B59491100F74239 /* CreateChannelRootView.swift */; };
-		75B65B232AC58FC3000232ED /* alice.macaroon in Resources */ = {isa = PBXBuildFile; fileRef = 75B65B222AC58FC3000232ED /* alice.macaroon */; };
 		75B65B252AD433AF000232ED /* DevUtilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B65B242AD433AF000232ED /* DevUtilityService.swift */; };
 		75B65B272AD433E5000232ED /* RPCCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B65B262AD433E5000232ED /* RPCCredentials.swift */; };
 		75B752E929F162AA00F2A93D /* RoundedCornerShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752E829F162AA00F2A93D /* RoundedCornerShape.swift */; };
@@ -301,6 +299,7 @@
 		75D8C5C328DC715900228298 /* ICoinStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C5C228DC715900228298 /* ICoinStorage.swift */; };
 		75D8C5C728DC89DB00228298 /* ReceiveViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D8C5C628DC89DB00228298 /* ReceiveViewModel.swift */; };
 		75D8C5CA28E1B00800228298 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 75D8C5C928E1B00800228298 /* Kingfisher */; };
+		75DF8A1E2B7A161E00AC74C5 /* PortalSwapSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 75DF8A1D2B7A161E00AC74C5 /* PortalSwapSDK */; };
 		75F9B9D42A3C27600085F607 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9D32A3C27600085F607 /* ActivityView.swift */; };
 		75F9B9D62A46DE270085F607 /* SetSecuritySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9D52A46DE270085F607 /* SetSecuritySettingsView.swift */; };
 		75F9B9D82A49E2A70085F607 /* TxSignConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F9B9D72A49E2A70085F607 /* TxSignConfirmationView.swift */; };
@@ -360,7 +359,6 @@
 		75231FE529FBD0E5001EED49 /* TxUserData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxUserData.swift; sourceTree = "<group>"; };
 		75231FE729FBD213001EED49 /* TxData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TxData+CoreDataClass.swift"; sourceTree = "<group>"; };
 		75231FE829FBD213001EED49 /* TxData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TxData+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		752BAB792AFD157700F27440 /* portal-swap-sdk-swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "portal-swap-sdk-swift"; path = "../../portal-swap-sdk-swift"; sourceTree = "<group>"; };
 		752BAB7C2B05F4DC00F27440 /* playnetContract.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = playnetContract.json; sourceTree = "<group>"; };
 		752BAB7E2B05F68600F27440 /* Bundle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bundle.swift; sourceTree = "<group>"; };
 		752FA6212965A0AF00008796 /* SendBTCService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendBTCService.swift; sourceTree = "<group>"; };
@@ -540,7 +538,6 @@
 		758DFC84294B6A7600AB35CC /* TransactionRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionRecord.swift; sourceTree = "<group>"; };
 		75A0F1CA2B59467D00F74239 /* LNChannelViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LNChannelViewModel.swift; sourceTree = "<group>"; };
 		75A0F1CC2B59491100F74239 /* CreateChannelRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateChannelRootView.swift; sourceTree = "<group>"; };
-		75B65B222AC58FC3000232ED /* alice.macaroon */ = {isa = PBXFileReference; lastKnownFileType = file; path = alice.macaroon; sourceTree = "<group>"; };
 		75B65B242AD433AF000232ED /* DevUtilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevUtilityService.swift; sourceTree = "<group>"; };
 		75B65B262AD433E5000232ED /* RPCCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPCCredentials.swift; sourceTree = "<group>"; };
 		75B752E829F162AA00F2A93D /* RoundedCornerShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoundedCornerShape.swift; sourceTree = "<group>"; };
@@ -646,6 +643,7 @@
 				75421841298BD2A80028D5DF /* Lightning in Frameworks */,
 				7545BC4128CA107100ED92C3 /* Coinpaprika in Frameworks */,
 				757FDA9D2B31E00F00FC8CCA /* BugsnagPerformanceSwiftUI in Frameworks */,
+				75DF8A1E2B7A161E00AC74C5 /* PortalSwapSDK in Frameworks */,
 				753A199E2AB0A2B100155812 /* EvmKit in Frameworks */,
 				7502D68B289BD8EF00613323 /* PortalUI in Frameworks */,
 				757FDAA12B31E64D00FC8CCA /* Mixpanel in Frameworks */,
@@ -656,7 +654,6 @@
 				479A7AC928B756DF0057E100 /* Factory in Frameworks */,
 				752BAB752AFCFE3400F27440 /* Eip20Kit in Frameworks */,
 				756DDD8C28A28858002EDC60 /* KeychainAccess in Frameworks */,
-				752BAB7B2AFD15F200F27440 /* PortalSwapSDK in Frameworks */,
 				7564C65E28D1F89E00ABA8CF /* DataField in Frameworks */,
 				75772A5D28F8192F00BE80B7 /* CodeScanner in Frameworks */,
 				757FDA962B31DFFF00FC8CCA /* Bugsnag in Frameworks */,
@@ -1002,8 +999,6 @@
 		756A3109288821F3004978E2 = {
 			isa = PBXGroup;
 			children = (
-				75F9B9F32A4ED5AC0085F607 /* alert.mp3 */,
-				75B65B222AC58FC3000232ED /* alice.macaroon */,
 				756A3114288821F3004978E2 /* Portal */,
 				755501C42A6131230027D5FD /* PortalTests */,
 				756A3113288821F3004978E2 /* Products */,
@@ -1023,7 +1018,6 @@
 		756A3114288821F3004978E2 /* Portal */ = {
 			isa = PBXGroup;
 			children = (
-				752BAB792AFD157700F27440 /* portal-swap-sdk-swift */,
 				7542183C298955410028D5DF /* Lightning */,
 				4774D72328B4F62500B7988B /* Info.plist */,
 				756A3115288821F3004978E2 /* Portal.swift */,
@@ -1037,6 +1031,7 @@
 				75517082293A5D7B00CC84D7 /* Navigation */,
 				756A312F288844AD004978E2 /* Views */,
 				752FA6202964A2F700008796 /* ViewModifiers */,
+				75F9B9F32A4ED5AC0085F607 /* alert.mp3 */,
 				756A3119288821F4004978E2 /* Assets.xcassets */,
 				756A3120288821F4004978E2 /* PortalDB.xcdatamodeld */,
 				756A311B288821F4004978E2 /* Preview Content */,
@@ -1383,12 +1378,12 @@
 				755FDD5029AFA30A00D8A29C /* Starscream */,
 				753A199D2AB0A2B100155812 /* EvmKit */,
 				752BAB742AFCFE3400F27440 /* Eip20Kit */,
-				752BAB7A2AFD15F200F27440 /* PortalSwapSDK */,
 				757FDA952B31DFFF00FC8CCA /* Bugsnag */,
 				757FDA972B31DFFF00FC8CCA /* BugsnagNetworkRequestPlugin */,
 				757FDA9A2B31E00F00FC8CCA /* BugsnagPerformance */,
 				757FDA9C2B31E00F00FC8CCA /* BugsnagPerformanceSwiftUI */,
 				757FDAA02B31E64D00FC8CCA /* Mixpanel */,
+				75DF8A1D2B7A161E00AC74C5 /* PortalSwapSDK */,
 			);
 			productName = BDKDemoApp;
 			productReference = 756A3112288821F3004978E2 /* Portal.app */;
@@ -1439,6 +1434,7 @@
 				757FDA942B31DFFF00FC8CCA /* XCRemoteSwiftPackageReference "bugsnag-cocoa" */,
 				757FDA992B31E00F00FC8CCA /* XCRemoteSwiftPackageReference "bugsnag-cocoa-performance" */,
 				757FDA9F2B31E64D00FC8CCA /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
+				75DF8A1C2B7A161E00AC74C5 /* XCRemoteSwiftPackageReference "portal-swap-sdk-swift" */,
 			);
 			productRefGroup = 756A3113288821F3004978E2 /* Products */;
 			projectDirPath = "";
@@ -1465,7 +1461,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				756A311D288821F4004978E2 /* Preview Assets.xcassets in Resources */,
-				75B65B232AC58FC3000232ED /* alice.macaroon in Resources */,
 				756A311A288821F4004978E2 /* Assets.xcassets in Resources */,
 				75754A982B202D830076FFB3 /* playnetContract.json in Resources */,
 				75F9B9F42A4ED5AC0085F607 /* alert.mp3 in Resources */,
@@ -1973,7 +1968,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_ASSET_PATHS = "\"Portal/Preview Content\"";
 				DEVELOPMENT_TEAM = HBPT8C8527;
 				ENABLE_PREVIEWS = YES;
@@ -2019,7 +2014,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_ASSET_PATHS = "\"Portal/Preview Content\"";
 				DEVELOPMENT_TEAM = HBPT8C8527;
 				ENABLE_PREVIEWS = YES;
@@ -2219,6 +2214,14 @@
 				minimumVersion = 7.0.0;
 			};
 		};
+		75DF8A1C2B7A161E00AC74C5 /* XCRemoteSwiftPackageReference "portal-swap-sdk-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Portaldefi/portal-swap-sdk-swift";
+			requirement = {
+				branch = "1-ver-1.0-update";
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2236,10 +2239,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 752BAB732AFCFE3400F27440 /* XCRemoteSwiftPackageReference "Eip20Kit.Swift" */;
 			productName = Eip20Kit;
-		};
-		752BAB7A2AFD15F200F27440 /* PortalSwapSDK */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PortalSwapSDK;
 		};
 		752FA62429670DD900008796 /* FeeRateKit */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -2319,6 +2318,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 75D8C5C828E1B00800228298 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		75DF8A1D2B7A161E00AC74C5 /* PortalSwapSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 75DF8A1C2B7A161E00AC74C5 /* XCRemoteSwiftPackageReference "portal-swap-sdk-swift" */;
+			productName = PortalSwapSDK;
 		};
 /* End XCSwiftPackageProductDependency section */
 
