@@ -226,6 +226,15 @@
       }
     },
     {
+      "identity" : "portal-swap-sdk-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Portaldefi/portal-swap-sdk-swift",
+      "state" : {
+        "branch" : "1-ver-1.0-update",
+        "revision" : "ed2d8a7d03d1ab20b1ca3f0d69f6a7d92e640793"
+      }
+    },
+    {
       "identity" : "portal-ui-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/FabricLabs/portal-ui-swift",
@@ -302,8 +311,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-http-types",
       "state" : {
-        "revision" : "99d066e29effa8845e4761dd3f2f831edfdf8925",
-        "version" : "1.0.0"
+        "revision" : "12358d55a3824bd5fed310b999ea8cf83a9a1a65",
+        "version" : "1.0.3"
       }
     },
     {
@@ -320,8 +329,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-nio-extras.git",
       "state" : {
-        "revision" : "798c962495593a23fdea0c0c63fd55571d8dff51",
-        "version" : "1.20.0"
+        "revision" : "363da63c1966405764f380c627409b2f9d9e710b",
+        "version" : "1.21.0"
       }
     },
     {
