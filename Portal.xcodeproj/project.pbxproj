@@ -2158,7 +2158,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Portaldefi/portal-swap-sdk-swift";
 			requirement = {
-				branch = "1-ver-1.0-update";
+				branch = main;
 				kind = branch;
 			};
 		};

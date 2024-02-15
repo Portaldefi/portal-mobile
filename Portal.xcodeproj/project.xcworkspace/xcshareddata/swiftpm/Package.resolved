@@ -230,8 +230,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Portaldefi/portal-swap-sdk-swift",
       "state" : {
-        "branch" : "1-ver-1.0-update",
-        "revision" : "ed2d8a7d03d1ab20b1ca3f0d69f6a7d92e640793"
+        "branch" : "main",
+        "revision" : "2e599b80fc29002960da2ab76c6b3ee9fca938af"
       }
     },
     {
