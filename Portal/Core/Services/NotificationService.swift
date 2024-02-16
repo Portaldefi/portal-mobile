@@ -8,6 +8,7 @@
 import Foundation
 import AVFoundation
 import Combine
+import UserNotifications
 
 final class NotificationService: INotificationService {
     private let player: AVPlayer?
@@ -45,6 +46,45 @@ final class NotificationService: INotificationService {
             self.newAlerts.value += 1
             self.alertsBeenSeen.value = false
             self.notifications.value.append(notification)
+        }
+    }
+    
+    func sendLocalNotification(title: String, body: String) {
+        // 1. Request permission
+        requestAuthorization { granted in
+            guard granted else { return }
+            
+            // 2. Create the notification content
+            let content = UNMutableNotificationContent()
+            content.title = title
+            content.body = body
+            content.sound = UNNotificationSound.default
+            
+            // 3. Create a trigger for the notification
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.125, repeats: false)
+            
+            // 4. Create a request
+            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+            
+            // 5. Schedule the notification
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error = error {
+                    print("Error scheduling local notification: \(error)")
+                }
+            }
+        }
+    }
+    
+    func isNotificationsEnrolled() async -> Bool {
+        await UNUserNotificationCenter
+            .current()
+            .notificationSettings()
+            .authorizationStatus == .authorized
+    }
+    
+    func requestAuthorization(granted: @escaping (Bool) -> Void) {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _granted, _ in
+            granted(_granted)
         }
     }
     
