@@ -14,6 +14,5 @@ protocol ITxUserDataStorage {
     func update(source: TxSource, id: String, notes: String)
     func update(source: TxSource, id: String, labels: [TxLabel])
     func update(source: TxSource, id: String, price: Decimal)
-    func fetchTxData(txID: String) -> TxData?
     func clear()
 }
