@@ -18,7 +18,10 @@ protocol INotificationService {
     var notifications: CurrentValueSubject<[PNotification], Never> { get }
     var newAlerts: CurrentValueSubject<Int, Never> { get }
     var alertsBeenSeen: CurrentValueSubject<Bool, Never> { get }
+    func requestAuthorization(granted: @escaping (Bool) -> Void)
     func notify(_ notification: PNotification)
+    func sendLocalNotification(title: String, body: String)
+    func isNotificationsEnrolled() async -> Bool
     func markAllAlertsViewed()
     func clear()
 }
