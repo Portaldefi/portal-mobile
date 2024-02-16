@@ -9,6 +9,7 @@ import Foundation
 import Combine
 
 protocol ITransactionsAdapter {
+    var lastKnownTxTimestamp: Int { get }
     var transactionRecords: [TransactionRecord] { get }
     var onTxsUpdate: AnyPublisher<Void, Never> { get }
 }
