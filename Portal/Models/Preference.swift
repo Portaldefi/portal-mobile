@@ -25,6 +25,7 @@ final class Preferences {
     @UserDefault("userCoins") var userCoins = [String]()
     @UserDefault("pinCodeEnabled") var pincodeEnabled = false
     @UserDefault("biometricsEnabled") var biometricsEnabled = false
+    @UserDefault("notificationsEnabled") var notificationsEnabled = false
 }
 
 @propertyWrapper
