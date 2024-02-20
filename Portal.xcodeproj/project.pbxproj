@@ -223,6 +223,7 @@
 		758DFC85294B6A7600AB35CC /* TransactionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758DFC84294B6A7600AB35CC /* TransactionRecord.swift */; };
 		75A0F1CB2B59467D00F74239 /* LNChannelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A0F1CA2B59467D00F74239 /* LNChannelViewModel.swift */; };
 		75A0F1CD2B59491100F74239 /* CreateChannelRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A0F1CC2B59491100F74239 /* CreateChannelRootView.swift */; };
+		75B3D9232B848CCB00104BD2 /* NotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B3D9222B848CCB00104BD2 /* NotificationDelegate.swift */; };
 		75B65B252AD433AF000232ED /* DevUtilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B65B242AD433AF000232ED /* DevUtilityService.swift */; };
 		75B65B272AD433E5000232ED /* RPCCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B65B262AD433E5000232ED /* RPCCredentials.swift */; };
 		75B752E929F162AA00F2A93D /* RoundedCornerShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B752E829F162AA00F2A93D /* RoundedCornerShape.swift */; };
@@ -525,6 +526,7 @@
 		758DFC84294B6A7600AB35CC /* TransactionRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionRecord.swift; sourceTree = "<group>"; };
 		75A0F1CA2B59467D00F74239 /* LNChannelViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LNChannelViewModel.swift; sourceTree = "<group>"; };
 		75A0F1CC2B59491100F74239 /* CreateChannelRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateChannelRootView.swift; sourceTree = "<group>"; };
+		75B3D9222B848CCB00104BD2 /* NotificationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDelegate.swift; sourceTree = "<group>"; };
 		75B65B242AD433AF000232ED /* DevUtilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevUtilityService.swift; sourceTree = "<group>"; };
 		75B65B262AD433E5000232ED /* RPCCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPCCredentials.swift; sourceTree = "<group>"; };
 		75B752E829F162AA00F2A93D /* RoundedCornerShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoundedCornerShape.swift; sourceTree = "<group>"; };
@@ -1003,8 +1005,6 @@
 				7542183C298955410028D5DF /* Lightning */,
 				4774D72328B4F62500B7988B /* Info.plist */,
 				756A3115288821F3004978E2 /* Portal.swift */,
-				479A7ACA28B759510057E100 /* Portal+Injection.swift */,
-				756A311E288821F4004978E2 /* Persistence.swift */,
 				75D8C59328D8887300228298 /* Core */,
 				4774D73028B4FD1800B7988B /* Extensions */,
 				756DDD8528A287A7002EDC60 /* Protocols */,
@@ -1036,6 +1036,7 @@
 				75BF3B9D2B5166F800089ACE /* TransactionRecord */,
 				756DDD9128A28C0A002EDC60 /* DB */,
 				75421842298BD5720028D5DF /* Peer.swift */,
+				75B3D9222B848CCB00104BD2 /* NotificationDelegate.swift */,
 				75BF3B9B2B5166CC00089ACE /* HodlInvoice.swift */,
 				75D8C5A828D88F8D00228298 /* AdapterState.swift */,
 				75D8C59E28D88C4F00228298 /* Wallet.swift */,
@@ -1224,6 +1225,8 @@
 		75D8C59328D8887300228298 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				479A7ACA28B759510057E100 /* Portal+Injection.swift */,
+				756A311E288821F4004978E2 /* Persistence.swift */,
 				750C05E429646838005519FF /* Services */,
 				755105F4294CA40D00525A16 /* Manager */,
 				75D8C5AC28D8908200228298 /* Factories */,
@@ -1594,6 +1597,7 @@
 				75F9B9F02A4DD0680085F607 /* TxType.swift in Sources */,
 				4774D72528B4FC2000B7988B /* StringFormatter.swift in Sources */,
 				755FDD4E29AD00D500D8A29C /* MockedLightningKitManager.swift in Sources */,
+				75B3D9232B848CCB00104BD2 /* NotificationDelegate.swift in Sources */,
 				755501BE2A5D57310027D5FD /* HighlightedText.swift in Sources */,
 				75772A682902D73E00BE80B7 /* TextLimitter.swift in Sources */,
 				756DDD6E28A272AB002EDC60 /* NoAccountView.swift in Sources */,

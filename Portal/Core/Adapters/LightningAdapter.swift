@@ -47,7 +47,7 @@ final class LightningAdapter {
                 transaction.timestamp > lastKnownTxTimestamp
             else { continue }
             
-            let satAmount = transaction.amount
+            let satAmount = Decimal(transaction.amount)
             let btcAmount = satAmount / 100_000_000
             let message = "You've received \(btcAmount.formatted()) BTC"
             
