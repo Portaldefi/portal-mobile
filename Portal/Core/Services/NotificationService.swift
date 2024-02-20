@@ -18,14 +18,16 @@ final class NotificationService: INotificationService {
     private(set) var alertsBeenSeen = CurrentValueSubject<Bool, Never>(false)
     
     private var accountId: String?
+    private let settings: IPortalSettings
     private var subscriptions = Set<AnyCancellable>()
         
-    init(accountManager: IAccountManager) {
+    init(accountManager: IAccountManager, settings: IPortalSettings) {
 //        if let url = Bundle.main.url(forResource: "alert", withExtension: "mp3") {
 //            player = AVPlayer.init(url: url)
 //        } else {
             player = nil
 //        }
+        self.settings = settings
         
         accountId = accountManager.activeAccount?.id
         
@@ -39,6 +41,8 @@ final class NotificationService: INotificationService {
     }
     
     func notify(_ notification: PNotification) {
+        guard settings.notificationsEnabled.value else { return }
+        
         player?.seek(to: .zero)
         player?.play()
         
@@ -50,6 +54,7 @@ final class NotificationService: INotificationService {
     }
     
     func sendLocalNotification(title: String, body: String) {
+        guard settings.notificationsEnabled.value else { return }
         // 1. Request permission
         requestAuthorization { granted in
             guard granted else { return }
