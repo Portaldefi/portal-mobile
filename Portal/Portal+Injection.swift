@@ -60,11 +60,15 @@ extension SharedContainer {
         let ethereumKitManager = Container.ethereumKitManager()
         let walletManager = Container.walletManager()
         let lightningKitManager = Container.lightningKitManager()
+        let txDataStorage = Container.txDataStorage()
+        let notificationService = Container.notificationService()
         
         let adapterFactory = AdapterFactory(
             appConfigProvider: appConfigProvider,
             ethereumKitManager: ethereumKitManager,
-            lightningKitManager: lightningKitManager
+            lightningKitManager: lightningKitManager,
+            txDataStorage: txDataStorage,
+            notificationService: notificationService
         )
         
         return AdapterManager(adapterFactory: adapterFactory, walletManager: walletManager)
