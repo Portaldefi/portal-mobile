@@ -7,6 +7,7 @@
 
 import Combine
 import LightningDevKit
+import Lightning
 
 class MockedLightningKitManager: ILightningKitManager {
     var bestBlock: Int32 = 0
@@ -21,7 +22,7 @@ class MockedLightningKitManager: ILightningKitManager {
         
     }
     
-    var transactions = [TransactionRecord]()
+    var transactions = [LightningPayment]()
     
     func createInvoice(paymentHash: String, satAmount: UInt64) async -> LightningDevKit.Bolt11Invoice? {
         nil
@@ -35,8 +36,8 @@ class MockedLightningKitManager: ILightningKitManager {
         []
     }
     
-    func pay(invoice: Bolt11Invoice) async throws -> TransactionRecord {
-        TransactionRecord.mocked(confirmed: true)
+    func pay(invoice: Bolt11Invoice) async throws -> LightningPayment {
+        LightningPayment.init(nodeId: nil, paymentId: UUID().uuidString, amount: 10000, preimage: String(), type: .sent, timestamp: 123876123, fee: 0, memo: "Mocked")
     }
     
     func createInvoice(paymentHash: String, satAmount: UInt64) async -> String? {
@@ -71,8 +72,8 @@ class MockedLightningKitManager: ILightningKitManager {
         
     }
     
-    var transactionsPublisher: AnyPublisher<[TransactionRecord], Never> {
-        Just([.mocked(confirmed: true)]).eraseToAnyPublisher()
+    var transactionsPublisher: AnyPublisher<[LightningPayment], Never> {
+        Just([]).eraseToAnyPublisher()
     }
     
     func pay(invoice: String) async throws -> TransactionRecord {
