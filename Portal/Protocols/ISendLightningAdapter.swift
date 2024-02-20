@@ -6,8 +6,11 @@
 //
 
 import Foundation
+import LightningDevKit
 
-protocol ISendLightningAdapter: ILightningInvoiceHandler {
+protocol ISendLightningAdapter {
     var balance: Decimal { get }
     var spendable: Decimal { get }
+    func decode(invoice: String) throws -> Bolt11Invoice
+    func pay(invoice: String) async throws -> TransactionRecord
 }

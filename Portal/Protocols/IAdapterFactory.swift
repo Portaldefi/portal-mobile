@@ -8,6 +8,6 @@
 import Foundation
 
 protocol IAdapterFactory {
-    func adapter(wallet: Wallet) -> IAdapter?
+    func adapter(wallet: Wallet) throws -> IAdapter
 }
 
