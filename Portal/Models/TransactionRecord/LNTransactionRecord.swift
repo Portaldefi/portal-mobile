@@ -41,10 +41,8 @@ class LNTransactionRecord: TransactionRecord {
         self.preimage = payment.preimage
         self.nodeId = payment.nodeId
         self.memo = payment.memo
-        
-        let source: TxSource = .lightning
-        
-        super.init(source: source, type: type, id: payment.paymentId, timestamp: payment.timestamp, userData: userData)
+                
+        super.init(source: .lightning, type: type, id: payment.paymentId, timestamp: payment.timestamp, userData: userData)
     }
 }
 

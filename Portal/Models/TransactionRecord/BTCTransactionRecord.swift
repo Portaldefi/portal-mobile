@@ -78,10 +78,8 @@ class BTCTransactionRecord: TransactionRecord {
         } else {
             self.fee = nil
         }
-                
-        let source: TxSource = .bitcoin
-        
-        super.init(source: source, type: type, id: transaction.txid, timestamp: timestamp, userData: userData)
+                        
+        super.init(source: .bitcoin, type: type, id: transaction.txid, timestamp: timestamp, userData: userData)
     }
 }
 
