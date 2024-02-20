@@ -22,7 +22,6 @@ public struct BlockInfo {
 
 class LightningKitManager: ILightningKitManager {
     @Injected(Container.notificationService) private var notificationService
-    @Injected(Container.txDataStorage) private var txDataStorage
     
     private let instance: Node
     private let connectionType: ConnectionType
@@ -40,17 +39,12 @@ class LightningKitManager: ILightningKitManager {
     private(set) var peer: Peer?
     private var subscriptions = Set<AnyCancellable>()
         
-    var transactionsPublisher: AnyPublisher<[TransactionRecord], Never> {
+    var transactionsPublisher: AnyPublisher<[LightningPayment], Never> {
         Just(transactions).eraseToAnyPublisher()
     }
     
-    var transactions: [TransactionRecord] {
-        fileManager.getPayments().map { payment in
-            let source: TxSource = .lightning
-            let data = txDataStorage.fetch(source: source, id: payment.paymentId)
-            let userData = TxUserData(data: data)
-            return LNTransactionRecord(payment: payment, userData: userData)
-        }
+    var transactions: [LightningPayment] {
+        fileManager.getPayments()
     }
             
     init(connectionType: ConnectionType) {
@@ -254,6 +248,8 @@ class LightningKitManager: ILightningKitManager {
         case .PendingHTLCsForwardable:
             print("PendingHTLCsForwardable")
             
+//            let value = event.getValueAsPendingHtlcsForwardable()!
+            
             instance.processPendingHTLCForwards()
         case .SpendableOutputs:
             print("SpendableOutputs")
@@ -444,18 +440,9 @@ extension LightningKitManager: ILightningInvoiceHandler {
     func createInvoice(paymentHash: String, satAmount: UInt64) async -> Bolt11Invoice? {
         await instance.createInvoice(paymentHash: paymentHash, satAmount: satAmount)
     }
-    
-    func pay(invoice: String) async throws -> TransactionRecord {
-        let decodedInvoice = try decode(invoice: invoice)
-        return try await pay(invoice: decodedInvoice)
-    }
-    
-    func pay(invoice: Bolt11Invoice) async throws -> TransactionRecord {
-        let paymentResult = try await instance.pay(invoice: invoice)
-        let source: TxSource = .lightning
-        let data = txDataStorage.fetch(source: source, id: paymentResult.paymentId)
-        let userData = TxUserData(data: data)
-        return LNTransactionRecord(payment: paymentResult, userData: userData)
+
+    func pay(invoice: Bolt11Invoice) async throws -> LightningPayment {
+        try await instance.pay(invoice: invoice)
     }
     
     func decode(invoice: String) throws -> Bolt11Invoice {
