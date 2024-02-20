@@ -101,6 +101,73 @@ struct WalletItemView: View {
             }
             .padding(.vertical, 12)
             .frame(height: 70)
+        case .erc20:
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 0) {
+                    CoinImageView(
+                        size: 32,
+                        url: viewModel.coin.icon,
+                        placeholderForegroundColor: Color.gray
+                    )
+                    .padding(.trailing, 8)
+                    
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack(spacing: 0) {
+                            HStack {
+                                Text(viewModel.coin.name)
+                                    .font(.Main.fixed(.monoBold, size: 16))
+                                    .foregroundColor(.white)
+                                    .frame(height: 16)
+                                Text("ERC-20")
+                                    .font(.Main.fixed(.monoBold, size: 12))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 4)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 5).foregroundColor(Palette.grayScale3A)
+                                    )
+                            }
+                            
+                            Spacer()
+                            
+                            if showBalance {
+                                Text(viewModel.balanceString)
+                                    .font(.Main.fixed(.monoBold, size: 20))
+                                    .foregroundColor(Palette.grayScaleEA)
+                                    .minimumScaleFactor(0.5)
+                                    .lineLimit(1)
+                                
+                                Text(viewModel.coin.unit)
+                                    .font(.Main.fixed(.monoRegular, size: 14))
+                                    .foregroundColor(Palette.grayScaleAA)
+                                    .padding(.leading, 4)
+                                    .offset(y: 1)
+                            }
+                        }
+                        
+                        HStack(spacing: 0) {
+                            Text("\(viewModel.coin.code) • \(viewModel.coin.network)")
+                                .font(.Main.fixed(.monoRegular, size: 14))
+                                .foregroundColor(Palette.grayScale6A)
+                            
+                            Spacer()
+                            
+                            if showBalance {
+                                Text(viewModel.valueString)
+                                    .font(.Main.fixed(.monoMedium, size: 16))
+                                    .foregroundColor(Palette.grayScale6A)
+                                
+                                Text(viewModel.fiatCurrency.code)
+                                    .font(.Main.fixed(.monoRegular, size: 14))
+                                    .foregroundColor(Palette.grayScale6A)
+                                    .padding(.leading, 4)
+                                    .offset(y: 1)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.vertical, 12)
+            .frame(height: 70)
         default:
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 0) {
