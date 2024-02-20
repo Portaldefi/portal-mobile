@@ -14,12 +14,14 @@ class PortalSettings: IPortalSettings {
     private(set) var portfolioCurrency: CurrentValueSubject<Coin, Never> = .init(.bitcoin())
     private(set) var pincodeEnabled: CurrentValueSubject<Bool, Never> = .init(false)
     private(set) var biometricsEnabled: CurrentValueSubject<Bool, Never> = .init(false)
+    private(set) var notificationsEnabled: CurrentValueSubject<Bool, Never> = .init(false)
         
     @Preference(\.fiatCurrencyData) private var fiatCurrencyPreference
     @Preference(\.portfolioCurrencyData) private var portfolioCurrencyPreference
     @Preference(\.userCoins) private var userCoinsPreference
     @Preference(\.pincodeEnabled) private var pincodeEnabledPreference
     @Preference(\.biometricsEnabled) private var biometricsEnabledPreference
+    @Preference(\.notificationsEnabled) private var notificationsEnabledPreference
     
     private var subscriptions = Set<AnyCancellable>()
     
@@ -38,24 +40,22 @@ class PortalSettings: IPortalSettings {
         userCoins.send(userCoinsPreference)
         pincodeEnabled.send(pincodeEnabledPreference)
         biometricsEnabled.send(biometricsEnabledPreference)
+        notificationsEnabled.send(notificationsEnabledPreference)
         
-        Preferences.standard
-            .preferencesChangedSubject
-            .filter { changedKeyPath in
-                changedKeyPath == \Preferences.biometricsEnabled
-            }.sink { [weak self] _ in
+        Preferences.standard.preferencesChangedSubject
+            .sink {  [weak self] keyPath in
                 guard let self = self else { return }
-                self.biometricsEnabled.send(self.biometricsEnabledPreference)
-            }
-            .store(in: &subscriptions)
-        
-        Preferences.standard
-            .preferencesChangedSubject
-            .filter { changedKeyPath in
-                changedKeyPath == \Preferences.pincodeEnabled
-            }.sink { [weak self] _ in
-                guard let self = self else { return }
-                self.pincodeEnabled.send(self.pincodeEnabledPreference)
+                
+                switch keyPath {
+                case \Preferences.pincodeEnabled:
+                    self.biometricsEnabled.send(self.biometricsEnabledPreference)
+                case \Preferences.pincodeEnabled:
+                    self.pincodeEnabled.send(self.pincodeEnabledPreference)
+                case \Preferences.notificationsEnabled:
+                    self.notificationsEnabled.send(self.notificationsEnabledPreference)
+                default:
+                    break
+                }
             }
             .store(in: &subscriptions)
     }
@@ -93,5 +93,11 @@ class PortalSettings: IPortalSettings {
         guard biometricsEnabledPreference != enabled else { return }
         biometricsEnabledPreference = enabled
         biometricsEnabled.send(enabled)
+    }
+    
+    func updateNotificationsSetting(enabled: Bool) {
+        guard notificationsEnabledPreference != enabled else { return }
+        notificationsEnabledPreference = enabled
+        notificationsEnabled.send(enabled)
     }
 }
