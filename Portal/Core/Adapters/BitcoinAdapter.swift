@@ -9,7 +9,6 @@ import Foundation
 import Combine
 import BitcoinDevKit
 import HsCryptoKit
-import Factory
 
 final class BitcoinAdapter {
     private enum DereviationPathBranch: Int {
@@ -34,8 +33,8 @@ final class BitcoinAdapter {
     private var _balance = Balance(immature: 0, trustedPending: 0, untrustedPending: 0, confirmed: 0, spendable: 0, total: 0)
     private var _transactions = [TransactionDetails]()
     
-    @Injected(Container.notificationService) var notificationService
-    @Injected(Container.txDataStorage) private var txDataStorage
+    private let notificationService: INotificationService
+    private let txDataStorage: ITxUserDataStorage
     
     static private func descriptor(derivedKey: String, network: Network) throws -> Descriptor {
         try Descriptor(descriptor: "wpkh(\(derivedKey))", network: network)
@@ -45,7 +44,10 @@ final class BitcoinAdapter {
         try DerivationPath(path: "m/84h/0h/\(index)h/\(branch.rawValue)")
     }
         
-    init(wallet: Wallet) throws {
+    init(wallet: Wallet, txDataStorage: ITxUserDataStorage, notificationService: INotificationService) throws {
+        self.txDataStorage = txDataStorage
+        self.notificationService = notificationService
+        
         let network = wallet.account.btcNetwork
         
         let account = wallet.account
@@ -163,7 +165,7 @@ final class BitcoinAdapter {
         let oldValue = _balance
         _balance = try wallet.getBalance()
         
-        if _balance != oldValue {
+        if _balance.spendable != oldValue.spendable {
             balanceUpdatedSubject.send()
         }
     }
@@ -173,11 +175,9 @@ final class BitcoinAdapter {
         
         guard !transactions.isEmpty else { return }
         
-        var shouldUpdate = false
+        var shouldUpdate = transactions.count != _transactions.count
         
-        if transactions.count != _transactions.count {
-            shouldUpdate = true
-        } else if transactions.count == _transactions.count {
+        if !shouldUpdate, transactions.count == _transactions.count {
             for i in 0...transactions.count - 1 {
                 if transactions[i].confirmationTime != _transactions[i].confirmationTime {
                     shouldUpdate = true
@@ -191,30 +191,38 @@ final class BitcoinAdapter {
         _transactions = transactions
         
         var txRecords = [TransactionRecord]()
-        
+                
         for txRecord in transactions {
-            var isNew = false
-            if txDataStorage.fetchTxData(txID: txRecord.txid) == nil { isNew = true }
-            
-            let source: TxSource = .bitcoin
-            let data = txDataStorage.fetch(source: source, id: txRecord.txid)
+            let data = txDataStorage.fetch(source: .bitcoin, id: txRecord.txid)
             let userData = TxUserData(data: data)
             let record = BTCTransactionRecord(transaction: txRecord, userData: userData)
             
             txRecords.append(record)
+                        
+            guard
+                lastKnownTxTimestamp > 0,
+                let timestamp = record.timestamp,
+                case .received(let coin) = record.type,
+                timestamp > lastKnownTxTimestamp
+            else { continue }
+                                            
+            let satAmount = record.amount ?? 0
+            let btcAmount = satAmount / 100_000_000
+            let message = "You've received \(btcAmount) \(coin.code.uppercased())"
             
-//            if isNew {
-//                guard record.type == .received else { return }
-//                
-//                let satAmount = record.amount?.double ?? 0
-//                let btcAmount = satAmount / 100_000_000
-//                let message = "You've received \(btcAmount) \(record.coin.code.uppercased())"
-//                
-//                let pNotification = PNotification(message: message)
-//                notificationService.notify(pNotification)
-//            }
+            notificationService.sendLocalNotification(
+                title: "Received \(coin.code.uppercased())",
+                body: message
+            )
         }
-                
+        
+        if
+            let mostRecentTxTimestamp = txRecords.compactMap({ $0.timestamp }).max(),
+            mostRecentTxTimestamp > lastKnownTxTimestamp
+        {
+            UserDefaults.standard.setValue(mostRecentTxTimestamp, forKey: "knownTxTimestamp.btc")
+        }
+        
         transactionsSubject.send(txRecords)
     }
 }
@@ -243,7 +251,7 @@ extension BitcoinAdapter: IBalanceAdapter {
     }
     
     var balance: Decimal {
-        Decimal(_balance.spendable + _balance.untrustedPending)/coinRate
+        Decimal(_balance.spendable)/coinRate
     }
     
     var balanceStateUpdated: AnyPublisher<Void, Never> {
@@ -262,6 +270,10 @@ extension BitcoinAdapter: IDepositAdapter {
 }
 
 extension BitcoinAdapter: ITransactionsAdapter {
+    var lastKnownTxTimestamp: Int {
+        UserDefaults.standard.integer(forKey: "knownTxTimestamp.btc")
+    }
+    
     var onTxsUpdate: AnyPublisher<Void, Never> {
         balanceUpdated
     }
@@ -270,26 +282,11 @@ extension BitcoinAdapter: ITransactionsAdapter {
         var txRecords = [TransactionRecord]()
         
         for txRecord in _transactions {
-            var isNew = false
-            if txDataStorage.fetchTxData(txID: txRecord.txid) == nil { isNew = true }
-            
-            let source: TxSource = .bitcoin
-            let data = txDataStorage.fetch(source: source, id: txRecord.txid)
+            let data = txDataStorage.fetch(source: .bitcoin, id: txRecord.txid)
             let userData = TxUserData(data: data)
             let record = BTCTransactionRecord(transaction: txRecord, userData: userData)
             
             txRecords.append(record)
-            
-//            if isNew {
-//                if record.type == .received {
-//                    let satAmount = record.amount?.double ?? 0
-//                    let btcAmount = satAmount / 100_000_000
-//                    let message = "You've received \(btcAmount) \(record.coin.code.uppercased())"
-//                    
-//                    let pNotification = PNotification(message: message)
-//                    notificationService.notify(pNotification)
-//                }
-//            }
         }
         
         return (txRecords).sorted(by: { $0.timestamp ?? 1 > $1.timestamp ?? 0 })
@@ -357,8 +354,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         
         if finalized {
             try blockchain.broadcast(transaction: psbt.extractTx())
-            let source: TxSource = .bitcoin
-            let data = txDataStorage.fetch(source: source, id: txDetails.txid)
+            let data = txDataStorage.fetch(source: .bitcoin, id: txDetails.txid)
             let userData = TxUserData(data: data)
             return BTCTransactionRecord(transaction: txDetails, userData: userData)
         } else {
@@ -389,8 +385,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
         
         if finalized {
             try blockchain.broadcast(transaction: psbt.extractTx())
-            let source: TxSource = .bitcoin
-            let data = txDataStorage.fetch(source: source, id: txDetails.txid)
+            let data = txDataStorage.fetch(source: .bitcoin, id: txDetails.txid)
             let userData = TxUserData(data: data)
             let record = BTCTransactionRecord(transaction: txDetails, userData: userData)
             return(record)
@@ -431,8 +426,7 @@ extension BitcoinAdapter: ISendBitcoinAdapter {
 
         if finalized {
             try blockchain.broadcast(transaction: psbt.extractTx())
-            let source: TxSource = .bitcoin
-            let data = txDataStorage.fetch(source: source, id: txDetails.txid)
+            let data = txDataStorage.fetch(source: .bitcoin, id: txDetails.txid)
             let userData = TxUserData(data: data)
             return BTCTransactionRecord(transaction: txDetails, userData: userData)
         } else {

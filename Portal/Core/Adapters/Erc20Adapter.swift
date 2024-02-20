@@ -11,7 +11,6 @@ import BigInt
 import EvmKit
 import Eip20Kit
 import HsExtensions
-import Factory
 
 struct Erc20Token {
     let name: String
@@ -33,30 +32,66 @@ struct Erc20Token {
 class Erc20Adapter {
     private let evmKit: EvmKit.Kit
     private let signer: Signer?
+    private let notificationService: INotificationService
+    private let txDataStorage: ITxUserDataStorage
     private let eip20Kit: Eip20Kit.Kit
     private let token: Erc20Token
-    
-    @Injected(Container.notificationService) var notificationService
-    @Injected(Container.txDataStorage) private var txDataStorage
+    private var cancellable: AnyCancellable?
 
-    init(evmKit: EvmKit.Kit, signer: Signer?, token: Erc20Token) throws {
+    init(evmKit: EvmKit.Kit, signer: Signer?, token: Erc20Token, txDataStorage: ITxUserDataStorage, notificationService: INotificationService) throws {
         self.evmKit = evmKit
         self.signer = signer
         self.token = token
+        self.txDataStorage = txDataStorage
+        self.notificationService = notificationService
         
         let contractAddress = try Address(hex: token.contractAddress)
         
         eip20Kit = try Eip20Kit.Kit.instance(evmKit: evmKit, contractAddress: contractAddress)
+        subscribeForBalanceUpdates()
+    }
+    
+    private func subscribeForBalanceUpdates() {
+        cancellable = onTxsUpdate.sink { [unowned self] _ in
+            updateLastKnowTxTimestamp()
+        }
+    }
+    
+    private func updateLastKnowTxTimestamp() {
+        for transaction in transactionRecords {
+            switch transaction {
+            case let record as EvmTransactionRecord:
+                guard
+                    lastKnownTxTimestamp > 0,
+                    let timestamp = transaction.timestamp,
+                    case .received(let coin) = transaction.type,
+                    timestamp > lastKnownTxTimestamp
+                else { continue }
+                                                
+                let amount = (record.amount ?? 0).formatted()
+                let message = "You've received \(amount) \(coin.code.uppercased())"
+                
+                notificationService.sendLocalNotification(
+                    title: "Received \(coin.code.uppercased())",
+                    body: message
+                )
+            default:
+                continue
+            }
+        }
+        
+        if
+            let mostRecentTxTimestamp = transactionRecords.compactMap({ $0.timestamp }).max(),
+            mostRecentTxTimestamp > lastKnownTxTimestamp
+        {
+            UserDefaults.standard.setValue(mostRecentTxTimestamp, forKey: "lastKnownTxTimestamp.eth.erc-20.\(token.code)")
+        }
     }
 
     private func transactionRecord(fromTransaction fullTransaction: FullTransaction) -> TransactionRecord {
         let transaction = fullTransaction.transaction
-        
-//        var isNew = false
-//        if txDataStorage.fetchTxData(txID: transaction.hash.hs.hexString) == nil { isNew = true }
                 
-        let source: TxSource = .erc20(token: token)
-        let data = txDataStorage.fetch(source: source, id: transaction.hash.hs.hexString)
+        let data = txDataStorage.fetch(source: .erc20(token: token), id: transaction.hash.hs.hexString)
         let userData = TxUserData(data: data)
         
         var type: TxType = .unknown
@@ -200,6 +235,10 @@ extension Erc20Adapter: IBalanceAdapter {
 }
 
 extension Erc20Adapter: ITransactionsAdapter {
+    var lastKnownTxTimestamp: Int {
+        UserDefaults.standard.integer(forKey: "knownTxTimestamp.eth.erc-20.\(token.code)")
+    }
+    
     var onTxsUpdate: AnyPublisher<Void, Never> {
         balancePublisher
     }

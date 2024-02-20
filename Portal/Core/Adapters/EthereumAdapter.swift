@@ -10,29 +10,67 @@ import Foundation
 import EvmKit
 import BigInt
 import Combine
-import Factory
 
 //MARK: - IAdapter
 class EthereumAdapter {
     private let evmKit: Kit
+    private let txDataStorage: ITxUserDataStorage
+    private let notificationService: INotificationService
     private let signer: Signer?
     private let decimal = 18
-    
-    @Injected(Container.txDataStorage) private var txDataStorage
-    @Injected(Container.notificationService) var notificationService
+    private var cancellable: AnyCancellable?
         
-    init(evmKit: Kit, signer: Signer?) {
+    init(evmKit: Kit, signer: Signer?, txDataStorage: ITxUserDataStorage, notificationService: INotificationService) {
         self.evmKit = evmKit
         self.signer = signer
+        self.txDataStorage = txDataStorage
+        self.notificationService = notificationService
+        
+        updateLastKnowTxTimestamp()
+        
+        subscribeForBalanceUpdates()
     }
 
+    private func subscribeForBalanceUpdates() {
+        cancellable = onTxsUpdate.sink { [unowned self] _ in
+            updateLastKnowTxTimestamp()
+        }
+    }
+    
+    private func updateLastKnowTxTimestamp() {
+        for transaction in transactionRecords {
+            switch transaction {
+            case let record as EvmTransactionRecord:
+                guard
+                    lastKnownTxTimestamp > 0,
+                    let timestamp = transaction.timestamp,
+                    case .received(let coin) = transaction.type,
+                    timestamp > lastKnownTxTimestamp
+                else { continue }
+                                                
+                let amount = (record.amount ?? 0).formatted()
+                let message = "You've received \(amount) \(coin.code.uppercased())"
+                
+                notificationService.sendLocalNotification(
+                    title: "Received \(coin.code.uppercased())",
+                    body: message
+                )
+            default:
+                continue
+            }
+        }
+        
+        if
+            let mostRecentTxTimestamp = transactionRecords.compactMap({ $0.timestamp }).max(),
+            mostRecentTxTimestamp > lastKnownTxTimestamp
+        {
+            UserDefaults.standard.setValue(mostRecentTxTimestamp, forKey: "knownTxTimestamp.eth")
+        }
+    }
+    
     private func transactionRecord(fullTransaction: FullTransaction) -> TransactionRecord {
         let transaction = fullTransaction.transaction
         let txHash = transaction.hash.hs.hexString
-        
-        var isNew = false
-        if txDataStorage.fetchTxData(txID: txHash) == nil { isNew = true }
-                
         let type: TxType
         
         switch fullTransaction.decoration {
@@ -49,31 +87,18 @@ class EthereumAdapter {
             amount = Decimal(sign: .plus, exponent: -decimal, significand: significand)
         }
         
-        let source: TxSource = .ethereum
-        let data = txDataStorage.fetch(source: source, id: txHash)
+        let data = txDataStorage.fetch(source: .ethereum, id: txHash)
         let userData = TxUserData(data: data)
         
-        let record = EvmTransactionRecord(
+        return EvmTransactionRecord(
             coin: .ethereum(),
             transaction: transaction,
-            type: type, 
+            type: type,
             amount: amount,
             sender: transaction.from?.hex,
             receiver: transaction.to?.hex,
             userData: userData
         )
-        
-//        if isNew {
-//            guard record.type == .received else { return record }
-//
-//            let amount = "\(record.amount?.double ?? 0)"
-//            let message = "You've received \(amount) \(record.coin.code.uppercased())"
-//
-//            let pNotification = PNotification(message: message)
-//            notificationService.notify(pNotification)
-//        }
-        
-        return record
     }
     
     private func convertToAdapterState(evmSyncState: SyncState) -> AdapterState {
@@ -196,6 +221,10 @@ extension EthereumAdapter: IBalanceAdapter {
 
 //MARK: - ITransactionsAdapter
 extension EthereumAdapter: ITransactionsAdapter {
+    var lastKnownTxTimestamp: Int {
+        UserDefaults.standard.integer(forKey: "knownTxTimestamp.eth")
+    }
+    
     var onTxsUpdate: AnyPublisher<Void, Never> {
         transactionsPublisher
     }

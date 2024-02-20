@@ -8,8 +8,12 @@
 import Foundation
 import Combine
 import LightningDevKit
+import Lightning
 
 final class LightningAdapter {
+    private let txDataStorage: ITxUserDataStorage
+    private let notificationService: INotificationService
+
     private let coinRate: Decimal = pow(10, 8)
     private let manager: ILightningKitManager
     private let updateTimer = RepeatingTimer(timeInterval: 5)
@@ -19,8 +23,10 @@ final class LightningAdapter {
     
     private var adapterState: AdapterState = .synced
     
-    init(wallet: Wallet, manager: ILightningKitManager) {
+    init(wallet: Wallet, manager: ILightningKitManager, txDataStorage: ITxUserDataStorage, notificationService: INotificationService) {
         self.manager = manager
+        self.txDataStorage = txDataStorage
+        self.notificationService = notificationService
         
         updateTimer.eventHandler = { [unowned self] in
             self.syncData()
@@ -31,6 +37,32 @@ final class LightningAdapter {
         guard _channelBalance != channelBalance else { return }
         _channelBalance = channelBalance
         balanceUpdatedSubject.send()
+        
+        let transactions = manager.transactions
+        
+        for transaction in transactions {
+            guard
+                lastKnownTxTimestamp > 0,
+                transaction.type == .received,
+                transaction.timestamp > lastKnownTxTimestamp
+            else { continue }
+            
+            let satAmount = transaction.amount
+            let btcAmount = satAmount / 100_000_000
+            let message = "You've received \(btcAmount.formatted()) BTC"
+            
+            notificationService.sendLocalNotification(
+                title: "Received BTC (Lightning)",
+                body: message
+            )
+        }
+        
+        if
+            let mostRecentTxTimestamp = transactions.map({ $0.timestamp }).max(),
+            mostRecentTxTimestamp > lastKnownTxTimestamp
+        {
+            UserDefaults.standard.setValue(mostRecentTxTimestamp, forKey: "knownTxTimestamp.btc.lightning")
+        }
     }
 }
 
@@ -53,7 +85,6 @@ extension LightningAdapter: IAdapter {
     }
     
     var blockchainHeight: Int32 {
-        //TODO: - implement blockchainHeight
         manager.bestBlock
     }
 }
@@ -77,8 +108,17 @@ extension LightningAdapter: IBalanceAdapter {
 }
 
 extension LightningAdapter: ITransactionsAdapter {
+    var lastKnownTxTimestamp: Int {
+        UserDefaults.standard.integer(forKey: "knownTxTimestamp.btc.lightning")
+    }
+    
     var transactionRecords: [TransactionRecord] {
-        manager.transactions.sorted(by: { $0.timestamp ?? 1 > $1.timestamp ?? 0 })
+        manager.transactions.map { payment in
+            let data = txDataStorage.fetch(source: .lightning, id: payment.paymentId)
+            let userData = TxUserData(data: data)
+            return LNTransactionRecord(payment: payment, userData: userData)
+        }
+        .sorted(by: { $0.timestamp ?? 1 > $1.timestamp ?? 0 })
     }
     
     var onTxsUpdate: AnyPublisher<Void, Never> {
@@ -100,15 +140,11 @@ extension LightningAdapter: ISendLightningAdapter {
     }
     
     func pay(invoice: String) async throws -> TransactionRecord {
-        try await manager.pay(invoice: invoice)
-    }
-    
-    func pay(invoice: Bolt11Invoice) async throws -> TransactionRecord {
-        try await manager.pay(invoice: invoice)
-    }
-    
-    func createInvoice(paymentHash: String, satAmount: UInt64) async -> Bolt11Invoice? {
-        await manager.createInvoice(paymentHash: paymentHash, satAmount: satAmount)
+        let decodedInvoice = try manager.decode(invoice: invoice)
+        let payment = try await manager.pay(invoice: decodedInvoice)
+        let data = txDataStorage.fetch(source: .lightning, id: payment.paymentId)
+        let userData = TxUserData(data: data)
+        return LNTransactionRecord(payment: payment, userData: userData)
     }
 }
 

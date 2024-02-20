@@ -11,45 +11,64 @@ class AdapterFactory: IAdapterFactory {
     private let appConfigProvider: IAppConfigProvider
     private let ethereumKitManager: EthereumKitManager
     private let lightningKitManager: ILightningKitManager
+    private let txDataStorage: ITxUserDataStorage
+    private let notificationService: INotificationService
 
-    init(appConfigProvider: IAppConfigProvider, ethereumKitManager: EthereumKitManager, lightningKitManager: ILightningKitManager) {
+    init(
+        appConfigProvider: IAppConfigProvider,
+        ethereumKitManager: EthereumKitManager,
+        lightningKitManager: ILightningKitManager,
+        txDataStorage: ITxUserDataStorage,
+        notificationService: INotificationService
+    ) {
         self.appConfigProvider = appConfigProvider
         self.ethereumKitManager = ethereumKitManager
         self.lightningKitManager = lightningKitManager
+        self.txDataStorage = txDataStorage
+        self.notificationService = notificationService
     }
     
-    func adapter(wallet: Wallet) -> IAdapter? {
+    func adapter(wallet: Wallet) throws -> IAdapter {
         switch wallet.coin.type {
         case .bitcoin:
-            do {
-                return try BitcoinAdapter(wallet: wallet)
-            } catch {
-                print("Error getting Bitcoin adapter: \(error)")
-                return nil
-            }
+            return try BitcoinAdapter(
+                wallet: wallet,
+                txDataStorage: txDataStorage,
+                notificationService: notificationService
+            )
         case .lightningBitcoin:
-            return LightningAdapter(wallet: wallet, manager: lightningKitManager)
+            return LightningAdapter(
+                wallet: wallet,
+                manager: lightningKitManager,
+                txDataStorage: txDataStorage, 
+                notificationService: notificationService
+            )
         case .ethereum:
-            if let ethKit = try? ethereumKitManager.kit(account: wallet.account) {
-                return EthereumAdapter(evmKit: ethKit, signer: ethereumKitManager.signer)
-            } else {
-                return nil
-            }
+            let ethKit = try ethereumKitManager.kit(account: wallet.account)
+            
+            return EthereumAdapter(
+                evmKit: ethKit,
+                signer: ethereumKitManager.signer,
+                txDataStorage: txDataStorage,
+                notificationService: notificationService
+            )
         case .erc20(let contractAddress):
-            if let ethKit = try? ethereumKitManager.kit(account: wallet.account) {
-                return try? Erc20Adapter(
-                    evmKit: ethKit,
-                    signer: ethereumKitManager.signer,
-                    token: Erc20Token(
-                        name: wallet.coin.name,
-                        code: wallet.coin.code,
-                        contractAddress: contractAddress,
-                        decimal: wallet.coin.decimal
-                    )
-                )
-            } else {
-                return nil
-            }
+            let ethKit = try ethereumKitManager.kit(account: wallet.account)
+                
+            let token = Erc20Token(
+                name: wallet.coin.name,
+                code: wallet.coin.code,
+                contractAddress: contractAddress,
+                decimal: wallet.coin.decimal
+            )
+            
+            return try Erc20Adapter(
+                evmKit: ethKit,
+                signer: ethereumKitManager.signer,
+                token: token,
+                txDataStorage: txDataStorage,
+                notificationService: notificationService
+            )
         }
     }
 }

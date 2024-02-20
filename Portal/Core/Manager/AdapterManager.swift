@@ -41,7 +41,7 @@ final class AdapterManager {
                 continue
             }
 
-            if let adapter = adapterFactory.adapter(wallet: wallet) {
+            if let adapter = try? adapterFactory.adapter(wallet: wallet) {
                 newAdapters[wallet] = adapter
                 adapter.start()
             }

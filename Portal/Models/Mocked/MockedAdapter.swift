@@ -10,6 +10,8 @@ import Combine
 import BitcoinDevKit
 
 class MockedAdapter: IAdapter, ISendBitcoinAdapter, ITransactionsAdapter, IDepositAdapter, IBalanceAdapter {
+    var lastKnownTxTimestamp: Int = 0
+    
     var onTxsUpdate: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
     
     var pubKey: String {
