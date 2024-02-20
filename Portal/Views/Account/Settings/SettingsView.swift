@@ -10,6 +10,7 @@ import PortalUI
 import Factory
 
 struct SettingsView: View {
+    @State private var notificationsEnabled = false
     @Environment(\.presentationMode) private var presentationMode
     @StateObject var viewModel = SettingsViewViewModel()
     @Environment(NavigationStack.self) var navigation: NavigationStack
@@ -46,6 +47,17 @@ struct SettingsView: View {
                     .contentShape(Rectangle())
                     .onTapGesture {
                         navigation.push(.devUtility)
+                    }
+                }
+                
+                Section(header: Text("Notifications")) {
+                    HStack{
+                        Text("Incoming transactions")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Toggle(isOn: $viewModel.notificationsEnabled) {
+                            EmptyView()
+                        }
+                        .disabled(!notificationsEnabled)
                     }
                 }
                 
@@ -98,6 +110,17 @@ struct SettingsView: View {
             .padding(.horizontal, 6)
             
             Spacer()
+        }
+        .onAppear {
+            Task {
+                notificationsEnabled = await viewModel.isNotificationsEnrolled()
+                guard !notificationsEnabled && viewModel.notificationsEnabled else { return }
+                viewModel.notificationsEnabled = false
+            }
+        }
+        .onReceive(viewModel.notificationsEnrolledPublisher.receive(on: RunLoop.main)) { enabled in
+            guard notificationsEnabled != enabled else { return }
+            notificationsEnabled = enabled
         }
     }
 }
