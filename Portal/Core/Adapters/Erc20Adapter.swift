@@ -84,7 +84,7 @@ class Erc20Adapter {
             let mostRecentTxTimestamp = transactionRecords.compactMap({ $0.timestamp }).max(),
             mostRecentTxTimestamp > lastKnownTxTimestamp
         {
-            UserDefaults.standard.setValue(mostRecentTxTimestamp, forKey: "lastKnownTxTimestamp.eth.erc-20.\(token.code)")
+            UserDefaults.standard.setValue(mostRecentTxTimestamp, forKey: "knownTxTimestamp.eth.erc-20.\(token.code)")
         }
     }
 
