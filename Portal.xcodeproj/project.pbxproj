@@ -1440,7 +1440,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /usr/bin/ruby;
-			shellScript = "api_key = '486f91e1be4e2943b4ef3cf55c4d5372'\n\n# Check if the build is for Release configuration and not for the simulator\nif ENV['CONFIGURATION'] == 'Release' && ENV['PLATFORM_NAME'] != 'iphonesimulator'\n  if ENV['ENABLE_USER_SCRIPT_SANDBOXING'] == 'YES'\n    count = ENV['SCRIPT_INPUT_FILE_COUNT'].to_i\n    abort 'error: dSYMs must be specified as build phase \"Input Files\" because ENABLE_USER_SCRIPT_SANDBOXING is enabled' unless count > 0\n    dsyms = []\n    for i in 0 .. count - 1\n      dsym = ENV[\"SCRIPT_INPUT_FILE_#{i}\"]\n      if File.exist? dsym\n        dsyms.append dsym\n      else\n        abort \"error: cannot read #{dsym}\" unless ENV['DEBUG_INFORMATION_FORMAT'] != 'dwarf-with-dsym'\n      end\n    end\n  else\n    dsyms = Dir[\"#{ENV['DWARF_DSYM_FOLDER_PATH']}/*/Contents/Resources/DWARF/*\"]\n  end\n\n  dsyms.each do |dsym|\n    Process.detach Process.spawn('/usr/bin/curl', '--http1.1',\n      '-F', \"apiKey=#{api_key}\",\n      '-F', \"dsym=@#{dsym}\",\n      '-F', \"projectRoot=#{ENV['PROJECT_DIR']}\",\n      'https://upload.bugsnag.com/'\n    )\n  end\nend\n";
+			shellScript = "api_key = '486f91e1be4e2943b4ef3cf55c4d5372'\n\n# Check if the build is for Release configuration and not for the simulator\nif ENV['CONFIGURATION'] == 'Release'\n  if ENV['ENABLE_USER_SCRIPT_SANDBOXING'] == 'YES'\n    count = ENV['SCRIPT_INPUT_FILE_COUNT'].to_i\n    abort 'error: dSYMs must be specified as build phase \"Input Files\" because ENABLE_USER_SCRIPT_SANDBOXING is enabled' unless count > 0\n    dsyms = []\n    for i in 0 .. count - 1\n      dsym = ENV[\"SCRIPT_INPUT_FILE_#{i}\"]\n      if File.exist? dsym\n        dsyms.append dsym\n      else\n        abort \"error: cannot read #{dsym}\" unless ENV['DEBUG_INFORMATION_FORMAT'] != 'dwarf-with-dsym'\n      end\n    end\n  else\n    dsyms = Dir[\"#{ENV['DWARF_DSYM_FOLDER_PATH']}/*/Contents/Resources/DWARF/*\"]\n  end\n\n  dsyms.each do |dsym|\n    Process.detach Process.spawn('/usr/bin/curl', '--http1.1',\n      '-F', \"apiKey=#{api_key}\",\n      '-F', \"dsym=@#{dsym}\",\n      '-F', \"projectRoot=#{ENV['PROJECT_DIR']}\",\n      'https://upload.bugsnag.com/'\n    )\n  end\nend\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1912,7 +1912,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_ASSET_PATHS = "\"Portal/Preview Content\"";
 				DEVELOPMENT_TEAM = HBPT8C8527;
 				ENABLE_PREVIEWS = YES;
@@ -1958,7 +1958,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_ASSET_PATHS = "\"Portal/Preview Content\"";
 				DEVELOPMENT_TEAM = HBPT8C8527;
 				ENABLE_PREVIEWS = YES;
