@@ -12,6 +12,7 @@ import Mixpanel
 
 @main
 struct Portal: App {
+    @UIApplicationDelegateAdaptor(NotificationDelegate.self) var delegate
     let persistenceController: PersistenceController
     
     init() {
