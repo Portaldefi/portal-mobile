@@ -14,6 +14,7 @@ struct MockedPortalSettings: IPortalSettings {
     private(set) var portfolioCurrency: CurrentValueSubject<Coin, Never> = .init(.bitcoin())
     private(set) var pincodeEnabled: CurrentValueSubject<Bool, Never> = .init(false)
     private(set) var biometricsEnabled: CurrentValueSubject<Bool, Never> = .init(false)
+    private(set) var notificationsEnabled: CurrentValueSubject<Bool, Never> = .init(false)
     
     func updateFiatCurrency(_ currency: FiatCurrency) {
         fiatCurrency.send(currency)
@@ -33,5 +34,9 @@ struct MockedPortalSettings: IPortalSettings {
     
     func updateBiometricsSetting(enabled: Bool) {
         biometricsEnabled.send(enabled)
+    }
+    
+    func updateNotificationsSetting(enabled: Bool) {
+        notificationsEnabled.send(enabled)
     }
 }
