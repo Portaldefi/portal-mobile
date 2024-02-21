@@ -40,7 +40,7 @@ struct WalletItemView: View {
                                 .foregroundColor(.white)
                                 .frame(height: 16)
                             
-                            Text("\(viewModel.coin.code) • \(viewModel.coin.network)")
+                            Text("\(viewModel.coin.network)")
                                 .font(.Main.fixed(.monoRegular, size: 14))
                                 .foregroundColor(Palette.grayScale6A)
                         }
@@ -145,7 +145,7 @@ struct WalletItemView: View {
                         }
                         
                         HStack(spacing: 0) {
-                            Text("\(viewModel.coin.code) • \(viewModel.coin.network)")
+                            Text("\(viewModel.coin.network)")
                                 .font(.Main.fixed(.monoRegular, size: 14))
                                 .foregroundColor(Palette.grayScale6A)
                             
@@ -203,7 +203,7 @@ struct WalletItemView: View {
                         }
                         
                         HStack(spacing: 0) {
-                            Text("\(viewModel.coin.code) • \(viewModel.coin.network)")
+                            Text("\(viewModel.coin.network)")
                                 .font(.Main.fixed(.monoRegular, size: 14))
                                 .foregroundColor(Palette.grayScale6A)
                             
